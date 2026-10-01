@@ -65,27 +65,28 @@
         <h2 class="text-2xl font-extrabold text-navy-800">Selamat datang</h2>
         <p class="text-sm text-slate-500 mt-1 mb-5">Masuk untuk melanjutkan ke portal.</p>
 
-        <!-- Pilih peran -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 rounded-2xl bg-slate-100 mb-5" role="tablist">
-          <button v-for="r in roles" :key="r.k" type="button" role="tab" @click="loginRole=r.k"
-            class="py-2 rounded-xl text-xs sm:text-sm font-bold transition"
-            :class="loginRole===r.k?'bg-navy-700 text-white shadow':'text-slate-500 hover:text-navy-700'">{{r.t}}</button>
+        <p class="text-sm font-semibold text-slate-700 mb-2">Masuk sebagai</p>
+        <div class="grid grid-cols-2 gap-2 mb-5" role="radiogroup" aria-label="Pilih peran">
+          <button v-for="r in roles" :key="r.k" type="button" role="radio" :aria-checked="loginRole===r.k" @click="pilihRole(r.k)"
+            class="text-left rounded-2xl border-2 px-3 py-2.5 transition focus:outline-none focus:ring-4 focus:ring-navy-700/20" :class="loginRole===r.k?'border-navy-700 bg-navy-50':'border-slate-200 bg-white hover:border-slate-300'">
+            <span class="flex items-center gap-2"><svg class="h-5 w-5 shrink-0" :class="loginRole===r.k?'text-navy-700':'text-slate-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="r.i"></svg><span class="text-sm font-bold" :class="loginRole===r.k?'text-navy-800':'text-slate-700'">{{r.t}}</span></span>
+            <span class="block text-[11px] leading-snug mt-1 text-slate-500">{{r.d}}</span></button>
         </div>
-        <p class="text-xs text-slate-500 -mt-2 mb-4">{{roleInfo.hint}}</p>
 
         <label class="text-sm font-semibold text-slate-700">{{roleInfo.label}}</label>
         <div class="relative mt-1 mb-4">
           <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-          <input v-model.trim="f.username" @keyup.enter="login" class="fld" :placeholder="roleInfo.ph" autocomplete="username" autocapitalize="none" spellcheck="false">
+          <input id="in-user" v-model.trim="f.username" @keyup.enter="login" class="fld" :placeholder="roleInfo.ph" autocomplete="username" autocapitalize="none" spellcheck="false">
         </div>
 
         <label class="text-sm font-semibold text-slate-700">Sandi</label>
         <div class="relative mt-1 mb-2">
           <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-          <input v-model="f.password" :type="showPw?'text':'password'" @keyup.enter="login" class="fld pr-14" placeholder="Masukkan sandi" autocomplete="current-password">
+          <input v-model="f.password" :type="showPw?'text':'password'" @keyup.enter="login" @keydown="capsCek" class="fld pr-14" placeholder="Masukkan sandi" autocomplete="current-password">
           <button type="button" @click="showPw=!showPw" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-navy-700 hover:text-navy-900">{{showPw?'Sembunyi':'Lihat'}}</button>
         </div>
 
+        <p v-if="caps" class="text-xs text-amber-600 font-semibold">Caps Lock sedang aktif</p>
         <p v-if="err" class="mt-3 flex gap-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm px-3 py-2"><span class="font-bold">!</span><span>{{err}}</span></p>
 
         <button @click="login" :disabled="busy||!f.username||!f.password"
@@ -103,7 +104,7 @@
         <a v-if="srv==='bad'" :href="API_URL" target="_blank" rel="noopener" class="mt-2 inline-block text-xs font-bold text-navy-700 underline">Uji alamat server</a>
         <p v-if="srv==='bad'&&srvMsg" class="mt-2 text-xs text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{{srvMsg}}</p>
       </div>
-      <p class="text-center text-xs text-slate-500 mt-5">Lupa sandi? Hubungi administrator sekolah.</p>
+      <p class="text-center text-xs text-slate-500 mt-5">{{loginRole==='SISWA'?'Lupa sandi? Hubungi wali kelas atau administrator sekolah.':'Lupa sandi? Hubungi administrator sekolah.'}}</p>
     </div>
   </div>
 </div>
@@ -119,7 +120,7 @@
     <button v-for="m in menu" :key="m.k" @click="go(m.k)" class="group whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium md:mb-1 flex items-center gap-3 transition"
       :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-white/10'">
       <svg class="h-5 w-5 shrink-0 transition" :class="view===m.k?'':'opacity-70 group-hover:opacity-100'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON[m.k]"></svg>
-      <span>{{m.t}}</span></button>
+      <span>{{m.t}}</span><span v-if="m.k==='catatansaya'&&belumBaca" class="ml-auto text-[10px] font-bold bg-rose-500 text-white rounded-full px-1.5">{{belumBaca}}</span></button>
     <button @click="logout" class="whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm text-amber-400 hover:bg-white/10 md:mt-6 flex items-center gap-3">
       <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON.keluar"></svg><span>Keluar</span></button>
   </aside>
@@ -139,10 +140,14 @@
         <p class="text-white/90 text-sm mt-2">{{sub[user.role]}}</p>
       </div>
       <div class="flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
+      <div v-if="dash.catatanBaru" class="rounded-2xl bg-violet-50 border border-violet-200 text-violet-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto">Anda punya <b>{{dash.catatanBaru}}</b> catatan baru dari pimpinan.</span><button @click="go('catatansaya')" class="btn-o !py-1 text-xs">Baca</button></div>
       <div v-if="peng.length||canPost" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-amber-400">
         <div class="flex items-center gap-2 mb-2"><h3 class="font-bold mr-auto">Pengumuman</h3><button v-if="canPost" @click="bukaPeng" class="btn-o !py-1 text-xs">Tulis pengumuman</button></div>
         <p v-if="!peng.length" class="text-sm text-slate-500">Belum ada pengumuman aktif.</p>
         <div v-for="p in peng" :key="p.id" class="py-2 border-t first:border-t-0 flex items-start gap-2"><div class="flex-1 min-w-0"><p class="font-bold text-sm">{{p.judul}}</p><p class="text-sm text-slate-600 whitespace-pre-line">{{p.isi}}</p><p class="text-xs text-slate-400 mt-1">{{fmtTgl(p.tanggal)}} &middot; {{p.olehNama}}<span v-if="p.sampai"> &middot; tayang s/d {{fmtTgl(p.sampai)}}</span></p></div><button v-if="canPost" @click="delPeng(p)" class="text-rose-600 text-xs font-bold">Hapus</button></div></div>
+      <div v-if="agenda.length||canPost" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-navy-700"><div class="flex items-center gap-2 mb-2"><h3 class="font-bold mr-auto">Agenda akademik</h3><button v-if="canPost" @click="bukaAg" class="btn-o !py-1 text-xs">Tambah agenda</button></div>
+        <p v-if="!agenda.length" class="text-sm text-slate-500">Tidak ada agenda dalam 60 hari ke depan.</p>
+        <div v-for="a in agenda" :key="a.id" class="flex items-center gap-2 text-sm py-1.5 border-t first:border-t-0"><span class="w-32 shrink-0 text-slate-500">{{a.tanggal.slice(8)}}/{{a.tanggal.slice(5,7)}}<span v-if="a.sampai&&a.sampai!==a.tanggal"> - {{a.sampai.slice(8)}}/{{a.sampai.slice(5,7)}}</span></span><span class="flex-1"><b>{{a.judul}}</b> <span class="text-xs text-slate-400">{{a.jenis}}</span></span><button v-if="canPost" @click="delAg(a)" class="text-rose-600 text-xs font-bold">Hapus</button></div></div>
       <div v-if="dash.tipe==='SISWA'" class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="card"><b class="n text-blue-900">{{dash.persen}}%</b>Kehadiran</div>
         <div class="card"><b class="n text-amber-600">{{dash.rataNilai==null?'-':dash.rataNilai}}</b>Rata-rata nilai</div>
@@ -683,15 +688,25 @@
           <button @click="savePengaturan" :disabled="busy" class="btn-p mt-5">Simpan pengaturan</button>
         </div>
         <div>
+          <div v-if="ak" class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-1">Bobot nilai &amp; KKM</h3><p class="text-xs text-slate-500 mb-3">Bobot menentukan nilai akhir mapel di Leger (0 = jenis tidak dipakai). Sebelum disimpan, Leger memakai rata-rata biasa.</p>
+            <div class="grid grid-cols-5 gap-2 mb-3"><label v-for="j in JENIS" :key="j" class="lb">{{j}}<input type="number" min="0" max="100" v-model.number="ak.bobot[j]" class="inp w-full mt-1"></label></div>
+            <label class="lb">KKM umum <input type="number" min="0" max="100" v-model.number="ak.def" class="inp w-24 ml-2"></label>
+            <div class="mt-3 max-h-48 overflow-y-auto"><div v-for="m in ak.mapel" :key="m" class="flex items-center gap-2 text-sm py-1"><span class="flex-1">{{m}}</span><input type="number" min="0" max="100" v-model="ak.map[m]" placeholder="umum" class="inp w-20 !py-1"></div></div>
+            <button @click="saveAk" :disabled="busy" class="btn-p mt-3">Simpan bobot &amp; KKM</button></div>
           <div class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-3">Pratinjau</h3><kop :k="cfg.kop"></kop><ttd :t="cfg.ttd"></ttd></div>
           <div class="bg-white rounded-2xl shadow-sm p-5">
-            <h3 class="font-bold mb-2">Backup</h3>
+            <template v-if="bk2"><h3 class="font-bold mb-2">Cadangan otomatis</h3>
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="bk2.aktif?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-800'">{{bk2.aktif?'Aktif - setiap hari pukul 02.00 WIB':'Belum aktif'}}</span>
+            <p class="text-xs text-slate-500 mt-2">{{bk2.terakhir?'Cadangan terakhir: '+bk2.terakhir+'. ':'Belum ada cadangan. '}}Disimpan {{bk2.simpan}} salinan terbaru di Google Drive. Reset data semester otomatis membuat cadangan lebih dulu.</p>
+            <p v-if="!bk2.aktif" class="text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mt-2">Untuk mengaktifkan: buka editor Apps Script, jalankan fungsi <b>pasangBackupOtomatis</b> sekali, lalu setujui izin yang diminta.</p>
+            <div class="mt-2 mb-5"><button @click="backupNow" :disabled="busy" class="btn-o">Cadangkan sekarang</button><a v-if="bk2.url" :href="bk2.url" target="_blank" rel="noopener" class="ml-3 text-blue-800 font-bold underline text-sm">Buka folder cadangan</a></div></template>
+          <h3 class="font-bold mb-2">Unduh manual</h3>
             <button @click="backup" :disabled="busy" class="btn-o">Siapkan unduhan Excel</button>
             <a v-if="backupUrl" :href="backupUrl" target="_blank" rel="noopener" class="ml-3 text-blue-800 font-bold underline">Unduh .xlsx</a>
             <p class="text-xs text-slate-500 mt-2">Berkas berisi seluruh sheet, termasuk hash sandi. Simpan di tempat aman.</p>
             <h3 class="font-bold mt-5 mb-2 text-rose-700">Reset data semester</h3>
             <p class="text-xs text-slate-500 mb-2">Menghapus presensi, nilai, jurnal, dan bimbingan. Siswa, kelas, jadwal, dan akun tetap. Unduh backup dulu.</p>
-            <input v-model.trim="resetTxt" placeholder="Ketik RESET" class="inp mr-2"><button @click="resetSem" :disabled="busy||resetTxt!=='RESET'" class="rounded-xl bg-rose-600 text-white px-4 py-2 text-sm font-bold disabled:opacity-40">Reset</button>
+            <input v-model.trim="resetLabel" maxlength="40" placeholder="Label arsip, mis. 2026-2027 Ganjil" class="inp w-full mb-2"><input v-model.trim="resetTxt" placeholder="Ketik RESET" class="inp mr-2"><button @click="resetSem" :disabled="busy||resetTxt!=='RESET'||resetLabel.length<3" class="rounded-xl bg-rose-600 text-white px-4 py-2 text-sm font-bold disabled:opacity-40">Reset</button>
           </div>
         </div>
       </div>
@@ -708,8 +723,8 @@
       <div v-if="leger.mapel.length" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-xs">
         <thead class="bg-slate-50 text-left"><tr><th class="p-2">No</th><th>NIS</th><th>Nama</th><th v-for="m in leger.mapel" :key="m">{{m}}</th><th>Rata-rata</th></tr></thead>
         <tbody><tr v-for="(r,i) in leger.siswa" :key="r.nis" class="border-t"><td class="p-2">{{i+1}}</td><td>{{r.nis}}</td><td>{{r.nama}}</td>
-          <td v-for="m in leger.mapel" :key="m" :class="r.nilai[m]!=null&&r.nilai[m]<75?'text-rose-600 font-bold':''">{{r.nilai[m]==null?'-':r.nilai[m]}}</td><td class="font-bold">{{r.rata==null?'-':r.rata}}</td></tr></tbody></table></div>
-      <p v-if="leger.mapel.length" class="text-xs text-slate-500 mt-2">Setiap sel adalah rata-rata seluruh skor mapel tersebut. Rata-rata akhir adalah rata-rata dari mapel yang sudah bernilai. Angka merah = di bawah 75.</p>
+          <td v-for="m in leger.mapel" :key="m"   :class="r.nilai[m]!=null&&r.nilai[m]<kkmOf(m)?'text-rose-600 font-bold':''">{{r.nilai[m]==null?'-':r.nilai[m]}}</td><td class="font-bold">{{r.rata==null?'-':r.rata}}</td></tr></tbody></table></div>
+      <p v-if="leger.mapel.length" class="text-xs text-slate-500 mt-2">Setiap sel adalah rata-rata seluruh skor mapel tersebut. Rata-rata akhir adalah rata-rata dari mapel yang sudah bernilai. Angka merah = di bawah KKM mapel.</p>
       <div v-if="leger.mapel.length" class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
     </section>
 
@@ -769,10 +784,47 @@
           <tbody><tr v-for="w in mon.wali" :key="w.kelas" class="border-t"><td class="p-3 font-semibold">{{w.kelas}}</td><td :class="w.wali?'':'text-rose-600'">{{w.waliNama||'Belum ada wali'}}</td><td>{{w.siswa}}</td><td>{{w.persen==null?'-':w.persen+'%'}}</td><td>{{w.bimbingan}}</td><td>{{w.dibina}}</td></tr></tbody></table></div>
         <div class="bg-white rounded-2xl shadow-sm p-4"><h3 class="font-bold mb-2">Siswa perlu perhatian <span class="text-xs font-normal text-slate-500">(alpa &ge; 3 atau hadir &lt; 75%)</span></h3>
           <p v-if="!mon.risiko.length" class="text-sm text-slate-500">Tidak ada siswa berisiko pada bulan ini.</p>
-          <div v-for="r in mon.risiko" :key="r.nis" class="flex justify-between text-sm py-1.5 border-t first:border-t-0"><span>{{r.nama}} <span class="text-slate-400">({{r.kelas}})</span></span><span><b class="text-rose-600">{{r.alpa}} alpa</b> <span class="text-slate-500">&middot; {{r.persen}}% dari {{r.hari}} sesi</span></span></div></div>
+          <div v-for="r in mon.risiko" :key="r.nis" class="flex flex-wrap justify-between gap-1 text-sm py-1.5 border-t first:border-t-0"><span>{{r.nama}} <span class="text-slate-400">({{r.kelas}})</span></span><span><b class="text-rose-600">{{r.alpa}} alpa</b> <span class="text-slate-500">&middot; {{r.persen}}% dari {{r.hari}} sesi</span> <a v-if="waLink(r)" :href="waLink(r)" target="_blank" rel="noopener noreferrer" class="btn-o !py-0.5 !px-2 text-xs ml-2">Hubungi orang tua</a><span v-else class="text-xs text-slate-400 ml-2">Kontak belum diisi</span></span></div></div>
       </template>
     </section>
 
+    <section v-if="view==='izin'">
+      <h2 class="h2">{{user.role==='SISWA'?'Pengajuan Izin':'Izin Siswa'}}</h2>
+      <div v-if="user.role==='SISWA'" class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3">
+        <label class="lb">Tanggal<input type="date" v-model="iz.tanggal" :min="hari0" class="inp w-full mt-1"></label>
+        <label class="lb">Jenis<select v-model="iz.jenis" class="inp w-full mt-1 normal-case"><option value="I">Izin</option><option value="S">Sakit</option></select></label>
+        <label class="lb sm:col-span-2">Alasan<input v-model.trim="iz.alasan" maxlength="200" placeholder="mis. demam, acara keluarga" class="inp w-full mt-1 normal-case"></label>
+        <button @click="saveIzin" :disabled="busy||!iz.alasan" class="btn-p sm:col-span-4 sm:w-48">Kirim pengajuan</button></div>
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th v-if="user.role!=='SISWA'">Siswa</th><th>Jenis</th><th>Alasan</th><th>Status</th><th v-if="user.role!=='SISWA'"></th></tr></thead>
+        <tbody><tr v-for="z in izlist" :key="z.id" class="border-t"><td class="p-3 whitespace-nowrap">{{z.tanggal}}</td><td v-if="user.role!=='SISWA'">{{z.nama}} <span class="text-slate-400">({{z.kelas}})</span></td><td>{{z.jenis==='S'?'Sakit':'Izin'}}</td><td>{{z.alasan}}</td>
+          <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="z.status==='Disetujui'?'bg-emerald-100 text-emerald-700':z.status==='Ditolak'?'bg-rose-100 text-rose-700':'bg-amber-100 text-amber-800'">{{z.status}}</span></td>
+          <td v-if="user.role!=='SISWA'" class="pr-3 whitespace-nowrap"><template v-if="z.status==='Menunggu'"><button @click="putusIzin(z,'Disetujui')" class="text-emerald-700 font-bold mr-3">Setujui</button><button @click="putusIzin(z,'Ditolak')" class="text-rose-600 font-bold">Tolak</button></template></td></tr>
+        <tr v-if="!izlist.length"><td colspan="6" class="p-4 text-slate-500">Belum ada pengajuan.</td></tr></tbody></table></div>
+      <p class="text-xs text-slate-500 mt-2">Izin yang disetujui otomatis terisi di form presensi pada tanggal tersebut. Persetujuan dilakukan oleh wali kelas.</p>
+    </section>
+    <!-- Catatan pimpinan -> guru -->
+    <section v-if="view==='catatan'">
+      <h2 class="h2">Catatan untuk Guru</h2>
+      <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-[1fr_2fr] gap-3">
+        <label class="lb">Guru penerima<select v-model="cg.guru" class="inp w-full mt-1 normal-case"><option value="">-- Pilih guru --</option><option v-for="g in guru" :key="g.username" :value="g.username">{{g.nama}}</option></select></label>
+        <label class="lb">Catatan, apresiasi, atau arahan<textarea v-model.trim="cg.isi" maxlength="1000" rows="3" placeholder="Hanya dapat dibaca guru yang bersangkutan" class="inp w-full mt-1 normal-case"></textarea></label>
+        <button @click="saveCatatan" :disabled="busy||!cg.guru||!cg.isi" class="btn-p sm:col-span-2 sm:w-48">Kirim catatan</button></div>
+      <div class="flex flex-wrap items-center gap-2 mb-3"><select v-model="cgf" class="inp"><option value="">Semua guru</option><option v-for="g in guru" :key="g.username" :value="g.username">{{g.nama}}</option></select><span class="text-sm text-slate-500">{{cgTampil.length}} catatan</span></div>
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Guru</th><th>Catatan</th><th>Status</th><th>Dari</th><th></th></tr></thead>
+        <tbody><tr v-for="c in cgTampil" :key="c.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{c.tanggal}}</td><td class="font-semibold">{{c.guruNama}}</td><td class="whitespace-pre-line">{{c.isi}}</td>
+          <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="c.dibaca?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-800'">{{c.dibaca?'Sudah dibaca':'Belum dibaca'}}</span></td><td>{{c.olehNama}}</td>
+          <td class="pr-3"><button @click="delCatatan(c)" class="text-rose-600 font-bold">Hapus</button></td></tr>
+        <tr v-if="!cgTampil.length"><td colspan="6" class="p-4 text-slate-500">Belum ada catatan.</td></tr></tbody></table></div>
+    </section>
+    <section v-if="view==='catatansaya'">
+      <h2 class="h2">Catatan Pimpinan</h2>
+      <p v-if="!cglist.length" class="text-sm text-slate-500">Belum ada catatan untuk Anda.</p>
+      <div v-for="c in cglist" :key="c.id" class="bg-white rounded-2xl shadow-sm p-4 mb-3 border-l-4" :class="c.dibaca?'border-slate-200':'border-violet-500'">
+        <p class="text-sm whitespace-pre-line">{{c.isi}}</p>
+        <p class="text-xs text-slate-400 mt-2">{{fmtTgl(c.tanggal)}} &middot; {{c.olehNama}}<span v-if="!c.dibaca" class="ml-2 font-bold text-violet-600">Baru</span></p></div>
+    </section>
     <!-- Ganti sandi -->
     <section v-if="view==='sandi'" class="max-w-sm">
       <h2 class="h2">Ganti Sandi</h2>
@@ -799,6 +851,13 @@
       <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p>
       <div class="flex justify-end gap-2 mt-4"><button @click="showPg=false" class="btn-o">Batal</button><button @click="savePeng" :disabled="busy||!pf.judul||!pf.isi" class="btn-p">Publikasikan</button></div></div></div>
     <div v-if="kartu" class="kartu-wrap"><div v-for="s in kartu.siswa" :key="s.nis" class="kartu"><p class="font-bold">Portal Akademik SMK CALM</p><p>{{s.nama}} &middot; {{kartu.kelas}}</p><p>Username (NIS): <b>{{s.nis}}</b></p><p>Sandi awal: <b>{{s.sandi||'sudah diganti, minta reset ke admin'}}</b></p></div></div>
+    <div v-if="showAg" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <h3 class="font-extrabold text-blue-900 mb-4">Tambah agenda akademik</h3>
+      <input v-model.trim="af.judul" maxlength="100" placeholder="Judul, mis. Penilaian Tengah Semester" class="inp w-full mb-3">
+      <select v-model="af.jenis" class="inp w-full mb-3"><option>Ujian</option><option>Libur</option><option>Kegiatan</option><option>Rapat</option></select>
+      <div class="grid grid-cols-2 gap-3"><label class="lb">Mulai<input type="date" v-model="af.tanggal" :min="hari0" class="inp w-full mt-1"></label><label class="lb">Selesai (opsional)<input type="date" v-model="af.sampai" :min="af.tanggal||hari0" class="inp w-full mt-1"></label></div>
+      <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p>
+      <div class="flex justify-end gap-2 mt-4"><button @click="showAg=false" class="btn-o">Batal</button><button @click="saveAg" :disabled="busy||!af.judul||!af.tanggal" class="btn-p">Simpan</button></div></div></div>
     <footer class="mt-10 pb-4 text-center text-xs text-slate-400 noprint">&copy; 2026 SMKS Ciledug Al-Musaddadiyah Garut</footer>
   </main>
 </div>
@@ -832,14 +891,20 @@ const app = createApp({
     const tanggal = ref(new Date().toLocaleDateString('sv-SE')), rows = ref([]), riwayat = ref([]);
     const f = reactive({ username: '', password: '' }), pw = reactive({ nis: '', lama: '', baru: '', konf: '' });
     const err = ref(''), ok = ref(''), busy = ref(false);
-    const loginRole = ref('ADMIN'), showPw = ref(false), srv = ref('wait'), srvMsg = ref('');
-    const roles = [{ k: 'ADMIN', t: 'Administrator' }, { k: 'GURU', t: 'Guru / Staff' }, { k: 'KEPSEK', t: 'Kepala Sekolah' }, { k: 'SISWA', t: 'Siswa' }];
+    const loginRole = ref((() => { try { const v = localStorage.getItem('lr'); return ['ADMIN', 'GURU', 'KEPSEK', 'SISWA'].includes(v) ? v : 'SISWA'; } catch (e) { return 'SISWA'; } })()), caps = ref(false), showPw = ref(false), srv = ref('wait'), srvMsg = ref('');
+    const roles = [
+      { k: 'ADMIN', t: 'Administrator', d: 'Kelola data induk sekolah', i: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>' },
+      { k: 'GURU', t: 'Guru / Staff', d: 'Presensi, nilai, dan jurnal', i: '<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2ZM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7Z"/>' },
+      { k: 'KEPSEK', t: 'Kepala Sekolah', d: 'Pantau kinerja sekolah', i: '<path d="M3 21h18M5 21V10l7-6 7 6v11M9 21v-6h6v6"/>' },
+      { k: 'SISWA', t: 'Siswa', d: 'Kehadiran, nilai, dan jadwal', i: '<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>' }];
     const ROLE_INFO = {
       ADMIN: { label: 'Username', ph: 'admin', hint: 'Akses penuh untuk mengelola data sekolah.' },
       GURU: { label: 'Username guru / staff', ph: 'username dari administrator', hint: 'Untuk guru, wali kelas, dan staf pengajar.' },
       KEPSEK: { label: 'Username kepala sekolah', ph: 'username dari administrator', hint: 'Memantau kinerja guru, wali kelas, dan siswa.' },
       SISWA: { label: 'NIS', ph: 'Nomor Induk Siswa', hint: 'Siswa masuk dengan NIS dan sandi awal dari sekolah.' } };
     const roleInfo = computed(() => ROLE_INFO[loginRole.value]);
+    const pilihRole = k => { loginRole.value = k; f.username = ''; f.password = ''; err.value = ''; try { localStorage.setItem('lr', k); } catch (e) { /* penyimpanan dinonaktifkan */ } Vue.nextTick(() => { const el = document.getElementById('in-user'); if (el) el.focus(); }); };
+    const capsCek = e => { caps.value = !!(e.getModifierState && e.getModifierState('CapsLock')); };
     const badge = { ADMIN: { t: 'ADMINISTRATOR', c: 'bg-navy-700 text-white' }, GURU: { t: 'GURU / PENGAJAR', c: 'bg-emerald-500 text-white' }, KEPSEK: { t: 'KEPALA SEKOLAH', c: 'bg-violet-600 text-white' }, SISWA: { t: 'SISWA', c: 'bg-amber-400 text-slate-900' } };
     const sc = { H: 'bg-emerald-500', I: 'bg-blue-600', S: 'bg-amber-500', A: 'bg-rose-600', D: 'bg-violet-600' };
     const lbl = { H: 'HADIR', I: 'IZIN', S: 'SAKIT', A: 'ALPA', D: 'DISPENSASI' };
@@ -847,11 +912,11 @@ const app = createApp({
     const acc = { KEPSEK: 'bg-violet-600 text-white', ADMIN: 'bg-navy-700 text-white', GURU: 'bg-emerald-600 text-white', SISWA: 'bg-amber-400 text-slate-900' };
     const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', SISWA: 'from-navy-900 to-navy-600' };
     const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.' };
-    const quick = { KEPSEK: ['monitor', 'presensi', 'leger', 'jadwal'], ADMIN: ['siswa', 'guru', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
+    const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
     const clock = ref(''), tick = () => clock.value = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
     tick(); setInterval(tick, 1000);
-    const M = { guru: 'Kelola Guru', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
-    const MENU = { ADMIN: ['dashboard', 'monitor', 'kelas', 'siswa', 'guru', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'jadwal', 'presensi', 'leger', 'jurnal', 'dokumen', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'nilaisaya', 'bimbingansaya', 'sandi'] };
+    const M = { guru: 'Kelola Guru', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
+    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'jurnal', 'dokumen', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -868,7 +933,7 @@ const app = createApp({
       riwayat: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
       nilaisaya: '<circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 8 5-3 5 3-1.5-8"/>',
       keluar: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>' };
-    ICON.bimbingansaya = ICON.bimbingan;
+    ICON.bimbingansaya = ICON.catatan = ICON.catatansaya = ICON.bimbingan; ICON.izin = ICON.dokumen;
     ICON.guru = '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/><path d="M17 3l2 2 3-3"/>';
     ICON.monitor = '<path d="M3 12h4l3-8 4 16 3-8h4"/>';
     const menu = computed(() => user.value ? MENU[user.value.role].map(k => ({ k, t: M[k] })) : []);
@@ -926,7 +991,7 @@ const app = createApp({
     function logout() { token.value = ''; user.value = null; sessionStorage.clear(); }
     const go = k => run(async () => {
       view.value = k; dash.value = null; q.value = ''; toTop();
-      if (k === 'dashboard') { dash.value = await api('dashboard'); await fetchPeng(); }
+      if (k === 'dashboard') { dash.value = await api('dashboard'); belumBaca.value = dash.value.catatanBaru || 0; await fetchPeng(); await fetchAg(); }
       if (k === 'presensi') {
         cfg.value = await api('pengaturanGet'); pilih.value = await api('presensiPilihan'); ptab.value = canInput.value ? 'input' : 'rekap';
         rows.value = []; rk.value = null; prRes.value = pgRes.value = prwRes.value = null; Object.assign(pi, { tanggal: hari0, kelas: '', mapel: '', ada: false });
@@ -942,11 +1007,14 @@ const app = createApp({
       if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; pilIdx.value = ''; }
       if (k === 'jurnal') { if (canWrite.value) pil.value = await api('pilihanNilai'); cfg.value = await api('pengaturanGet'); await fetchJ(); }
       if (k === 'bimbingan') { bk.value = await api('bimbinganKelas'); cfg.value = await api('pengaturanGet'); await fetchB(); }
-      if (k === 'pengaturan') { cfg.value = await api('pengaturanGet'); backupUrl.value = ''; }
+      if (k === 'pengaturan') { cfg.value = await api('pengaturanGet'); backupUrl.value = ''; bk2.value = await api('backupStatus').catch(() => null); ak.value = await api('akademikGet').catch(() => null); }
       if (k === 'bimbingansaya') await fetchB();
       if (k === 'leger') { cfg.value = await api('pengaturanGet'); lk.value = await api('legerKelas'); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
       if (k === 'dokumen') await fetchD();
       if (k === 'nilaisaya') nilaiSaya.value = await api('nilaiSaya');
+      if (k === 'izin') await fetchIz();
+      if (k === 'catatan') { guru.value = await api('guruList'); await fetchCg(); }
+      if (k === 'catatansaya') { await fetchCg(); await api('catatanGuruBaca'); belumBaca.value = 0; }
       if (k === 'sandi') Object.assign(pw, { nis: user.value.username, lama: '', baru: '', konf: '' });
     });
     const ganti = () => run(async () => {
@@ -1054,7 +1122,7 @@ const app = createApp({
     const backup = () => run(async () => { backupUrl.value = (await api('backup')).url; });
     const resetSem = () => run(async () => {
       if (!confirm('Hapus SELURUH data presensi, nilai, jurnal, dan bimbingan? Tidak bisa dibatalkan.')) return;
-      await api('resetSemester', { konfirmasi: resetTxt.value }); resetTxt.value = ''; ok.value = 'Data semester direset';
+      await api('resetSemester', { konfirmasi: resetTxt.value, label: resetLabel.value }); resetTxt.value = resetLabel.value = ''; ok.value = 'Data semester diarsipkan ke Drive dan direset';
     });
 
     const fetchD = async () => dokumen.value = await api('dokumenList', { q: q.value });
@@ -1264,6 +1332,33 @@ const app = createApp({
       saveXlsx('Rekap_Presensi_' + (h ? pr.tanggal : pr.bulan) + '.xlsx', [['Rekap', aoa, [5, 12, 14, 22, 10, 8, 6, 6, 6, 6, 6, 9]]]); ok.value = 'Rekap diekspor';
     });
 
+    /* ====== v3.6: izin siswa, agenda, bobot & KKM, arsip ====== */
+    const izlist = ref([]), iz = reactive({ tanggal: hari0, jenis: 'I', alasan: '' }), fetchIz = async () => izlist.value = await api('izinList');
+    const saveIzin = () => run(async () => { await api('izinSave', { ...iz }); iz.alasan = ''; await fetchIz(); ok.value = 'Pengajuan terkirim ke wali kelas'; });
+    const putusIzin = (z, st) => run(async () => { await api('izinPutus', { id: z.id, status: st }); await fetchIz(); ok.value = 'Izin ' + st.toLowerCase(); });
+    const agenda = ref([]), showAg = ref(false), af = reactive({ judul: '', jenis: 'Ujian', tanggal: '', sampai: '' });
+    const fetchAg = async () => { try { agenda.value = await api('agendaList'); } catch (e) { agenda.value = []; } };
+    const bukaAg = () => { err.value = ''; Object.assign(af, { judul: '', jenis: 'Ujian', tanggal: '', sampai: '' }); showAg.value = true; };
+    const saveAg = () => run(async () => { await api('agendaSave', { ...af }); showAg.value = false; await fetchAg(); ok.value = 'Agenda ditambahkan'; });
+    const delAg = a => confirm('Hapus agenda "' + a.judul + '"?') && run(async () => { await api('agendaDelete', { id: a.id }); await fetchAg(); });
+    const JENIS = ['Harian', 'Tugas', 'Praktik', 'UTS', 'UAS'], ak = ref(null), resetLabel = ref('');
+    const saveAk = () => run(async () => {
+      const t = JENIS.reduce((a, j) => a + (Number(ak.value.bobot[j]) || 0), 0); if (t <= 0) throw new Error('Total bobot harus lebih dari 0');
+      await api('akademikSave', { bobot: ak.value.bobot, def: ak.value.def, map: ak.value.map }); ok.value = 'Bobot dan KKM tersimpan';
+    });
+    const kkmOf = m => { const k = leger.value.kkm; return k ? (k.map[m] || k.def) : 75; };
+
+    /* ====== v3.5: cadangan otomatis ====== */
+    const bk2 = ref(null);
+    const backupNow = () => run(async () => { const d = await api('backupSekarang'); bk2.value = await api('backupStatus'); ok.value = 'Cadangan dibuat: ' + d.nama; });
+
+    /* ====== v3.4: catatan pimpinan untuk guru ====== */
+    const cglist = ref([]), cg = reactive({ guru: '', isi: '' }), cgf = ref(''), belumBaca = ref(0);
+    const cgTampil = computed(() => cglist.value.filter(c => !cgf.value || c.guru === cgf.value));
+    const fetchCg = async () => cglist.value = await api('catatanGuruList');
+    const saveCatatan = () => run(async () => { await api('catatanGuruSave', { guru: cg.guru, isi: cg.isi }); cg.isi = ''; await fetchCg(); ok.value = 'Catatan terkirim ke guru'; });
+    const delCatatan = c => confirm('Hapus catatan untuk ' + c.guruNama + '?') && run(async () => { await api('catatanGuruDelete', { id: c.id }); await fetchCg(); });
+
     /* ====== v3.3: pengumuman, kartu login, edit jurnal ====== */
     const peng = ref([]), showPg = ref(false), pf = reactive({ judul: '', isi: '', sampai: '' }), kartu = ref(null);
     const canPost = computed(() => !!user.value && ['ADMIN', 'KEPSEK'].includes(user.value.role));
@@ -1283,6 +1378,12 @@ const app = createApp({
     /* ====== Monitoring (Kepala Sekolah & Admin) ====== */
     const mon = ref(null), monBulan = ref(hari0.slice(0, 7));
     const bandMax = computed(() => mon.value ? Math.max(0, ...mon.value.bands.map(b => b.n)) : 0);
+    const waLink = r => { // nomor Indonesia: 08xx / 8xx / 62xx / +62xx -> wa.me/62xx
+      let n = String(r.kontak || '').replace(/\D/g, ''); if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n;
+      if (!/^62\d{8,13}$/.test(n)) return '';
+      const t = 'Yth. Bapak/Ibu orang tua/wali dari ' + r.nama + ' (' + r.kelas + '). Kami dari SMK CALM menginformasikan bahwa pada ' + fmtBln(mon.value.bulan) + ' ananda tercatat alpa ' + r.alpa + ' kali dengan kehadiran ' + r.persen + '%. Mohon kerja samanya untuk memantau kehadiran ananda. Terima kasih.';
+      return 'https://wa.me/' + n + '?text=' + encodeURIComponent(t);
+    };
     const fetchMon = async () => mon.value = await api('monitor', { bulan: monBulan.value });
     const loadMon = () => run(fetchMon);
 
@@ -1296,7 +1397,7 @@ const app = createApp({
       parent.postMessage({ calmHeight: Math.ceil(h) + 24 }, '*');
     }, 600);
 
-    return { API_URL, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, resetSiswa, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, resetSiswa, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
