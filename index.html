@@ -104,7 +104,7 @@
         <a v-if="srv==='bad'" :href="API_URL" target="_blank" rel="noopener" class="mt-2 inline-block text-xs font-bold text-navy-700 underline">Uji alamat server</a>
         <p v-if="srv==='bad'&&srvMsg" class="mt-2 text-xs text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{{srvMsg}}</p>
       </div>
-      <p class="text-center text-xs text-slate-500 mt-5">{{loginRole==='SISWA'?'Lupa sandi? Hubungi wali kelas atau administrator sekolah.':'Lupa sandi? Hubungi administrator sekolah.'}}</p>
+      <p class="text-center text-xs text-slate-500 mt-5">Lupa sandi? Hubungi administrator sekolah.</p>
     </div>
   </div>
 </div>
@@ -420,7 +420,7 @@
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th v-if="canEdit" class="p-3 w-8"><input type="checkbox" :checked="semuaDipilih" @change="pilihSemua($event.target.checked)" aria-label="Pilih semua siswa"></th><th :class="canEdit?'':'p-3'">NIS</th><th>Nama</th><th>L/P</th><th>Kelas</th><th>Kontak</th><th v-if="canEdit"></th></tr></thead>
         <tbody><tr v-for="s in siswaTampil" :key="s.nis" class="border-t"><td v-if="canEdit" class="p-3"><input type="checkbox" :value="s.nis" v-model="pilihNis" :aria-label="'Pilih '+s.nama"></td><td :class="canEdit?'':'p-3'">{{s.nis}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td>
-          <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editSiswa(s)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="resetSiswa(s)" class="text-amber-600 font-bold mr-3">Reset sandi</button><button @click="delSiswa(s)" class="text-rose-600 font-bold">Hapus</button></td></tr>
+          <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editSiswa(s)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delSiswa(s)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!siswaTampil.length"><td :colspan="canEdit?7:5" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':canEdit?'Belum ada siswa. Klik Tambah siswa atau Impor Excel.':'Belum ada data siswa.'}}</td></tr></tbody></table></div>
 
       <!-- Form tambah/ubah -->
@@ -487,7 +487,7 @@
           <td class="p-3 font-semibold">{{g.nama}}</td><td>{{g.username}}</td>
           <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[g.role]">{{ROLE_LBL[g.role]}}</span></td>
           <td>{{g.wali.join(', ')||'-'}}</td><td class="max-w-[14rem]">{{g.kelasAjar.join(', ')||'-'}}</td><td class="text-center">{{g.jam}}</td>
-          <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editGuru(g)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="resetGuru(g)" class="text-amber-600 font-bold mr-3">Reset sandi</button><button @click="delGuru(g)" class="text-rose-600 font-bold">Hapus</button></td></tr>
+          <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editGuru(g)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delGuru(g)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!guruTampil.length"><td :colspan="canEdit?7:6" class="p-4 text-slate-500">{{gdata.length?'Tidak ada akun yang cocok dengan filter.':canEdit?'Belum ada guru. Klik Tambah guru atau Impor Excel.':'Belum ada data guru.'}}</td></tr></tbody></table></div>
       <p v-if="canEdit" class="text-xs text-slate-500 mt-2">Guru yang dipilih sebagai wali kelas otomatis dapat mengisi Bimbingan Wali untuk kelasnya.</p>
 
@@ -1277,9 +1277,6 @@ const app = createApp({
       if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi, role: gf.role }]);
       ok.value = gf.edit ? 'Data guru diperbarui' : 'Akun guru dibuat';
     });
-    const resetGuru = g => confirm('Atur ulang sandi ' + g.nama + '? Sandi lama tidak berlaku dan sesi login guru ini dihentikan.') && run(async () => {
-      const d = await api('resetSandi', { username: g.username }); showKred('Sandi baru ' + d.nama, [{ username: d.username, nama: d.nama, sandi: d.sandi, role: g.role }]);
-    });
     const delGuru = g => confirm('Hapus akun ' + g.nama + '? Status wali kelasnya ikut dilepas.') && run(async () => { await api('guruDelete', { username: g.username }); await refreshGuru(); ok.value = 'Akun dihapus'; });
     const exportGuru = () => run(async () => {
       const aoa = [['No', 'Username', 'Nama', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, ROLE_LBL[g.role] || 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
@@ -1351,9 +1348,6 @@ const app = createApp({
       if (pilihNis.value.length > 300) throw new Error('Maksimal 300 siswa per proses');
       const d = await api('siswaPindah', { nis: pilihNis.value, kelas: kelasTujuan.value });
       showP.value = false; pilihNis.value = []; siswa.value = await api('siswaList'); await refresh(); ok.value = d.dipindah + ' siswa dipindahkan';
-    });
-    const resetSiswa = s => confirm('Atur ulang sandi ' + s.nama + '? Sandi lama tidak berlaku.') && run(async () => {
-      const d = await api('resetSandi', { username: s.nis }); showKred('Sandi baru ' + d.nama, [{ username: d.username, nama: d.nama, sandi: d.sandi, role: 'SISWA', kelas: s.kelas, kontak: s.kontak }]);
     });
     const presensiCepat = j => go('presensi').then(() => { Object.assign(pi, { tanggal: hari0, kelas: j.kelas, mapel: j.mapel }); loadPresensi(); });
     const exportLeger = () => run(async () => {
@@ -1434,8 +1428,8 @@ const app = createApp({
     Vue.watch([akq, akrole, akkelas], () => { akpilih.value = []; });
     const withKontak = l => l.map(c => ({ ...c, kontak: (akMap.value.get(c.username) || {}).kontak || '' }));
     const kirimAkun = async (aksi, names) => { let h = [], gagal = ''; try { for (let i = 0; i < names.length; i += 50) h = h.concat(await api(aksi, { usernames: names.slice(i, i + 50) })); } catch (e) { gagal = niceErr(e.message); } return { h, gagal }; };
-    const hasilAkun = async (judul, { h, gagal }) => { // sandi yang sudah dibuat tetap ditampilkan walau satu paket gagal
-      if (h.length) { try { await fetchAkun(); } catch (e) { /* dimuat ulang saat menu dibuka */ } akpilih.value = []; showKred(judul, withKontak(h)); }
+    const hasilAkun = async (judul, { h, gagal }) => { // sandi yang sudah dibuat tetap ditampilkan walau satu paket gagal; status lokal diperbarui tanpa memuat ulang daftar
+      if (h.length) { h.forEach(c => { const a = akMap.value.get(c.username); if (a) a.awal = true; }); akpilih.value = []; showKred(judul, withKontak(h)); }
       if (gagal) throw new Error(gagal + (h.length ? ' (' + h.length + ' akun sudah diproses dan ditampilkan)' : ''));
     };
     const konfirmReset = names => confirm('Atur ulang sandi ' + names.length + ' akun? Sandi lama tidak berlaku dan sesi login mereka dihentikan.') && run(async () => {
@@ -1467,11 +1461,11 @@ const app = createApp({
       parent.postMessage({ calmHeight: Math.ceil(h) + 24 }, '*');
     }, 600);
 
-    return { canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, resetSiswa, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
-      jhari, jq, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, resetGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax,
+      jhari, jq, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax,
       leger, lk, lkelas, dokumen, showD, df, loadDok, loadLeger, saveDok, delDok,
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
