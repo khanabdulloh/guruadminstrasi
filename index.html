@@ -44,31 +44,45 @@
       <span class="inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span>
     </div>
     <button v-for="m in menu" :key="m.k" @click="go(m.k)" class="whitespace-nowrap md:w-full text-left px-3 py-2 rounded-xl text-sm font-medium md:mb-1"
-      :class="view===m.k?'bg-blue-800 text-white shadow-inner':'hover:bg-slate-800'">{{m.t}}</button>
+      :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-slate-800'">{{m.t}}</button>
     <button @click="logout" class="whitespace-nowrap md:w-full text-left px-3 py-2 rounded-xl text-sm text-amber-400 hover:bg-slate-800 md:mt-6">Keluar</button>
   </aside>
 
   <main class="flex-1 p-4 md:p-8 max-w-5xl">
+    <div class="flex items-center gap-2 mb-4 noprint"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span><span class="text-sm text-slate-500">{{user.nama}}</span></div>
     <p v-if="err" class="mb-4 rounded-xl bg-rose-50 text-rose-700 text-sm px-4 py-2">{{err}}</p>
     <p v-if="ok" class="mb-4 rounded-xl bg-emerald-50 text-emerald-700 text-sm px-4 py-2">{{ok}}</p>
 
     <!-- Dashboard -->
     <section v-if="view==='dashboard' && dash">
-      <div class="rounded-2xl bg-gradient-to-r from-blue-900 to-blue-700 text-white p-6 mb-6">
+      <div class="rounded-2xl bg-gradient-to-r text-white p-6 mb-4" :class="heroCls[user.role]">
+        <p class="text-xs font-bold opacity-80">{{badge[user.role].t}}<span v-if="user.role==='SISWA'&&user.kelas">, Kelas {{user.kelas}}</span></p>
         <h2 class="text-2xl font-extrabold">Halo, {{user.nama}}!</h2>
-        <p class="text-blue-100 text-sm">{{tgl}}</p>
+        <p class="text-white/80 text-sm">{{tgl}}, pukul {{clock}} WIB</p>
+        <p class="text-white/90 text-sm mt-2">{{sub[user.role]}}</p>
       </div>
+      <div class="flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
       <div v-if="dash.tipe==='SISWA'" class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="card"><b class="n text-blue-900">{{dash.persen}}%</b>Kehadiran</div>
-        <div class="card"><b class="n">{{dash.I}}</b>Izin</div>
-        <div class="card"><b class="n">{{dash.S}}</b>Sakit</div>
+        <div class="card"><b class="n text-amber-600">{{dash.rataNilai==null?'-':dash.rataNilai}}</b>Rata-rata nilai</div>
+        <div class="card"><b class="n">{{dash.I+dash.S}}</b>Izin dan sakit</div>
         <div class="card"><b class="n text-rose-600">{{dash.A}}</b>Alpa</div>
+      </div>
+      <div v-else-if="dash.tipe==='GURU'" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="card"><b class="n">{{dash.kelasAjar}}</b>Kelas ajar</div>
+        <div class="card"><b class="n text-emerald-600">{{dash.jadwalHariIni.length}}</b>Jam mengajar hari ini</div>
+        <div class="card"><b class="n text-amber-600">{{dash.hariIni.total?dash.hariIni.persen+'%':'-'}}</b>Hadir hari ini (kelas saya)</div>
       </div>
       <div v-else class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="card"><b class="n">{{dash.siswa}}</b>Siswa</div>
         <div class="card"><b class="n">{{dash.guru}}</b>Guru</div>
         <div class="card"><b class="n">{{dash.kelas}}</b>Kelas</div>
         <div class="card"><b class="n text-amber-600">{{dash.hariIni.total?dash.hariIni.persen+'%':'-'}}</b>Hadir hari ini</div>
+      </div>
+      <div v-if="dash.tipe!=='ADMIN'" class="bg-white rounded-2xl shadow-sm p-4 mt-4">
+        <h3 class="font-bold mb-2">{{dash.tipe==='SISWA'?'Mapel hari ini':'Jadwal mengajar hari ini'}}</h3>
+        <p v-if="!dash.jadwalHariIni.length" class="text-sm text-slate-500">Tidak ada jadwal hari ini.</p>
+        <div v-for="j in dash.jadwalHariIni" :key="j.jam+j.mapel+j.kelas" class="flex justify-between text-sm py-2 border-t first:border-t-0"><span><b>{{j.jam}}</b> {{j.mapel}}</span><span class="text-slate-500">{{dash.tipe==='SISWA'?j.guruNama:j.kelas}}</span></div>
       </div>
       <div v-if="dash.tipe!=='SISWA'" class="grid lg:grid-cols-2 gap-4 mt-4">
         <div class="bg-white rounded-2xl shadow-sm p-4">
@@ -394,7 +408,7 @@
 
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
-const API_URL = 'https://script.google.com/macros/s/AKfycbwcfPzDxCsJxXTFSRH-R6x2rZEt5goThRhqhWG4hqLE4_0Z6ZD3Icu8sjOoRbDtgwobVw/exec';
+const API_URL = 'https://script.google.com/macros/s/GANTI_DENGAN_ID_DEPLOY/exec';
 const { createApp, ref, reactive, computed } = Vue;
 const LOGO = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiD-8YPFS6i86EyZZNDUhwuam5ro_mtc9So2muvB7EDWz1Zp6rarLubvVS3vfVVoto_S6SaHlIPPnmNaddUugGUztWkJYhDwwT8CU1BcUuq9TNyxnHKa6B44iDBx6LjR1-z3r7_C34jviaWeOYgk4bNJHsziPV4KR5mQjY69HVhyphenhyphenR3STD4xp-b46x_HeR4/s160/An8Em6pLCtVUNFZTK-rgdQG9pKiDxE1AR7m_1QO_5slD3C5qFXYq7S9suI1ztpViB_aUnbOGE2-Y71AU9SF3GjQzZ09xbw5aat-JT_7ptJ4VcfdGeJ73DWbHD9IDtVHa_16MjCj09HJ4eGBvZMo-removebg-preview.png';
 
@@ -410,6 +424,12 @@ const app = createApp({
     const sc = { H: 'bg-emerald-500', I: 'bg-blue-600', S: 'bg-amber-500', A: 'bg-rose-600' };
     const lbl = { H: 'HADIR', I: 'IZIN', S: 'SAKIT', A: 'ALPA' };
     const tgl = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const acc = { ADMIN: 'bg-indigo-600 text-white', GURU: 'bg-emerald-600 text-white', SISWA: 'bg-amber-400 text-slate-900' };
+    const heroCls = { ADMIN: 'from-blue-900 to-indigo-600', GURU: 'from-blue-900 to-emerald-600', SISWA: 'from-blue-900 to-blue-600' };
+    const sub = { ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.' };
+    const quick = { ADMIN: ['siswa', 'jadwal', 'rekap', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
+    const clock = ref(''), tick = () => clock.value = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
+    tick(); setInterval(tick, 1000);
     const M = { dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', rekap: 'Rekap Presensi', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
     const MENU = { ADMIN: ['dashboard', 'siswa', 'kelas', 'jadwal', 'presensi', 'rekap', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'rekap', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'nilaisaya', 'bimbingansaya', 'sandi'] };
     const menu = computed(() => user.value ? MENU[user.value.role].map(k => ({ k, t: M[k] })) : []);
@@ -520,7 +540,7 @@ const app = createApp({
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
     setInterval(() => parent.postMessage({ calmHeight: document.documentElement.scrollHeight }, '*'), 800);
 
-    return { LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, rkelas, rbulan, fc, txc, segs, loadRekap,
