@@ -6,10 +6,11 @@
 <title>Portal Akademik SMK CALM</title>
 <meta name="theme-color" content="#0b3d91">
 <script>if(window.self!==window.top)document.documentElement.classList.add("embedded")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config={theme:{extend:{colors:{navy:{50:"#eef3fb",100:"#d9e4f6",600:"#134aa8",700:"#0b3d91",800:"#082f70",900:"#061f4d",950:"#041536"},blue:{700:"#134aa8",800:"#0b3d91",900:"#072a66"}}}}}</script>
 <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}
 .login-bg{background:radial-gradient(1200px 600px at 10% -10%,#1b56c0 0%,transparent 60%),radial-gradient(900px 500px at 110% 110%,#134aa8 0%,transparent 55%),linear-gradient(160deg,#0b3d91 0%,#072a66 55%,#041536 100%)}
@@ -23,6 +24,12 @@
 .modal-wrap{display:flex;justify-content:center;align-items:flex-start;overflow-y:auto}.modal-box{margin:auto}
 .embedded .min-h-screen,.embedded aside{min-height:0}.embedded .login-wrap{min-height:680px}.embedded .modal-box{margin:1rem auto auto}
 .kartu-wrap{display:none}
+button:disabled{cursor:not-allowed}
+:focus-visible{outline:3px solid rgba(245,158,11,.75);outline-offset:2px}
+.btn-o:hover:not(:disabled){background:#eef3fb}.btn-o:disabled{opacity:.5}
+.sr-skip{position:absolute;left:-999px}.sr-skip:focus{left:8px;top:8px;z-index:60;background:#fff;padding:.5rem 1rem;border-radius:.5rem}
+table tbody tr:hover{background:#f8fafc}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media print{.modal-wrap{display:none!important}body.cetak-kartu main>*:not(.kartu-wrap){display:none!important}body.cetak-kartu .kartu-wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.kartu{break-inside:avoid;border:1px dashed #475569;padding:8px 10px;font-size:12px;line-height:1.5}}
 </style>
 </head>
@@ -111,13 +118,19 @@
 
 <!-- APP -->
 <div v-else class="min-h-screen md:flex">
-  <aside class="md:w-60 bg-navy-900 text-slate-200 md:min-h-screen p-4 flex md:block gap-2 overflow-x-auto">
+  <a href="#utama" class="sr-skip noprint">Lewati ke konten</a>
+  <header class="md:hidden noprint sticky top-0 z-40 bg-navy-900 text-white flex items-center gap-3 px-4 py-2.5 shadow">
+    <button @click="mnav=!mnav" :aria-expanded="mnav" aria-label="Buka menu" class="p-1.5 rounded-lg hover:bg-white/10"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path v-if="!mnav" d="M4 6h16M4 12h16M4 18h16"/><path v-else d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <img :src="LOGO" alt="" class="h-7 w-7 object-contain"><span class="font-extrabold">SMK CALM</span>
+    <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span>
+  </header>
+  <aside :class="mnav?'block':'hidden'" class="md:block md:w-60 md:shrink-0 bg-navy-900 text-slate-200 md:sticky md:top-0 md:h-screen md:overflow-y-auto p-4 max-h-[75vh] overflow-y-auto md:max-h-none" aria-label="Menu utama">
     <div class="hidden md:block mb-6">
       <img :src="LOGO" alt="" class="h-10 w-10 object-contain mb-1">
       <p class="font-extrabold text-white">SMK CALM</p>
       <span class="inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span>
     </div>
-    <button v-for="m in menu" :key="m.k" @click="go(m.k)" class="group whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium md:mb-1 flex items-center gap-3 transition"
+    <button v-for="m in menu" :key="m.k" @click="go(m.k);mnav=false" :aria-current="view===m.k?'page':null" class="group whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium md:mb-1 flex items-center gap-3 transition"
       :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-white/10'">
       <svg class="h-5 w-5 shrink-0 transition" :class="view===m.k?'':'opacity-70 group-hover:opacity-100'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON[m.k]"></svg>
       <span>{{m.t}}</span><span v-if="m.k==='catatansaya'&&belumBaca" class="ml-auto text-[10px] font-bold bg-rose-500 text-white rounded-full px-1.5">{{belumBaca}}</span></button>
@@ -125,10 +138,10 @@
       <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON.keluar"></svg><span>Keluar</span></button>
   </aside>
 
-  <main class="flex-1 min-w-0 p-4 pb-10 md:p-8 md:pb-12 max-w-5xl">
-    <div class="flex items-center gap-2 mb-4 noprint"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span><span class="text-sm text-slate-500">{{user.nama}}</span></div>
-    <p v-if="err" role="alert" class="sticky top-2 z-30 mb-4 rounded-xl bg-rose-50 border border-rose-200 shadow text-rose-700 text-sm px-4 py-2">{{err}}</p>
-    <p v-if="ok" role="status" class="sticky top-2 z-30 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 shadow text-emerald-700 text-sm px-4 py-2">{{ok}}</p>
+  <main id="utama" class="flex-1 min-w-0 p-4 pb-10 md:p-8 md:pb-12 max-w-7xl">
+    <div class="hidden md:flex items-center gap-2 mb-4 noprint"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span><span class="text-sm text-slate-500">{{user.nama}}</span></div>
+    <p v-if="err" role="alert" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-rose-50 border border-rose-200 shadow text-rose-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{err}}</span><button @click="err=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
+    <p v-if="ok" role="status" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 shadow text-emerald-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{ok}}</span><button @click="ok=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
 
     <p v-if="view==='dashboard'&&!dash&&!err" class="text-sm text-slate-500 animate-pulse">Memuat dashboard...</p>
     <!-- Dashboard -->
@@ -136,7 +149,7 @@
       <div class="rounded-2xl bg-gradient-to-r text-white p-6 mb-4" :class="heroCls[user.role]">
         <p class="text-xs font-bold opacity-80">{{badge[user.role].t}}<span v-if="user.role==='SISWA'&&user.kelas">, Kelas {{user.kelas}}</span></p>
         <h2 class="text-2xl font-extrabold">Halo, {{user.nama}}!</h2>
-        <p class="text-white/80 text-sm">{{tgl}}, pukul {{clock}} WIB</p>
+        <p class="text-white/80 text-sm">{{tgl}}, pukul <span class="clk"></span> WIB</p>
         <p class="text-white/90 text-sm mt-2">{{sub[user.role]}}</p>
       </div>
       <div class="flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
@@ -246,7 +259,7 @@
               <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>NIS</th><th>Nama</th><th>Status</th><th>Keterangan</th></tr></thead>
               <tbody><tr v-for="(r,i) in rows" :key="r.nis" class="border-t">
                 <td class="p-3">{{i+1}}</td><td>{{r.nis}}</td><td class="pr-2">{{r.nama}}</td>
-                <td><div class="flex gap-1"><button v-for="s in ST" :key="s.k" type="button" @click="r.status=s.k" :title="s.t" :aria-label="s.t" class="w-8 h-8 rounded-lg font-bold text-xs" :class="r.status===s.k?sc[s.k]+' text-white':'bg-slate-100 text-slate-600'">{{s.k}}</button></div></td>
+                <td><div class="flex gap-1"><button v-for="s in ST" :key="s.k" type="button" @click="r.status=s.k" :title="s.t" :aria-label="s.t" class="w-9 h-9 rounded-lg font-bold text-xs" :class="r.status===s.k?sc[s.k]+' text-white':'bg-slate-100 text-slate-600'">{{s.k}}</button></div></td>
                 <td class="pr-3"><input v-model="r.keterangan" maxlength="100" placeholder="opsional" class="w-full min-w-[8rem] border-b border-slate-200 py-1 focus:outline-none focus:border-blue-700"></td>
               </tr></tbody>
             </table>
@@ -424,7 +437,7 @@
         <tr v-if="!siswaTampil.length"><td :colspan="canEdit?7:5" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':canEdit?'Belum ada siswa. Klik Tambah siswa atau Impor Excel.':'Belum ada data siswa.'}}</td></tr></tbody></table></div>
 
       <!-- Form tambah/ubah -->
-      <div v-if="showS" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="showS" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{sf.edit?'Ubah siswa':'Tambah siswa'}}</h3>
         <input v-model.trim="sf.nis" :disabled="sf.edit" placeholder="NIS" class="inp w-full mb-3 disabled:bg-slate-100">
         <input v-model.trim="sf.nama" placeholder="Nama lengkap" class="inp w-full mb-3">
@@ -434,13 +447,13 @@
         <div class="flex justify-end gap-2"><button @click="showS=false" class="btn-o">Batal</button><button @click="saveSiswa" :disabled="busy" class="btn-p">Simpan</button></div>
       </div></div>
 
-      <div v-if="showP" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="showP" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-2">Pindah / naik kelas</h3><p class="text-sm text-slate-600 mb-3">{{pilihNis.length}} siswa terpilih akan dipindahkan ke:</p>
         <select v-model="kelasTujuan" class="inp w-full mb-3"><option value="">-- Pilih kelas tujuan --</option><option v-for="k in kelasAll" :key="k.kelas">{{k.kelas}}</option></select>
         <p v-if="err" class="text-sm text-rose-600 mb-2">{{err}}</p>
         <div class="flex justify-end gap-2"><button @click="showP=false" class="btn-o">Batal</button><button @click="doPindah" :disabled="busy||!kelasTujuan" class="btn-p">Pindahkan</button></div></div></div>
       <!-- Pratinjau impor -->
-      <div v-if="imp.show" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl">
+      <div v-if="imp.show" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl">
         <h3 class="font-extrabold text-blue-900">Impor siswa dari Excel</h3>
         <p class="text-xs text-slate-500 mb-3">{{imp.file}}</p>
         <template v-if="!imp.done">
@@ -492,7 +505,7 @@
       <p v-if="canEdit" class="text-xs text-slate-500 mt-2">Guru yang dipilih sebagai wali kelas otomatis dapat mengisi Bimbingan Wali untuk kelasnya.</p>
 
       <!-- Form tambah/ubah -->
-      <div v-if="showG" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="showG" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{gf.edit?'Ubah guru':'Tambah guru'}}</h3>
         <label class="lb">Username</label><input v-model.trim="gf.username" :disabled="gf.edit" placeholder="mis. budi.santoso" autocapitalize="none" class="inp w-full mt-1 mb-3 disabled:bg-slate-100">
         <label class="lb">Nama lengkap</label><input v-model.trim="gf.nama" maxlength="100" placeholder="Nama beserta gelar" class="inp w-full mt-1 mb-3">
@@ -508,7 +521,7 @@
       </div></div>
 
       <!-- Pratinjau impor guru -->
-      <div v-if="gimp.show" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl">
+      <div v-if="gimp.show" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl">
         <h3 class="font-extrabold text-blue-900">Impor guru dari Excel</h3>
         <p class="text-xs text-slate-500 mb-3">{{gimp.file}}</p>
         <template v-if="!gimp.done">
@@ -549,7 +562,7 @@
           <td class="whitespace-nowrap pr-3"><button @click="editKelas(k)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delKelas(k)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!kelasAll.length"><td colspan="4" class="p-4 text-slate-500">Belum ada kelas. Klik <b>Tambah kelas</b> untuk membuat kelas pertama.</td></tr></tbody></table></div>
 
-      <div v-if="showK" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="showK" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{kf.edit?'Ubah kelas':'Tambah kelas'}}</h3>
         <label class="text-sm font-semibold text-slate-700">Nama kelas</label>
         <input v-model.trim="kf.kelas" :disabled="kf.edit" @keyup.enter="saveKelas" placeholder="mis. X TKJ 1" class="inp w-full mt-1 mb-3 disabled:bg-slate-100">
@@ -573,7 +586,7 @@
           <td v-if="canJadwal" class="pr-3"><button v-if="user.role==='ADMIN'||j.guru===user.username" @click="delJadwal(j)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!jadwalTampil.length"><td :colspan="canJadwal?6:5" class="p-4 text-slate-500">{{jadwal.length?'Tidak ada jadwal yang cocok dengan filter.':'Belum ada jadwal.'}}</td></tr></tbody></table></div>
 
-      <div v-if="showJd" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="showJd" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">Tambah Jadwal Baru</h3>
         <div class="grid grid-cols-2 gap-3">
           <label class="lb col-span-2 sm:col-span-1">Hari<select v-model="jf.hari" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Hari --</option><option v-for="h in hariList" :key="h">{{h}}</option></select></label>
@@ -599,10 +612,10 @@
         <input v-model.trim="nm.tp" @change="loadNilai" placeholder="Tujuan pembelajaran" class="inp flex-1 min-w-[200px]">
         <select v-model="nm.jenis" @change="loadNilai" class="inp"><option>Harian</option><option>Tugas</option><option>Praktik</option><option>UTS</option><option>UAS</option></select>
       </div>
-      <p v-if="pil.length&&!nrows.length" class="text-xs text-slate-500 mb-3">Pilih kelas - mapel, isi tujuan pembelajaran, lalu tekan Tab/Enter agar daftar siswa muncul.</p>
+      <p v-if="pil.length&&!nrows.length" class="text-xs text-slate-500 mb-3">Pilih kelas - mapel, isi tujuan pembelajaran, lalu tekan Tab/Enter agar daftar siswa muncul. Setelah itu, Enter pada kolom skor berpindah ke siswa berikutnya.</p>
       <div v-if="nrows.length" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">NIS</th><th>Nama</th><th>Skor (0-100)</th></tr></thead>
-        <tbody><tr v-for="r in nrows" :key="r.nis" class="border-t"><td class="p-3">{{r.nis}}</td><td>{{r.nama}}</td><td><input type="number" min="0" max="100" v-model="r.skor" class="w-24 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
+        <tbody><tr v-for="r in nrows" :key="r.nis" class="border-t"><td class="p-3">{{r.nis}}</td><td>{{r.nama}}</td><td><input type="number" inputmode="decimal" min="0" max="100" v-model="r.skor" @keydown.enter.prevent="nextSkor($event)" data-skor class="w-24 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
       <button v-if="nrows.length" @click="saveNilai" :disabled="busy" class="mt-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan nilai</button>
     </section>
 
@@ -627,7 +640,7 @@
           <td class="pr-3 noprint"><button v-if="canWrite" @click="editJurnal(j)" class="text-blue-800 font-bold mr-3">Ubah</button><button v-if="canWrite" @click="delJurnal(j)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!jurnal.length"><td colspan="7" class="p-4 text-slate-500">Belum ada jurnal pada bulan ini.</td></tr></tbody></table></div>
       <div class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
-      <div v-if="showJ" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="showJ" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{jr.id?'Ubah jurnal':'Tambah jurnal'}}</h3>
         <input type="date" v-model="jr.tanggal" class="inp w-full mb-3">
         <p v-if="jr.id" class="text-sm font-bold text-slate-700 mb-3">{{jr.info}}</p><select v-else v-model="jr.pi" class="inp w-full mb-3"><option value="">Kelas - Mapel</option><option v-for="(p,i) in pil" :value="i">{{p.kelas}} - {{p.mapel}}</option></select>
@@ -650,7 +663,7 @@
           <td class="pr-3 noprint"><button @click="delBimb(b)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!bimb.length"><td colspan="6" class="p-4 text-slate-500">Belum ada catatan pada bulan ini.</td></tr></tbody></table></div>
       <div class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
-      <div v-if="showB" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="showB" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">Tambah catatan bimbingan</h3>
         <input type="date" v-model="bf.tanggal" class="inp w-full mb-3">
         <select v-model="bf.kelas" @change="pickKelasB" class="inp w-full mb-3"><option value="">Pilih kelas</option><option v-for="k in bk">{{k}}</option></select>
@@ -742,7 +755,7 @@
         <tbody><tr v-for="d in dokumen" :key="d.id" class="border-t"><td class="p-3"><a :href="d.url" target="_blank" rel="noopener noreferrer" class="text-blue-800 font-bold underline">{{d.judul}}</a></td><td>{{d.kategori||'-'}}</td><td>{{d.tanggal}} oleh {{d.olehNama}}</td>
           <td class="pr-3"><button @click="delDok(d)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!dokumen.length"><td colspan="4" class="p-4 text-slate-500">Belum ada dokumen.</td></tr></tbody></table></div>
-      <div v-if="showD" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="showD" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">Simpan tautan dokumen</h3>
         <input v-model.trim="df.judul" maxlength="150" placeholder="Judul dokumen" class="inp w-full mb-3">
         <input v-model.trim="df.url" placeholder="Tautan (https://...)" class="inp w-full mb-3">
@@ -859,7 +872,7 @@
       <button @click="ganti" :disabled="busy" class="rounded-xl bg-blue-800 text-white font-bold px-6 py-2.5 disabled:opacity-60">Simpan sandi</button>
     </section>
       <!-- Sandi baru / bagikan akun -->
-      <div v-if="kred.show" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div v-if="kred.show" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-2">{{kred.judul}}</h3>
         <p class="text-sm text-slate-600 mb-3">Bagikan ke pemilik akun lewat WhatsApp, salinan, atau kartu cetak. Sandi ini tersimpan di sheet <b>Kredensial</b> hanya sampai pengguna menggantinya sendiri.</p>
         <div class="max-h-[50vh] overflow-y-auto">
@@ -869,7 +882,7 @@
         <div class="flex flex-wrap justify-end gap-2 mt-3"><button @click="copyKred" class="btn-o">{{kred.copied?'Tersalin':'Salin'}}</button><button @click="cetakKred" class="btn-o">Cetak kartu</button><button v-if="kred.list.length>1" @click="unduhKred" class="btn-o">Unduh Excel</button><button @click="kred.show=false" class="btn-p">Tutup</button></div>
       </div></div>
 
-    <div v-if="showPg" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+    <div v-if="showPg" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
       <h3 class="font-extrabold text-blue-900 mb-4">Tulis pengumuman</h3>
       <input v-model.trim="pf.judul" maxlength="100" placeholder="Judul" class="inp w-full mb-3">
       <textarea v-model.trim="pf.isi" maxlength="1000" rows="4" placeholder="Isi pengumuman" class="inp w-full mb-3"></textarea>
@@ -877,7 +890,7 @@
       <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p>
       <div class="flex justify-end gap-2 mt-4"><button @click="showPg=false" class="btn-o">Batal</button><button @click="savePeng" :disabled="busy||!pf.judul||!pf.isi" class="btn-p">Publikasikan</button></div></div></div>
     <div v-if="kartu" class="kartu-wrap"><div v-for="s in kartu.siswa" :key="s.nis" class="kartu"><p class="font-bold">Portal Akademik SMK CALM</p><p>{{s.nama}} &middot; {{s.ket||kartu.kelas}}</p><p>Username{{s.ket?'':' (NIS)'}}: <b>{{s.nis}}</b></p><p>Sandi awal: <b>{{s.sandi||'sudah diganti, minta reset ke admin'}}</b></p></div></div>
-    <div v-if="showAg" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+    <div v-if="showAg" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
       <h3 class="font-extrabold text-blue-900 mb-4">Tambah agenda akademik</h3>
       <input v-model.trim="af.judul" maxlength="100" placeholder="Judul, mis. Penilaian Tengah Semester" class="inp w-full mb-3">
       <select v-model="af.jenis" class="inp w-full mb-3"><option>Ujian</option><option>Libur</option><option>Kegiatan</option><option>Rapat</option></select>
@@ -941,8 +954,9 @@ const app = createApp({
     const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600' };
     const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Lihat dan unduh data guru dan siswa.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.' };
     const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], STAF: ['siswa', 'guru'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
-    const clock = ref(''), tick = () => clock.value = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
-    tick(); setInterval(tick, 1000);
+    const clock = ref(''), tick = () => { const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' }); document.querySelectorAll('.clk').forEach(e => { if (e.textContent !== t) e.textContent = t; }); };
+    tick(); setInterval(tick, 1000); // ubah DOM langsung: tidak memicu render ulang seluruh aplikasi tiap detik
+    const mnav = ref(false);
     const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
     const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'jurnal', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
     const ICON = {
@@ -984,7 +998,7 @@ const app = createApp({
     const sf = reactive({ edit: false, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
     const jf = reactive({ hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
 
-    const SAFE = a => !/save|delete|import|hapus|reset|ganti|backup/i.test(a); // hanya aksi baca yang boleh diulang otomatis
+    const SAFE = a => !/save|delete|import|hapus|reset|ganti|backup|putus|pindah|baca/i.test(a); // hanya aksi baca yang boleh diulang otomatis
     async function api(action, p = {}) {
       let r, t;
       for (let n = 0; ; n++) {
@@ -1021,7 +1035,7 @@ const app = createApp({
       sessionStorage.setItem('tk', d.token); sessionStorage.setItem('us', JSON.stringify(d.user));
       go('dashboard');
     });
-    function logout() { token.value = ''; user.value = null; sessionStorage.clear(); }
+    function logout() { token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; kred.list = []; kred.show = false; kartu.value = null; f.password = ''; }
     const go = k => run(async () => {
       if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
       view.value = k; dash.value = null; q.value = ''; toTop();
@@ -1135,6 +1149,7 @@ const app = createApp({
     });
     const delKelas = k => confirm('Hapus kelas ' + k.kelas + '? Jadwal kelas ini ikut terhapus.') && run(async () => { await api('kelasDelete', { kelas: k.kelas }); await refresh(); });
     const delJadwal = j => confirm('Hapus jadwal ' + j.mapel + ' ' + j.kelas + '?') && run(async () => { await api('jadwalDelete', { id: j.id }); jadwal.value = await api('jadwalList'); });
+    const nextSkor = e => { const a = [...document.querySelectorAll('input[data-skor]')], i = a.indexOf(e.target); (a[i + 1] || e.target).focus(); };
     const loadNilai = () => { nrows.value = []; const p = pil.value[pilIdx.value]; if (p && nm.tp) run(async () => nrows.value = await api('nilaiGet', { ...p, tp: nm.tp, jenis: nm.jenis })); };
     const saveNilai = () => run(async () => { if (!nm.tp) throw new Error('Isi tujuan pembelajaran terlebih dahulu'); const bad = nrows.value.find(r => r.skor !== '' && r.skor != null && !(Number(r.skor) >= 0 && Number(r.skor) <= 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus antara 0 dan 100'); const d = await api('nilaiSave', { ...pil.value[pilIdx.value], tp: nm.tp, jenis: nm.jenis, rows: nrows.value }); ok.value = d.tersimpan + ' nilai tersimpan'; });
 
@@ -1451,7 +1466,8 @@ const app = createApp({
       saveXlsx('Akun_Sandi_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Akun', [['Nama', 'Peran', 'Kelas', 'Username', 'Sandi']].concat(kred.list.map(c => [c.nama, ROLE_LBL[c.role] || '', c.kelas || '', String(c.username), String(c.sandi)])), [32, 16, 14, 20, 14]]]);
     });
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = showAg.value = false; if (!busy.value) imp.show = gimp.show = false; } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { mnav.value = false; showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = showAg.value = false; if (!busy.value) imp.show = gimp.show = false; } });
+    new MutationObserver(ms => { for (const m of ms) for (const nd of m.addedNodes) { if (nd.nodeType === 1 && nd.classList && nd.classList.contains('modal-wrap')) { const el = nd.querySelector('input:not([disabled]):not([type=checkbox]),select,textarea'); if (el) setTimeout(() => el.focus(), 30); } } }).observe(document.getElementById('app'), { childList: true, subtree: true });
     if (user.value) go('dashboard');
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
     // Tinggi dihitung dari isi aplikasi (bukan tinggi jendela) agar tidak terpotong; modal tinggi ikut diperhitungkan
@@ -1461,7 +1477,7 @@ const app = createApp({
       parent.postMessage({ calmHeight: Math.ceil(h) + 24 }, '*');
     }, 600);
 
-    return { canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
