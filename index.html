@@ -830,6 +830,25 @@
         <p class="text-sm whitespace-pre-line">{{c.isi}}</p>
         <p class="text-xs text-slate-400 mt-2">{{fmtTgl(c.tanggal)}} &middot; {{c.olehNama}}<span v-if="!c.dibaca" class="ml-2 font-bold text-violet-600">Baru</span></p></div>
     </section>
+    <!-- Akun & Sandi (admin) -->
+    <section v-if="view==='akun'">
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">Akun &amp; Sandi</h2>
+        <div class="flex flex-wrap gap-2"><button v-if="akpilih.length" @click="bagikanAwal(akpilih)" :disabled="busy" class="btn-o">Bagikan sandi awal ({{akpilih.length}})</button><button v-if="akpilih.length" @click="konfirmReset(akpilih)" :disabled="busy" class="btn-p">Reset sandi {{akpilih.length}} akun</button></div></div>
+      <div class="flex flex-wrap gap-2 mb-3">
+        <select v-model="akrole" class="inp"><option value="">Semua peran</option><option value="SISWA">Siswa</option><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf</option></select>
+        <select v-model="akkelas" class="inp"><option value="">Semua kelas</option><option v-for="k in akKelas" :key="k">{{k}}</option></select>
+        <input v-model.trim="akq" placeholder="Cari nama / username..." class="inp flex-1 min-w-[10rem]">
+        <span class="text-sm text-slate-500 self-center">{{akTampil.length}} dari {{akun.length}} akun</span></div>
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3 w-8"><input type="checkbox" :checked="akSemua" @change="akPilihSemua($event.target.checked)" aria-label="Pilih semua akun"></th><th>Nama</th><th>Username</th><th>Peran</th><th>Kelas</th><th>Sandi awal</th><th></th></tr></thead>
+        <tbody><tr v-for="a in akLihat" :key="a.username" class="border-t"><td class="p-3"><input type="checkbox" :value="a.username" v-model="akpilih" :aria-label="'Pilih '+a.nama"></td><td class="font-semibold">{{a.nama}}</td><td>{{a.username}}</td>
+          <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[a.role]">{{ROLE_LBL[a.role]}}</span></td><td>{{a.kelas||'-'}}</td>
+          <td><span class="text-xs font-bold" :class="a.awal?'text-emerald-700':'text-slate-400'">{{a.awal?'Tersedia':'Sudah diganti'}}</span></td>
+          <td class="whitespace-nowrap pr-3"><button v-if="a.awal" @click="bagikanAwal([a.username])" class="text-blue-800 font-bold mr-3">Bagikan</button><button @click="resetSatu(a)" class="text-amber-600 font-bold">Reset &amp; bagikan</button></td></tr>
+        <tr v-if="!akLihat.length"><td colspan="7" class="p-4 text-slate-500">{{akun.length?'Tidak ada akun yang cocok dengan filter.':'Belum ada akun.'}}</td></tr></tbody></table></div>
+      <p v-if="akTampil.length>300" class="text-xs text-slate-500 mt-2">Menampilkan 300 akun pertama; persempit dengan filter atau pencarian.</p>
+      <p class="text-xs text-slate-500 mt-2">Sandi disimpan sebagai hash sehingga tidak dapat dilihat. Bila pengguna lupa sandi, pilih <b>Reset &amp; bagikan</b> lalu kirim lewat WhatsApp atau cetak kartunya. <b>Bagikan</b> hanya tersedia selama pengguna belum mengganti sandi awalnya.</p>
+    </section>
     <!-- Ganti sandi -->
     <section v-if="view==='sandi'" class="max-w-sm">
       <h2 class="h2">Ganti Sandi</h2>
@@ -839,13 +858,15 @@
       <input v-model="pw.konf" type="password" placeholder="Ulangi sandi baru" class="inp w-full mb-4">
       <button @click="ganti" :disabled="busy" class="rounded-xl bg-blue-800 text-white font-bold px-6 py-2.5 disabled:opacity-60">Simpan sandi</button>
     </section>
-      <!-- Sandi baru (tampil sekali) -->
+      <!-- Sandi baru / bagikan akun -->
       <div v-if="kred.show" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-2">{{kred.judul}}</h3>
-        <p class="text-sm text-slate-600 mb-3">Catat atau salin sekarang. Sandi ini tidak ditampilkan lagi (admin dapat mengatur ulang kapan saja).</p>
+        <p class="text-sm text-slate-600 mb-3">Bagikan ke pemilik akun lewat WhatsApp, salinan, atau kartu cetak. Sandi ini tersimpan di sheet <b>Kredensial</b> hanya sampai pengguna menggantinya sendiri.</p>
+        <div class="max-h-[50vh] overflow-y-auto">
         <div v-for="c in kred.list" :key="c.username" class="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 mb-2 text-sm">
-          <p class="font-bold text-slate-800">{{c.nama}}</p><p>Username: <b class="select-all">{{c.username}}</b></p><p>Sandi: <b class="select-all text-lg tracking-wider">{{c.sandi}}</b></p></div>
-        <div class="flex justify-end gap-2 mt-3"><button @click="copyKred" class="btn-o">{{kred.copied?'Tersalin':'Salin'}}</button><button @click="kred.show=false" class="btn-p">Tutup</button></div>
+          <p class="font-bold text-slate-800">{{c.nama}}<span v-if="c.role" class="font-normal text-slate-500"> &middot; {{ROLE_LBL[c.role]||c.role}}<span v-if="c.kelas"> {{c.kelas}}</span></span></p><p>Username: <b class="select-all">{{c.username}}</b></p><p>Sandi: <b class="select-all text-lg tracking-wider">{{c.sandi}}</b></p>
+          <a :href="waAkun(c)" target="_blank" rel="noopener noreferrer" class="btn-o !py-0.5 !px-2 text-xs mt-2 inline-block">{{noWa(c.kontak)?'WA orang tua':'Kirim WA'}}</a></div></div>
+        <div class="flex flex-wrap justify-end gap-2 mt-3"><button @click="copyKred" class="btn-o">{{kred.copied?'Tersalin':'Salin'}}</button><button @click="cetakKred" class="btn-o">Cetak kartu</button><button v-if="kred.list.length>1" @click="unduhKred" class="btn-o">Unduh Excel</button><button @click="kred.show=false" class="btn-p">Tutup</button></div>
       </div></div>
 
     <div v-if="showPg" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
@@ -855,7 +876,7 @@
       <label class="lb">Tayang sampai (opsional)<input type="date" v-model="pf.sampai" :min="hari0" class="inp w-full mt-1 normal-case"></label>
       <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p>
       <div class="flex justify-end gap-2 mt-4"><button @click="showPg=false" class="btn-o">Batal</button><button @click="savePeng" :disabled="busy||!pf.judul||!pf.isi" class="btn-p">Publikasikan</button></div></div></div>
-    <div v-if="kartu" class="kartu-wrap"><div v-for="s in kartu.siswa" :key="s.nis" class="kartu"><p class="font-bold">Portal Akademik SMK CALM</p><p>{{s.nama}} &middot; {{kartu.kelas}}</p><p>Username (NIS): <b>{{s.nis}}</b></p><p>Sandi awal: <b>{{s.sandi||'sudah diganti, minta reset ke admin'}}</b></p></div></div>
+    <div v-if="kartu" class="kartu-wrap"><div v-for="s in kartu.siswa" :key="s.nis" class="kartu"><p class="font-bold">Portal Akademik SMK CALM</p><p>{{s.nama}} &middot; {{s.ket||kartu.kelas}}</p><p>Username{{s.ket?'':' (NIS)'}}: <b>{{s.nis}}</b></p><p>Sandi awal: <b>{{s.sandi||'sudah diganti, minta reset ke admin'}}</b></p></div></div>
     <div v-if="showAg" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
       <h3 class="font-extrabold text-blue-900 mb-4">Tambah agenda akademik</h3>
       <input v-model.trim="af.judul" maxlength="100" placeholder="Judul, mis. Penilaian Tengah Semester" class="inp w-full mb-3">
@@ -919,11 +940,11 @@ const app = createApp({
     const acc = { KEPSEK: 'bg-violet-600 text-white', ADMIN: 'bg-navy-700 text-white', GURU: 'bg-emerald-600 text-white', STAF: 'bg-sky-600 text-white', SISWA: 'bg-amber-400 text-slate-900' };
     const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600' };
     const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Lihat dan unduh data guru dan siswa.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.' };
-    const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], STAF: ['siswa', 'guru'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
+    const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], STAF: ['siswa', 'guru'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
     const clock = ref(''), tick = () => clock.value = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
     tick(); setInterval(tick, 1000);
-    const M = { guru: 'Kelola Guru', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
-    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'jurnal', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
+    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
+    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'jurnal', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -943,10 +964,11 @@ const app = createApp({
     ICON.bimbingansaya = ICON.catatan = ICON.catatansaya = ICON.bimbingan; ICON.izin = ICON.dokumen;
     ICON.guru = '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/><path d="M17 3l2 2 3-3"/>';
     ICON.monitor = '<path d="M3 12h4l3-8 4 16 3-8h4"/>';
+    ICON.akun = '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14 9l2 2"/>';
     const MS = { siswa: 'Data Siswa', guru: 'Data Guru' }; // nama menu untuk peran hanya-lihat
     const menu = computed(() => user.value ? MENU[user.value.role].map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || M[k] })) : []);
     const canEdit = computed(() => !!user.value && user.value.role === 'ADMIN'); // STAF hanya melihat & mengunduh
-    const ROLE_LBL = { GURU: 'Guru', KEPSEK: 'Kepala sekolah', STAF: 'Staf' }, ROLE_CLS = { GURU: 'bg-emerald-100 text-emerald-700', KEPSEK: 'bg-violet-100 text-violet-700', STAF: 'bg-sky-100 text-sky-700' };
+    const ROLE_LBL = { SISWA: 'Siswa', GURU: 'Guru', KEPSEK: 'Kepala sekolah', STAF: 'Staf' }, ROLE_CLS = { SISWA: 'bg-amber-100 text-amber-800', GURU: 'bg-emerald-100 text-emerald-700', KEPSEK: 'bg-violet-100 text-violet-700', STAF: 'bg-sky-100 text-sky-700' };
     const roleDari = t => /^k/i.test(t) ? 'KEPSEK' : /^(s|t)/i.test(t) ? 'STAF' : 'GURU';
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]);
@@ -1015,6 +1037,7 @@ const app = createApp({
       if (k === 'kelas') { kelasAll.value = await api('kelasDetail'); guru.value = await api('guruList'); }
       if (k === 'jadwal') { jadwal.value = await api('jadwalList'); jhari.value = jq.value = ''; if (canJadwal.value) kelasNama.value = await api('kelasSemua'); if (user.value.role === 'ADMIN') guru.value = await api('guruList'); }
       if (k === 'guru') { gq.value = grole.value = ''; await refreshGuru(); }
+      if (k === 'akun') { akq.value = akrole.value = akkelas.value = ''; akpilih.value = []; await fetchAkun(); }
       if (k === 'monitor') await fetchMon();
       if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; pilIdx.value = ''; }
       if (k === 'jurnal') { if (canWrite.value) pil.value = await api('pilihanNilai'); cfg.value = await api('pengaturanGet'); await fetchJ(); }
@@ -1251,11 +1274,11 @@ const app = createApp({
       if (!gf.edit && gf.sandi && gf.sandi.length < 6) throw new Error('Sandi minimal 6 karakter');
       const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, sandi: gf.sandi, wali: gf.role !== 'GURU' ? [] : gf.wali } });
       showG.value = false; await refreshGuru();
-      if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi }]);
+      if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi, role: gf.role }]);
       ok.value = gf.edit ? 'Data guru diperbarui' : 'Akun guru dibuat';
     });
     const resetGuru = g => confirm('Atur ulang sandi ' + g.nama + '? Sandi lama tidak berlaku dan sesi login guru ini dihentikan.') && run(async () => {
-      const d = await api('resetSandi', { username: g.username }); showKred('Sandi baru ' + d.nama, [{ username: d.username, nama: d.nama, sandi: d.sandi }]);
+      const d = await api('resetSandi', { username: g.username }); showKred('Sandi baru ' + d.nama, [{ username: d.username, nama: d.nama, sandi: d.sandi, role: g.role }]);
     });
     const delGuru = g => confirm('Hapus akun ' + g.nama + '? Status wali kelasnya ikut dilepas.') && run(async () => { await api('guruDelete', { username: g.username }); await refreshGuru(); ok.value = 'Akun dihapus'; });
     const exportGuru = () => run(async () => {
@@ -1330,7 +1353,7 @@ const app = createApp({
       showP.value = false; pilihNis.value = []; siswa.value = await api('siswaList'); await refresh(); ok.value = d.dipindah + ' siswa dipindahkan';
     });
     const resetSiswa = s => confirm('Atur ulang sandi ' + s.nama + '? Sandi lama tidak berlaku.') && run(async () => {
-      const d = await api('resetSandi', { username: s.nis }); showKred('Sandi baru ' + d.nama, [{ username: d.username, nama: d.nama, sandi: d.sandi }]);
+      const d = await api('resetSandi', { username: s.nis }); showKred('Sandi baru ' + d.nama, [{ username: d.username, nama: d.nama, sandi: d.sandi, role: 'SISWA', kelas: s.kelas, kontak: s.kontak }]);
     });
     const presensiCepat = j => go('presensi').then(() => { Object.assign(pi, { tanggal: hari0, kelas: j.kelas, mapel: j.mapel }); loadPresensi(); });
     const exportLeger = () => run(async () => {
@@ -1399,6 +1422,41 @@ const app = createApp({
     const fetchMon = async () => mon.value = await api('monitor', { bulan: monBulan.value });
     const loadMon = () => run(fetchMon);
 
+    /* ====== v3.8: Akun & Sandi (bagikan akun, reset sandi) ====== */
+    const akun = ref([]), akq = ref(''), akrole = ref(''), akkelas = ref(''), akpilih = ref([]);
+    const fetchAkun = async () => { akun.value = await api('akunList'); };
+    const akMap = computed(() => new Map(akun.value.map(a => [a.username, a])));
+    const akTampil = computed(() => { const t = akq.value.toLowerCase(); return akun.value.filter(a => (!akrole.value || a.role === akrole.value) && (!akkelas.value || a.kelas === akkelas.value) && (!t || (a.nama + ' ' + a.username + ' ' + a.kelas).toLowerCase().includes(t))); });
+    const akLihat = computed(() => akTampil.value.slice(0, 300));
+    const akKelas = computed(() => [...new Set(akun.value.map(a => a.kelas).filter(Boolean))].sort());
+    const akSemua = computed(() => akLihat.value.length > 0 && akLihat.value.every(a => akpilih.value.includes(a.username)));
+    const akPilihSemua = c => { akpilih.value = c ? akLihat.value.map(a => a.username) : []; };
+    Vue.watch([akq, akrole, akkelas], () => { akpilih.value = []; });
+    const withKontak = l => l.map(c => ({ ...c, kontak: (akMap.value.get(c.username) || {}).kontak || '' }));
+    const kirimAkun = async (aksi, names) => { let h = [], gagal = ''; try { for (let i = 0; i < names.length; i += 50) h = h.concat(await api(aksi, { usernames: names.slice(i, i + 50) })); } catch (e) { gagal = niceErr(e.message); } return { h, gagal }; };
+    const hasilAkun = async (judul, { h, gagal }) => { // sandi yang sudah dibuat tetap ditampilkan walau satu paket gagal
+      if (h.length) { try { await fetchAkun(); } catch (e) { /* dimuat ulang saat menu dibuka */ } akpilih.value = []; showKred(judul, withKontak(h)); }
+      if (gagal) throw new Error(gagal + (h.length ? ' (' + h.length + ' akun sudah diproses dan ditampilkan)' : ''));
+    };
+    const konfirmReset = names => confirm('Atur ulang sandi ' + names.length + ' akun? Sandi lama tidak berlaku dan sesi login mereka dihentikan.') && run(async () => {
+      const r = await kirimAkun('akunReset', names); await hasilAkun(r.h.length === 1 ? 'Sandi baru ' + r.h[0].nama : 'Sandi baru ' + r.h.length + ' akun', r); });
+    const resetSatu = a => konfirmReset([a.username]);
+    const bagikanAwal = names => run(async () => {
+      const r = await kirimAkun('akunSandiAwal', names);
+      if (!r.h.length && !r.gagal) throw new Error('Sandi awal tidak tersimpan (pengguna sudah menggantinya). Gunakan Reset & bagikan.');
+      await hasilAkun('Akun dan sandi awal', r); });
+    const portalUrl = () => EMB ? (document.referrer || location.href) : location.href.split(/[?#]/)[0];
+    const teksAkun = c => 'Akun Portal Akademik SMK CALM\nNama: ' + c.nama + '\nUsername: ' + c.username + '\nSandi: ' + c.sandi + '\nAlamat: ' + portalUrl() + '\nSegera ganti sandi lewat menu Ganti Sandi setelah masuk.';
+    const noWa = k => { let n = String(k || '').replace(/\D/g, ''); if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n; return /^62\d{8,13}$/.test(n) ? n : ''; };
+    const waAkun = c => 'https://wa.me/' + noWa(c.kontak) + '?text=' + encodeURIComponent(teksAkun(c));
+    const cetakKred = () => {
+      kartu.value = { kelas: kred.judul, siswa: kred.list.map(c => ({ nis: c.username, nama: c.nama, sandi: c.sandi, ket: (ROLE_LBL[c.role] || '') + (c.kelas ? ' ' + c.kelas : '') || 'Akun' })) };
+      Vue.nextTick(() => { document.body.classList.add('cetak-kartu'); window.addEventListener('afterprint', () => { document.body.classList.remove('cetak-kartu'); kartu.value = null; }, { once: true }); window.print(); });
+    };
+    const unduhKred = () => run(async () => {
+      saveXlsx('Akun_Sandi_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Akun', [['Nama', 'Peran', 'Kelas', 'Username', 'Sandi']].concat(kred.list.map(c => [c.nama, ROLE_LBL[c.role] || '', c.kelas || '', String(c.username), String(c.sandi)])), [32, 16, 14, 20, 14]]]);
+    });
+
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = showAg.value = false; if (!busy.value) imp.show = gimp.show = false; } });
     if (user.value) go('dashboard');
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
@@ -1415,6 +1473,7 @@ const app = createApp({
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
       jhari, jq, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, resetGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax,
       leger, lk, lkelas, dokumen, showD, df, loadDok, loadLeger, saveDok, delDok,
+      akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai };
   }
