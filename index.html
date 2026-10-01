@@ -67,8 +67,8 @@
 
         <p class="text-sm font-semibold text-slate-700 mb-2">Masuk sebagai</p>
         <div class="grid grid-cols-2 gap-2 mb-5" role="radiogroup" aria-label="Pilih peran">
-          <button v-for="r in roles" :key="r.k" type="button" role="radio" :aria-checked="loginRole===r.k" @click="pilihRole(r.k)"
-            class="text-left rounded-2xl border-2 px-3 py-2.5 transition focus:outline-none focus:ring-4 focus:ring-navy-700/20" :class="loginRole===r.k?'border-navy-700 bg-navy-50':'border-slate-200 bg-white hover:border-slate-300'">
+          <button v-for="(r,ri) in roles" :key="r.k" type="button" role="radio" :aria-checked="loginRole===r.k" @click="pilihRole(r.k)"
+            class="text-left rounded-2xl border-2 px-3 py-2.5 transition focus:outline-none focus:ring-4 focus:ring-navy-700/20" :class="[roles.length%2&&ri===roles.length-1?'col-span-2':'',loginRole===r.k?'border-navy-700 bg-navy-50':'border-slate-200 bg-white hover:border-slate-300']">
             <span class="flex items-center gap-2"><svg class="h-5 w-5 shrink-0" :class="loginRole===r.k?'text-navy-700':'text-slate-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="r.i"></svg><span class="text-sm font-bold" :class="loginRole===r.k?'text-navy-800':'text-slate-700'">{{r.t}}</span></span>
             <span class="block text-[11px] leading-snug mt-1 text-slate-500">{{r.d}}</span></button>
         </div>
@@ -159,6 +159,11 @@
         <div class="card"><b class="n text-emerald-600">{{dash.jadwalHariIni.length}}</b>Jam mengajar hari ini</div>
         <div class="card"><b class="n text-amber-600">{{dash.hariIni.total?dash.hariIni.persen+'%':'-'}}</b>Hadir hari ini (kelas saya)</div>
       </div>
+      <div v-else-if="dash.tipe==='STAF'" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="card"><b class="n">{{dash.siswa}}</b>Siswa</div>
+        <div class="card"><b class="n">{{dash.guru}}</b>Guru</div>
+        <div class="card"><b class="n">{{dash.kelas}}</b>Kelas</div>
+      </div>
       <div v-else class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="card"><b class="n">{{dash.siswa}}</b>Siswa</div>
         <div class="card"><b class="n">{{dash.guru}}</b>Guru</div>
@@ -174,7 +179,7 @@
         <h3 class="font-bold mb-2">Kelas perwalian saya</h3>
         <div v-for="w in dash.waliRingkas" :key="w.kelas" class="text-sm py-2 border-t first:border-t-0 flex flex-wrap gap-x-4 gap-y-1"><b class="w-24">{{w.kelas}}</b><span>{{w.siswa}} siswa</span><span>Hari ini: <b>{{w.persenHariIni==null?'-':w.persenHariIni+'%'}}</b></span><span>Bulan ini: <b>{{w.persenBulan==null?'-':w.persenBulan+'%'}}</b></span><span class="text-rose-600">Alpa {{w.alpaBulan}}</span><span class="text-slate-500">Bimbingan {{w.bimbinganBulan}}</span></div>
       </div>
-      <div v-if="dash.tipe!=='SISWA'" class="grid lg:grid-cols-2 gap-4 mt-4">
+      <div v-if="dash.tipe!=='SISWA'&&dash.tipe!=='STAF'" class="grid lg:grid-cols-2 gap-4 mt-4">
         <div class="bg-white rounded-2xl shadow-sm p-4">
           <h3 class="font-bold mb-2">Kehadiran 7 hari terakhir</h3>
           <svg viewBox="0 0 210 100" class="w-full h-40" role="img" aria-label="Persentase kehadiran sekolah selama 7 hari terakhir">
@@ -402,21 +407,21 @@
 
     <!-- Siswa -->
     <section v-if="view==='siswa'">
-      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">Kelola Siswa</h2>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">{{canEdit?'Kelola Siswa':'Data Siswa'}}</h2>
         <div class="flex flex-wrap gap-2">
-          <button @click="templateSiswa" class="btn-o">Unduh template</button>
-          <label class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickFile"></label>
+          <button v-if="canEdit" @click="templateSiswa" class="btn-o">Unduh template</button>
+          <label v-if="canEdit" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickFile"></label>
           <button @click="exportSiswa" :disabled="!siswaTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
-          <button @click="editSiswa(null)" class="btn-p">Tambah siswa</button></div></div>
+          <button v-if="canEdit" @click="editSiswa(null)" class="btn-p">Tambah siswa</button></div></div>
       <div class="flex flex-wrap gap-2 mb-3">
         <select v-model="skelas" class="inp"><option value="">Semua kelas</option><option v-for="k in kelasAll" :value="k.kelas">{{k.kelas}} ({{k.jumlah}})</option></select>
         <input v-model.trim="sq" placeholder="Cari NIS / nama..." class="inp flex-1 min-w-[10rem]">
-        <span class="text-sm text-slate-500 self-center">{{siswaTampil.length}} dari {{siswa.length}} siswa</span><button v-if="skelas" @click="cetakKartu" :disabled="busy" class="btn-o">Cetak kartu login</button><button v-if="pilihNis.length" @click="bukaPindah" class="btn-p">Pindahkan {{pilihNis.length}} siswa</button></div>
+        <span class="text-sm text-slate-500 self-center">{{siswaTampil.length}} dari {{siswa.length}} siswa</span><button v-if="skelas&&canEdit" @click="cetakKartu" :disabled="busy" class="btn-o">Cetak kartu login</button><button v-if="canEdit&&pilihNis.length" @click="bukaPindah" class="btn-p">Pindahkan {{pilihNis.length}} siswa</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th class="p-3 w-8"><input type="checkbox" :checked="semuaDipilih" @change="pilihSemua($event.target.checked)" aria-label="Pilih semua siswa"></th><th>NIS</th><th>Nama</th><th>L/P</th><th>Kelas</th><th>Kontak</th><th></th></tr></thead>
-        <tbody><tr v-for="s in siswaTampil" :key="s.nis" class="border-t"><td class="p-3"><input type="checkbox" :value="s.nis" v-model="pilihNis" :aria-label="'Pilih '+s.nama"></td><td>{{s.nis}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td>
-          <td class="whitespace-nowrap pr-3"><button @click="editSiswa(s)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="resetSiswa(s)" class="text-amber-600 font-bold mr-3">Reset sandi</button><button @click="delSiswa(s)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!siswaTampil.length"><td colspan="7" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':'Belum ada siswa. Klik Tambah siswa atau Impor Excel.'}}</td></tr></tbody></table></div>
+        <thead class="bg-slate-50 text-left"><tr><th v-if="canEdit" class="p-3 w-8"><input type="checkbox" :checked="semuaDipilih" @change="pilihSemua($event.target.checked)" aria-label="Pilih semua siswa"></th><th :class="canEdit?'':'p-3'">NIS</th><th>Nama</th><th>L/P</th><th>Kelas</th><th>Kontak</th><th v-if="canEdit"></th></tr></thead>
+        <tbody><tr v-for="s in siswaTampil" :key="s.nis" class="border-t"><td v-if="canEdit" class="p-3"><input type="checkbox" :value="s.nis" v-model="pilihNis" :aria-label="'Pilih '+s.nama"></td><td :class="canEdit?'':'p-3'">{{s.nis}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td>
+          <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editSiswa(s)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="resetSiswa(s)" class="text-amber-600 font-bold mr-3">Reset sandi</button><button @click="delSiswa(s)" class="text-rose-600 font-bold">Hapus</button></td></tr>
+        <tr v-if="!siswaTampil.length"><td :colspan="canEdit?7:5" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':canEdit?'Belum ada siswa. Klik Tambah siswa atau Impor Excel.':'Belum ada data siswa.'}}</td></tr></tbody></table></div>
 
       <!-- Form tambah/ubah -->
       <div v-if="showS" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
@@ -466,32 +471,32 @@
 
     <!-- Guru (Admin) -->
     <section v-if="view==='guru'">
-      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">Kelola Guru</h2>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">{{canEdit?'Kelola Guru':'Data Guru'}}</h2>
         <div class="flex flex-wrap gap-2">
-          <button @click="templateGuru" class="btn-o">Unduh template</button>
-          <label class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickGuruFile"></label>
+          <button v-if="canEdit" @click="templateGuru" class="btn-o">Unduh template</button>
+          <label v-if="canEdit" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickGuruFile"></label>
           <button @click="exportGuru" :disabled="!guruTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
-          <button @click="editGuru(null)" class="btn-p">Tambah guru</button></div></div>
+          <button v-if="canEdit" @click="editGuru(null)" class="btn-p">Tambah guru</button></div></div>
       <div class="flex flex-wrap gap-2 mb-3">
-        <select v-model="grole" class="inp"><option value="">Semua peran</option><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option></select>
+        <select v-model="grole" class="inp"><option value="">Semua peran</option><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf</option></select>
         <input v-model.trim="gq" placeholder="Cari nama / username / kelas..." class="inp flex-1 min-w-[10rem]">
         <span class="text-sm text-slate-500 self-center">{{guruTampil.length}} dari {{gdata.length}} akun</span></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama</th><th>Username</th><th>Peran</th><th>Wali kelas</th><th>Kelas ajar</th><th class="text-center">Jam</th><th></th></tr></thead>
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama</th><th>Username</th><th>Peran</th><th>Wali kelas</th><th>Kelas ajar</th><th class="text-center">Jam</th><th v-if="canEdit"></th></tr></thead>
         <tbody><tr v-for="g in guruTampil" :key="g.username" class="border-t align-top">
           <td class="p-3 font-semibold">{{g.nama}}</td><td>{{g.username}}</td>
-          <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="g.role==='KEPSEK'?'bg-violet-100 text-violet-700':'bg-emerald-100 text-emerald-700'">{{g.role==='KEPSEK'?'Kepala sekolah':'Guru'}}</span></td>
+          <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[g.role]">{{ROLE_LBL[g.role]}}</span></td>
           <td>{{g.wali.join(', ')||'-'}}</td><td class="max-w-[14rem]">{{g.kelasAjar.join(', ')||'-'}}</td><td class="text-center">{{g.jam}}</td>
-          <td class="whitespace-nowrap pr-3"><button @click="editGuru(g)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="resetGuru(g)" class="text-amber-600 font-bold mr-3">Reset sandi</button><button @click="delGuru(g)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!guruTampil.length"><td colspan="7" class="p-4 text-slate-500">{{gdata.length?'Tidak ada akun yang cocok dengan filter.':'Belum ada guru. Klik Tambah guru atau Impor Excel.'}}</td></tr></tbody></table></div>
-      <p class="text-xs text-slate-500 mt-2">Guru yang dipilih sebagai wali kelas otomatis dapat mengisi Bimbingan Wali untuk kelasnya.</p>
+          <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editGuru(g)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="resetGuru(g)" class="text-amber-600 font-bold mr-3">Reset sandi</button><button @click="delGuru(g)" class="text-rose-600 font-bold">Hapus</button></td></tr>
+        <tr v-if="!guruTampil.length"><td :colspan="canEdit?7:6" class="p-4 text-slate-500">{{gdata.length?'Tidak ada akun yang cocok dengan filter.':canEdit?'Belum ada guru. Klik Tambah guru atau Impor Excel.':'Belum ada data guru.'}}</td></tr></tbody></table></div>
+      <p v-if="canEdit" class="text-xs text-slate-500 mt-2">Guru yang dipilih sebagai wali kelas otomatis dapat mengisi Bimbingan Wali untuk kelasnya.</p>
 
       <!-- Form tambah/ubah -->
       <div v-if="showG" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{gf.edit?'Ubah guru':'Tambah guru'}}</h3>
         <label class="lb">Username</label><input v-model.trim="gf.username" :disabled="gf.edit" placeholder="mis. budi.santoso" autocapitalize="none" class="inp w-full mt-1 mb-3 disabled:bg-slate-100">
         <label class="lb">Nama lengkap</label><input v-model.trim="gf.nama" maxlength="100" placeholder="Nama beserta gelar" class="inp w-full mt-1 mb-3">
-        <label class="lb">Peran</label><select v-model="gf.role" @change="gf.role==='KEPSEK'&&(gf.wali=[])" class="inp w-full mt-1 mb-3"><option value="GURU">Guru / Staff</option><option value="KEPSEK">Kepala sekolah</option></select>
+        <label class="lb">Peran</label><select v-model="gf.role" @change="gf.role!=='GURU'&&(gf.wali=[])" class="inp w-full mt-1 mb-3"><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf / Tata Usaha (hanya lihat &amp; unduh)</option></select>
         <template v-if="!gf.edit"><label class="lb">Sandi awal <span class="font-normal normal-case text-slate-400">(kosongkan = dibuat acak)</span></label><input v-model="gf.sandi" placeholder="min. 6 karakter" class="inp w-full mt-1 mb-3"></template>
         <template v-if="gf.role==='GURU'"><label class="lb">Wali kelas <span class="font-normal normal-case text-slate-400">(opsional, boleh lebih dari satu)</span></label>
           <div class="mt-1 mb-3 max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-2">
@@ -515,7 +520,7 @@
           <div class="overflow-auto border rounded-xl max-h-80"><table class="w-full text-xs">
             <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>Username</th><th>Nama</th><th>Peran</th><th>Wali kelas</th><th>Status</th></tr></thead>
             <tbody><tr v-for="r in gimp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
-              <td class="p-2">{{r.no}}</td><td>{{r.username}}</td><td>{{r.nama}}</td><td>{{r.role==='KEPSEK'?'Kepsek':'Guru'}}</td><td>{{r.wali.join(', ')}}</td>
+              <td class="p-2">{{r.no}}</td><td>{{r.username}}</td><td>{{r.nama}}</td><td>{{r.role==='KEPSEK'?'Kepsek':r.role==='STAF'?'Staf':'Guru'}}</td><td>{{r.wali.join(', ')}}</td>
               <td :class="r.st==='error'?'text-rose-600':r.st==='ubah'?'text-blue-800':'text-emerald-700'">{{r.st==='error'?r.msg:r.st==='ubah'?(gimp.update?'Diperbarui':'Dilewati'):'Baru'}}</td></tr></tbody></table></div>
           <p v-if="gimp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{gimp.rows.length}}; semua baris tetap diproses.</p>
           <div v-if="busy&&gimp.prog" class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden"><div class="h-full bg-blue-700 transition-all" :style="{width:gimp.prog+'%'}"></div></div>
@@ -724,7 +729,7 @@
         <thead class="bg-slate-50 text-left"><tr><th class="p-2">No</th><th>NIS</th><th>Nama</th><th v-for="m in leger.mapel" :key="m">{{m}}</th><th>Rata-rata</th></tr></thead>
         <tbody><tr v-for="(r,i) in leger.siswa" :key="r.nis" class="border-t"><td class="p-2">{{i+1}}</td><td>{{r.nis}}</td><td>{{r.nama}}</td>
           <td v-for="m in leger.mapel" :key="m"   :class="r.nilai[m]!=null&&r.nilai[m]<kkmOf(m)?'text-rose-600 font-bold':''">{{r.nilai[m]==null?'-':r.nilai[m]}}</td><td class="font-bold">{{r.rata==null?'-':r.rata}}</td></tr></tbody></table></div>
-      <p v-if="leger.mapel.length" class="text-xs text-slate-500 mt-2">Setiap sel adalah rata-rata seluruh skor mapel tersebut. Rata-rata akhir adalah rata-rata dari mapel yang sudah bernilai. Angka merah = di bawah KKM mapel.</p>
+      <p v-if="leger.mapel.length" class="text-xs text-slate-500 mt-2">Setiap sel adalah nilai akhir mapel tersebut (berbobot bila bobot sudah diatur di Pengaturan, selain itu rata-rata seluruh skor). Rata-rata akhir adalah rata-rata dari mapel yang sudah bernilai. Angka merah = di bawah KKM mapel.</p>
       <div v-if="leger.mapel.length" class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
     </section>
 
@@ -891,32 +896,34 @@ const app = createApp({
     const tanggal = ref(new Date().toLocaleDateString('sv-SE')), rows = ref([]), riwayat = ref([]);
     const f = reactive({ username: '', password: '' }), pw = reactive({ nis: '', lama: '', baru: '', konf: '' });
     const err = ref(''), ok = ref(''), busy = ref(false);
-    const loginRole = ref((() => { try { const v = localStorage.getItem('lr'); return ['ADMIN', 'GURU', 'KEPSEK', 'SISWA'].includes(v) ? v : 'SISWA'; } catch (e) { return 'SISWA'; } })()), caps = ref(false), showPw = ref(false), srv = ref('wait'), srvMsg = ref('');
+    const loginRole = ref((() => { try { const v = localStorage.getItem('lr'); return ['ADMIN', 'GURU', 'KEPSEK', 'STAF', 'SISWA'].includes(v) ? v : 'SISWA'; } catch (e) { return 'SISWA'; } })()), caps = ref(false), showPw = ref(false), srv = ref('wait'), srvMsg = ref('');
     const roles = [
       { k: 'ADMIN', t: 'Administrator', d: 'Kelola data induk sekolah', i: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>' },
-      { k: 'GURU', t: 'Guru / Staff', d: 'Presensi, nilai, dan jurnal', i: '<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2ZM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7Z"/>' },
+      { k: 'GURU', t: 'Guru', d: 'Presensi, nilai, dan jurnal', i: '<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2ZM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7Z"/>' },
       { k: 'KEPSEK', t: 'Kepala Sekolah', d: 'Pantau kinerja sekolah', i: '<path d="M3 21h18M5 21V10l7-6 7 6v11M9 21v-6h6v6"/>' },
+      { k: 'STAF', t: 'Staf / TU', d: 'Lihat dan unduh data guru & siswa', i: '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>' },
       { k: 'SISWA', t: 'Siswa', d: 'Kehadiran, nilai, dan jadwal', i: '<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>' }];
     const ROLE_INFO = {
       ADMIN: { label: 'Username', ph: 'admin', hint: 'Akses penuh untuk mengelola data sekolah.' },
-      GURU: { label: 'Username guru / staff', ph: 'username dari administrator', hint: 'Untuk guru, wali kelas, dan staf pengajar.' },
+      GURU: { label: 'Username guru', ph: 'username dari administrator', hint: 'Untuk guru dan wali kelas.' },
+      STAF: { label: 'Username staf', ph: 'username dari administrator', hint: 'Melihat dan mengunduh data guru dan siswa.' },
       KEPSEK: { label: 'Username kepala sekolah', ph: 'username dari administrator', hint: 'Memantau kinerja guru, wali kelas, dan siswa.' },
       SISWA: { label: 'NIS', ph: 'Nomor Induk Siswa', hint: 'Siswa masuk dengan NIS dan sandi awal dari sekolah.' } };
     const roleInfo = computed(() => ROLE_INFO[loginRole.value]);
     const pilihRole = k => { loginRole.value = k; f.username = ''; f.password = ''; err.value = ''; try { localStorage.setItem('lr', k); } catch (e) { /* penyimpanan dinonaktifkan */ } Vue.nextTick(() => { const el = document.getElementById('in-user'); if (el) el.focus(); }); };
     const capsCek = e => { caps.value = !!(e.getModifierState && e.getModifierState('CapsLock')); };
-    const badge = { ADMIN: { t: 'ADMINISTRATOR', c: 'bg-navy-700 text-white' }, GURU: { t: 'GURU / PENGAJAR', c: 'bg-emerald-500 text-white' }, KEPSEK: { t: 'KEPALA SEKOLAH', c: 'bg-violet-600 text-white' }, SISWA: { t: 'SISWA', c: 'bg-amber-400 text-slate-900' } };
+    const badge = { ADMIN: { t: 'ADMINISTRATOR', c: 'bg-navy-700 text-white' }, GURU: { t: 'GURU / PENGAJAR', c: 'bg-emerald-500 text-white' }, STAF: { t: 'STAF / TATA USAHA', c: 'bg-sky-500 text-white' }, KEPSEK: { t: 'KEPALA SEKOLAH', c: 'bg-violet-600 text-white' }, SISWA: { t: 'SISWA', c: 'bg-amber-400 text-slate-900' } };
     const sc = { H: 'bg-emerald-500', I: 'bg-blue-600', S: 'bg-amber-500', A: 'bg-rose-600', D: 'bg-violet-600' };
     const lbl = { H: 'HADIR', I: 'IZIN', S: 'SAKIT', A: 'ALPA', D: 'DISPENSASI' };
     const tgl = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    const acc = { KEPSEK: 'bg-violet-600 text-white', ADMIN: 'bg-navy-700 text-white', GURU: 'bg-emerald-600 text-white', SISWA: 'bg-amber-400 text-slate-900' };
-    const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', SISWA: 'from-navy-900 to-navy-600' };
-    const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.' };
-    const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
+    const acc = { KEPSEK: 'bg-violet-600 text-white', ADMIN: 'bg-navy-700 text-white', GURU: 'bg-emerald-600 text-white', STAF: 'bg-sky-600 text-white', SISWA: 'bg-amber-400 text-slate-900' };
+    const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600' };
+    const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Lihat dan unduh data guru dan siswa.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.' };
+    const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], STAF: ['siswa', 'guru'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
     const clock = ref(''), tick = () => clock.value = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
     tick(); setInterval(tick, 1000);
     const M = { guru: 'Kelola Guru', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
-    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'jurnal', 'dokumen', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
+    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'jurnal', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -936,7 +943,11 @@ const app = createApp({
     ICON.bimbingansaya = ICON.catatan = ICON.catatansaya = ICON.bimbingan; ICON.izin = ICON.dokumen;
     ICON.guru = '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/><path d="M17 3l2 2 3-3"/>';
     ICON.monitor = '<path d="M3 12h4l3-8 4 16 3-8h4"/>';
-    const menu = computed(() => user.value ? MENU[user.value.role].map(k => ({ k, t: M[k] })) : []);
+    const MS = { siswa: 'Data Siswa', guru: 'Data Guru' }; // nama menu untuk peran hanya-lihat
+    const menu = computed(() => user.value ? MENU[user.value.role].map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || M[k] })) : []);
+    const canEdit = computed(() => !!user.value && user.value.role === 'ADMIN'); // STAF hanya melihat & mengunduh
+    const ROLE_LBL = { GURU: 'Guru', KEPSEK: 'Kepala sekolah', STAF: 'Staf' }, ROLE_CLS = { GURU: 'bg-emerald-100 text-emerald-700', KEPSEK: 'bg-violet-100 text-violet-700', STAF: 'bg-sky-100 text-sky-700' };
+    const roleDari = t => /^k/i.test(t) ? 'KEPSEK' : /^(s|t)/i.test(t) ? 'STAF' : 'GURU';
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]);
     const cfg = ref({ kop: { logoKiri: '', logoKanan: '', baris: [] }, ttd: { kota: '', jabatan: '', nama: '', nip: '' } }), resetTxt = ref(''), backupUrl = ref('');
@@ -990,6 +1001,7 @@ const app = createApp({
     });
     function logout() { token.value = ''; user.value = null; sessionStorage.clear(); }
     const go = k => run(async () => {
+      if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
       view.value = k; dash.value = null; q.value = ''; toTop();
       if (k === 'dashboard') { dash.value = await api('dashboard'); belumBaca.value = dash.value.catatanBaru || 0; await fetchPeng(); await fetchAg(); }
       if (k === 'presensi') {
@@ -1237,7 +1249,7 @@ const app = createApp({
       if (!/^[A-Za-z0-9._-]{3,30}$/.test(gf.username)) throw new Error('Username 3-30 karakter: huruf, angka, titik, minus, atau garis bawah');
       if (!gf.nama) throw new Error('Nama wajib diisi');
       if (!gf.edit && gf.sandi && gf.sandi.length < 6) throw new Error('Sandi minimal 6 karakter');
-      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, sandi: gf.sandi, wali: gf.role === 'KEPSEK' ? [] : gf.wali } });
+      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, sandi: gf.sandi, wali: gf.role !== 'GURU' ? [] : gf.wali } });
       showG.value = false; await refreshGuru();
       if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi }]);
       ok.value = gf.edit ? 'Data guru diperbarui' : 'Akun guru dibuat';
@@ -1247,13 +1259,13 @@ const app = createApp({
     });
     const delGuru = g => confirm('Hapus akun ' + g.nama + '? Status wali kelasnya ikut dilepas.') && run(async () => { await api('guruDelete', { username: g.username }); await refreshGuru(); ok.value = 'Akun dihapus'; });
     const exportGuru = () => run(async () => {
-      const aoa = [['No', 'Username', 'Nama', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, g.role === 'KEPSEK' ? 'Kepala Sekolah' : 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
+      const aoa = [['No', 'Username', 'Nama', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, ROLE_LBL[g.role] || 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
       saveXlsx('Data_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Guru', aoa, [5, 20, 32, 16, 20, 30, 12]]]); ok.value = guruTampil.value.length + ' akun diekspor';
     });
     const templateGuru = () => run(async () => {
       saveXlsx('Template_Impor_Guru.xlsx', [
-        ['Data Guru', [['Username', 'Nama', 'Peran', 'Wali Kelas', 'Sandi'], ['budi.santoso', 'Budi Santoso, S.Pd.', 'Guru', 'X TKJ 1', ''], ['siti.aminah', 'Siti Aminah, S.Kom.', 'Guru', 'XI TM 1, XI TM 2', 'rahasia123'], ['kepsek', 'Drs. Contoh, M.Pd.', 'Kepala Sekolah', '', '']], [20, 34, 16, 24, 16]],
-        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Guru"; hapus baris contoh.'], ['2. Kolom wajib: Username (3-30 karakter: huruf, angka, titik, minus, garis bawah) dan Nama.'], ['3. Peran: Guru atau Kepala Sekolah (kosong = Guru). Kepala sekolah tidak bisa menjadi wali kelas.'], ['4. Wali Kelas: nama kelas yang SUDAH ada di Kelola Kelas; beberapa kelas dipisah koma. Kosong = tidak mengubah.'], ['5. Sandi: opsional, min. 6 karakter. Kosong = dibuat acak (dapat diunduh setelah impor). Untuk akun yang sudah ada, kolom ini diabaikan.']], [100]]]);
+        ['Data Guru', [['Username', 'Nama', 'Peran', 'Wali Kelas', 'Sandi'], ['budi.santoso', 'Budi Santoso, S.Pd.', 'Guru', 'X TKJ 1', ''], ['siti.aminah', 'Siti Aminah, S.Kom.', 'Guru', 'XI TM 1, XI TM 2', 'rahasia123'], ['kepsek', 'Drs. Contoh, M.Pd.', 'Kepala Sekolah', '', ''], ['staf.tu', 'Rina Lestari', 'Staf', '', '']], [20, 34, 16, 24, 16]],
+        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Guru"; hapus baris contoh.'], ['2. Kolom wajib: Username (3-30 karakter: huruf, angka, titik, minus, garis bawah) dan Nama.'], ['3. Peran: Guru, Kepala Sekolah, atau Staf (staf hanya dapat melihat dan mengunduh data guru dan siswa). Kosong = Guru. Hanya guru yang bisa menjadi wali kelas.'], ['4. Wali Kelas: nama kelas yang SUDAH ada di Kelola Kelas; beberapa kelas dipisah koma. Kosong = tidak mengubah.'], ['5. Sandi: opsional, min. 6 karakter. Kosong = dibuat acak (dapat diunduh setelah impor). Untuk akun yang sudah ada, kolom ini diabaikan.']], [100]]]);
     });
     const gimp = reactive({ show: false, rows: [], file: '', update: true, done: null, creds: [], gagal: [], prog: 0 });
     const gimpCount = computed(() => { const c = { baru: 0, ubah: 0, error: 0 }; gimp.rows.forEach(r => c[r.st]++); c.siap = c.baru + (gimp.update ? c.ubah : 0); return c; });
@@ -1271,7 +1283,7 @@ const app = createApp({
         kelasAll.value.forEach(k => kmap[k.kelas.toLowerCase()] = k.kelas);
         aoa.slice(1).forEach((r, i) => {
           if (r.every(v => !norm(v))) return;
-          const o = { no: i + 2, username: norm(r[c.un]), nama: norm(r[c.nama]), role: c.role >= 0 && /^k/i.test(norm(r[c.role])) ? 'KEPSEK' : 'GURU', wali: [], sandi: c.sandi < 0 ? '' : norm(r[c.sandi]), st: 'baru', msg: '' };
+          const o = { no: i + 2, username: norm(r[c.un]), nama: norm(r[c.nama]), role: roleDari(c.role >= 0 ? norm(r[c.role]) : ''), wali: [], sandi: c.sandi < 0 ? '' : norm(r[c.sandi]), st: 'baru', msg: '' };
           const walis = c.wali < 0 ? [] : norm(r[c.wali]).split(/[,;|\n]/).map(s => s.trim()).filter(Boolean), salah = [];
           walis.forEach(w => { const k = kmap[w.toLowerCase()]; if (k) { if (o.wali.indexOf(k) < 0) o.wali.push(k); } else salah.push(w); });
           if (!o.username) { o.st = 'error'; o.msg = 'Username kosong'; }
@@ -1279,7 +1291,7 @@ const app = createApp({
           else if (seen.has(o.username)) { o.st = 'error'; o.msg = 'Username ganda di file'; }
           else if (!o.nama) { o.st = 'error'; o.msg = 'Nama kosong'; }
           else if (salah.length) { o.st = 'error'; o.msg = 'Kelas belum ada: ' + salah.join(', '); }
-          else if (o.role === 'KEPSEK' && o.wali.length) { o.st = 'error'; o.msg = 'Kepsek tidak bisa jadi wali kelas'; }
+          else if (o.role !== 'GURU' && o.wali.length) { o.st = 'error'; o.msg = 'Hanya guru yang bisa jadi wali kelas'; }
           else if (ada.has(o.username)) o.st = 'ubah';
           else if (o.sandi && o.sandi.length < 6) { o.st = 'error'; o.msg = 'Sandi min. 6 karakter'; }
           seen.add(o.username); out.push(o);
@@ -1303,7 +1315,7 @@ const app = createApp({
       try { await refreshGuru(); } catch (e) { /* daftar dimuat ulang saat menu dibuka lagi */ }
     });
     const downloadGuruCreds = () => run(async () => {
-      saveXlsx('Kredensial_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['Username', 'Nama', 'Peran', 'Sandi awal']].concat(gimp.creds.map(x => [String(x.username), x.nama, x.role === 'KEPSEK' ? 'Kepala Sekolah' : 'Guru', String(x.sandi)])), [20, 34, 16, 14]]]);
+      saveXlsx('Kredensial_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['Username', 'Nama', 'Peran', 'Sandi awal']].concat(gimp.creds.map(x => [String(x.username), x.nama, ROLE_LBL[x.role] || 'Guru', String(x.sandi)])), [20, 34, 16, 14]]]);
     });
 
     /* ====== v3.2: pindah kelas, reset sandi siswa, ekspor, aksi cepat ====== */
@@ -1387,7 +1399,7 @@ const app = createApp({
     const fetchMon = async () => mon.value = await api('monitor', { bulan: monBulan.value });
     const loadMon = () => run(fetchMon);
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = false; if (!busy.value) imp.show = gimp.show = false; } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = showAg.value = false; if (!busy.value) imp.show = gimp.show = false; } });
     if (user.value) go('dashboard');
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
     // Tinggi dihitung dari isi aplikasi (bukan tinggi jendela) agar tidak terpotong; modal tinggi ikut diperhitungkan
@@ -1397,7 +1409,7 @@ const app = createApp({
       parent.postMessage({ calmHeight: Math.ceil(h) + 24 }, '*');
     }, 600);
 
-    return { API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, resetSiswa, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, resetSiswa, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
