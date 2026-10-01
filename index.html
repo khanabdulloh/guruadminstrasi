@@ -22,8 +22,10 @@
 @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .up{animation:up .5s ease both}
 .modal-wrap{display:flex;justify-content:center;align-items:flex-start;overflow-y:auto}.modal-box{margin:auto}
-.embedded .min-h-screen,.embedded aside{min-height:0}.embedded .login-wrap{min-height:680px}.embedded .modal-box{margin:1rem auto auto}
-.kartu-wrap{display:none}
+.embedded .min-h-screen,.embedded aside{min-height:0}.embedded aside{height:auto!important;position:static!important;max-height:none!important}.embedded .login-wrap{min-height:680px}.embedded .modal-box{margin:1rem auto auto}
+.kartu-wrap,.rapor-wrap{display:none}
+@page rapor{size:A4 portrait;margin:15mm}
+@media print{body.cetak-rapor main>*:not(.rapor-wrap){display:none!important}body.cetak-rapor .rapor-wrap{display:block;page:rapor}.rapor-page{break-after:page;page-break-after:always}}
 button:disabled{cursor:not-allowed}
 :focus-visible{outline:3px solid rgba(245,158,11,.75);outline-offset:2px}
 .btn-o:hover:not(:disabled){background:#eef3fb}.btn-o:disabled{opacity:.5}
@@ -742,10 +744,31 @@ table tbody tr:hover{background:#f8fafc}
         <thead class="bg-slate-50 text-left"><tr><th class="p-2">No</th><th>NIS</th><th>Nama</th><th v-for="m in leger.mapel" :key="m">{{m}}</th><th>Rata-rata</th></tr></thead>
         <tbody><tr v-for="(r,i) in leger.siswa" :key="r.nis" class="border-t"><td class="p-2">{{i+1}}</td><td>{{r.nis}}</td><td>{{r.nama}}</td>
           <td v-for="m in leger.mapel" :key="m"   :class="r.nilai[m]!=null&&r.nilai[m]<kkmOf(m)?'text-rose-600 font-bold':''">{{r.nilai[m]==null?'-':r.nilai[m]}}</td><td class="font-bold">{{r.rata==null?'-':r.rata}}</td></tr></tbody></table></div>
+      <div v-if="remedial.length" class="bg-white rounded-2xl shadow-sm p-4 mt-4"><h3 class="font-bold mb-2">Daftar remedial <span class="text-xs font-normal text-slate-500">(nilai di bawah KKM)</span></h3>
+        <div v-for="r in remedial" :key="r.mapel" class="py-2 border-t first:border-t-0 text-sm"><b>{{r.mapel}}</b> <span class="text-slate-400">KKM {{r.kkm}}</span> &middot; {{r.list.length}} siswa<p class="text-slate-600">{{r.list.map(x=>x.nama+' ('+x.nilai+')').join(', ')}}</p></div></div>
       <p v-if="leger.mapel.length" class="text-xs text-slate-500 mt-2">Setiap sel adalah nilai akhir mapel tersebut (berbobot bila bobot sudah diatur di Pengaturan, selain itu rata-rata seluruh skor). Rata-rata akhir adalah rata-rata dari mapel yang sudah bernilai. Angka merah = di bawah KKM mapel.</p>
       <div v-if="leger.mapel.length" class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
     </section>
 
+    <!-- Rapor -->
+    <section v-if="view==='rapor'">
+      <h2 class="h2">Rapor Siswa</h2>
+      <p v-if="!rpPil.length" class="text-sm text-slate-500">Rapor hanya dapat dicetak oleh wali kelas. Admin menetapkan wali di Kelola Kelas.</p>
+      <div v-else class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
+        <label class="lb">Kelas<select v-model="rpKelas" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Kelas --</option><option v-for="k in rpPil" :key="k">{{k}}</option></select></label>
+        <label class="lb">Semester<select v-model="rpMeta.sem" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select></label>
+        <label class="lb">Tahun ajaran<input v-model.trim="rpMeta.tahun" placeholder="2026/2027" class="inp w-full mt-1 normal-case"></label>
+        <button @click="cetakRapor" :disabled="!rp||!rp.siswa.length" class="btn-p">Cetak semua rapor</button></div>
+      <template v-if="rp">
+        <p v-if="!rp.mapel.length" class="text-sm text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mb-3">Belum ada nilai untuk kelas ini; rapor akan kosong pada bagian nilai.</p>
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+          <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>Rata-rata</th><th>Belum tuntas</th><th>S</th><th>I</th><th>A</th><th>Catatan wali kelas (tercetak di rapor)</th></tr></thead>
+          <tbody><tr v-for="(s,i) in rp.siswa" :key="s.nis" class="border-t"><td class="p-3">{{i+1}}</td><td>{{s.nama}}</td><td class="font-bold">{{s.rata==null?'-':s.rata}}</td><td :class="belumR(s)?'text-rose-600 font-bold':''">{{belumR(s)}} mapel</td><td>{{s.hadir.S}}</td><td>{{s.hadir.I}}</td><td>{{s.hadir.A}}</td>
+            <td class="pr-3"><input v-model="rpCat[s.nis]" maxlength="200" placeholder="opsional" class="w-full min-w-[12rem] border-b border-slate-200 py-1 focus:outline-none focus:border-blue-700"></td></tr>
+          <tr v-if="!rp.siswa.length"><td colspan="8" class="p-4 text-slate-500">Belum ada siswa di kelas ini.</td></tr></tbody></table></div>
+        <p class="text-xs text-slate-500 mt-2">Kehadiran dihitung per hari (status terburuk dari semua sesi hari itu). Catatan wali tidak disimpan di server; isi sebelum mencetak.</p>
+      </template>
+    </section>
     <!-- Dokumen digital -->
     <section v-if="view==='dokumen'">
       <div class="flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Dokumen Digital</h2>
@@ -865,6 +888,7 @@ table tbody tr:hover{background:#f8fafc}
     <!-- Ganti sandi -->
     <section v-if="view==='sandi'" class="max-w-sm">
       <h2 class="h2">Ganti Sandi</h2>
+      <p v-if="user.wajib" role="alert" class="mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3">Demi keamanan, ganti sandi awal Anda terlebih dahulu sebelum memakai portal.</p>
       <input v-model="pw.nis" disabled class="inp w-full mb-3 bg-slate-100">
       <input v-model="pw.lama" type="password" placeholder="Sandi lama" class="inp w-full mb-3">
       <input v-model="pw.baru" type="password" placeholder="Sandi baru (min. 6 karakter)" class="inp w-full mb-3">
@@ -889,6 +913,17 @@ table tbody tr:hover{background:#f8fafc}
       <label class="lb">Tayang sampai (opsional)<input type="date" v-model="pf.sampai" :min="hari0" class="inp w-full mt-1 normal-case"></label>
       <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p>
       <div class="flex justify-end gap-2 mt-4"><button @click="showPg=false" class="btn-o">Batal</button><button @click="savePeng" :disabled="busy||!pf.judul||!pf.isi" class="btn-p">Publikasikan</button></div></div></div>
+    <div v-if="rp&&view==='rapor'" class="rapor-wrap"><div v-for="s in rp.siswa" :key="s.nis" class="rapor-page">
+      <kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">LAPORAN HASIL BELAJAR (RAPOR)</p>
+      <table class="text-sm mb-3"><tr><td class="pr-3">Nama</td><td>: {{s.nama}}</td><td class="pl-8 pr-3">Kelas</td><td>: {{rp.kelas}}</td></tr><tr><td>NIS</td><td>: {{s.nis}}</td><td class="pl-8">Semester</td><td>: {{rpMeta.sem}} {{rpMeta.tahun}}</td></tr></table>
+      <table class="w-full text-sm border-collapse mb-3"><thead><tr class="bg-slate-100"><th class="border p-1">No</th><th class="border p-1 text-left">Mata Pelajaran</th><th class="border p-1">KKM</th><th class="border p-1">Nilai</th><th class="border p-1">Keterangan</th></tr></thead><tbody>
+        <tr v-for="(m,i) in rp.mapel" :key="m"><td class="border p-1 text-center">{{i+1}}</td><td class="border p-1">{{m}}</td><td class="border p-1 text-center">{{kkmR(m)}}</td><td class="border p-1 text-center font-bold">{{s.nilai[m]==null?'-':s.nilai[m]}}</td><td class="border p-1 text-center">{{s.nilai[m]==null?'-':s.nilai[m]>=kkmR(m)?'Tuntas':'Belum tuntas'}}</td></tr>
+        <tr class="font-bold"><td class="border p-1" colspan="3">Rata-rata</td><td class="border p-1 text-center">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td></tr></tbody></table>
+      <table class="text-sm border-collapse mb-3"><thead><tr class="bg-slate-100"><th class="border p-1 px-3" colspan="4">Kehadiran (hari)</th></tr></thead><tbody><tr><td class="border p-1 px-3">Sakit: {{s.hadir.S}}</td><td class="border p-1 px-3">Izin: {{s.hadir.I}}</td><td class="border p-1 px-3">Alpa: {{s.hadir.A}}</td><td class="border p-1 px-3">Dispensasi: {{s.hadir.D}}</td></tr></tbody></table>
+      <div class="border p-2 text-sm mb-4" style="min-height:3rem"><b>Catatan wali kelas:</b> {{rpCat[s.nis]||'-'}}</div>
+      <div class="flex justify-between text-sm mt-6"><div class="text-center w-56"><div>Wali Kelas</div><div class="h-16"></div><div class="font-bold underline">{{rp.waliNama||'.....................'}}</div></div>
+        <div class="text-center w-56"><div>{{cfg.ttd.kota}}, {{tglCetak}}</div><div>{{cfg.ttd.jabatan}}</div><div class="h-16"></div><div class="font-bold underline">{{cfg.ttd.nama||'.....................'}}</div><div v-if="cfg.ttd.nip">NIP. {{cfg.ttd.nip}}</div></div></div>
+    </div></div>
     <div v-if="kartu" class="kartu-wrap"><div v-for="s in kartu.siswa" :key="s.nis" class="kartu"><p class="font-bold">Portal Akademik SMK CALM</p><p>{{s.nama}} &middot; {{s.ket||kartu.kelas}}</p><p>Username{{s.ket?'':' (NIS)'}}: <b>{{s.nis}}</b></p><p>Sandi awal: <b>{{s.sandi||'sudah diganti, minta reset ke admin'}}</b></p></div></div>
     <div v-if="showAg" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
       <h3 class="font-extrabold text-blue-900 mb-4">Tambah agenda akademik</h3>
@@ -957,8 +992,8 @@ const app = createApp({
     const clock = ref(''), tick = () => { const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' }); document.querySelectorAll('.clk').forEach(e => { if (e.textContent !== t) e.textContent = t; }); };
     tick(); setInterval(tick, 1000); // ubah DOM langsung: tidak memicu render ulang seluruh aplikasi tiap detik
     const mnav = ref(false);
-    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
-    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'jurnal', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
+    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', sandi: 'Ganti Sandi' };
+    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -977,10 +1012,11 @@ const app = createApp({
       keluar: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>' };
     ICON.bimbingansaya = ICON.catatan = ICON.catatansaya = ICON.bimbingan; ICON.izin = ICON.dokumen;
     ICON.guru = '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/><path d="M17 3l2 2 3-3"/>';
+    ICON.rapor = ICON.nilaisaya;
     ICON.monitor = '<path d="M3 12h4l3-8 4 16 3-8h4"/>';
     ICON.akun = '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14 9l2 2"/>';
     const MS = { siswa: 'Data Siswa', guru: 'Data Guru' }; // nama menu untuk peran hanya-lihat
-    const menu = computed(() => user.value ? MENU[user.value.role].map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || M[k] })) : []);
+    const menu = computed(() => user.value ? MENU[user.value.role].filter(k => !user.value.wajib || k === 'sandi').map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || M[k] })) : []);
     const canEdit = computed(() => !!user.value && user.value.role === 'ADMIN'); // STAF hanya melihat & mengunduh
     const ROLE_LBL = { SISWA: 'Siswa', GURU: 'Guru', KEPSEK: 'Kepala sekolah', STAF: 'Staf' }, ROLE_CLS = { SISWA: 'bg-amber-100 text-amber-800', GURU: 'bg-emerald-100 text-emerald-700', KEPSEK: 'bg-violet-100 text-violet-700', STAF: 'bg-sky-100 text-sky-700' };
     const roleDari = t => /^k/i.test(t) ? 'KEPSEK' : /^(s|t)/i.test(t) ? 'STAF' : 'GURU';
@@ -1033,10 +1069,11 @@ const app = createApp({
       const d = await api('login', { username: f.username, password: f.password });
       token.value = d.token; user.value = d.user; f.password = '';
       sessionStorage.setItem('tk', d.token); sessionStorage.setItem('us', JSON.stringify(d.user));
-      go('dashboard');
+      go('dashboard'); // go() mengarahkan ke Ganti Sandi bila sandi awal belum diganti
     });
     function logout() { token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; kred.list = []; kred.show = false; kartu.value = null; f.password = ''; }
     const go = k => run(async () => {
+      if (user.value.wajib) k = 'sandi';
       if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
       view.value = k; dash.value = null; q.value = ''; toTop();
       if (k === 'dashboard') { dash.value = await api('dashboard'); belumBaca.value = dash.value.catatanBaru || 0; await fetchPeng(); await fetchAg(); }
@@ -1060,6 +1097,7 @@ const app = createApp({
       if (k === 'bimbingansaya') await fetchB();
       if (k === 'leger') { cfg.value = await api('pengaturanGet'); lk.value = await api('legerKelas'); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
       if (k === 'dokumen') await fetchD();
+      if (k === 'rapor') { cfg.value = await api('pengaturanGet'); rpPil.value = await api('raporPilihan'); rp.value = null; rpKelas.value = ''; }
       if (k === 'nilaisaya') nilaiSaya.value = await api('nilaiSaya');
       if (k === 'izin') await fetchIz();
       if (k === 'catatan') { guru.value = await api('guruList'); await fetchCg(); }
@@ -1069,7 +1107,9 @@ const app = createApp({
     const ganti = () => run(async () => {
       if (!pw.lama) throw new Error('Isi sandi lama'); if (pw.baru.length < 6) throw new Error('Sandi baru minimal 6 karakter');
       if (pw.baru !== pw.konf) throw new Error('Konfirmasi sandi tidak cocok');
-      await api('gantiPassword', { lama: pw.lama, baru: pw.baru }); ok.value = 'Sandi diperbarui'; pw.lama = pw.baru = pw.konf = '';
+      if (pw.baru === pw.lama) throw new Error('Sandi baru harus berbeda dari sandi lama');
+      await api('gantiPassword', { lama: pw.lama, baru: pw.baru }); pw.lama = pw.baru = pw.konf = '';
+      if (user.value.wajib) { user.value.wajib = false; sessionStorage.setItem('us', JSON.stringify(user.value)); await go('dashboard'); ok.value = 'Sandi diperbarui. Selamat datang di portal!'; } else ok.value = 'Sandi diperbarui';
     });
 
     const refresh = async () => { kelasList.value = []; kelasAll.value = await api('kelasDetail'); };
@@ -1391,6 +1431,14 @@ const app = createApp({
       await api('akademikSave', { bobot: ak.value.bobot, def: ak.value.def, map: ak.value.map }); ok.value = 'Bobot dan KKM tersimpan';
     });
     const kkmOf = m => { const k = leger.value.kkm; return k ? (k.map[m] || k.def) : 75; };
+    const remedial = computed(() => leger.value.mapel.map(m => ({ mapel: m, kkm: kkmOf(m), list: leger.value.siswa.filter(r => r.nilai[m] != null && r.nilai[m] < kkmOf(m)).map(r => ({ nama: r.nama, nilai: r.nilai[m] })) })).filter(r => r.list.length));
+    /* ====== Rapor ====== */
+    const rpPil = ref([]), rpKelas = ref(''), rp = ref(null), rpCat = reactive({}), rpMeta = reactive({ sem: 'Ganjil', tahun: '' });
+    const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const kkmR = m => { const k = rp.value && rp.value.kkm; return k ? (k.map[m] || k.def) : 75; };
+    const belumR = s => rp.value.mapel.filter(m => s.nilai[m] != null && s.nilai[m] < kkmR(m)).length;
+    const loadRapor = () => run(async () => { Object.keys(rpCat).forEach(k => delete rpCat[k]); rp.value = rpKelas.value ? await api('raporData', { kelas: rpKelas.value }) : null; });
+    const cetakRapor = () => { if (!rp.value || !rp.value.siswa.length) return; document.body.classList.add('cetak-rapor'); window.addEventListener('afterprint', () => document.body.classList.remove('cetak-rapor'), { once: true }); window.print(); };
 
     /* ====== v3.5: cadangan otomatis ====== */
     const bk2 = ref(null);
@@ -1477,7 +1525,7 @@ const app = createApp({
       parent.postMessage({ calmHeight: Math.ceil(h) + 24 }, '*');
     }, 600);
 
-    return { mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { remedial, rpPil, rpKelas, rp, rpCat, rpMeta, tglCetak, kkmR, belumR, loadRapor, cetakRapor, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
