@@ -4,48 +4,113 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portal Akademik SMK CALM</title>
+<meta name="theme-color" content="#0b3d91">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config={theme:{extend:{colors:{blue:{700:"#134aa8",800:"#0b3d91",900:"#072a66"}}}}}</script>
+<script>tailwind.config={theme:{extend:{colors:{navy:{50:"#eef3fb",100:"#d9e4f6",600:"#134aa8",700:"#0b3d91",800:"#082f70",900:"#061f4d",950:"#041536"},blue:{700:"#134aa8",800:"#0b3d91",900:"#072a66"}}}}}</script>
 <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
-<style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}</style>
+<style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}
+.login-bg{background:radial-gradient(1200px 600px at 10% -10%,#1b56c0 0%,transparent 60%),radial-gradient(900px 500px at 110% 110%,#134aa8 0%,transparent 55%),linear-gradient(160deg,#0b3d91 0%,#072a66 55%,#041536 100%)}
+.login-bg::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,#000,transparent 85%);-webkit-mask-image:linear-gradient(to bottom,#000,transparent 85%)}
+.fld{width:100%;border:1.5px solid #cbd5e1;border-radius:.9rem;padding:.7rem .9rem .7rem 2.6rem;font-size:.95rem;background:#f8fafc;transition:.15s}
+.fld:focus{outline:none;border-color:#0b3d91;background:#fff;box-shadow:0 0 0 4px rgba(11,61,145,.15)}
+.spin{width:1rem;height:1rem;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.up{animation:up .5s ease both}
+</style>
 </head>
 <body class="bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
 
 <!-- LOGIN -->
-<div v-if="!user" class="min-h-screen grid md:grid-cols-2">
-  <div class="hidden md:flex flex-col justify-end p-12 bg-[#0F172A] text-white">
-    <img :src="LOGO" alt="Logo SMK CALM" class="h-20 w-20 object-contain mb-4">
-    <p class="text-amber-400 font-bold">SMKS Ciledug Al-Musaddadiyah Garut</p>
-    <h1 class="text-4xl font-extrabold mt-2 leading-tight">Portal Akademik</h1>
-    <p class="mt-3 text-slate-300 max-w-sm">Presensi, nilai, dan jurnal dalam satu tempat untuk admin, guru, dan siswa.</p>
+<div v-if="!user" class="min-h-screen grid lg:grid-cols-[1.1fr_1fr]">
+  <!-- Panel kiri -->
+  <div class="login-bg relative hidden lg:flex flex-col justify-between p-12 text-white overflow-hidden">
+    <div class="relative flex items-center gap-3">
+      <span class="grid place-items-center h-14 w-14 rounded-2xl bg-white shadow-lg"><img :src="LOGO" alt="Logo SMK CALM" class="h-10 w-10 object-contain"></span>
+      <div class="leading-tight"><p class="font-extrabold tracking-wide">SMK CALM</p><p class="text-xs text-blue-200">Yayasan Al-Musaddadiyah Garut</p></div>
+    </div>
+    <div class="relative up">
+      <span class="inline-flex items-center gap-2 text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1 text-blue-100">Terakreditasi A &middot; BAN-S/M</span>
+      <h1 class="text-5xl font-extrabold mt-4 leading-[1.1]">Portal<br>Akademik</h1>
+      <p class="mt-4 text-blue-100/90 max-w-md leading-relaxed">Presensi, nilai, jurnal mengajar, dan bimbingan wali dalam satu tempat untuk administrator, guru, dan siswa.</p>
+      <div class="mt-8 grid grid-cols-3 gap-3 max-w-md text-sm">
+        <div class="rounded-2xl bg-white/10 border border-white/15 p-3"><p class="font-bold">Presensi</p><p class="text-xs text-blue-200 mt-0.5">Harian &amp; rekap</p></div>
+        <div class="rounded-2xl bg-white/10 border border-white/15 p-3"><p class="font-bold">Nilai</p><p class="text-xs text-blue-200 mt-0.5">Input &amp; leger</p></div>
+        <div class="rounded-2xl bg-white/10 border border-white/15 p-3"><p class="font-bold">Jurnal</p><p class="text-xs text-blue-200 mt-0.5">Mengajar &amp; wali</p></div>
+      </div>
+    </div>
+    <p class="relative text-xs text-blue-200/80">&copy; 2026 SMKS Ciledug Al-Musaddadiyah Garut</p>
   </div>
-  <div class="flex items-center justify-center p-6">
-    <div class="w-full max-w-sm bg-white rounded-2xl shadow-sm p-8">
-      <h2 class="text-xl font-extrabold text-blue-900">Masuk</h2>
-      <p class="text-sm text-slate-500 mb-5">Siswa masuk dengan NIS.</p>
-      <label class="text-sm font-medium">Username / NIS</label>
-      <input v-model.trim="f.username" class="w-full mt-1 mb-3 rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700" autocomplete="username">
-      <label class="text-sm font-medium">Sandi</label>
-      <input v-model="f.password" type="password" @keyup.enter="login" class="w-full mt-1 mb-4 rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700" autocomplete="current-password">
-      <p v-if="err" class="text-sm text-rose-600 mb-3">{{err}}</p>
-      <button @click="login" :disabled="busy" class="w-full rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold py-2.5 disabled:opacity-60">{{busy?'Memeriksa...':'Masuk'}}</button>
+
+  <!-- Panel kanan -->
+  <div class="relative flex flex-col items-center justify-center p-5 sm:p-8 bg-navy-50 lg:bg-slate-50">
+    <div class="lg:hidden login-bg absolute inset-x-0 top-0 h-56 rounded-b-[2.5rem]"></div>
+    <div class="relative w-full max-w-md up">
+      <div class="lg:hidden text-center text-white mb-5 pt-4">
+        <span class="inline-grid place-items-center h-16 w-16 rounded-2xl bg-white shadow-lg"><img :src="LOGO" alt="Logo" class="h-11 w-11 object-contain"></span>
+        <h1 class="text-2xl font-extrabold mt-3">Portal Akademik</h1>
+        <p class="text-xs text-blue-200">SMKS Ciledug Al-Musaddadiyah Garut</p>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-xl shadow-navy-900/10 border border-slate-200/70 p-6 sm:p-8">
+        <h2 class="text-2xl font-extrabold text-navy-800">Selamat datang</h2>
+        <p class="text-sm text-slate-500 mt-1 mb-5">Masuk untuk melanjutkan ke portal.</p>
+
+        <!-- Pilih peran -->
+        <div class="grid grid-cols-3 gap-1 p-1 rounded-2xl bg-slate-100 mb-5" role="tablist">
+          <button v-for="r in roles" :key="r.k" type="button" role="tab" @click="loginRole=r.k"
+            class="py-2 rounded-xl text-xs sm:text-sm font-bold transition"
+            :class="loginRole===r.k?'bg-navy-700 text-white shadow':'text-slate-500 hover:text-navy-700'">{{r.t}}</button>
+        </div>
+        <p class="text-xs text-slate-500 -mt-2 mb-4">{{roleInfo.hint}}</p>
+
+        <label class="text-sm font-semibold text-slate-700">{{roleInfo.label}}</label>
+        <div class="relative mt-1 mb-4">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          <input v-model.trim="f.username" @keyup.enter="login" class="fld" :placeholder="roleInfo.ph" autocomplete="username" autocapitalize="none" spellcheck="false">
+        </div>
+
+        <label class="text-sm font-semibold text-slate-700">Sandi</label>
+        <div class="relative mt-1 mb-2">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <input v-model="f.password" :type="showPw?'text':'password'" @keyup.enter="login" class="fld pr-14" placeholder="Masukkan sandi" autocomplete="current-password">
+          <button type="button" @click="showPw=!showPw" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-navy-700 hover:text-navy-900">{{showPw?'Sembunyi':'Lihat'}}</button>
+        </div>
+
+        <p v-if="err" class="mt-3 flex gap-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm px-3 py-2"><span class="font-bold">!</span><span>{{err}}</span></p>
+
+        <button @click="login" :disabled="busy||!f.username||!f.password"
+          class="mt-5 w-full rounded-2xl bg-navy-700 hover:bg-navy-800 active:bg-navy-900 text-white font-bold py-3 shadow-lg shadow-navy-700/30 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          <span v-if="busy" class="spin"></span>{{busy?'Memeriksa...':'Masuk'}}
+        </button>
+
+        <div class="mt-5 flex items-center justify-between text-xs">
+          <span class="inline-flex items-center gap-1.5" :class="srv==='ok'?'text-emerald-600':srv==='bad'?'text-rose-600':'text-slate-400'">
+            <span class="h-2 w-2 rounded-full" :class="srv==='ok'?'bg-emerald-500':srv==='bad'?'bg-rose-500':'bg-slate-300 animate-pulse'"></span>
+            {{srv==='ok'?'Server terhubung':srv==='bad'?'Server tidak merespons':'Mengecek server...'}}
+          </span>
+          <button v-if="srv==='bad'" type="button" @click="cekServer" class="font-bold text-navy-700 hover:underline">Coba lagi</button>
+        </div>
+        <p v-if="srv==='bad'&&srvMsg" class="mt-2 text-xs text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{{srvMsg}}</p>
+      </div>
+      <p class="text-center text-xs text-slate-500 mt-5">Lupa sandi? Hubungi administrator sekolah.</p>
     </div>
   </div>
 </div>
 
 <!-- APP -->
 <div v-else class="min-h-screen md:flex">
-  <aside class="md:w-60 bg-[#0F172A] text-slate-200 md:min-h-screen p-4 flex md:block gap-2 overflow-x-auto">
+  <aside class="md:w-60 bg-navy-900 text-slate-200 md:min-h-screen p-4 flex md:block gap-2 overflow-x-auto">
     <div class="hidden md:block mb-6">
       <img :src="LOGO" alt="" class="h-10 w-10 object-contain mb-1">
       <p class="font-extrabold text-white">SMK CALM</p>
       <span class="inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span>
     </div>
     <button v-for="m in menu" :key="m.k" @click="go(m.k)" class="whitespace-nowrap md:w-full text-left px-3 py-2 rounded-xl text-sm font-medium md:mb-1"
-      :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-slate-800'">{{m.t}}</button>
-    <button @click="logout" class="whitespace-nowrap md:w-full text-left px-3 py-2 rounded-xl text-sm text-amber-400 hover:bg-slate-800 md:mt-6">Keluar</button>
+      :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-white/10'">{{m.t}}</button>
+    <button @click="logout" class="whitespace-nowrap md:w-full text-left px-3 py-2 rounded-xl text-sm text-amber-400 hover:bg-white/10 md:mt-6">Keluar</button>
   </aside>
 
   <main class="flex-1 p-4 md:p-8 max-w-5xl">
@@ -420,12 +485,19 @@ const app = createApp({
     const tanggal = ref(new Date().toLocaleDateString('sv-SE')), rows = ref([]), riwayat = ref([]);
     const f = reactive({ username: '', password: '' }), pw = reactive({ nis: '', lama: '', baru: '', konf: '' });
     const err = ref(''), ok = ref(''), busy = ref(false);
-    const badge = { ADMIN: { t: 'ADMINISTRATOR', c: 'bg-indigo-500 text-white' }, GURU: { t: 'GURU / PENGAJAR', c: 'bg-emerald-500 text-white' }, SISWA: { t: 'SISWA', c: 'bg-amber-400 text-slate-900' } };
+    const loginRole = ref('ADMIN'), showPw = ref(false), srv = ref('wait'), srvMsg = ref('');
+    const roles = [{ k: 'ADMIN', t: 'Administrator' }, { k: 'GURU', t: 'Guru / Staff' }, { k: 'SISWA', t: 'Siswa' }];
+    const ROLE_INFO = {
+      ADMIN: { label: 'Username', ph: 'admin', hint: 'Akses penuh untuk mengelola data sekolah.' },
+      GURU: { label: 'Username guru / staff', ph: 'username dari administrator', hint: 'Untuk guru, wali kelas, dan staf pengajar.' },
+      SISWA: { label: 'NIS', ph: 'Nomor Induk Siswa', hint: 'Siswa masuk dengan NIS dan sandi awal dari sekolah.' } };
+    const roleInfo = computed(() => ROLE_INFO[loginRole.value]);
+    const badge = { ADMIN: { t: 'ADMINISTRATOR', c: 'bg-navy-700 text-white' }, GURU: { t: 'GURU / PENGAJAR', c: 'bg-emerald-500 text-white' }, SISWA: { t: 'SISWA', c: 'bg-amber-400 text-slate-900' } };
     const sc = { H: 'bg-emerald-500', I: 'bg-blue-600', S: 'bg-amber-500', A: 'bg-rose-600' };
     const lbl = { H: 'HADIR', I: 'IZIN', S: 'SAKIT', A: 'ALPA' };
     const tgl = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    const acc = { ADMIN: 'bg-indigo-600 text-white', GURU: 'bg-emerald-600 text-white', SISWA: 'bg-amber-400 text-slate-900' };
-    const heroCls = { ADMIN: 'from-blue-900 to-indigo-600', GURU: 'from-blue-900 to-emerald-600', SISWA: 'from-blue-900 to-blue-600' };
+    const acc = { ADMIN: 'bg-navy-700 text-white', GURU: 'bg-emerald-600 text-white', SISWA: 'bg-amber-400 text-slate-900' };
+    const heroCls = { ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', SISWA: 'from-navy-900 to-navy-600' };
     const sub = { ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.' };
     const quick = { ADMIN: ['siswa', 'jadwal', 'rekap', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
     const clock = ref(''), tick = () => clock.value = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
@@ -449,14 +521,27 @@ const app = createApp({
     const jf = reactive({ hari: 'Senin', jam: '', kelas: '', mapel: '', guru: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
 
     async function api(action, p = {}) {
-      const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, token: token.value, ...p }) }); // text/plain: tanpa preflight CORS
-      const j = await r.json();
+      let r, t;
+      try { r = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, token: token.value, ...p }) }); } // text/plain: tanpa preflight CORS
+      catch (e) { throw new Error('NETWORK'); }
+      t = await r.text();
+      let j; try { j = JSON.parse(t); } catch (e) { throw new Error('NONJSON'); }
       if (!j.ok) { if (/Sesi/.test(j.error)) logout(); throw new Error(j.error); }
       return j.data;
     }
+    const NET = 'Tidak dapat terhubung ke server. Periksa internet, lalu pastikan Web App di-deploy dengan akses "Anyone" dan URL /exec benar.';
+    const NONJSON = 'Server membalas halaman error, bukan data. Biasanya: Web App belum di-deploy ulang (Deploy > Manage deployments > Edit > Version: New version), akses bukan "Anyone", atau ada galat pada kode Apps Script.';
+    const niceErr = m => m === 'NETWORK' || m === 'Failed to fetch' ? NET : m === 'NONJSON' ? NONJSON
+      : /Cannot read properties of null/.test(m) ? 'Sheet belum lengkap. Jalankan fungsi setup() sekali di editor Apps Script. (' + m + ')' : m;
+    async function cekServer() {
+      srv.value = 'wait'; srvMsg.value = '';
+      try { const r = await fetch(API_URL); const j = JSON.parse(await r.text()); srv.value = j.ok ? 'ok' : 'bad'; if (!j.ok) srvMsg.value = j.error || ''; }
+      catch (e) { srv.value = 'bad'; srvMsg.value = e instanceof SyntaxError ? NONJSON : NET; }
+    }
+    if (!user.value) cekServer();
     async function run(fn) {
       err.value = ok.value = ''; busy.value = true;
-      try { await fn(); } catch (e) { err.value = e.message === 'Failed to fetch' ? 'Tidak dapat terhubung ke server' : e.message; }
+      try { await fn(); } catch (e) { err.value = niceErr(e.message); }
       busy.value = false;
     }
     const login = () => run(async () => {
@@ -540,7 +625,7 @@ const app = createApp({
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
     setInterval(() => parent.postMessage({ calmHeight: document.documentElement.scrollHeight }, '*'), 800);
 
-    return { acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, rkelas, rbulan, fc, txc, segs, loadRekap,
