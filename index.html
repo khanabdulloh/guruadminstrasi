@@ -8,6 +8,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config={theme:{extend:{colors:{navy:{50:"#eef3fb",100:"#d9e4f6",600:"#134aa8",700:"#0b3d91",800:"#082f70",900:"#061f4d",950:"#041536"},blue:{700:"#134aa8",800:"#0b3d91",900:"#072a66"}}}}}</script>
 <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}
 .login-bg{background:radial-gradient(1200px 600px at 10% -10%,#1b56c0 0%,transparent 60%),radial-gradient(900px 500px at 110% 110%,#134aa8 0%,transparent 55%),linear-gradient(160deg,#0b3d91 0%,#072a66 55%,#041536 100%)}
@@ -108,9 +109,12 @@
       <p class="font-extrabold text-white">SMK CALM</p>
       <span class="inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span>
     </div>
-    <button v-for="m in menu" :key="m.k" @click="go(m.k)" class="whitespace-nowrap md:w-full text-left px-3 py-2 rounded-xl text-sm font-medium md:mb-1"
-      :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-white/10'">{{m.t}}</button>
-    <button @click="logout" class="whitespace-nowrap md:w-full text-left px-3 py-2 rounded-xl text-sm text-amber-400 hover:bg-white/10 md:mt-6">Keluar</button>
+    <button v-for="m in menu" :key="m.k" @click="go(m.k)" class="group whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium md:mb-1 flex items-center gap-3 transition"
+      :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-white/10'">
+      <svg class="h-5 w-5 shrink-0 transition" :class="view===m.k?'':'opacity-70 group-hover:opacity-100'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON[m.k]"></svg>
+      <span>{{m.t}}</span></button>
+    <button @click="logout" class="whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm text-amber-400 hover:bg-white/10 md:mt-6 flex items-center gap-3">
+      <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON.keluar"></svg><span>Keluar</span></button>
   </aside>
 
   <main class="flex-1 p-4 md:p-8 max-w-5xl">
@@ -217,12 +221,23 @@
 
     <!-- Siswa -->
     <section v-if="view==='siswa'">
-      <div class="flex justify-between items-center mb-4"><h2 class="h2 !mb-0">Kelola Siswa</h2><button @click="editSiswa(null)" class="btn-p">Tambah siswa</button></div>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">Kelola Siswa</h2>
+        <div class="flex flex-wrap gap-2">
+          <button @click="templateSiswa" class="btn-o">Unduh template</button>
+          <label class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickFile"></label>
+          <button @click="exportSiswa" :disabled="!siswaTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
+          <button @click="editSiswa(null)" class="btn-p">Tambah siswa</button></div></div>
+      <div class="flex flex-wrap gap-2 mb-3">
+        <select v-model="skelas" class="inp"><option value="">Semua kelas</option><option v-for="k in kelasAll" :value="k.kelas">{{k.kelas}} ({{k.jumlah}})</option></select>
+        <input v-model.trim="sq" placeholder="Cari NIS / nama..." class="inp flex-1 min-w-[10rem]">
+        <span class="text-sm text-slate-500 self-center">{{siswaTampil.length}} dari {{siswa.length}} siswa</span></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">NIS</th><th>Nama</th><th>L/P</th><th>Kelas</th><th>Kontak</th><th></th></tr></thead>
-        <tbody><tr v-for="s in siswa" :key="s.nis" class="border-t"><td class="p-3">{{s.nis}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td>
+        <tbody><tr v-for="s in siswaTampil" :key="s.nis" class="border-t"><td class="p-3">{{s.nis}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td>
           <td class="whitespace-nowrap pr-3"><button @click="editSiswa(s)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delSiswa(s)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!siswa.length"><td colspan="6" class="p-4 text-slate-500">Belum ada siswa. Klik Tambah siswa.</td></tr></tbody></table></div>
+        <tr v-if="!siswaTampil.length"><td colspan="6" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':'Belum ada siswa. Klik Tambah siswa atau Impor Excel.'}}</td></tr></tbody></table></div>
+
+      <!-- Form tambah/ubah -->
       <div v-if="showS" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-10"><div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{sf.edit?'Ubah siswa':'Tambah siswa'}}</h3>
         <input v-model.trim="sf.nis" :disabled="sf.edit" placeholder="NIS" class="inp w-full mb-3 disabled:bg-slate-100">
@@ -231,6 +246,35 @@
           <select v-model="sf.kelas" class="inp flex-1"><option value="">Pilih kelas</option><option v-for="k in kelasAll" :value="k.kelas">{{k.kelas}}</option></select></div>
         <input v-model.trim="sf.kontak" placeholder="Kontak (opsional)" class="inp w-full mb-4">
         <div class="flex justify-end gap-2"><button @click="showS=false" class="btn-o">Batal</button><button @click="saveSiswa" :disabled="busy" class="btn-p">Simpan</button></div>
+      </div></div>
+
+      <!-- Pratinjau impor -->
+      <div v-if="imp.show" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-10"><div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl max-h-[90vh] flex flex-col">
+        <h3 class="font-extrabold text-blue-900">Impor siswa dari Excel</h3>
+        <p class="text-xs text-slate-500 mb-3">{{imp.file}}</p>
+        <template v-if="!imp.done">
+          <div class="flex flex-wrap gap-2 text-xs font-bold mb-3">
+            <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">{{impCount.baru}} baru</span>
+            <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{impCount.ubah}} sudah ada</span>
+            <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">{{impCount.error}} bermasalah (dilewati)</span></div>
+          <label class="flex items-center gap-2 text-sm mb-3"><input type="checkbox" v-model="imp.update"> Perbarui data siswa yang NIS-nya sudah ada</label>
+          <div class="overflow-auto border rounded-xl flex-1"><table class="w-full text-xs">
+            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>NIS</th><th>Nama</th><th>L/P</th><th>Kelas</th><th>Status</th></tr></thead>
+            <tbody><tr v-for="r in imp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
+              <td class="p-2">{{r.no}}</td><td>{{r.nis}}</td><td>{{r.nama}}</td><td>{{r.gender}}</td><td>{{r.kelas}}</td>
+              <td :class="r.st==='error'?'text-rose-600':r.st==='ubah'?'text-blue-800':'text-emerald-700'">{{r.st==='error'?r.msg:r.st==='ubah'?'Diperbarui':'Baru'}}</td></tr></tbody></table></div>
+          <p v-if="imp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{imp.rows.length}}; semua baris tetap diproses.</p>
+          <p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p>
+          <div class="flex justify-end gap-2 mt-4"><button @click="imp.show=false" class="btn-o">Batal</button>
+            <button @click="doImport" :disabled="busy||!impCount.siap" class="btn-p disabled:opacity-50">{{busy?'Mengimpor...':'Impor '+impCount.siap+' siswa'}}</button></div>
+        </template>
+        <template v-else>
+          <p class="rounded-xl bg-emerald-50 text-emerald-700 text-sm px-4 py-3 mb-3">Selesai: {{imp.done.baru}} siswa baru, {{imp.done.ubah}} diperbarui.</p>
+          <div v-if="imp.creds.length" class="rounded-xl bg-amber-50 text-amber-800 text-sm px-4 py-3 mb-3">
+            {{imp.creds.length}} akun siswa baru dibuat dengan sandi acak. Unduh dan bagikan ke siswa; sandi tidak ditampilkan lagi di sini (tersimpan di sheet <b>Kredensial</b>).
+            <div class="mt-2"><button @click="downloadCreds" class="btn-p">Unduh kredensial (Excel)</button></div></div>
+          <div class="flex justify-end mt-2"><button @click="imp.show=false" class="btn-o">Tutup</button></div>
+        </template>
       </div></div>
     </section>
 
@@ -504,6 +548,24 @@ const app = createApp({
     tick(); setInterval(tick, 1000);
     const M = { dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', rekap: 'Rekap Presensi', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
     const MENU = { ADMIN: ['dashboard', 'siswa', 'kelas', 'jadwal', 'presensi', 'rekap', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'rekap', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'nilaisaya', 'bimbingansaya', 'sandi'] };
+    const ICON = {
+      dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+      siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+      kelas: '<path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M15 10h.01"/>',
+      jadwal: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+      presensi: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 14l2 2 4-4"/>',
+      rekap: '<path d="M3 3v18h18M7 16v-5M12 16V8M17 16v-8"/>',
+      nilai: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+      leger: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
+      jurnal: '<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2ZM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7Z"/>',
+      bimbingan: '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/>',
+      dokumen: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+      pengaturan: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+      sandi: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+      riwayat: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      nilaisaya: '<circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 8 5-3 5 3-1.5-8"/>',
+      keluar: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>' };
+    ICON.bimbingansaya = ICON.bimbingan;
     const menu = computed(() => user.value ? MENU[user.value.role].map(k => ({ k, t: M[k] })) : []);
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]);
@@ -578,6 +640,67 @@ const app = createApp({
     });
 
     const refresh = async () => { kelasList.value = []; kelasAll.value = await api('kelasDetail'); };
+    const skelas = ref(''), sq = ref('');
+    const siswaTampil = computed(() => { const t = sq.value.toLowerCase(); return siswa.value.filter(s => (!skelas.value || s.kelas === skelas.value) && (!t || (s.nis + ' ' + s.nama).toLowerCase().includes(t))); });
+    const XL = () => { if (!window.XLSX) throw new Error('Pustaka Excel belum termuat. Periksa internet lalu muat ulang halaman.'); return window.XLSX; };
+    function saveXlsx(name, sheets) {
+      const X = XL(), wb = X.utils.book_new();
+      sheets.forEach(([n, aoa, w]) => { const ws = X.utils.aoa_to_sheet(aoa); ws['!cols'] = w.map(c => ({ wch: c })); X.utils.book_append_sheet(wb, ws, n); });
+      X.writeFile(wb, name);
+    }
+    const exportSiswa = () => run(async () => {
+      const list = siswaTampil.value.slice().sort((a, b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
+      const aoa = [['No', 'NIS', 'Nama', 'L/P', 'Kelas', 'Kontak']].concat(list.map((s, i) => [i + 1, String(s.nis), s.nama, s.gender, s.kelas, s.kontak]));
+      saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 16, 32, 5, 12, 18]]]);
+      ok.value = list.length + ' siswa diekspor';
+    });
+    const templateSiswa = () => run(async () => {
+      saveXlsx('Template_Impor_Siswa.xlsx', [
+        ['Data Siswa', [['NIS', 'Nama', 'L/P', 'Kelas', 'Kontak'], ['0012345678', 'Contoh Siswa Satu', 'L', 'X TKJ 1', '081234567890'], ['0012345679', 'Contoh Siswa Dua', 'P', 'X TKJ 1', '']], [16, 32, 6, 14, 18]],
+        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Siswa"; hapus dua baris contoh.'], ['2. Kolom wajib: NIS, Nama, Kelas. L/P diisi L atau P (kosong dianggap L).'], ['3. Format kolom NIS sebagai Teks agar angka 0 di depan tidak hilang.'], ['4. Kelas baru otomatis dibuat. Akun login siswa dibuat otomatis dengan sandi acak.']], [90]]]);
+    });
+    const imp = reactive({ show: false, rows: [], file: '', update: true, done: null, creds: [] });
+    const impCount = computed(() => { const c = { baru: 0, ubah: 0, error: 0 }; imp.rows.forEach(r => c[r.st]++); c.siap = c.baru + (imp.update ? c.ubah : 0); return c; });
+    const norm = v => String(v == null ? '' : v).trim();
+    async function pickFile(ev) {
+      const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+      await run(async () => {
+        const X = XL(), wb = X.read(await f.arrayBuffer(), { type: 'array' });
+        const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
+        const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
+        const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
+        const c = { nis: col(['nis', 'nomorinduk', 'nisn']), nama: col(['nama', 'namasiswa', 'namalengkap']), jk: col(['lp', 'jk', 'gender', 'jeniskelamin']), kelas: col(['kelas', 'rombel']), kontak: col(['kontak', 'hp', 'telepon', 'telp', 'wa', 'nohp']) };
+        if (c.nis < 0 || c.nama < 0 || c.kelas < 0) throw new Error('Baris pertama harus berisi judul kolom NIS, Nama, dan Kelas. Gunakan tombol "Unduh template".');
+        const ada = new Set(siswa.value.map(x => String(x.nis))), seen = new Set(), rows = [];
+        aoa.slice(1).forEach((r, i) => {
+          if (r.every(v => !norm(v))) return;
+          const g = norm(r[c.jk]).toUpperCase();
+          const o = { no: i + 2, nis: norm(r[c.nis]), nama: norm(r[c.nama]), gender: g.startsWith('P') ? 'P' : 'L', kelas: norm(r[c.kelas]), kontak: c.kontak < 0 ? '' : norm(r[c.kontak]), st: 'baru', msg: '' };
+          if (!o.nis) { o.st = 'error'; o.msg = 'NIS kosong'; }
+          else if (/e\+/i.test(o.nis)) { o.st = 'error'; o.msg = 'NIS berformat ilmiah; ubah kolom ke Teks'; }
+          else if (seen.has(o.nis)) { o.st = 'error'; o.msg = 'NIS ganda di file'; }
+          else if (!o.nama) { o.st = 'error'; o.msg = 'Nama kosong'; }
+          else if (!o.kelas) { o.st = 'error'; o.msg = 'Kelas kosong'; }
+          else if (ada.has(o.nis)) o.st = 'ubah';
+          seen.add(o.nis); rows.push(o);
+        });
+        if (!rows.length) throw new Error('Tidak ada data siswa di file.');
+        Object.assign(imp, { show: true, rows, file: f.name, update: true, done: null, creds: [] });
+      });
+    }
+    const doImport = () => run(async () => {
+      const list = imp.rows.filter(r => r.st !== 'error' && (imp.update || r.st === 'baru')).map(r => ({ nis: r.nis, nama: r.nama, gender: r.gender, kelas: r.kelas, kontak: r.kontak }));
+      let baru = 0, ubah = 0, creds = [];
+      for (let i = 0; i < list.length; i += 100) {
+        const d = await api('siswaImport', { rows: list.slice(i, i + 100), update: imp.update });
+        baru += d.baru; ubah += d.ubah; creds = creds.concat(d.kredensial || []);
+      }
+      imp.creds = creds; imp.done = { baru, ubah };
+      siswa.value = await api('siswaList'); kelasAll.value = await api('kelasDetail');
+    });
+    const downloadCreds = () => run(async () => {
+      saveXlsx('Kredensial_Siswa_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['NIS (username)', 'Nama', 'Kelas', 'Sandi awal']].concat(imp.creds.map(x => [String(x.nis), x.nama, x.kelas, String(x.sandi)])), [18, 32, 14, 14]]]);
+    });
     const editSiswa = s => { Object.assign(sf, { edit: !!s, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }, s || {}); showS.value = true; };
     const saveSiswa = () => run(async () => {
       await api('siswaSave', { edit: sf.edit, s: { nis: sf.nis, nama: sf.nama, gender: sf.gender, kelas: sf.kelas, kontak: sf.kontak } });
@@ -625,7 +748,7 @@ const app = createApp({
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
     setInterval(() => parent.postMessage({ calmHeight: document.documentElement.scrollHeight }, '*'), 800);
 
-    return { loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, rkelas, rbulan, fc, txc, segs, loadRekap,
