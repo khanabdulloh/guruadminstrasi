@@ -280,13 +280,24 @@
 
     <!-- Kelas -->
     <section v-if="view==='kelas'">
-      <h2 class="h2">Kelola Kelas</h2>
-      <div class="flex flex-wrap gap-3 mb-4"><input v-model.trim="kf.kelas" placeholder="Nama kelas, mis. X TKJ 1" class="inp"><select v-model="kf.wali" class="inp"><option value="">Wali kelas</option><option v-for="g in guru" :value="g.username">{{g.nama}}</option></select><button @click="saveKelas" :disabled="busy" class="btn-p">Simpan kelas</button></div>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">Kelola Kelas</h2>
+        <button @click="editKelas(null)" class="btn-p inline-flex items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Tambah kelas</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Kelas</th><th>Wali kelas</th><th>Siswa</th><th></th></tr></thead>
-        <tbody><tr v-for="k in kelasAll" :key="k.kelas" class="border-t"><td class="p-3">{{k.kelas}}</td><td>{{k.waliNama||'-'}}</td><td>{{k.jumlah}}</td>
-          <td class="whitespace-nowrap pr-3"><button @click="Object.assign(kf,{kelas:k.kelas,wali:k.wali})" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delKelas(k)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!kelasAll.length"><td colspan="4" class="p-4 text-slate-500">Belum ada kelas.</td></tr></tbody></table></div>
+        <tbody><tr v-for="k in kelasAll" :key="k.kelas" class="border-t"><td class="p-3 font-semibold">{{k.kelas}}</td><td>{{k.waliNama||'-'}}</td><td>{{k.jumlah}}</td>
+          <td class="whitespace-nowrap pr-3"><button @click="editKelas(k)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delKelas(k)" class="text-rose-600 font-bold">Hapus</button></td></tr>
+        <tr v-if="!kelasAll.length"><td colspan="4" class="p-4 text-slate-500">Belum ada kelas. Klik <b>Tambah kelas</b> untuk membuat kelas pertama.</td></tr></tbody></table></div>
+
+      <div v-if="showK" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-10"><div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+        <h3 class="font-extrabold text-blue-900 mb-4">{{kf.edit?'Ubah kelas':'Tambah kelas'}}</h3>
+        <label class="text-sm font-semibold text-slate-700">Nama kelas</label>
+        <input v-model.trim="kf.kelas" :disabled="kf.edit" @keyup.enter="saveKelas" placeholder="mis. X TKJ 1" class="inp w-full mt-1 mb-3 disabled:bg-slate-100">
+        <label class="text-sm font-semibold text-slate-700">Wali kelas <span class="font-normal text-slate-400">(opsional)</span></label>
+        <select v-model="kf.wali" class="inp w-full mt-1 mb-1"><option value="">- Belum ditentukan -</option><option v-for="g in guru" :value="g.username">{{g.nama}}</option></select>
+        <p v-if="!guru.length" class="text-xs text-slate-500 mb-3">Belum ada akun guru. Wali kelas bisa diisi nanti setelah akun guru dibuat.</p>
+        <p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p>
+        <div class="flex justify-end gap-2 mt-4"><button @click="showK=false" class="btn-o">Batal</button><button @click="saveKelas" :disabled="busy" class="btn-p">Simpan</button></div>
+      </div></div>
     </section>
 
     <!-- Jadwal -->
@@ -547,7 +558,7 @@ const app = createApp({
     const clock = ref(''), tick = () => clock.value = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
     tick(); setInterval(tick, 1000);
     const M = { dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', rekap: 'Rekap Presensi', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', sandi: 'Ganti Sandi' };
-    const MENU = { ADMIN: ['dashboard', 'siswa', 'kelas', 'jadwal', 'presensi', 'rekap', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'rekap', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'nilaisaya', 'bimbingansaya', 'sandi'] };
+    const MENU = { ADMIN: ['dashboard', 'kelas', 'siswa', 'jadwal', 'presensi', 'rekap', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'rekap', 'nilai', 'leger', 'jurnal', 'bimbingan', 'dokumen', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'nilaisaya', 'bimbingansaya', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -579,7 +590,7 @@ const app = createApp({
     const segs = h => { let y = 80; return h.total ? ['H', 'I', 'S', 'A'].map(k => { const ht = h[k] / h.total * 80; y -= ht; return { k, y, ht }; }) : []; };
     const jurnal = ref([]), bimb = ref([]), bulan = ref(hari0.slice(0, 7)), q = ref(''), showJ = ref(false), showB = ref(false), bk = ref([]), bsiswa = ref([]);
     const jr = reactive({ tanggal: hari0, pi: '', materi: '', catatan: '' }), bf = reactive({ tanggal: hari0, kelas: '', nis: '', catatan: '', solusi: '' });
-    const sf = reactive({ edit: false, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }), kf = reactive({ kelas: '', wali: '' });
+    const sf = reactive({ edit: false, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
     const jf = reactive({ hari: 'Senin', jam: '', kelas: '', mapel: '', guru: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
 
     async function api(action, p = {}) {
@@ -707,7 +718,13 @@ const app = createApp({
       showS.value = false; siswa.value = await api('siswaList'); await refresh(); ok.value = 'Data siswa tersimpan';
     });
     const delSiswa = s => confirm('Hapus ' + s.nama + '? Akun login siswa ikut terhapus.') && run(async () => { await api('siswaDelete', { nis: s.nis }); siswa.value = await api('siswaList'); await refresh(); });
-    const saveKelas = () => run(async () => { await api('kelasSave', { ...kf }); kf.kelas = kf.wali = ''; await refresh(); ok.value = 'Kelas tersimpan'; });
+    const editKelas = k => { err.value = ok.value = ''; Object.assign(kf, { edit: !!k, kelas: k ? k.kelas : '', wali: k ? k.wali : '' }); showK.value = true; };
+    const saveKelas = () => run(async () => {
+      if (!kf.kelas) throw new Error('Nama kelas wajib diisi');
+      if (!kf.edit && kelasAll.value.some(k => k.kelas.toLowerCase() === kf.kelas.toLowerCase())) throw new Error('Kelas "' + kf.kelas + '" sudah ada');
+      await api('kelasSave', { kelas: kf.kelas, wali: kf.wali });
+      showK.value = false; await refresh(); ok.value = 'Kelas tersimpan';
+    });
     const delKelas = k => confirm('Hapus kelas ' + k.kelas + '? Jadwal kelas ini ikut terhapus.') && run(async () => { await api('kelasDelete', { kelas: k.kelas }); await refresh(); });
     const saveJadwal = () => run(async () => { await api('jadwalSave', { j: { ...jf } }); jf.jam = jf.mapel = ''; jadwal.value = await api('jadwalList'); ok.value = 'Jadwal ditambahkan'; });
     const delJadwal = j => confirm('Hapus jadwal ' + j.mapel + ' ' + j.kelas + '?') && run(async () => { await api('jadwalDelete', { id: j.id }); jadwal.value = await api('jadwalList'); });
@@ -748,7 +765,7 @@ const app = createApp({
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
     setInterval(() => parent.postMessage({ calmHeight: document.documentElement.scrollHeight }, '*'), 800);
 
-    return { ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, rkelas, rbulan, fc, txc, segs, loadRekap,
