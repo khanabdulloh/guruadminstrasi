@@ -13,7 +13,7 @@
 <style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}
 .login-bg{background:radial-gradient(1200px 600px at 10% -10%,#1b56c0 0%,transparent 60%),radial-gradient(900px 500px at 110% 110%,#134aa8 0%,transparent 55%),linear-gradient(160deg,#0b3d91 0%,#072a66 55%,#041536 100%)}
 .login-bg::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,#000,transparent 85%);-webkit-mask-image:linear-gradient(to bottom,#000,transparent 85%)}
-.fld{width:100%;border:1.5px solid #cbd5e1;border-radius:.9rem;padding:.7rem .9rem .7rem 2.6rem;font-size:.95rem;background:#f8fafc;transition:.15s}
+.fld{min-width:0;text-overflow:ellipsis;width:100%;border:1.5px solid #cbd5e1;border-radius:.9rem;padding:.7rem .9rem .7rem 2.6rem;font-size:.95rem;background:#f8fafc;transition:.15s}
 .fld:focus{outline:none;border-color:#0b3d91;background:#fff;box-shadow:0 0 0 4px rgba(11,61,145,.15)}
 .spin{width:1rem;height:1rem;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -22,7 +22,7 @@
 .ovl{position:fixed;inset:0;z-index:40;display:flex;overflow-y:auto;padding:1rem;background:rgba(15,23,42,.5)}
 .mdl{margin:auto;width:100%;background:#fff;border-radius:1rem;box-shadow:0 20px 40px rgba(2,6,23,.25);padding:1.5rem}
 .bar{height:.6rem;border-radius:9999px;background:#e2e8f0;overflow:hidden}.bar>i{display:block;height:100%;border-radius:9999px;transition:width .4s}
-@media(max-width:640px){.inp,.fld{font-size:16px}.mdl{padding:1.25rem}}
+@media(max-width:640px){.inp,.fld{font-size:16px}.fld{padding-left:2.4rem}.fld::placeholder{font-size:14px}.mdl{padding:1.25rem}}
 @media print{.print-break{break-inside:avoid}.bar{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style>
 </head>
@@ -68,7 +68,7 @@
         <!-- Pilih peran -->
         <div class="grid grid-cols-4 gap-1 p-1 rounded-2xl bg-slate-100 mb-5" role="tablist">
           <button v-for="r in roles" :key="r.k" type="button" role="tab" @click="loginRole=r.k"
-            class="py-2 rounded-xl text-xs sm:text-sm font-bold transition"
+            class="py-2 px-1 rounded-xl text-[11px] min-[380px]:text-xs sm:text-sm font-bold transition whitespace-nowrap overflow-hidden text-ellipsis"
             :class="loginRole===r.k?'bg-navy-700 text-white shadow':'text-slate-500 hover:text-navy-700'">{{r.t}}</button>
         </div>
         <p class="text-xs text-slate-500 -mt-2 mb-4">{{roleInfo.hint}}</p>
@@ -93,7 +93,7 @@
           <span v-if="busy" class="spin"></span>{{busy?'Memeriksa...':'Masuk'}}
         </button>
 
-        <div class="mt-5 flex items-center justify-between text-xs">
+        <div class="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs">
           <span class="inline-flex items-center gap-1.5" :class="srv==='ok'?'text-emerald-600':srv==='bad'?'text-rose-600':'text-slate-400'">
             <span class="h-2 w-2 rounded-full" :class="srv==='ok'?'bg-emerald-500':srv==='bad'?'bg-rose-500':'bg-slate-300 animate-pulse'"></span>
             {{srv==='ok'?'Server terhubung':srv==='bad'?'Server tidak merespons':'Mengecek server...'}}
@@ -701,9 +701,9 @@ const app = createApp({
     const roles = [{ k: 'ADMIN', t: 'Admin' }, { k: 'GURU', t: 'Guru' }, { k: 'KEPSEK', t: 'Kepsek' }, { k: 'SISWA', t: 'Siswa' }];
     const ROLE_INFO = {
       ADMIN: { label: 'Username', ph: 'admin', hint: 'Akses penuh untuk mengelola data sekolah.' },
-      GURU: { label: 'Username guru / staff', ph: 'username dari administrator', hint: 'Untuk guru, wali kelas, dan staf pengajar.' },
-      KEPSEK: { label: 'Username kepala sekolah', ph: 'username dari administrator', hint: 'Memantau kinerja guru, wali kelas, dan siswa.' },
-      SISWA: { label: 'NIS', ph: 'Nomor Induk Siswa', hint: 'Siswa masuk dengan NIS dan sandi awal dari sekolah.' } };
+      GURU: { label: 'Username guru', ph: 'Username dari admin', hint: 'Untuk guru, wali kelas, dan staf pengajar.' },
+      KEPSEK: { label: 'Username kepala sekolah', ph: 'Username dari admin', hint: 'Memantau kinerja guru, wali kelas, dan siswa.' },
+      SISWA: { label: 'NIS', ph: 'NIS Anda', hint: 'Siswa masuk dengan NIS dan sandi awal dari sekolah.' } };
     const roleInfo = computed(() => ROLE_INFO[loginRole.value]);
     const badge = { ADMIN: { t: 'ADMINISTRATOR', c: 'bg-navy-700 text-white' }, GURU: { t: 'GURU / PENGAJAR', c: 'bg-emerald-500 text-white' }, KEPSEK: { t: 'KEPALA SEKOLAH', c: 'bg-violet-600 text-white' }, SISWA: { t: 'SISWA', c: 'bg-amber-400 text-slate-900' } };
     const sc = { H: 'bg-emerald-500', I: 'bg-blue-600', S: 'bg-amber-500', A: 'bg-rose-600' };
