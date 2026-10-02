@@ -472,7 +472,7 @@ table tbody tr:hover{background:#f8fafc}
               <td :class="r.st==='error'?'text-rose-600':r.st==='ubah'?'text-blue-800':'text-emerald-700'">{{r.st==='error'?r.msg:r.st==='ubah'?'Diperbarui':'Baru'}}</td></tr></tbody></table></div>
           <p v-if="imp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{imp.rows.length}}; semua baris tetap diproses.</p>
           <p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p>
-          <div class="flex justify-end gap-2 mt-4"><button @click="imp.show=false" class="btn-o">Batal</button>
+          <div class="flex justify-end gap-2 mt-4"><button @click="imp.show=false" :disabled="busy" class="btn-o">Batal</button>
             <button @click="doImport" :disabled="busy||!impCount.siap" class="btn-p disabled:opacity-50">{{busy?'Mengimpor...':'Impor '+impCount.siap+' siswa'}}</button></div>
         </template>
         <template v-else>
@@ -789,7 +789,7 @@ table tbody tr:hover{background:#f8fafc}
         <input v-model.trim="q" @keyup.enter="loadDok" placeholder="Cari, lalu Enter" class="inp"><button @click="showD=true" class="btn-p">Simpan tautan</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Judul</th><th>Kategori</th><th>Ditambahkan</th><th></th></tr></thead>
-        <tbody><tr v-for="d in dokumen" :key="d.id" class="border-t"><td class="p-3"><a :href="d.url" target="_blank" rel="noopener noreferrer" class="text-blue-800 font-bold underline">{{d.judul}}</a></td><td>{{d.kategori||'-'}}</td><td>{{d.tanggal}} oleh {{d.olehNama}}</td>
+        <tbody><tr v-for="d in dokumen" :key="d.id" class="border-t"><td class="p-3"><a :href="/^https?:\/\//i.test(d.url)?d.url:'#'" target="_blank" rel="noopener noreferrer" class="text-blue-800 font-bold underline">{{d.judul}}</a></td><td>{{d.kategori||'-'}}</td><td>{{d.tanggal}} oleh {{d.olehNama}}</td>
           <td class="pr-3"><button @click="delDok(d)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!dokumen.length"><td colspan="4" class="p-4 text-slate-500">Belum ada dokumen.</td></tr></tbody></table></div>
       <div v-if="showD" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
@@ -1054,7 +1054,7 @@ const app = createApp({
     const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600' };
     const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Lihat dan unduh data guru dan siswa.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.' };
     const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal'], STAF: ['siswa', 'guru'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya'] };
-    const clock = ref(''), tick = () => { const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' }); document.querySelectorAll('.clk').forEach(e => { if (e.textContent !== t) e.textContent = t; }); };
+    const clock = ref(''), tick = () => { if (document.hidden) return; const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' }); document.querySelectorAll('.clk').forEach(e => { if (e.textContent !== t) e.textContent = t; }); };
     tick(); setInterval(tick, 1000); // ubah DOM langsung: tidak memicu render ulang seluruh aplikasi tiap detik
     const mnav = ref(false);
     const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', pkl: 'PKL / Prakerin', tahun: 'Tahun Ajaran', sandi: 'Ganti Sandi' };
@@ -1100,7 +1100,9 @@ const app = createApp({
     const sf = reactive({ edit: false, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
     const jf = reactive({ hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
 
-    const SAFE = a => !/save|simpan|delete|import|hapus|reset|ganti|backup|putus|pindah|baca|lulus|arsip|nilai$/i.test(a); // hanya aksi baca yang boleh diulang otomatis
+    // Daftar putih aksi BACA (idempoten): hanya ini yang boleh diulang otomatis saat jaringan putus. Aksi baru default-nya TIDAK diulang (aman).
+    const READ = new Set(['agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
+    const SAFE = a => READ.has(a);
     async function api(action, p = {}) {
       let r, t;
       for (let n = 0; ; n++) {
@@ -1142,7 +1144,7 @@ const app = createApp({
       if (user.value.wajib) k = 'sandi';
       if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
       view.value = k; dash.value = null; q.value = ''; toTop();
-      if (k === 'dashboard') { const side = Promise.all([fetchPeng(), fetchAg()]); const d = await api('dashboard'); if (view.value !== k) return; dash.value = d; belumBaca.value = d.catatanBaru || 0; await side; }
+      if (k === 'dashboard') { const side = Promise.all([fetchPeng(), fetchAg()]); const d = await api('dashboard'); if (view.value !== k) return; dash.value = d; Vue.nextTick(tick); belumBaca.value = d.catatanBaru || 0; await side; }
       if (k === 'presensi') {
         [cfg.value, pilih.value] = await Promise.all([api('pengaturanGet'), api('presensiPilihan')]); ptab.value = canInput.value ? 'input' : 'rekap';
         rows.value = []; rk.value = null; prRes.value = pgRes.value = prwRes.value = null; Object.assign(pi, { tanggal: hari0, kelas: '', mapel: '', ada: false });
@@ -1246,13 +1248,17 @@ const app = createApp({
     }
     const doImport = () => run(async () => {
       const list = imp.rows.filter(r => r.st !== 'error' && (imp.update || r.st === 'baru')).map(r => ({ nis: r.nis, nama: r.nama, gender: r.gender, kelas: r.kelas, kontak: r.kontak }));
-      let baru = 0, ubah = 0, creds = [];
-      for (let i = 0; i < list.length; i += 100) {
-        const d = await api('siswaImport', { rows: list.slice(i, i + 100), update: imp.update });
-        baru += d.baru; ubah += d.ubah; creds = creds.concat(d.kredensial || []);
-      }
-      imp.creds = creds; imp.done = { baru, ubah };
-      siswa.value = await api('siswaList'); kelasAll.value = await api('kelasDetail');
+      let baru = 0, ubah = 0, creds = [], gagal = '';
+      try {
+        for (let i = 0; i < list.length; i += 100) {
+          const d = await api('siswaImport', { rows: list.slice(i, i + 100), update: imp.update });
+          baru += d.baru; ubah += d.ubah; creds = creds.concat(d.kredensial || []);
+        }
+      } catch (e) { gagal = niceErr(e.message); } // paket sebelumnya sudah tersimpan di server; sandinya tetap ditampilkan
+      if (baru + ubah) imp.done = { baru, ubah };
+      imp.creds = creds;
+      try { siswa.value = await api('siswaList'); kelasAll.value = await api('kelasDetail'); } catch (e) { /* daftar dimuat ulang saat menu dibuka lagi */ }
+      if (gagal) throw new Error(gagal + (baru + ubah ? ' (' + (baru + ubah) + ' siswa sudah diproses; sandi akun baru dapat diunduh pada jendela impor)' : ''));
     });
     const downloadCreds = () => run(async () => {
       await saveXlsx('Kredensial_Siswa_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['NIS (username)', 'Nama', 'Kelas', 'Sandi awal']].concat(imp.creds.map(x => [String(x.nis), x.nama, x.kelas, String(x.sandi)])), [18, 32, 14, 14]]]);
@@ -1273,8 +1279,16 @@ const app = createApp({
     const delKelas = k => confirm('Hapus kelas ' + k.kelas + '? Jadwal kelas ini ikut terhapus.') && run(async () => { await api('kelasDelete', { kelas: k.kelas }); await refresh(); });
     const delJadwal = j => confirm('Hapus jadwal ' + j.mapel + ' ' + j.kelas + '?') && run(async () => { await api('jadwalDelete', { id: j.id }); jadwal.value = await api('jadwalList'); });
     const nextSkor = e => { const a = [...document.querySelectorAll('input[data-skor]')], i = a.indexOf(e.target); (a[i + 1] || e.target).focus(); };
-    const loadNilai = () => { nrows.value = []; const p = pil.value[pilIdx.value]; if (p && nm.tp) run(async () => nrows.value = await api('nilaiGet', { ...p, tp: nm.tp, jenis: nm.jenis })); };
-    const saveNilai = () => run(async () => { if (!nm.tp) throw new Error('Isi tujuan pembelajaran terlebih dahulu'); const bad = nrows.value.find(r => r.skor !== '' && r.skor != null && !(Number(r.skor) >= 0 && Number(r.skor) <= 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus antara 0 dan 100'); const d = await api('nilaiSave', { ...pil.value[pilIdx.value], tp: nm.tp, jenis: nm.jenis, rows: nrows.value }); ok.value = d.tersimpan + ' nilai tersimpan'; });
+    let nReq = 0, nKey = null; // nKey = kelas/mapel/TP/jenis yang BENAR-BENAR dimuat; simpan selalu memakai kunci ini, bukan isian form yang bisa sudah berubah
+    const loadNilai = () => {
+      nrows.value = []; nKey = null; const p = pil.value[pilIdx.value], rid = ++nReq;
+      if (p && nm.tp) run(async () => { const key = { ...p, tp: nm.tp, jenis: nm.jenis }, d = await api('nilaiGet', key); if (rid !== nReq) return; nrows.value = d; nKey = key; });
+    };
+    const saveNilai = () => run(async () => {
+      if (!nKey || !nrows.value.length) throw new Error('Daftar siswa belum dimuat untuk isian ini. Isi tujuan pembelajaran lalu tekan Tab/Enter, tunggu daftar muncul, baru simpan.');
+      const bad = nrows.value.find(r => r.skor !== '' && r.skor != null && !(Number(r.skor) >= 0 && Number(r.skor) <= 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus antara 0 dan 100');
+      const d = await api('nilaiSave', { ...nKey, rows: nrows.value }); ok.value = d.tersimpan + ' nilai tersimpan';
+    });
 
     const fetchJ = async () => jurnal.value = await api('jurnalList', { bulan: bulan.value, q: q.value });
     const fetchB = async () => bimb.value = await api('bimbinganList', { bulan: bulan.value, q: q.value });
@@ -1300,7 +1314,8 @@ const app = createApp({
 
     const fetchD = async () => dokumen.value = await api('dokumenList', { q: q.value });
     const loadDok = () => run(fetchD);
-    const loadLeger = () => run(async () => leger.value = lkelas.value ? await api('legerGet', { kelas: lkelas.value }) : { mapel: [], siswa: [] });
+    let lgReq = 0;
+    const loadLeger = () => run(async () => { const rid = ++lgReq, k = lkelas.value; if (!k) { leger.value = { mapel: [], siswa: [] }; return; } const d = await api('legerGet', { kelas: k }); if (rid === lgReq) leger.value = d; });
     const saveDok = () => run(async () => { await api('dokumenSave', { ...df }); showD.value = false; df.judul = df.url = df.kategori = ''; await fetchD(); ok.value = 'Dokumen tersimpan'; });
     const delDok = d => confirm('Hapus tautan ' + d.judul + '?') && run(async () => { await api('dokumenDelete', { id: d.id }); await fetchD(); });
 
@@ -1513,7 +1528,7 @@ const app = createApp({
       const t = JENIS.reduce((a, j) => a + (Number(ak.value.bobot[j]) || 0), 0); if (t <= 0) throw new Error('Total bobot harus lebih dari 0');
       await api('akademikSave', { bobot: ak.value.bobot, def: ak.value.def, map: ak.value.map }); ok.value = 'Bobot dan KKM tersimpan';
     });
-    const kkmOf = m => { const k = leger.value.kkm; return k ? (k.map[m] || k.def) : 75; };
+    const kkmOf = m => { const k = leger.value.kkm; return k ? (k.map[m] != null ? k.map[m] : k.def) : 75; };
     const remedial = computed(() => leger.value.mapel.map(m => ({ mapel: m, kkm: kkmOf(m), list: leger.value.siswa.filter(r => r.nilai[m] != null && r.nilai[m] < kkmOf(m)).map(r => ({ nama: r.nama, nilai: r.nilai[m] })) })).filter(r => r.list.length));
     const kunci = ref(null), saveKunci = () => run(async () => { await api('kunciSimpan', { terkunci: kunci.value.terkunci }); ok.value = 'Kunci nilai tersimpan'; });
     const logs = ref([]), lq = ref(''), AKSI = { nilaiSave: 'Ubah nilai', presensiHapus: 'Hapus presensi', siswaDelete: 'Hapus siswa', siswaPindah: 'Pindah kelas', guruDelete: 'Hapus akun', kelasDelete: 'Hapus kelas', jadwalDelete: 'Hapus jadwal', jurnalDelete: 'Hapus jurnal', bimbinganDelete: 'Hapus bimbingan', akunReset: 'Reset sandi', resetSemester: 'Reset semester', kunciSimpan: 'Kunci nilai', pklDelete: 'Hapus penempatan PKL', pklNilai: 'Nilai PKL', riwayatArsip: 'Simpan riwayat kelas', luluskanKelas: 'Luluskan kelas' };
@@ -1522,9 +1537,10 @@ const app = createApp({
     /* ====== Rapor ====== */
     const rpPil = ref([]), rpKelas = ref(''), rp = ref(null), rpCat = reactive({}), rpMeta = reactive({ sem: 'Ganjil', tahun: '' });
     const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-    const kkmR = m => { const k = rp.value && rp.value.kkm; return k ? (k.map[m] || k.def) : 75; };
+    const kkmR = m => { const k = rp.value && rp.value.kkm; return k ? (k.map[m] != null ? k.map[m] : k.def) : 75; };
     const belumR = s => rp.value.mapel.filter(m => s.nilai[m] != null && s.nilai[m] < kkmR(m)).length;
-    const loadRapor = () => run(async () => { Object.keys(rpCat).forEach(k => delete rpCat[k]); rp.value = rpKelas.value ? await api('raporData', { kelas: rpKelas.value }) : null; });
+    let rpReq = 0;
+    const loadRapor = () => run(async () => { Object.keys(rpCat).forEach(k => delete rpCat[k]); const rid = ++rpReq, k = rpKelas.value, d = k ? await api('raporData', { kelas: k }) : null; if (rid === rpReq) rp.value = d; });
     const cetakRapor = () => { if (!rp.value || !rp.value.siswa.length) return; document.body.classList.add('cetak-rapor'); window.addEventListener('afterprint', () => document.body.classList.remove('cetak-rapor'), { once: true }); window.print(); };
 
     /* ====== v3.5: cadangan otomatis ====== */
@@ -1646,6 +1662,7 @@ const app = createApp({
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
     // Tinggi dihitung dari isi aplikasi (bukan tinggi jendela) agar tidak terpotong; modal tinggi ikut diperhitungkan
     if (EMB) setInterval(() => {
+      if (document.hidden) return;
       const a = document.getElementById('app'); if (!a) return;
       let h = a.getBoundingClientRect().height; const mb = document.querySelector('.modal-box'); if (mb) h = Math.max(h, mb.getBoundingClientRect().height + 64);
       const nh = Math.ceil(h) + 24; if (nh !== window.__lh) { window.__lh = nh; parent.postMessage({ calmHeight: nh }, '*'); }
