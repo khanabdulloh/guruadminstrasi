@@ -161,7 +161,7 @@ table tbody tr:hover{background:#f8fafc}
       <div class="flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
       <div v-if="dash.izinMenunggu" class="rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto"><b>{{dash.izinMenunggu}}</b> pengajuan izin siswa menunggu persetujuan Anda.</span><button @click="go('izin')" class="btn-o !py-1 text-xs">Tinjau</button></div>
       <div v-if="dash.izinSaya&&dash.izinSaya.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-sky-500"><h3 class="font-bold mb-2">Status izin saya</h3>
-        <div v-for="z in dash.izinSaya" :key="z.tanggal+z.status" class="flex justify-between text-sm py-1 border-t first:border-t-0"><span>{{fmtTgl(z.tanggal)}} &middot; {{z.jenis==='S'?'Sakit':'Izin'}}</span><span class="font-bold" :class="z.status==='Disetujui'?'text-emerald-700':z.status==='Ditolak'?'text-rose-600':'text-amber-700'">{{z.status}}</span></div></div>
+        <div v-for="z in dash.izinSaya" :key="z.id||z.tanggal+z.status" class="flex justify-between text-sm py-1 border-t first:border-t-0"><span>{{fmtTgl(z.tanggal)}} &middot; {{z.jenis==='S'?'Sakit':'Izin'}}</span><span class="font-bold" :class="z.status==='Disetujui'?'text-emerald-700':z.status==='Ditolak'?'text-rose-600':'text-amber-700'">{{z.status}}</span></div></div>
       <div v-if="dash.perangkatKurang" class="rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto"><b>{{dash.perangkatKurang}}</b> perangkat ajar belum dikumpulkan.</span><button @click="go('perangkat')" class="btn-o !py-1 text-xs">Lengkapi</button></div>
       <div v-if="dash.catatanBaru" class="rounded-2xl bg-violet-50 border border-violet-200 text-violet-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto">Anda punya <b>{{dash.catatanBaru}}</b> catatan baru dari pimpinan.</span><button @click="go('catatansaya')" class="btn-o !py-1 text-xs">Baca</button></div>
       <div v-if="peng.length||canPost" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-amber-400">
@@ -1345,11 +1345,12 @@ const app = createApp({
       go('dashboard'); // go() mengarahkan ke Ganti Sandi bila sandi awal belum diganti
     });
     function logout() { token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
+    let dashAt = 0;
     const go = k => run(async () => {
       if (user.value.wajib) k = 'sandi';
       if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
       view.value = k; dash.value = null; q.value = ''; toTop();
-      if (k === 'dashboard') { const side = Promise.all([fetchPeng(), fetchAg()]); const d = await api('dashboard'); if (view.value !== k) return; dash.value = d; Vue.nextTick(tick); belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0; await side; }
+      if (k === 'dashboard') { const side = Promise.all([fetchPeng(), fetchAg()]); const d = await api('dashboard'); if (view.value !== k) return; dash.value = d; dashAt = Date.now(); Vue.nextTick(tick); belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0; await side; }
       if (k === 'presensi') {
         [cfg.value, pilih.value] = await Promise.all([api('pengaturanGet'), api('presensiPilihan')]); ptab.value = canInput.value ? 'input' : 'rekap';
         rows.value = []; rk.value = null; prRes.value = pgRes.value = prwRes.value = null; Object.assign(pi, { tanggal: hari0, kelas: '', mapel: '', ada: false });
@@ -1383,6 +1384,12 @@ const app = createApp({
       if (k === 'pkl') { const r = await Promise.all([api('pklList'), user.value.role === 'ADMIN' ? api('siswaList') : null, user.value.role === 'ADMIN' ? api('guruList') : null]); pkl.value = r[0]; if (r[1]) siswa.value = r[1]; if (r[2]) guru.value = r[2]; pq.value = ''; jp.value = null; }
       if (k === 'tahun') { const r = await Promise.all([api('pengaturanGet'), api('kelasDetail'), api('alumniList'), api('riwayatList', {})]); cfg.value = r[0]; Object.assign(ta, r[0].tahun || {}); kelasAll.value = r[1]; alumni.value = r[2]; rw.value = r[3]; rwSel.value = rwq.value = aq.value = ''; rwLabel.value = ((ta.tahun || '') + ' ' + (ta.semester || '')).trim(); Object.assign(ll, { kelas: '', tahun: '', txt: '' }); }
       if (k === 'sandi') Object.assign(pw, { nis: user.value.username, lama: '', baru: '', konf: '' });
+    });
+    // Dashboard disegarkan diam-diam saat tab kembali aktif (mis. status izin baru diputuskan wali kelas), tanpa kedip.
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState !== 'visible' || !user.value || view.value !== 'dashboard' || !dash.value || busy.value || Date.now() - dashAt < 45000) return;
+      dashAt = Date.now();
+      try { const d = await api('dashboard'); if (view.value === 'dashboard' && user.value) { dash.value = d; belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0; } } catch (e) { /* diam: pemuatan ulang manual tetap tersedia */ }
     });
     const ganti = () => run(async () => {
       if (!pw.lama) throw new Error('Isi sandi lama'); if (pw.baru.length < 6) throw new Error('Sandi baru minimal 6 karakter');
@@ -1534,7 +1541,7 @@ const app = createApp({
     /* ====== v3: izin & utilitas umum ====== */
     const canInput = computed(() => !!user.value && ['ADMIN', 'GURU'].includes(user.value.role));
     const canJadwal = canInput, canWrite = canInput;
-    const fmtTgl = s => s ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    const fmtTgl = s => s && /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
     const fmtBln = s => s ? new Date(Number(s.slice(0, 4)), Number(s.slice(5, 7)) - 1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) : '';
     const COL = { H: '#10b981', I: '#2563eb', S: '#f59e0b', A: '#e11d48', D: '#8b5cf6' };
     const ST = [{ k: 'H', t: 'Hadir' }, { k: 'I', t: 'Izin' }, { k: 'S', t: 'Sakit' }, { k: 'A', t: 'Alpa' }, { k: 'D', t: 'Dispensasi' }];
