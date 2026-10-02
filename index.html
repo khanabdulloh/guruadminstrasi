@@ -155,6 +155,9 @@ table tbody tr:hover{background:#f8fafc}
         <p class="text-white/90 text-sm mt-2">{{sub[user.role]}}</p>
       </div>
       <div class="flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
+      <div v-if="dash.izinMenunggu" class="rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto"><b>{{dash.izinMenunggu}}</b> pengajuan izin siswa menunggu persetujuan Anda.</span><button @click="go('izin')" class="btn-o !py-1 text-xs">Tinjau</button></div>
+      <div v-if="dash.izinSaya&&dash.izinSaya.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-sky-500"><h3 class="font-bold mb-2">Status izin saya</h3>
+        <div v-for="z in dash.izinSaya" :key="z.tanggal+z.status" class="flex justify-between text-sm py-1 border-t first:border-t-0"><span>{{fmtTgl(z.tanggal)}} &middot; {{z.jenis==='S'?'Sakit':'Izin'}}</span><span class="font-bold" :class="z.status==='Disetujui'?'text-emerald-700':z.status==='Ditolak'?'text-rose-600':'text-amber-700'">{{z.status}}</span></div></div>
       <div v-if="dash.catatanBaru" class="rounded-2xl bg-violet-50 border border-violet-200 text-violet-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto">Anda punya <b>{{dash.catatanBaru}}</b> catatan baru dari pimpinan.</span><button @click="go('catatansaya')" class="btn-o !py-1 text-xs">Baca</button></div>
       <div v-if="peng.length||canPost" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-amber-400">
         <div class="flex items-center gap-2 mb-2"><h3 class="font-bold mr-auto">Pengumuman</h3><button v-if="canPost" @click="bukaPeng" class="btn-o !py-1 text-xs">Tulis pengumuman</button></div>
@@ -614,11 +617,12 @@ table tbody tr:hover{background:#f8fafc}
         <input v-model.trim="nm.tp" @change="loadNilai" placeholder="Tujuan pembelajaran" class="inp flex-1 min-w-[200px]">
         <select v-model="nm.jenis" @change="loadNilai" class="inp"><option>Harian</option><option>Tugas</option><option>Praktik</option><option>UTS</option><option>UAS</option></select>
       </div>
+      <p v-if="pairKunci" role="alert" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">Nilai kelas ini <b>dikunci</b> oleh admin{{user.role==='ADMIN'?' (sebagai admin Anda tetap bisa mengubah; tercatat di log)':'. Hubungi admin bila perlu perubahan'}}.</p>
       <p v-if="pil.length&&!nrows.length" class="text-xs text-slate-500 mb-3">Pilih kelas - mapel, isi tujuan pembelajaran, lalu tekan Tab/Enter agar daftar siswa muncul. Setelah itu, Enter pada kolom skor berpindah ke siswa berikutnya.</p>
       <div v-if="nrows.length" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">NIS</th><th>Nama</th><th>Skor (0-100)</th></tr></thead>
         <tbody><tr v-for="r in nrows" :key="r.nis" class="border-t"><td class="p-3">{{r.nis}}</td><td>{{r.nama}}</td><td><input type="number" inputmode="decimal" min="0" max="100" v-model="r.skor" @keydown.enter.prevent="nextSkor($event)" data-skor class="w-24 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
-      <button v-if="nrows.length" @click="saveNilai" :disabled="busy" class="mt-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan nilai</button>
+      <button v-if="nrows.length" @click="saveNilai" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="mt-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan nilai</button>
     </section>
 
     <!-- Nilai saya -->
@@ -713,6 +717,9 @@ table tbody tr:hover{background:#f8fafc}
             <label class="lb">KKM umum <input type="number" min="0" max="100" v-model.number="ak.def" class="inp w-24 ml-2"></label>
             <div class="mt-3 max-h-48 overflow-y-auto"><div v-for="m in ak.mapel" :key="m" class="flex items-center gap-2 text-sm py-1"><span class="flex-1">{{m}}</span><input type="number" min="0" max="100" v-model="ak.map[m]" placeholder="umum" class="inp w-20 !py-1"></div></div>
             <button @click="saveAk" :disabled="busy" class="btn-p mt-3">Simpan bobot &amp; KKM</button></div>
+          <div v-if="kunci" class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-1">Kunci nilai</h3><p class="text-xs text-slate-500 mb-3">Guru tidak dapat mengubah nilai kelas yang dikunci (admin tetap bisa, tercatat di Log). Kunci setelah rapor dibagikan.</p>
+            <div class="max-h-40 overflow-y-auto mb-3"><label v-for="k in kunci.kelas" :key="k" class="flex items-center gap-2 text-sm py-1"><input type="checkbox" :value="k" v-model="kunci.terkunci"> {{k}}</label><p v-if="!kunci.kelas.length" class="text-xs text-slate-500">Belum ada kelas.</p></div>
+            <button @click="saveKunci" :disabled="busy" class="btn-p">Simpan kunci</button></div>
           <div class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-3">Pratinjau</h3><kop :k="cfg.kop"></kop><ttd :t="cfg.ttd"></ttd></div>
           <div class="bg-white rounded-2xl shadow-sm p-5">
             <template v-if="bk2"><h3 class="font-bold mb-2">Cadangan otomatis</h3>
@@ -750,6 +757,15 @@ table tbody tr:hover{background:#f8fafc}
       <div v-if="leger.mapel.length" class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
     </section>
 
+    <!-- Log aktivitas -->
+    <section v-if="view==='log'">
+      <div class="flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Log Aktivitas</h2><input v-model.trim="lq" placeholder="Cari pengguna / aksi / detail" class="inp"><button @click="go('log')" class="btn-o">Muat ulang</button></div>
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Waktu</th><th>Pengguna</th><th>Aksi</th><th>Detail</th></tr></thead>
+        <tbody><tr v-for="l in logTampil" :key="l.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{l.waktu}}</td><td>{{l.nama}} <span class="text-xs text-slate-400">({{l.username}})</span></td><td class="font-semibold whitespace-nowrap">{{aksiLbl(l.aksi)}}</td><td class="text-slate-600">{{l.detail}}</td></tr>
+        <tr v-if="!logTampil.length"><td colspan="4" class="p-4 text-slate-500">{{logs.length?'Tidak ada catatan yang cocok.':'Belum ada aktivitas tercatat.'}}</td></tr></tbody></table></div>
+      <p class="text-xs text-slate-500 mt-2">300 catatan terbaru: perubahan nilai, penghapusan data, pindah kelas, reset sandi dan semester, serta kunci nilai.</p>
+    </section>
     <!-- Rapor -->
     <section v-if="view==='rapor'">
       <h2 class="h2">Rapor Siswa</h2>
@@ -992,8 +1008,8 @@ const app = createApp({
     const clock = ref(''), tick = () => { const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' }); document.querySelectorAll('.clk').forEach(e => { if (e.textContent !== t) e.textContent = t; }); };
     tick(); setInterval(tick, 1000); // ubah DOM langsung: tidak memicu render ulang seluruh aplikasi tiap detik
     const mnav = ref(false);
-    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', sandi: 'Ganti Sandi' };
-    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
+    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', sandi: 'Ganti Sandi' };
+    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'dokumen', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'izin', 'catatansaya', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -1012,7 +1028,7 @@ const app = createApp({
       keluar: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>' };
     ICON.bimbingansaya = ICON.catatan = ICON.catatansaya = ICON.bimbingan; ICON.izin = ICON.dokumen;
     ICON.guru = '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/><path d="M17 3l2 2 3-3"/>';
-    ICON.rapor = ICON.nilaisaya;
+    ICON.rapor = ICON.nilaisaya; ICON.log = ICON.riwayat;
     ICON.monitor = '<path d="M3 12h4l3-8 4 16 3-8h4"/>';
     ICON.akun = '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14 9l2 2"/>';
     const MS = { siswa: 'Data Siswa', guru: 'Data Guru' }; // nama menu untuk peran hanya-lihat
@@ -1093,7 +1109,8 @@ const app = createApp({
       if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; pilIdx.value = ''; }
       if (k === 'jurnal') { if (canWrite.value) pil.value = await api('pilihanNilai'); cfg.value = await api('pengaturanGet'); await fetchJ(); }
       if (k === 'bimbingan') { bk.value = await api('bimbinganKelas'); cfg.value = await api('pengaturanGet'); await fetchB(); }
-      if (k === 'pengaturan') { cfg.value = await api('pengaturanGet'); backupUrl.value = ''; bk2.value = await api('backupStatus').catch(() => null); ak.value = await api('akademikGet').catch(() => null); }
+      if (k === 'pengaturan') { cfg.value = await api('pengaturanGet'); backupUrl.value = ''; bk2.value = await api('backupStatus').catch(() => null); ak.value = await api('akademikGet').catch(() => null); kunci.value = await api('kunciGet').catch(() => null); }
+      if (k === 'log') logs.value = await api('logList');
       if (k === 'bimbingansaya') await fetchB();
       if (k === 'leger') { cfg.value = await api('pengaturanGet'); lk.value = await api('legerKelas'); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
       if (k === 'dokumen') await fetchD();
@@ -1432,6 +1449,10 @@ const app = createApp({
     });
     const kkmOf = m => { const k = leger.value.kkm; return k ? (k.map[m] || k.def) : 75; };
     const remedial = computed(() => leger.value.mapel.map(m => ({ mapel: m, kkm: kkmOf(m), list: leger.value.siswa.filter(r => r.nilai[m] != null && r.nilai[m] < kkmOf(m)).map(r => ({ nama: r.nama, nilai: r.nilai[m] })) })).filter(r => r.list.length));
+    const kunci = ref(null), saveKunci = () => run(async () => { await api('kunciSimpan', { terkunci: kunci.value.terkunci }); ok.value = 'Kunci nilai tersimpan'; });
+    const logs = ref([]), lq = ref(''), AKSI = { nilaiSave: 'Ubah nilai', presensiHapus: 'Hapus presensi', siswaDelete: 'Hapus siswa', siswaPindah: 'Pindah kelas', guruDelete: 'Hapus akun', kelasDelete: 'Hapus kelas', jadwalDelete: 'Hapus jadwal', jurnalDelete: 'Hapus jurnal', bimbinganDelete: 'Hapus bimbingan', akunReset: 'Reset sandi', resetSemester: 'Reset semester', kunciSimpan: 'Kunci nilai' };
+    const aksiLbl = a => AKSI[a] || a, logTampil = computed(() => { const t = lq.value.toLowerCase(); return logs.value.filter(l => !t || (l.nama + ' ' + l.username + ' ' + aksiLbl(l.aksi) + ' ' + l.detail).toLowerCase().includes(t)); });
+    const pairKunci = computed(() => { const p = pil.value[pilIdx.value]; return !!(p && p.kunci); });
     /* ====== Rapor ====== */
     const rpPil = ref([]), rpKelas = ref(''), rp = ref(null), rpCat = reactive({}), rpMeta = reactive({ sem: 'Ganjil', tahun: '' });
     const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1525,7 +1546,7 @@ const app = createApp({
       parent.postMessage({ calmHeight: Math.ceil(h) + 24 }, '*');
     }, 600);
 
-    return { remedial, rpPil, rpKelas, rp, rpCat, rpMeta, tglCetak, kkmR, belumR, loadRapor, cetakRapor, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpCat, rpMeta, tglCetak, kkmR, belumR, loadRapor, cetakRapor, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
