@@ -981,22 +981,51 @@ table tbody tr:hover{background:#f8fafc}
     </section>
     <!-- Akun & Sandi (admin) -->
     <section v-if="view==='akun'">
-      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">Akun &amp; Sandi</h2>
-        <div class="flex flex-wrap gap-2"><button v-if="akOrtu" @click="buatOrtu" :disabled="busy" class="btn-o">Buat akun orang tua ({{akOrtu}})</button><button v-if="akpilih.length" @click="bagikanAwal(akpilih)" :disabled="busy" class="btn-o">Bagikan sandi awal ({{akpilih.length}})</button><button v-if="akpilih.length" @click="konfirmReset(akpilih)" :disabled="busy" class="btn-p">Reset sandi {{akpilih.length}} akun</button></div></div>
-      <div class="flex flex-wrap gap-2 mb-3">
-        <select v-model="akrole" class="inp"><option value="">Semua peran</option><option value="SISWA">Siswa</option><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf</option><option value="BK">Guru BK</option><option value="ORTU">Orang tua</option></select>
-        <select v-model="akkelas" class="inp"><option value="">Semua kelas</option><option v-for="k in akKelas" :key="k">{{k}}</option></select>
-        <input v-model.trim="akq" placeholder="Cari nama / username..." class="inp flex-1 min-w-[10rem]">
-        <span class="text-sm text-slate-500 self-center">{{akTampil.length}} dari {{akun.length}} akun</span></div>
-      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th class="p-3 w-8"><input type="checkbox" :checked="akSemua" @change="akPilihSemua($event.target.checked)" aria-label="Pilih semua akun"></th><th>Nama</th><th>Username</th><th>Peran</th><th>Kelas</th><th>Sandi awal</th><th></th></tr></thead>
-        <tbody><tr v-for="a in akLihat" :key="a.username" class="border-t"><td class="p-3"><input type="checkbox" :value="a.username" v-model="akpilih" :aria-label="'Pilih '+a.nama"></td><td class="font-semibold">{{a.nama}}</td><td>{{a.username}}</td>
-          <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[a.role]">{{ROLE_LBL[a.role]}}</span></td><td>{{a.kelas||'-'}}</td>
-          <td><span class="text-xs font-bold" :class="a.awal?'text-emerald-700':'text-slate-400'">{{a.awal?'Tersedia':'Sudah diganti'}}</span></td>
-          <td class="whitespace-nowrap pr-3"><button v-if="a.awal" @click="bagikanAwal([a.username])" class="text-blue-800 font-bold mr-3">Bagikan</button><button @click="resetSatu(a)" class="text-amber-600 font-bold">Reset &amp; bagikan</button></td></tr>
-        <tr v-if="!akLihat.length"><td colspan="7" class="p-4 text-slate-500">{{akun.length?'Tidak ada akun yang cocok dengan filter.':'Belum ada akun.'}}</td></tr></tbody></table></div>
-      <p v-if="akTampil.length>300" class="text-xs text-slate-500 mt-2">Menampilkan 300 akun pertama; persempit dengan filter atau pencarian.</p>
-      <p class="text-xs text-slate-500 mt-2">Sandi disimpan sebagai hash sehingga tidak dapat dilihat. Bila pengguna lupa sandi, pilih <b>Reset &amp; bagikan</b> lalu kirim lewat WhatsApp atau cetak kartunya. <b>Bagikan</b> hanya tersedia selama pengguna belum mengganti sandi awalnya.</p>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><div><h2 class="h2 !mb-0">Kelola Akun Orang Tua</h2><p class="text-sm text-slate-500 mt-1">Buat, lihat, dan bagikan akun wali berdasarkan siswa.</p></div></div>
+
+      <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-4">
+        <div class="flex flex-wrap items-center gap-2 mb-3"><div class="font-extrabold text-blue-900 mr-auto">1. Pilih siswa untuk dibuatkan akun orang tua</div><span class="text-xs font-bold text-blue-700 bg-white rounded-full px-3 py-1">{{ortuSiswaTampil.length}} siswa</span></div>
+        <div class="flex flex-wrap gap-2 mb-3">
+          <select v-model="ortuKelas" class="inp"><option value="">Semua kelas</option><option v-for="k in akKelas" :key="k">{{k}}</option></select>
+          <input v-model.trim="ortuQ" placeholder="Cari nama siswa / NIS..." class="inp flex-1 min-w-[12rem]">
+          <button @click="pilihSemuaOrtuSiswa(!ortuSemua)" class="btn-o">{{ortuSemua?'Batalkan semua':'Pilih semua siswa'}}</button>
+        </div>
+        <div class="bg-white rounded-xl border overflow-hidden max-h-72 overflow-y-auto">
+          <label v-for="s in ortuSiswaTampil" :key="s.username" class="flex items-center gap-3 px-4 py-3 border-b last:border-b-0 cursor-pointer hover:bg-slate-50">
+            <input type="checkbox" :value="s.username" v-model="ortuPil" class="w-4 h-4">
+            <span class="font-semibold text-slate-800 flex-1">{{s.nama}}</span>
+            <span class="text-xs text-slate-500">NIS {{s.username}}</span>
+            <span class="text-xs font-semibold text-slate-500">{{s.kelas||'-'}}</span>
+          </label>
+          <div v-if="!ortuSiswaTampil.length" class="p-4 text-sm text-slate-500">Tidak ada siswa yang sesuai filter.</div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 mt-3"><span class="text-sm text-slate-600">Terpilih: <b>{{ortuPil.length}}</b> siswa</span><button v-if="ortuPil.length" @click="buatOrtuDariPilihan" :disabled="busy" class="btn-p">Buat akun orang tua ({{ortuPil.length}})</button></div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 border">
+        <div class="flex flex-wrap items-center gap-2 mb-3"><div class="font-extrabold text-slate-800 mr-auto">2. Akun orang tua yang sudah dibuat</div><span class="text-xs font-bold text-slate-500">{{ortuAkunTampil.length}} akun</span></div>
+        <div class="flex flex-wrap gap-2 mb-3">
+          <select v-model="ortuAkunKelas" class="inp"><option value="">Semua kelas</option><option v-for="k in akKelas" :key="k">{{k}}</option></select>
+          <input v-model.trim="ortuAkunQ" placeholder="Cari nama / username..." class="inp flex-1 min-w-[12rem]">
+        </div>
+        <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama akun</th><th>Siswa</th><th>Username</th><th>Kelas</th><th>Status sandi</th><th class="pr-3">Aksi</th></tr></thead>
+          <tbody><tr v-for="a in ortuAkunTampil" :key="a.username" class="border-t align-top"><td class="p-3 font-semibold">{{a.nama}}</td><td>{{namaAnakOrtu(a)}}</td><td>{{a.username}}</td><td>{{a.kelas||'-'}}</td><td><span class="text-xs font-bold" :class="a.awal?'text-emerald-700':'text-slate-400'">{{a.awal?'Sandi awal tersedia':'Sandi sudah diganti'}}</span></td><td class="whitespace-nowrap pr-3"><button v-if="a.awal" @click="bagikanAwal([a.username])" :disabled="busy" class="text-blue-800 font-bold mr-3">Bagikan</button><button @click="resetSatu(a)" :disabled="busy" class="text-amber-600 font-bold">Reset &amp; bagikan</button></td></tr>
+          <tr v-if="!ortuAkunTampil.length"><td colspan="6" class="p-4 text-slate-500">Belum ada akun orang tua untuk filter ini.</td></tr></tbody></table></div>
+      </div>
+      <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800"><b>Catatan:</b> password hanya dapat ditampilkan saat dibuat atau di-reset. Setelah orang tua mengganti password, gunakan <b>Reset &amp; bagikan</b> jika mereka lupa.</div>
+
+      <details class="mt-5 bg-white rounded-2xl shadow-sm border"><summary class="cursor-pointer p-4 font-bold text-slate-700">Kelola akun lainnya (Siswa, Guru, Staf, BK, Kepsek)</summary>
+        <div class="p-4 pt-0">
+          <div class="flex flex-wrap gap-2 mb-3">
+            <select v-model="akrole" class="inp"><option value="">Semua peran</option><option value="SISWA">Siswa</option><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf</option><option value="BK">Guru BK</option></select>
+            <select v-model="akkelas" class="inp"><option value="">Semua kelas</option><option v-for="k in akKelas" :key="k">{{k}}</option></select>
+            <input v-model.trim="akq" placeholder="Cari nama / username..." class="inp flex-1 min-w-[10rem]">
+            <span class="text-sm text-slate-500 self-center">{{akTampil.length}} dari {{akun.length}} akun</span></div>
+          <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3 w-8"><input type="checkbox" :checked="akSemua" @change="akPilihSemua($event.target.checked)" aria-label="Pilih semua akun"></th><th class="p-3">Nama</th><th>Username</th><th>Peran</th><th>Kelas</th><th>Sandi awal</th><th></th></tr></thead>
+            <tbody><tr v-for="a in akLihat" :key="a.username" class="border-t"><td class="p-3"><input type="checkbox" :value="a.username" v-model="akpilih" :aria-label="'Pilih '+a.nama"></td><td class="font-semibold">{{a.nama}}</td><td>{{a.username}}</td><td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[a.role]">{{ROLE_LBL[a.role]}}</span></td><td>{{a.kelas||'-'}}</td><td><span class="text-xs font-bold" :class="a.awal?'text-emerald-700':'text-slate-400'">{{a.awal?'Tersedia':'Sudah diganti'}}</span></td><td class="whitespace-nowrap pr-3"><button v-if="a.awal" @click="bagikanAwal([a.username])" class="text-blue-800 font-bold mr-3">Bagikan</button><button @click="resetSatu(a)" class="text-amber-600 font-bold">Reset &amp; bagikan</button></td></tr><tr v-if="!akLihat.length"><td colspan="7" class="p-4 text-slate-500">{{akun.length?'Tidak ada akun yang cocok dengan filter.':'Belum ada akun.'}}</td></tr></tbody></table></div>
+          <p v-if="akTampil.length>300" class="text-xs text-slate-500 mt-2">Menampilkan 300 akun pertama; persempit dengan filter atau pencarian.</p>
+        </div>
+      </details>
     </section>
     <!-- Portal orang tua: data anak -->
     <section v-if="view==='anak'">
@@ -1952,6 +1981,7 @@ const app = createApp({
 
     /* ====== v3.8: Akun & Sandi (bagikan akun, reset sandi) ====== */
     const akun = ref([]), akq = ref(''), akrole = ref(''), akkelas = ref(''), akpilih = ref([]);
+    const ortuKelas = ref(''), ortuQ = ref(''), ortuPil = ref([]), ortuAkunKelas = ref(''), ortuAkunQ = ref('');
     const fetchAkun = async () => { akun.value = await api('akunList'); };
     const akMap = computed(() => new Map(akun.value.map(a => [a.username, a])));
     const akTampil = computed(() => { const t = akq.value.toLowerCase(); return akun.value.filter(a => (!akrole.value || a.role === akrole.value) && (!akkelas.value || a.kelas === akkelas.value) && (!t || (a.nama + ' ' + a.username + ' ' + a.kelas).toLowerCase().includes(t))); });
@@ -1959,7 +1989,13 @@ const app = createApp({
     const akKelas = computed(() => [...new Set(akun.value.map(a => a.kelas).filter(Boolean))].sort());
     const akSemua = computed(() => akLihat.value.length > 0 && akLihat.value.every(a => akpilih.value.includes(a.username)));
     const akPilihSemua = c => { akpilih.value = c ? akLihat.value.map(a => a.username) : []; };
+    const ortuSiswaTampil = computed(() => { const q = ortuQ.value.toLowerCase(); return akun.value.filter(a => a.role === 'SISWA' && (!ortuKelas.value || a.kelas === ortuKelas.value) && (!q || (a.nama + ' ' + a.username + ' ' + a.kelas).toLowerCase().includes(q))).slice(0, 500); });
+    const ortuSemua = computed(() => ortuSiswaTampil.value.length > 0 && ortuSiswaTampil.value.every(a => ortuPil.value.includes(a.username)));
+    const pilihSemuaOrtuSiswa = c => { ortuPil.value = c ? ortuSiswaTampil.value.map(a => a.username) : []; };
+    const ortuAkunTampil = computed(() => { const q = ortuAkunQ.value.toLowerCase(); return akun.value.filter(a => a.role === 'ORTU' && (!ortuAkunKelas.value || a.kelas === ortuAkunKelas.value) && (!q || (a.nama + ' ' + a.username + ' ' + (a.anakNama || '') + ' ' + a.kelas).toLowerCase().includes(q))).slice(0, 500); });
+    const namaAnakOrtu = a => { const nis = String(a.username || '').replace(/^ortu/i, ''); const s = akun.value.find(x => x.role === 'SISWA' && String(x.username) === nis); return s ? s.nama : '-'; };
     Vue.watch([akq, akrole, akkelas], () => { akpilih.value = []; });
+    Vue.watch([ortuKelas, ortuQ], () => { ortuPil.value = []; });
     const withKontak = l => l.map(c => ({ ...c, kontak: (akMap.value.get(c.username) || {}).kontak || '' }));
     const kirimAkun = async (aksi, names) => { let h = [], gagal = ''; try { for (let i = 0; i < names.length; i += 50) h = h.concat(await api(aksi, { usernames: names.slice(i, i + 50) })); } catch (e) { gagal = niceErr(e.message); } return { h, gagal }; };
     const hasilAkun = async (judul, { h, gagal }) => { // sandi yang sudah dibuat tetap ditampilkan walau satu paket gagal; status lokal diperbarui tanpa memuat ulang daftar
@@ -2048,12 +2084,12 @@ const app = createApp({
     const perluTindak = computed(() => { const m = new Map(), t = pel.value.total || {}; pel.value.rows.forEach(r => { if (!m.has(r.nis)) m.set(r.nis, { nis: r.nis, nama: r.nama, kelas: r.kelas, total: t[r.nis] || 0 }); }); return [...m.values()].filter(x => x.total >= pel.value.ambang).sort((a, c) => c.total - a.total); });
     const butirSaran = computed(() => [...new Set(pel.value.rows.map(r => r.butir))].sort());
     const akOrtu = computed(() => akpilih.value.filter(u => (akMap.value.get(u) || {}).role === 'SISWA').length);
-    const buatOrtu = () => run(async () => {
-      const nis = akpilih.value.filter(u => (akMap.value.get(u) || {}).role === 'SISWA');
+    const buatOrtuDariPilihan = () => run(async () => {
+      const nis = ortuPil.value.map(String);
       if (!nis.length) throw new Error('Pilih akun siswa terlebih dahulu');
       let dibuat = [], lewat = 0, gagal = '';
       try { for (let i = 0; i < nis.length; i += 50) { const d = await api('ortuBuat', { nis: nis.slice(i, i + 50) }); dibuat = dibuat.concat(d.dibuat || []); lewat += d.lewat || 0; } } catch (e) { gagal = niceErr(e.message); }
-      if (dibuat.length) { akpilih.value = []; showKred('Akun orang tua dibuat', dibuat); try { await fetchAkun(); } catch (e) { /* dimuat ulang saat menu dibuka lagi */ } }
+      if (dibuat.length) { ortuPil.value = []; showKred('Akun orang tua dibuat', dibuat); try { await fetchAkun(); } catch (e) { /* dimuat ulang saat menu dibuka lagi */ } }
       if (gagal) throw new Error(gagal + (dibuat.length ? ' (' + dibuat.length + ' akun sudah dibuat dan ditampilkan)' : ''));
       if (!dibuat.length) throw new Error('Semua siswa terpilih sudah memiliki akun orang tua.');
       ok.value = dibuat.length + ' akun orang tua dibuat' + (lewat ? ', ' + lewat + ' sudah ada' : '');
@@ -2077,10 +2113,11 @@ const app = createApp({
       jhari, jq, jblok, blokInfo, bf2, BLOK_CLS, blokLbl, saveBlok, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, jimp, jimpCount, exportJadwal, templateJadwal, pickJadwalFile, doImportJadwal, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax,
       leger, lk, lkelas, dokumen, showD, df, loadDok, loadLeger, saveDok, delDok,
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
+      ortuKelas, ortuQ, ortuPil, ortuSiswaTampil, ortuSemua, pilihSemuaOrtuSiswa, buatOrtuDariPilihan, ortuAkunKelas, ortuAkunQ, ortuAkunTampil, namaAnakOrtu,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai,
       antreSaya, kirimAntre, buangAntre, pwa, pasang, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
-      anak, atab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, plf, canPel, loadPl, openPl, pickKelasPl, savePl, delPl, perluTindak, butirSaran, akOrtu, buatOrtu };
+      anak, atab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, plf, canPel, loadPl, openPl, pickKelasPl, savePl, delPl, perluTindak, butirSaran, akOrtu, buatOrtuDariPilihan };
   }
 });
 app.component('kop', { props: ['k'], template: `<div class="flex items-center gap-3 border-b-4 border-double border-slate-800 pb-2 mb-3">
