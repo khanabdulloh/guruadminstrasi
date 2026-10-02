@@ -6,9 +6,8 @@
 <title>Portal Akademik SMK CALM</title>
 <meta name="theme-color" content="#0b3d91">
 <script>if(window.self!==window.top)document.documentElement.classList.add("embedded")</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin><link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}
 .login-bg{background:radial-gradient(1200px 600px at 10% -10%,#1b56c0 0%,transparent 60%),radial-gradient(900px 500px at 110% 110%,#134aa8 0%,transparent 55%),linear-gradient(160deg,#0b3d91 0%,#072a66 55%,#041536 100%)}
@@ -1185,20 +1184,34 @@ const app = createApp({
     const refresh = async () => { kelasList.value = []; kelasAll.value = await api('kelasDetail'); };
     const skelas = ref(''), sq = ref('');
     const siswaTampil = computed(() => { const t = sq.value.toLowerCase(); return siswa.value.filter(s => (!skelas.value || s.kelas === skelas.value) && (!t || (s.nis + ' ' + s.nama).toLowerCase().includes(t))); });
-    const XL = () => { if (!window.XLSX) throw new Error('Pustaka Excel belum termuat. Periksa internet lalu muat ulang halaman.'); return window.XLSX; };
-    function saveXlsx(name, sheets) {
-      const X = XL(), wb = X.utils.book_new();
+    // Pustaka Excel dimuat hanya saat dibutuhkan (ekspor / impor), satu kali, dengan batas waktu dan bisa dicoba ulang.
+    const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', XL_GAGAL = 'Pustaka Excel gagal dimuat. Periksa koneksi internet lalu coba lagi.';
+    let xlLoad = null;
+    const XL = () => {
+      if (window.XLSX) return Promise.resolve(window.XLSX);
+      if (xlLoad) return xlLoad; // permintaan bersamaan memakai satu unduhan
+      return xlLoad = new Promise((res, rej) => {
+        const el = document.createElement('script'); let selesai = false, t = null;
+        const gagal = () => { if (selesai) return; selesai = true; clearTimeout(t); xlLoad = null; el.remove(); rej(new Error(XL_GAGAL)); };
+        t = setTimeout(gagal, 20000);
+        el.async = true; el.onerror = gagal;
+        el.onload = () => { if (selesai) return; selesai = true; clearTimeout(t); if (window.XLSX) res(window.XLSX); else { xlLoad = null; el.remove(); rej(new Error(XL_GAGAL)); } };
+        el.src = XLSX_URL; document.head.appendChild(el);
+      });
+    };
+    async function saveXlsx(name, sheets) {
+      const X = await XL(), wb = X.utils.book_new();
       sheets.forEach(([n, aoa, w]) => { const ws = X.utils.aoa_to_sheet(aoa); ws['!cols'] = w.map(c => ({ wch: c })); X.utils.book_append_sheet(wb, ws, n); });
       X.writeFile(wb, name);
     }
     const exportSiswa = () => run(async () => {
       const list = siswaTampil.value.slice().sort((a, b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
       const aoa = [['No', 'NIS', 'Nama', 'L/P', 'Kelas', 'Kontak']].concat(list.map((s, i) => [i + 1, String(s.nis), s.nama, s.gender, s.kelas, s.kontak]));
-      saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 16, 32, 5, 12, 18]]]);
+      await saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 16, 32, 5, 12, 18]]]);
       ok.value = list.length + ' siswa diekspor';
     });
     const templateSiswa = () => run(async () => {
-      saveXlsx('Template_Impor_Siswa.xlsx', [
+      await saveXlsx('Template_Impor_Siswa.xlsx', [
         ['Data Siswa', [['NIS', 'Nama', 'L/P', 'Kelas', 'Kontak'], ['0012345678', 'Contoh Siswa Satu', 'L', 'X TKJ 1', '081234567890'], ['0012345679', 'Contoh Siswa Dua', 'P', 'X TKJ 1', '']], [16, 32, 6, 14, 18]],
         ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Siswa"; hapus dua baris contoh.'], ['2. Kolom wajib: NIS, Nama, Kelas. L/P diisi L atau P (kosong dianggap L).'], ['3. Format kolom NIS sebagai Teks agar angka 0 di depan tidak hilang.'], ['4. Kelas baru otomatis dibuat. Akun login siswa dibuat otomatis dengan sandi acak.']], [90]]]);
     });
@@ -1208,7 +1221,7 @@ const app = createApp({
     async function pickFile(ev) {
       const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
       await run(async () => {
-        const X = XL(), wb = X.read(await f.arrayBuffer(), { type: 'array' });
+        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array' });
         const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
         const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
         const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
@@ -1242,7 +1255,7 @@ const app = createApp({
       siswa.value = await api('siswaList'); kelasAll.value = await api('kelasDetail');
     });
     const downloadCreds = () => run(async () => {
-      saveXlsx('Kredensial_Siswa_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['NIS (username)', 'Nama', 'Kelas', 'Sandi awal']].concat(imp.creds.map(x => [String(x.nis), x.nama, x.kelas, String(x.sandi)])), [18, 32, 14, 14]]]);
+      await saveXlsx('Kredensial_Siswa_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['NIS (username)', 'Nama', 'Kelas', 'Sandi awal']].concat(imp.creds.map(x => [String(x.nis), x.nama, x.kelas, String(x.sandi)])), [18, 32, 14, 14]]]);
     });
     const editSiswa = s => { Object.assign(sf, { edit: !!s, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }, s || {}); showS.value = true; };
     const saveSiswa = () => run(async () => {
@@ -1405,10 +1418,10 @@ const app = createApp({
     const delGuru = g => confirm('Hapus akun ' + g.nama + '? Status wali kelasnya ikut dilepas.') && run(async () => { await api('guruDelete', { username: g.username }); await refreshGuru(); ok.value = 'Akun dihapus'; });
     const exportGuru = () => run(async () => {
       const aoa = [['No', 'Username', 'Nama', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, ROLE_LBL[g.role] || 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
-      saveXlsx('Data_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Guru', aoa, [5, 20, 32, 16, 20, 30, 12]]]); ok.value = guruTampil.value.length + ' akun diekspor';
+      await saveXlsx('Data_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Guru', aoa, [5, 20, 32, 16, 20, 30, 12]]]); ok.value = guruTampil.value.length + ' akun diekspor';
     });
     const templateGuru = () => run(async () => {
-      saveXlsx('Template_Impor_Guru.xlsx', [
+      await saveXlsx('Template_Impor_Guru.xlsx', [
         ['Data Guru', [['Username', 'Nama', 'Peran', 'Wali Kelas', 'Sandi'], ['budi.santoso', 'Budi Santoso, S.Pd.', 'Guru', 'X TKJ 1', ''], ['siti.aminah', 'Siti Aminah, S.Kom.', 'Guru', 'XI TM 1, XI TM 2', 'rahasia123'], ['kepsek', 'Drs. Contoh, M.Pd.', 'Kepala Sekolah', '', ''], ['staf.tu', 'Rina Lestari', 'Staf', '', '']], [20, 34, 16, 24, 16]],
         ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Guru"; hapus baris contoh.'], ['2. Kolom wajib: Username (3-30 karakter: huruf, angka, titik, minus, garis bawah) dan Nama.'], ['3. Peran: Guru, Kepala Sekolah, atau Staf (staf hanya dapat melihat dan mengunduh data guru dan siswa). Kosong = Guru. Hanya guru yang bisa menjadi wali kelas.'], ['4. Wali Kelas: nama kelas yang SUDAH ada di Kelola Kelas; beberapa kelas dipisah koma. Kosong = tidak mengubah.'], ['5. Sandi: opsional, min. 6 karakter. Kosong = dibuat acak (dapat diunduh setelah impor). Untuk akun yang sudah ada, kolom ini diabaikan.']], [100]]]);
     });
@@ -1417,7 +1430,7 @@ const app = createApp({
     async function pickGuruFile(ev) {
       const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
       await run(async () => {
-        const X = XL(), wb = X.read(await f.arrayBuffer(), { type: 'array' });
+        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array' });
         const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
         const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
         const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
@@ -1460,7 +1473,7 @@ const app = createApp({
       try { await refreshGuru(); } catch (e) { /* daftar dimuat ulang saat menu dibuka lagi */ }
     });
     const downloadGuruCreds = () => run(async () => {
-      saveXlsx('Kredensial_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['Username', 'Nama', 'Peran', 'Sandi awal']].concat(gimp.creds.map(x => [String(x.username), x.nama, ROLE_LBL[x.role] || 'Guru', String(x.sandi)])), [20, 34, 16, 14]]]);
+      await saveXlsx('Kredensial_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['Username', 'Nama', 'Peran', 'Sandi awal']].concat(gimp.creds.map(x => [String(x.username), x.nama, ROLE_LBL[x.role] || 'Guru', String(x.sandi)])), [20, 34, 16, 14]]]);
     });
 
     /* ====== v3.2: pindah kelas, reset sandi siswa, ekspor, aksi cepat ====== */
@@ -1477,13 +1490,13 @@ const app = createApp({
     const presensiCepat = j => go('presensi').then(() => { Object.assign(pi, { tanggal: hari0, kelas: j.kelas, mapel: j.mapel }); loadPresensi(); });
     const exportLeger = () => run(async () => {
       const L = leger.value, aoa = [['No', 'NIS', 'Nama'].concat(L.mapel, ['Rata-rata'])].concat(L.siswa.map((r, i) => [i + 1, String(r.nis), r.nama].concat(L.mapel.map(m => r.nilai[m] == null ? '' : r.nilai[m]), [r.rata == null ? '' : r.rata])));
-      saveXlsx('Leger_' + lkelas.value + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Leger', aoa, [5, 16, 32].concat(L.mapel.map(() => 14), [10])]]); ok.value = 'Leger diekspor';
+      await saveXlsx('Leger_' + lkelas.value + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Leger', aoa, [5, 16, 32].concat(L.mapel.map(() => 14), [10])]]); ok.value = 'Leger diekspor';
     });
     const exportRekap = () => run(async () => {
       const R = prRes.value, h = pr.jenis === 'Harian';
       const aoa = [['No'].concat(h ? ['Tanggal'] : [], ['Kelas', 'Mapel'], h ? [] : ['Pertemuan'], ['Siswa', 'H', 'D', 'I', 'S', 'A', '% Hadir'])]
         .concat(R.rows.map((r, i) => [i + 1].concat(h ? [r.tanggal] : [], [r.kelas, r.mapel || '(data lama)'], h ? [] : [r.pertemuan], [r.siswa, r.H, r.D, r.I, r.S, r.A, r.persen])));
-      saveXlsx('Rekap_Presensi_' + (h ? pr.tanggal : pr.bulan) + '.xlsx', [['Rekap', aoa, [5, 12, 14, 22, 10, 8, 6, 6, 6, 6, 6, 9]]]); ok.value = 'Rekap diekspor';
+      await saveXlsx('Rekap_Presensi_' + (h ? pr.tanggal : pr.bulan) + '.xlsx', [['Rekap', aoa, [5, 12, 14, 22, 10, 8, 6, 6, 6, 6, 6, 9]]]); ok.value = 'Rekap diekspor';
     });
 
     /* ====== v3.6: izin siswa, agenda, bobot & KKM, arsip ====== */
@@ -1585,7 +1598,7 @@ const app = createApp({
       Vue.nextTick(() => { document.body.classList.add('cetak-kartu'); window.addEventListener('afterprint', () => { document.body.classList.remove('cetak-kartu'); kartu.value = null; }, { once: true }); window.print(); });
     };
     const unduhKred = () => run(async () => {
-      saveXlsx('Akun_Sandi_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Akun', [['Nama', 'Peran', 'Kelas', 'Username', 'Sandi']].concat(kred.list.map(c => [c.nama, ROLE_LBL[c.role] || '', c.kelas || '', String(c.username), String(c.sandi)])), [32, 16, 14, 20, 14]]]);
+      await saveXlsx('Akun_Sandi_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Akun', [['Nama', 'Peran', 'Kelas', 'Username', 'Sandi']].concat(kred.list.map(c => [c.nama, ROLE_LBL[c.role] || '', c.kelas || '', String(c.username), String(c.sandi)])), [32, 16, 14, 20, 14]]]);
     });
 
     /* ====== v4.1: PKL, tahun ajaran, riwayat kelas, alumni ====== */
@@ -1613,7 +1626,7 @@ const app = createApp({
     const saveNilaiPkl = () => run(async () => { await api('pklNilai', { id: jp.value.id, nilai: nl.nilai, catatan: nl.catatan }); await fetchPkl(); ok.value = 'Nilai PKL tersimpan'; });
     const exportPkl = () => run(async () => {
       const aoa = [['No', 'NIS', 'Nama', 'Kelas', 'Industri', 'Alamat', 'Mulai', 'Selesai', 'Guru Pembimbing', 'Pembimbing Industri', 'Jurnal', 'Nilai']].concat(pklTampil.value.map((p, i) => [i + 1, String(p.nis), p.nama, p.kelas, p.industri, p.alamat, p.mulai, p.selesai, p.guruNama, p.pembimbingIndustri, p.jurnal, p.nilai == null ? '' : p.nilai]));
-      saveXlsx('Data_PKL_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['PKL', aoa, [5, 16, 30, 12, 28, 30, 12, 12, 26, 26, 8, 8]]]); ok.value = pklTampil.value.length + ' penempatan diekspor';
+      await saveXlsx('Data_PKL_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['PKL', aoa, [5, 16, 30, 12, 28, 30, 12, 12, 26, 26, 8, 8]]]); ok.value = pklTampil.value.length + ' penempatan diekspor';
     });
     const ta = reactive({ tahun: '', semester: 'Ganjil' }), rw = ref({ labels: [], rows: [] }), rwSel = ref(''), rwq = ref(''), rwLabel = ref(''), alumni = ref([]), aq = ref(''), ll = reactive({ kelas: '', tahun: '', txt: '' });
     const alumniTampil = computed(() => { const t = aq.value.toLowerCase(); return alumni.value.filter(a => !t || (a.nis + ' ' + a.nama + ' ' + a.tahunLulus + ' ' + a.kelas).toLowerCase().includes(t)); });
@@ -1624,8 +1637,8 @@ const app = createApp({
       const d = await api('luluskanKelas', { kelas: ll.kelas, tahun: ll.tahun, konfirmasi: ll.txt });
       Object.assign(ll, { kelas: '', txt: '' }); [alumni.value, kelasAll.value] = await Promise.all([api('alumniList'), api('kelasDetail')]); ok.value = d.diluluskan + ' siswa dipindahkan ke alumni';
     });
-    const exportRw = () => run(async () => { const aoa = [['No', 'Label', 'NIS', 'Nama', 'Kelas']].concat(rw.value.rows.map((r, i) => [i + 1, r.tahun, String(r.nis), r.nama, r.kelas])); saveXlsx('Riwayat_Kelas_' + (rwSel.value || 'Semua').replace(/[^\w-]+/g, '_') + '.xlsx', [['Riwayat', aoa, [5, 20, 16, 32, 14]]]); });
-    const exportAlumni = () => run(async () => { const aoa = [['No', 'NIS', 'Nama', 'L/P', 'Kelas Akhir', 'Tahun Lulus']].concat(alumniTampil.value.map((a, i) => [i + 1, String(a.nis), a.nama, a.gender, a.kelas, a.tahunLulus])); saveXlsx('Data_Alumni_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Alumni', aoa, [5, 16, 32, 5, 14, 12]]]); ok.value = alumniTampil.value.length + ' alumni diekspor'; });
+    const exportRw = () => run(async () => { const aoa = [['No', 'Label', 'NIS', 'Nama', 'Kelas']].concat(rw.value.rows.map((r, i) => [i + 1, r.tahun, String(r.nis), r.nama, r.kelas])); await saveXlsx('Riwayat_Kelas_' + (rwSel.value || 'Semua').replace(/[^\w-]+/g, '_') + '.xlsx', [['Riwayat', aoa, [5, 20, 16, 32, 14]]]); });
+    const exportAlumni = () => run(async () => { const aoa = [['No', 'NIS', 'Nama', 'L/P', 'Kelas Akhir', 'Tahun Lulus']].concat(alumniTampil.value.map((a, i) => [i + 1, String(a.nis), a.nama, a.gender, a.kelas, a.tahunLulus])); await saveXlsx('Data_Alumni_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Alumni', aoa, [5, 16, 32, 5, 14, 12]]]); ok.value = alumniTampil.value.length + ' alumni diekspor'; });
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { mnav.value = false; showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = showAg.value = showPk.value = false; jp.value = null; if (!busy.value) imp.show = gimp.show = false; } });
     new MutationObserver(ms => { for (const m of ms) for (const nd of m.addedNodes) { if (nd.nodeType === 1 && nd.classList && nd.classList.contains('modal-wrap')) { const el = nd.querySelector('input:not([disabled]):not([type=checkbox]),select,textarea'); if (el) setTimeout(() => el.focus(), 30); } } }).observe(document.getElementById('app'), { childList: true, subtree: true });
