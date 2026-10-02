@@ -582,6 +582,9 @@ table tbody tr:hover{background:#f8fafc}
       <div class="flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Jadwal {{user.role==='SISWA'?'Pelajaran':'Mengajar'}}</h2>
         <select v-model="jhari" class="inp"><option value="">Semua hari</option><option v-for="h in hariList" :key="h">{{h}}</option></select>
         <input v-model.trim="jq" placeholder="Cari kelas / mapel / guru" class="inp">
+        <button v-if="canJadwal" @click="templateJadwal" class="btn-o">Unduh template</button>
+        <label v-if="canJadwal" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickJadwalFile"></label>
+        <button @click="exportJadwal" :disabled="!jadwalTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
         <button v-if="canJadwal" @click="openJadwal" class="btn-p inline-flex items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Tambah jadwal</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Hari</th><th>Jam</th><th>Kelas</th><th>Mapel</th><th>Guru</th><th v-if="canJadwal"></th></tr></thead>
@@ -603,6 +606,34 @@ table tbody tr:hover{background:#f8fafc}
         <p v-if="user.role==='GURU'" class="text-xs text-slate-500 mt-3">Jadwal ini otomatis atas nama Anda.</p>
         <p v-if="err" class="text-sm text-rose-600 mt-3 rounded-xl bg-rose-50 px-3 py-2">{{err}}</p>
         <div class="flex justify-end gap-2 mt-5"><button @click="showJd=false" class="btn-o">Batal</button><button @click="saveJadwal" :disabled="busy" class="btn-p uppercase">Simpan Jadwal</button></div>
+      </div></div>
+      <!-- Pratinjau impor jadwal -->
+      <div v-if="jimp.show" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl">
+        <h3 class="font-extrabold text-blue-900">Impor jadwal dari Excel</h3>
+        <p class="text-xs text-slate-500 mb-3">{{jimp.file}}</p>
+        <template v-if="!jimp.done">
+          <div class="flex flex-wrap gap-2 text-xs font-bold mb-3">
+            <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">{{jimpCount.baru}} baru</span>
+            <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{jimpCount.ada}} sudah ada (dilewati)</span>
+            <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">{{jimpCount.error}} bermasalah (dilewati)</span></div>
+          <div class="overflow-auto border rounded-xl max-h-80"><table class="w-full text-xs">
+            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>Hari</th><th>Jam</th><th>Kelas</th><th>Mapel</th><th>Guru</th><th>Status</th></tr></thead>
+            <tbody><tr v-for="r in jimp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
+              <td class="p-2">{{r.no}}</td><td>{{r.dHari}}</td><td class="whitespace-nowrap">{{r.dJam}}</td><td>{{r.dKelas}}</td><td>{{r.dMapel}}</td><td>{{r.dGuru}}</td>
+              <td :class="r.st==='error'?'text-rose-600':r.st==='ada'?'text-blue-800':'text-emerald-700'">{{r.st==='baru'?'Baru':r.msg}}</td></tr></tbody></table></div>
+          <p v-if="jimp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{jimp.rows.length}}; semua baris tetap diproses.</p>
+          <p class="text-xs text-slate-500 mt-2">Jadwal yang sudah ada tidak diubah atau dihapus. Impor hanya menambah baris baru; mengulang impor file yang sama aman.</p>
+          <div v-if="busy&&jimp.prog" class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden"><div class="h-full bg-blue-700 transition-all" :style="{width:jimp.prog+'%'}"></div></div>
+          <p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p>
+          <div class="flex justify-end gap-2 mt-4"><button @click="jimp.show=false" :disabled="busy" class="btn-o">Batal</button>
+            <button @click="doImportJadwal" :disabled="busy||!jimpCount.baru" class="btn-p disabled:opacity-50">{{busy?'Mengimpor...':'Impor '+jimpCount.baru+' jadwal'}}</button></div>
+        </template>
+        <template v-else>
+          <p class="rounded-xl bg-emerald-50 text-emerald-700 text-sm px-4 py-3 mb-3">Selesai: {{jimp.done.baru}} jadwal ditambahkan, {{jimp.done.lewat}} sudah ada (dilewati)<span v-if="jimp.gagal.length">, {{jimp.gagal.length}} gagal</span>.</p>
+          <div v-if="jimp.gagal.length" class="rounded-xl bg-rose-50 text-rose-700 text-xs px-4 py-3 mb-3 max-h-32 overflow-auto"><p v-for="(g,i) in jimp.gagal" :key="i"><b>Baris {{g.no}}</b>: {{g.msg}}</p></div>
+          <p v-if="jimp.note" class="rounded-xl bg-amber-50 text-amber-800 text-xs px-4 py-3 mb-3">{{jimp.note}}</p>
+          <div class="flex justify-end mt-2"><button @click="jimp.show=false" class="btn-o">Tutup</button></div>
+        </template>
       </div></div>
     </section>
 
@@ -1139,7 +1170,7 @@ const app = createApp({
       sessionStorage.setItem('tk', d.token); sessionStorage.setItem('us', JSON.stringify(d.user));
       go('dashboard'); // go() mengarahkan ke Ganti Sandi bila sandi awal belum diganti
     });
-    function logout() { token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; }
+    function logout() { token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; }
     const go = k => run(async () => {
       if (user.value.wajib) k = 'sandi';
       if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
@@ -1409,6 +1440,135 @@ const app = createApp({
       showJd.value = false; jadwal.value = await api('jadwalList'); ok.value = 'Jadwal ditambahkan';
     });
 
+    /* ====== Ekspor & impor jadwal (Excel) ====== */
+    const p2 = n => String(n).padStart(2, '0');
+    const HARI_ALIAS = { senin: 'Senin', selasa: 'Selasa', rabu: 'Rabu', kamis: 'Kamis', jumat: 'Jumat', sabtu: 'Sabtu', monday: 'Senin', tuesday: 'Selasa', wednesday: 'Rabu', thursday: 'Kamis', friday: 'Jumat', saturday: 'Sabtu' };
+    const hariDari = v => HARI_ALIAS[norm(v).toLowerCase().replace(/[^a-z]/g, '')] || '';
+    const hhmm = v => { // "7:00", "07.30", "0730", "7:00 PM", pecahan hari Excel (0.2916) -> "HH:MM"; '' bila tidak valid
+      let s = norm(v).toLowerCase().replace(/\s*wib$/, ''); if (!s) return '';
+      if (/^0?\.\d+$/.test(s)) { const t = Math.round(parseFloat(s) * 1440); return t > 0 && t < 1440 ? p2(Math.floor(t / 60)) + ':' + p2(t % 60) : ''; }
+      let ap = ''; const mm = s.match(/\s*([ap])\.?\s?m\.?$/); if (mm) { ap = mm[1]; s = s.slice(0, mm.index).trim(); }
+      const a = s.match(/^(\d{1,2})(?:[:.](\d{2}))?(?::\d{2})?$/), b = s.match(/^(\d{2})(\d{2})$/); let h, m;
+      if (a) { h = Number(a[1]); m = a[2] == null ? 0 : Number(a[2]); } else if (b) { h = Number(b[1]); m = Number(b[2]); } else return '';
+      if (ap) { if (h < 1 || h > 12) return ''; h = h % 12 + (ap === 'p' ? 12 : 0); }
+      return h > 23 || m > 59 ? '' : p2(h) + ':' + p2(m);
+    };
+    const menit = s => Number(s.slice(0, 2)) * 60 + Number(s.slice(3, 5));
+    const rentangJam = s => { const m = String(s).match(/^(\d{1,2})[.:](\d{2})\s*-\s*(\d{1,2})[.:](\d{2})$/); return m ? [Number(m[1]) * 60 + Number(m[2]), Number(m[3]) * 60 + Number(m[4])] : null; };
+    const tumpang = (a, c) => a[0] < c[1] && c[0] < a[1]; // sama dengan beririsan() di server
+    const spasi = s => norm(s).replace(/\s+/g, ' ');
+
+    const exportJadwal = () => run(async () => {
+      const aoa = [['No', 'Hari', 'Jam Mulai', 'Jam Selesai', 'Kelas', 'Mapel', 'Username Guru', 'Nama Guru']].concat(jadwalTampil.value.map((j, i) => {
+        const p = String(j.jam).split(/\s*-\s*/); return [i + 1, j.hari, p[0] || '', p[1] || '', j.kelas, j.mapel, j.guru, j.guruNama];
+      }));
+      await saveXlsx('Jadwal_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Jadwal', aoa, [5, 10, 11, 12, 14, 28, 18, 28]]]);
+      ok.value = jadwalTampil.value.length + ' jadwal diekspor';
+    });
+    const templateJadwal = () => run(async () => {
+      const adm = user.value.role === 'ADMIN';
+      const head = ['Hari', 'Jam Mulai', 'Jam Selesai', 'Kelas', 'Mapel'].concat(adm ? ['Username Guru'] : []);
+      const contoh = [['Senin', '07:00', '08:30', 'X TKJ 1', 'Matematika', 'budi.santoso'], ['Senin', '08:30', '10:00', 'X TKJ 1', 'Bahasa Indonesia', 'siti.aminah'], ['Selasa', '07:00', '09:00', 'XI TM 1', 'Dasar Kejuruan', 'budi.santoso']].map(r => adm ? r : r.slice(0, 5));
+      const petunjuk = [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Jadwal"; hapus baris contoh.'], ['2. Hari: Senin sampai Sabtu.'], ['3. Jam mulai dan jam selesai berformat 24 jam, mis. 07:00 dan 08:30. Jam selesai harus lebih besar dari jam mulai.'], ['4. Kelas harus sudah ada (lihat sheet "Daftar Kelas"). Mapel bebas; penulisan disamakan dengan mapel yang sudah ada.'],
+        adm ? ['5. Username Guru: lihat sheet "Daftar Guru" (nama lengkap guru juga diterima bila unik).'] : ['5. Jadwal otomatis atas nama Anda.'],
+        ['Baris yang bentrok (guru atau kelas pada hari dan jam yang beririsan) dan baris yang sudah ada akan dilewati. Jadwal lama tidak diubah.']];
+      const sheets = [['Data Jadwal', [head].concat(contoh), adm ? [10, 11, 12, 14, 28, 18] : [10, 11, 12, 14, 28]], ['Petunjuk', petunjuk, [110]], ['Daftar Kelas', [['Kelas']].concat(kelasNama.value.map(k => [k])), [20]]];
+      if (adm) sheets.push(['Daftar Guru', [['Username', 'Nama']].concat(guru.value.map(g => [g.username, g.nama])), [20, 34]]);
+      await saveXlsx('Template_Impor_Jadwal.xlsx', sheets);
+    });
+
+    const jimp = reactive({ show: false, rows: [], file: '', done: null, gagal: [], prog: 0, note: '' });
+    const jimpCount = computed(() => { const c = { baru: 0, ada: 0, error: 0 }; jimp.rows.forEach(r => c[r.st]++); return c; });
+    async function pickJadwalFile(ev) {
+      const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+      await run(async () => {
+        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array' });
+        const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
+        const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
+        const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
+        const c = { hari: col(['hari']), mulai: col(['jammulai', 'mulai', 'awal']), selesai: col(['jamselesai', 'selesai', 'akhir']), jam: col(['jam', 'waktu', 'jampelajaran']), kelas: col(['kelas', 'rombel']), mapel: col(['mapel', 'matapelajaran', 'pelajaran']) };
+        const cg = hd.map((h, i) => ['usernameguru', 'username', 'user', 'kodeguru', 'guru', 'namaguru', 'nama'].indexOf(h) >= 0 ? i : -1).filter(i => i >= 0);
+        const adm = user.value.role === 'ADMIN', dua = c.mulai >= 0 && c.selesai >= 0;
+        if (c.hari < 0 || c.kelas < 0 || c.mapel < 0 || (!dua && c.jam < 0)) throw new Error('Baris pertama harus berisi judul kolom Hari, Jam Mulai, Jam Selesai, Kelas, dan Mapel. Gunakan tombol "Unduh template".');
+        if (adm && !cg.length) throw new Error('Kolom guru tidak ditemukan. Tambahkan kolom "Username Guru" (lihat template).');
+        if (aoa.length - 1 > 1000) throw new Error('Maksimal 1000 baris per berkas. Pecah menjadi beberapa file.');
+        // data terbaru dari server agar pemeriksaan bentrok akurat
+        const rr = await Promise.all([api('jadwalList'), api('kelasSemua'), adm ? api('guruList') : null]);
+        jadwal.value = rr[0]; kelasNama.value = rr[1]; if (rr[2]) guru.value = rr[2];
+        const kmap = {}, mmap = {}, gU = {}, gN = {}, gDup = new Set();
+        kelasNama.value.forEach(k => kmap[spasi(k).toLowerCase()] = k);
+        jadwal.value.forEach(j => { const k = spasi(j.mapel).toLowerCase(); if (!mmap[k]) mmap[k] = j.mapel; });
+        guru.value.forEach(g => { gU[String(g.username).toLowerCase()] = g; const n = spasi(g.nama).toLowerCase(); if (gN[n]) gDup.add(n); else gN[n] = g; });
+        const byG = {}, byK = {}, ada = new Map(), taruh = (m, k, a, no) => (m[k] = m[k] || []).push({ a, no });
+        jadwal.value.forEach(j => {
+          const a = rentangJam(j.jam), jk = a ? a.join('-') : String(j.jam);
+          ada.set([j.hari, jk, j.kelas, spasi(j.mapel).toLowerCase(), j.guru].join('|'), 0);
+          if (a) { taruh(byG, j.hari + '|' + j.guru, a, 0); taruh(byK, j.hari + '|' + j.kelas, a, 0); }
+        });
+        const out = [];
+        aoa.slice(1).forEach((r, i) => {
+          if (r.every(v => !norm(v))) return;
+          const rawJam = dua ? [norm(r[c.mulai]), norm(r[c.selesai])] : norm(r[c.jam]).split(/\s*(?:-|\u2013|\u2014|s\/d|sd|sampai)\s*/i);
+          const mu = hhmm(rawJam[0]), se = hhmm(rawJam[1]), rawKelas = spasi(r[c.kelas]);
+          const o = { no: i + 2, hari: hariDari(r[c.hari]), mulai: mu, selesai: se, jam: mu && se ? mu + '-' + se : '', kelas: kmap[rawKelas.toLowerCase()] || '', mapel: spasi(r[c.mapel]).slice(0, 100), guru: '', guruNama: '', st: 'baru', msg: '' };
+          o.dHari = o.hari || norm(r[c.hari]); o.dJam = o.jam || rawJam.filter(Boolean).join(' - '); o.dKelas = o.kelas || rawKelas;
+          if (o.mapel) { const k = o.mapel.toLowerCase(); if (mmap[k]) o.mapel = mmap[k]; else mmap[k] = o.mapel; } // ejaan pertama dipakai
+          o.dMapel = o.mapel;
+          let g = null, amb = false; const vals = adm ? cg.map(x => spasi(r[x])).filter(Boolean) : [];
+          if (adm) {
+            vals.some(v => (g = gU[v.toLowerCase()] || null) !== null);
+            if (!g) vals.some(v => { const n = v.toLowerCase(); if (gDup.has(n)) { amb = true; return false; } g = gN[n] || null; return g !== null; });
+          } else g = { username: user.value.username, nama: user.value.nama };
+          if (g) { o.guru = String(g.username); o.guruNama = g.nama; }
+          o.dGuru = o.guruNama || vals[0] || '';
+          const bad = m => { o.st = 'error'; o.msg = m; };
+          if (!o.hari) bad('Hari tidak valid (Senin-Sabtu)');
+          else if (!mu || !se) bad('Jam mulai/selesai tidak valid (contoh 07:00)');
+          else if (mu >= se) bad('Jam selesai harus lebih besar dari jam mulai');
+          else if (!o.kelas) bad(rawKelas ? 'Kelas "' + rawKelas + '" belum ada' : 'Kelas kosong');
+          else if (!o.mapel) bad('Mapel kosong');
+          else if (!g) bad(amb ? 'Nama guru ganda; pakai username' : 'Guru tidak ditemukan');
+          else {
+            const a = [menit(mu), menit(se)], key = [o.hari, a.join('-'), o.kelas, o.mapel.toLowerCase(), o.guru].join('|');
+            if (ada.has(key)) { o.st = 'ada'; o.msg = ada.get(key) ? 'Sama dengan baris ' + ada.get(key) : 'Sudah ada di jadwal'; }
+            else {
+              const g1 = (byG[o.hari + '|' + o.guru] || []).find(x => tumpang(a, x.a)), k1 = (byK[o.hari + '|' + o.kelas] || []).find(x => tumpang(a, x.a));
+              if (g1) bad('Bentrok: guru sudah mengajar pada jam itu' + (g1.no ? ' (baris ' + g1.no + ')' : ''));
+              else if (k1) bad('Bentrok: kelas ' + o.kelas + ' sudah punya pelajaran pada jam itu' + (k1.no ? ' (baris ' + k1.no + ')' : ''));
+              else { ada.set(key, o.no); taruh(byG, o.hari + '|' + o.guru, a, o.no); taruh(byK, o.hari + '|' + o.kelas, a, o.no); }
+            }
+          }
+          out.push(o);
+        });
+        if (!out.length) throw new Error('Tidak ada data jadwal di file.');
+        Object.assign(jimp, { show: true, rows: out, file: f.name, done: null, gagal: [], prog: 0, note: '' });
+      });
+    }
+    const doImportJadwal = () => run(async () => {
+      const list = jimp.rows.filter(r => r.st === 'baru').map(r => ({ no: r.no, hari: r.hari, mulai: r.mulai, selesai: r.selesai, kelas: r.kelas, mapel: r.mapel, guru: r.guru }));
+      const lewatLokal = jimpCount.value.ada; let baru = 0, lewat = 0, gagal = [], lama = false;
+      const perBaris = async part => { // server belum diperbarui (tanpa jadwalImport): simpan satu per satu lewat jadwalSave
+        const d = { baru: 0, lewat: 0, gagal: [] };
+        for (const r of part) {
+          try { await api('jadwalSave', { j: { hari: r.hari, kelas: r.kelas, mapel: r.mapel, mulai: r.mulai, selesai: r.selesai, guru: r.guru } }); d.baru++; }
+          catch (e) { if (/^(NETWORK|TIMEOUT|NONJSON)$|Sesi/.test(e.message)) throw e; d.gagal.push({ no: r.no, msg: niceErr(e.message) }); }
+        }
+        return d;
+      };
+      jimp.prog = 1;
+      try {
+        for (let i = 0; i < list.length; i += 50) {
+          const part = list.slice(i, i + 50); let d = null;
+          if (!lama) { try { d = await api('jadwalImport', { rows: part }); } catch (e) { if (i === 0 && e.message === 'Akses ditolak') lama = true; else throw e; } }
+          if (lama) d = await perBaris(part);
+          baru += d.baru; lewat += d.lewat; gagal = gagal.concat(d.gagal || []);
+          jimp.prog = Math.max(1, Math.round(Math.min(list.length, i + 50) / list.length * 100));
+        }
+      } catch (e) { gagal.push({ no: '-', msg: 'Proses terhenti: ' + niceErr(e.message) + (baru ? ' (' + baru + ' jadwal sudah tersimpan)' : '') }); }
+      Object.assign(jimp, { done: { baru, lewat: lewat + lewatLokal }, gagal, prog: 0, note: lama ? 'Server Apps Script belum diperbarui ke versi terbaru, jadi impor berjalan per baris (lebih lambat). Tempel patch v4.4 lalu deploy versi baru agar impor lebih cepat.' : '' });
+      try { jadwal.value = await api('jadwalList'); } catch (e) { /* dimuat ulang saat menu dibuka lagi */ }
+    });
+
     /* ====== Kelola Guru ====== */
     const gdata = ref([]), gq = ref(''), grole = ref(''), showG = ref(false);
     const gf = reactive({ edit: false, username: '', nama: '', role: 'GURU', sandi: '', wali: [] });
@@ -1531,7 +1691,7 @@ const app = createApp({
     const kkmOf = m => { const k = leger.value.kkm; return k ? (k.map[m] != null ? k.map[m] : k.def) : 75; };
     const remedial = computed(() => leger.value.mapel.map(m => ({ mapel: m, kkm: kkmOf(m), list: leger.value.siswa.filter(r => r.nilai[m] != null && r.nilai[m] < kkmOf(m)).map(r => ({ nama: r.nama, nilai: r.nilai[m] })) })).filter(r => r.list.length));
     const kunci = ref(null), saveKunci = () => run(async () => { await api('kunciSimpan', { terkunci: kunci.value.terkunci }); ok.value = 'Kunci nilai tersimpan'; });
-    const logs = ref([]), lq = ref(''), AKSI = { nilaiSave: 'Ubah nilai', presensiHapus: 'Hapus presensi', siswaDelete: 'Hapus siswa', siswaPindah: 'Pindah kelas', guruDelete: 'Hapus akun', kelasDelete: 'Hapus kelas', jadwalDelete: 'Hapus jadwal', jurnalDelete: 'Hapus jurnal', bimbinganDelete: 'Hapus bimbingan', akunReset: 'Reset sandi', resetSemester: 'Reset semester', kunciSimpan: 'Kunci nilai', pklDelete: 'Hapus penempatan PKL', pklNilai: 'Nilai PKL', riwayatArsip: 'Simpan riwayat kelas', luluskanKelas: 'Luluskan kelas' };
+    const logs = ref([]), lq = ref(''), AKSI = { nilaiSave: 'Ubah nilai', presensiHapus: 'Hapus presensi', siswaDelete: 'Hapus siswa', siswaPindah: 'Pindah kelas', guruDelete: 'Hapus akun', kelasDelete: 'Hapus kelas', jadwalDelete: 'Hapus jadwal', jadwalImport: 'Impor jadwal', jurnalDelete: 'Hapus jurnal', bimbinganDelete: 'Hapus bimbingan', akunReset: 'Reset sandi', resetSemester: 'Reset semester', kunciSimpan: 'Kunci nilai', pklDelete: 'Hapus penempatan PKL', pklNilai: 'Nilai PKL', riwayatArsip: 'Simpan riwayat kelas', luluskanKelas: 'Luluskan kelas' };
     const aksiLbl = a => AKSI[a] || a, logTampil = computed(() => { const t = lq.value.toLowerCase(); return logs.value.filter(l => !t || (l.nama + ' ' + l.username + ' ' + aksiLbl(l.aksi) + ' ' + l.detail).toLowerCase().includes(t)); });
     const pairKunci = computed(() => { const p = pil.value[pilIdx.value]; return !!(p && p.kunci); });
     /* ====== Rapor ====== */
@@ -1656,7 +1816,7 @@ const app = createApp({
     const exportRw = () => run(async () => { const aoa = [['No', 'Label', 'NIS', 'Nama', 'Kelas']].concat(rw.value.rows.map((r, i) => [i + 1, r.tahun, String(r.nis), r.nama, r.kelas])); await saveXlsx('Riwayat_Kelas_' + (rwSel.value || 'Semua').replace(/[^\w-]+/g, '_') + '.xlsx', [['Riwayat', aoa, [5, 20, 16, 32, 14]]]); });
     const exportAlumni = () => run(async () => { const aoa = [['No', 'NIS', 'Nama', 'L/P', 'Kelas Akhir', 'Tahun Lulus']].concat(alumniTampil.value.map((a, i) => [i + 1, String(a.nis), a.nama, a.gender, a.kelas, a.tahunLulus])); await saveXlsx('Data_Alumni_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Alumni', aoa, [5, 16, 32, 5, 14, 12]]]); ok.value = alumniTampil.value.length + ' alumni diekspor'; });
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { mnav.value = false; showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = showAg.value = showPk.value = false; jp.value = null; if (!busy.value) imp.show = gimp.show = false; } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { mnav.value = false; showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = showAg.value = showPk.value = false; jp.value = null; if (!busy.value) imp.show = gimp.show = jimp.show = false; } });
     new MutationObserver(ms => { for (const m of ms) for (const nd of m.addedNodes) { if (nd.nodeType === 1 && nd.classList && nd.classList.contains('modal-wrap')) { const el = nd.querySelector('input:not([disabled]):not([type=checkbox]),select,textarea'); if (el) setTimeout(() => el.focus(), 30); } } }).observe(document.getElementById('app'), { childList: true, subtree: true });
     if (user.value) go('dashboard');
     // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
@@ -1672,7 +1832,7 @@ const app = createApp({
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
-      jhari, jq, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax,
+      jhari, jq, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, jimp, jimpCount, exportJadwal, templateJadwal, pickJadwalFile, doImportJadwal, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax,
       leger, lk, lkelas, dokumen, showD, df, loadDok, loadLeger, saveDok, delDok,
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
