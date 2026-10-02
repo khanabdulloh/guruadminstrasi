@@ -146,6 +146,9 @@ table tbody tr:hover{background:#f8fafc}
     <p v-if="err" role="alert" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-rose-50 border border-rose-200 shadow text-rose-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{err}}</span><button @click="err=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
     <p v-if="ok" role="status" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 shadow text-emerald-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{ok}}</span><button @click="ok=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
 
+    <div v-if="antreSaya.length" class="noprint mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-2">
+      <div class="flex flex-wrap items-center gap-2"><span class="mr-auto"><b>{{antreSaya.length}}</b> data menunggu dikirim ke server.</span><button @click="kirimAntre(false)" :disabled="busy" class="btn-o !py-1 text-xs">Kirim sekarang</button></div>
+      <div v-for="x in antreSaya" :key="x.id" class="flex items-center gap-2 text-xs mt-1"><span class="flex-1">{{x.label}}<span v-if="x.galat" class="text-rose-600 font-bold"> - ditolak server: {{x.galat}}</span></span><button @click="buangAntre(x.id)" class="text-rose-600 font-bold">Buang</button></div></div>
     <p v-if="view==='dashboard'&&!dash&&!err" class="text-sm text-slate-500 animate-pulse">Memuat dashboard...</p>
     <!-- Dashboard -->
     <section v-if="view==='dashboard' && dash">
@@ -1261,6 +1264,30 @@ const app = createApp({
     const delPa = r => confirm('Hapus ' + r.jenis + ' - ' + r.mapel + '?') && run(async () => { await api('perangkatDelete', { id: r.id }); await fetchPa(); });
     const aturPa = () => run(async () => { await api('perangkatAtur', { wajib: paAtur.wajib.split(','), tenggat: paAtur.tenggat }); await fetchPa(); ok.value = 'Pengaturan perangkat disimpan'; });
     const ingatPa = () => confirm('Kirim pengingat ke guru yang perangkatnya belum lengkap?') && run(async () => { const d = await api('perangkatIngatkan'); ok.value = d.dikirim + ' pengingat terkirim' + (d.sudah ? ' (' + d.sudah + ' guru sudah dikirimi hari ini)' : ''); });
+    /* ====== Antrean simpan offline (presensi & nilai): tersimpan di HP bila sinyal putus, dikirim otomatis saat tersambung. Aman diulang: simpan = menimpa satu sesi/isian. ====== */
+    const QK = 'calm_antrean';
+    const qBaca = () => { try { const l = JSON.parse(localStorage.getItem(QK) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } };
+    const antre = ref(qBaca());
+    const qTulis = l => { try { localStorage.setItem(QK, JSON.stringify(l)); } catch (e) { /* penyimpanan penuh/dilarang: antrean hanya di memori */ } antre.value = l; };
+    const antreSaya = computed(() => antre.value.filter(x => user.value && x.user === user.value.username));
+    const jaringan = m => m === 'NETWORK' || m === 'TIMEOUT' || m === 'Failed to fetch';
+    const qHapusKey = key => { if (user.value) qTulis(qBaca().filter(x => !(x.user === user.value.username && x.key === key))); };
+    const qMasuk = (action, label, key, payload) => { qHapusKey(key); const l = qBaca(); l.push({ id: Date.now() + Math.random().toString(36).slice(2, 6), user: user.value.username, action, label, key, payload: JSON.parse(JSON.stringify(payload)), galat: '' }); qTulis(l); };
+    const buangAntre = id => qTulis(qBaca().filter(x => x.id !== id));
+    let qJalan = false;
+    const kirimAntre = async diam => {
+      if (qJalan || !user.value) return; qJalan = true; let n = 0;
+      try {
+        for (const x of qBaca().filter(y => y.user === user.value.username)) {
+          try { await api(x.action, x.payload); buangAntre(x.id); n++; }
+          catch (e) { if (jaringan(e.message) || /Sesi/.test(e.message)) break; qTulis(qBaca().map(y => y.id === x.id ? { ...y, galat: e.message } : y)); } // ditolak server (mis. nilai dikunci): tampilkan, jangan diulang
+        }
+      } finally { qJalan = false; }
+      if (n && !diam) ok.value = n + ' data tertunda berhasil dikirim';
+    };
+    window.addEventListener('online', () => kirimAntre(false));
+    Vue.watch(() => user.value && user.value.username, u => { if (u) setTimeout(() => kirimAntre(false), 1500); });
+    setInterval(() => { if (navigator.onLine && antreSaya.value.some(x => !x.galat)) kirimAntre(true); }, 60000);
     const pwa = ref(!!window.__pwa), ukd = ref(null);
     window.addEventListener('pwa-ready', () => { pwa.value = true; });
     const pasang = async () => { const e = window.__pwa; if (!e) return; e.prompt(); try { await e.userChoice; } catch (x) { /* abaikan */ } window.__pwa = null; pwa.value = false; };
@@ -1469,7 +1496,9 @@ const app = createApp({
     const saveNilai = () => run(async () => {
       if (!nKey || !nrows.value.length) throw new Error('Daftar siswa belum dimuat untuk isian ini. Isi tujuan pembelajaran lalu tekan Tab/Enter, tunggu daftar muncul, baru simpan.');
       const bad = nrows.value.find(r => r.skor !== '' && r.skor != null && !(Number(r.skor) >= 0 && Number(r.skor) <= 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus antara 0 dan 100');
-      const d = await api('nilaiSave', { ...nKey, rows: nrows.value }); ok.value = d.tersimpan + ' nilai tersimpan';
+      const body = { ...nKey, rows: nrows.value }, key = 'n|' + [nKey.kelas, nKey.mapel, nKey.tp, nKey.jenis].join('|'); let d;
+      try { d = await api('nilaiSave', body); } catch (e) { if (!jaringan(e.message)) throw e; qMasuk('nilaiSave', 'Nilai ' + nKey.kelas + ' - ' + nKey.mapel + ' (' + nKey.jenis + ')', key, body); ok.value = 'Tidak ada sinyal. Nilai disimpan di HP dan dikirim otomatis saat tersambung.'; return; }
+      qHapusKey(key); ok.value = d.tersimpan + ' nilai tersimpan';
     });
 
     const fetchJ = async () => jurnal.value = await api('jurnalList', { bulan: bulan.value, q: q.value });
@@ -1533,7 +1562,9 @@ const app = createApp({
     };
     const savePresensi = () => run(async () => {
       if (!pi.kelas || !pi.mapel) throw new Error('Pilih kelas dan mata pelajaran terlebih dahulu');
-      const d = await api('presensiSave', { kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal, rows: rows.value }), r = ringkasInput.value;
+      const body = { kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal, rows: rows.value }, key = 'p|' + [pi.kelas, pi.mapel, pi.tanggal].join('|'), r = ringkasInput.value; let d;
+      try { d = await api('presensiSave', body); } catch (e) { if (!jaringan(e.message)) throw e; qMasuk('presensiSave', 'Presensi ' + pi.kelas + ' - ' + pi.mapel + ' (' + pi.tanggal + ')', key, body); ok.value = 'Tidak ada sinyal. Presensi disimpan di HP dan dikirim otomatis saat tersambung.'; return; }
+      qHapusKey(key);
       pi.ada = true; ok.value = d.tersimpan + ' siswa tersimpan (Hadir ' + r.H + ', Izin ' + r.I + ', Sakit ' + r.S + ', Alpa ' + r.A + ', Dispensasi ' + r.D + ')';
     });
     const fetchSesi = async () => {
@@ -2022,7 +2053,7 @@ const app = createApp({
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai,
-      pwa, pasang, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
+      antreSaya, kirimAntre, buangAntre, pwa, pasang, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
       anak, atab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, plf, canPel, loadPl, openPl, pickKelasPl, savePl, delPl, perluTindak, butirSaran, akOrtu, buatOrtu };
   }
 });
