@@ -159,6 +159,7 @@ table tbody tr:hover{background:#f8fafc}
         <p class="text-white/90 text-sm mt-2">{{sub[user.role]}}</p>
       </div>
       <div class="flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
+      <div v-if="dash.blok" class="rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-sm px-4 py-3 mb-4 flex items-center gap-2 flex-wrap"><span>Jadwal minggu ini: <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="BLOK_CLS[dash.blok.aktif]">Blok {{dash.blok.aktif}}</span></span><span>&middot; Minggu depan: <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="BLOK_CLS[dash.blok.depan]">Blok {{dash.blok.depan}}</span></span></div>
       <div v-if="dash.izinMenunggu" class="rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto"><b>{{dash.izinMenunggu}}</b> pengajuan izin siswa menunggu persetujuan Anda.</span><button @click="go('izin')" class="btn-o !py-1 text-xs">Tinjau</button></div>
       <div v-if="dash.izinSaya&&dash.izinSaya.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-sky-500"><h3 class="font-bold mb-2">Status izin saya</h3>
         <div v-for="z in dash.izinSaya" :key="z.id||z.tanggal+z.status" class="flex justify-between text-sm py-1 border-t first:border-t-0"><span>{{fmtTgl(z.tanggal)}} &middot; {{z.jenis==='S'?'Sakit':'Izin'}}</span><span class="font-bold" :class="z.status==='Disetujui'?'text-emerald-700':z.status==='Ditolak'?'text-rose-600':'text-amber-700'">{{z.status}}</span></div></div>
@@ -596,16 +597,18 @@ table tbody tr:hover{background:#f8fafc}
     <section v-if="view==='jadwal'">
       <div class="flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Jadwal {{user.role==='SISWA'?'Pelajaran':'Mengajar'}}</h2>
         <select v-model="jhari" class="inp"><option value="">Semua hari</option><option v-for="h in hariList" :key="h">{{h}}</option></select>
+        <select v-model="jblok" class="inp"><option value="">Semua blok</option><option value="A">Blok A</option><option value="B">Blok B</option></select>
         <input v-model.trim="jq" placeholder="Cari kelas / mapel / guru" class="inp">
         <button v-if="canJadwal" @click="templateJadwal" class="btn-o">Unduh template</button>
         <label v-if="canJadwal" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickJadwalFile"></label>
         <button @click="exportJadwal" :disabled="!jadwalTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
         <button v-if="canJadwal" @click="openJadwal" class="btn-p inline-flex items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Tambah jadwal</button></div>
+      <div v-if="blokInfo" class="rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-sm px-4 py-3 mb-4 flex items-center gap-2 flex-wrap"><span>Minggu ini: <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="BLOK_CLS[blokInfo.aktif]">Blok {{blokInfo.aktif}}</span></span><span>&middot; Minggu depan (mulai {{fmtTgl(blokInfo.seninDepan)}}): <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="BLOK_CLS[blokInfo.depan]">Blok {{blokInfo.depan}}</span></span></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Hari</th><th>Jam</th><th>Kelas</th><th>Mapel</th><th>Guru</th><th v-if="canJadwal"></th></tr></thead>
-        <tbody><tr v-for="j in jadwalTampil" :key="j.id" class="border-t"><td class="p-3">{{j.hari}}</td><td class="whitespace-nowrap">{{j.jam}}</td><td>{{j.kelas}}</td><td>{{j.mapel}}</td><td>{{j.guruNama}}</td>
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Hari</th><th>Jam</th><th>Blok</th><th>Kelas</th><th>Mapel</th><th>Guru</th><th v-if="canJadwal"></th></tr></thead>
+        <tbody><tr v-for="j in jadwalTampil" :key="j.id" class="border-t"><td class="p-3">{{j.hari}}</td><td class="whitespace-nowrap">{{j.jam}}</td><td><span class="text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap" :class="BLOK_CLS[j.blok||'']">{{j.blok?'Blok '+j.blok:'Tiap minggu'}}</span></td><td>{{j.kelas}}</td><td>{{j.mapel}}</td><td>{{j.guruNama}}</td>
           <td v-if="canJadwal" class="pr-3"><button v-if="user.role==='ADMIN'||j.guru===user.username" @click="delJadwal(j)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!jadwalTampil.length"><td :colspan="canJadwal?6:5" class="p-4 text-slate-500">{{jadwal.length?'Tidak ada jadwal yang cocok dengan filter.':'Belum ada jadwal.'}}</td></tr></tbody></table></div>
+        <tr v-if="!jadwalTampil.length"><td :colspan="canJadwal?7:6" class="p-4 text-slate-500">{{jadwal.length?'Tidak ada jadwal yang cocok dengan filter.':'Belum ada jadwal.'}}</td></tr></tbody></table></div>
 
       <div v-if="showJd" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">Tambah Jadwal Baru</h3>
@@ -614,6 +617,7 @@ table tbody tr:hover{background:#f8fafc}
           <label class="lb col-span-2 sm:col-span-1">Kelas<select v-model="jf.kelas" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Kelas --</option><option v-for="k in kelasNama" :key="k">{{k}}</option></select></label>
           <label class="lb col-span-2">Mata pelajaran<input v-model.trim="jf.mapel" list="dl-mapel" maxlength="100" placeholder="Masukkan mata pelajaran" class="inp w-full mt-1 normal-case"></label>
           <datalist id="dl-mapel"><option v-for="m in mapelSaran" :key="m" :value="m"></option></datalist>
+          <label class="lb col-span-2">Blok jadwal<select v-model="jf.blok" class="inp w-full mt-1 normal-case"><option value="">Setiap minggu (Blok A dan B)</option><option value="A">Blok A saja</option><option value="B">Blok B saja</option></select></label>
           <label class="lb">Jam mulai<input type="time" v-model="jf.mulai" class="inp w-full mt-1"></label>
           <label class="lb">Jam selesai<input type="time" v-model="jf.selesai" class="inp w-full mt-1"></label>
           <label v-if="user.role==='ADMIN'" class="lb col-span-2">Guru pengajar<select v-model="jf.guru" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Guru --</option><option v-for="g in guru" :key="g.username" :value="g.username">{{g.nama}}</option></select></label>
@@ -632,9 +636,9 @@ table tbody tr:hover{background:#f8fafc}
             <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{jimpCount.ada}} sudah ada (dilewati)</span>
             <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">{{jimpCount.error}} bermasalah (dilewati)</span></div>
           <div class="overflow-auto border rounded-xl max-h-80"><table class="w-full text-xs">
-            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>Hari</th><th>Jam</th><th>Kelas</th><th>Mapel</th><th>Guru</th><th>Status</th></tr></thead>
+            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>Hari</th><th>Jam</th><th>Blok</th><th>Kelas</th><th>Mapel</th><th>Guru</th><th>Status</th></tr></thead>
             <tbody><tr v-for="r in jimp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
-              <td class="p-2">{{r.no}}</td><td>{{r.dHari}}</td><td class="whitespace-nowrap">{{r.dJam}}</td><td>{{r.dKelas}}</td><td>{{r.dMapel}}</td><td>{{r.dGuru}}</td>
+              <td class="p-2">{{r.no}}</td><td>{{r.dHari}}</td><td class="whitespace-nowrap">{{r.dJam}}</td><td class="whitespace-nowrap">{{r.dBlok}}</td><td>{{r.dKelas}}</td><td>{{r.dMapel}}</td><td>{{r.dGuru}}</td>
               <td :class="r.st==='error'?'text-rose-600':r.st==='ada'?'text-blue-800':'text-emerald-700'">{{r.st==='baru'?'Baru':r.msg}}</td></tr></tbody></table></div>
           <p v-if="jimp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{jimp.rows.length}}; semua baris tetap diproses.</p>
           <p class="text-xs text-slate-500 mt-2">Jadwal yang sudah ada tidak diubah atau dihapus. Impor hanya menambah baris baru; mengulang impor file yang sama aman.</p>
@@ -737,6 +741,14 @@ table tbody tr:hover{background:#f8fafc}
     <section v-if="view==='pengaturan'">
       <h2 class="h2">Pengaturan Sekolah</h2>
       <div class="grid lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl shadow-sm p-5 lg:col-span-2">
+          <h3 class="font-bold mb-1">Blok jadwal (A / B bergantian)</h3>
+          <p class="text-sm text-slate-500 mb-3">Blok berganti setiap pekan (Senin-Minggu). Tentukan satu pekan acuan beserta bloknya; pekan lain dihitung otomatis.<span v-if="blokInfo"> Saat ini: minggu ini <b>Blok {{blokInfo.aktif}}</b>, minggu depan <b>Blok {{blokInfo.depan}}</b>.</span></p>
+          <div class="grid sm:grid-cols-4 gap-3 items-end">
+            <label class="lb">Tanggal dalam pekan acuan<input type="date" v-model="bf2.acuan" class="inp w-full mt-1"></label>
+            <label class="lb">Pekan itu adalah<select v-model="bf2.blok" class="inp w-full mt-1 normal-case"><option value="A">Blok A</option><option value="B">Blok B</option></select></label>
+            <label class="lb">Lama satu blok<select v-model.number="bf2.minggu" class="inp w-full mt-1 normal-case"><option :value="1">1 minggu</option><option :value="2">2 minggu</option><option :value="3">3 minggu</option><option :value="4">4 minggu</option></select></label>
+            <button @click="saveBlok" :disabled="busy||!bf2.acuan" class="btn-p">Simpan blok</button></div></div>
         <div class="bg-white rounded-2xl shadow-sm p-5">
           <h3 class="font-bold mb-3">Kop surat</h3>
           <input v-model.trim="cfg.kop.logoKiri" placeholder="URL logo kiri (https://...)" class="inp w-full mb-2">
@@ -1303,7 +1315,7 @@ const app = createApp({
     const jurnal = ref([]), bimb = ref([]), bulan = ref(hari0.slice(0, 7)), q = ref(''), showJ = ref(false), showB = ref(false), bk = ref([]), bsiswa = ref([]);
     const jr = reactive({ id: '', info: '', tanggal: hari0, pi: '', materi: '', catatan: '' }), bf = reactive({ tanggal: hari0, kelas: '', nis: '', catatan: '', solusi: '' });
     const sf = reactive({ edit: false, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
-    const jf = reactive({ hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
+    const jf = reactive({ hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '', blok: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
 
     // Daftar putih aksi BACA (idempoten): hanya ini yang boleh diulang otomatis saat jaringan putus. Aksi baru default-nya TIDAK diulang (aman).
     const READ = new Set(['perangkatList', 'bkSiswa', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranList', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
@@ -1360,14 +1372,14 @@ const app = createApp({
       if (k === 'riwayat') riwayat.value = await api('riwayatSaya');
       if (k === 'siswa') { [siswa.value, kelasAll.value] = await Promise.all([api('siswaList'), api('kelasDetail')]); }
       if (k === 'kelas') { [kelasAll.value, guru.value] = await Promise.all([api('kelasDetail'), api('guruList')]); }
-      if (k === 'jadwal') { const r = await Promise.all([api('jadwalList'), canJadwal.value ? api('kelasSemua') : null, user.value.role === 'ADMIN' ? api('guruList') : null]); jadwal.value = r[0]; jhari.value = jq.value = ''; if (r[1]) kelasNama.value = r[1]; if (r[2]) guru.value = r[2]; }
+      if (k === 'jadwal') { const r = await Promise.all([api('jadwalList'), canJadwal.value ? api('kelasSemua') : null, user.value.role === 'ADMIN' ? api('guruList') : null, api('blokInfo').catch(() => null)]); jadwal.value = r[0]; blokInfo.value = r[3]; jhari.value = jq.value = jblok.value = ''; if (r[1]) kelasNama.value = r[1]; if (r[2]) guru.value = r[2]; }
       if (k === 'guru') { gq.value = grole.value = ''; await refreshGuru(); }
       if (k === 'akun') { akq.value = akrole.value = akkelas.value = ''; akpilih.value = []; await fetchAkun(); }
       if (k === 'monitor') { const r = await Promise.all([fetchMon(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; }
       if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; pilIdx.value = ''; }
       if (k === 'jurnal') { const r = await Promise.all([canWrite.value ? api('pilihanNilai') : null, api('pengaturanGet'), fetchJ()]); if (r[0]) pil.value = r[0]; cfg.value = r[1]; }
       if (k === 'bimbingan') { [bk.value, cfg.value] = await Promise.all([api('bimbinganKelas'), api('pengaturanGet'), fetchB()]); }
-      if (k === 'pengaturan') { const r = await Promise.all([api('pengaturanGet'), api('backupStatus').catch(() => null), api('akademikGet').catch(() => null), api('kunciGet').catch(() => null), api('ukuranData').catch(() => null)]); ukd.value = r[4]; cfg.value = r[0]; backupUrl.value = ''; bk2.value = r[1]; ak.value = r[2]; kunci.value = r[3]; }
+      if (k === 'pengaturan') { const r = await Promise.all([api('pengaturanGet'), api('backupStatus').catch(() => null), api('akademikGet').catch(() => null), api('kunciGet').catch(() => null), api('ukuranData').catch(() => null)]); ukd.value = r[4]; cfg.value = r[0]; { const bi = await api('blokInfo').catch(() => null); if (bi) { blokInfo.value = bi; Object.assign(bf2, { acuan: bi.acuan, blok: bi.blokAcuan, minggu: bi.minggu }); } } backupUrl.value = ''; bk2.value = r[1]; ak.value = r[2]; kunci.value = r[3]; }
       if (k === 'log') logs.value = await api('logList');
       if (k === 'bimbingansaya') await fetchB();
       if (k === 'leger') { [cfg.value, lk.value] = await Promise.all([api('pengaturanGet'), api('legerKelas')]); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
@@ -1614,10 +1626,14 @@ const app = createApp({
     });
 
     /* ====== Jadwal ====== */
-    const jhari = ref(''), jq = ref(''), showJd = ref(false), kelasNama = ref([]);
-    const jadwalTampil = computed(() => { const t = jq.value.toLowerCase(); return jadwal.value.filter(j => (!jhari.value || j.hari === jhari.value) && (!t || (j.kelas + ' ' + j.mapel + ' ' + j.guruNama).toLowerCase().includes(t))); });
+    const jhari = ref(''), jq = ref(''), jblok = ref(''), showJd = ref(false), kelasNama = ref([]);
+    const blokInfo = ref(null), bf2 = reactive({ acuan: '', blok: 'B', minggu: 1 });
+    const BLOK_CLS = { A: 'bg-blue-100 text-blue-800', B: 'bg-amber-100 text-amber-800', '': 'bg-slate-100 text-slate-600' };
+    const blokLbl = b => b ? 'Blok ' + b : 'Setiap minggu';
+    const saveBlok = () => run(async () => { blokInfo.value = await api('blokSimpan', { ...bf2 }); ok.value = 'Blok jadwal disimpan. Minggu ini Blok ' + blokInfo.value.aktif + ', minggu depan Blok ' + blokInfo.value.depan; });
+    const jadwalTampil = computed(() => { const t = jq.value.toLowerCase(); return jadwal.value.filter(j => (!jhari.value || j.hari === jhari.value) && (!jblok.value || !j.blok || j.blok === jblok.value) && (!t || (j.kelas + ' ' + j.mapel + ' ' + j.guruNama).toLowerCase().includes(t))); });
     const mapelSaran = computed(() => [...new Set(jadwal.value.map(j => j.mapel))].sort((a, b) => a.localeCompare(b)));
-    const openJadwal = () => { err.value = ok.value = ''; Object.assign(jf, { hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '' }); showJd.value = true; };
+    const openJadwal = () => { err.value = ok.value = ''; Object.assign(jf, { hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '', blok: '' }); showJd.value = true; };
     const saveJadwal = () => run(async () => {
       if (!jf.hari) throw new Error('Pilih hari');
       if (!jf.kelas) throw new Error('Pilih kelas');
@@ -1648,20 +1664,21 @@ const app = createApp({
     const spasi = s => norm(s).replace(/\s+/g, ' ');
 
     const exportJadwal = () => run(async () => {
-      const aoa = [['No', 'Hari', 'Jam Mulai', 'Jam Selesai', 'Kelas', 'Mapel', 'Username Guru', 'Nama Guru']].concat(jadwalTampil.value.map((j, i) => {
-        const p = String(j.jam).split(/\s*-\s*/); return [i + 1, j.hari, p[0] || '', p[1] || '', j.kelas, j.mapel, j.guru, j.guruNama];
+      const aoa = [['No', 'Hari', 'Jam Mulai', 'Jam Selesai', 'Blok', 'Kelas', 'Mapel', 'Username Guru', 'Nama Guru']].concat(jadwalTampil.value.map((j, i) => {
+        const p = String(j.jam).split(/\s*-\s*/); return [i + 1, j.hari, p[0] || '', p[1] || '', j.blok || '', j.kelas, j.mapel, j.guru, j.guruNama];
       }));
-      await saveXlsx('Jadwal_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Jadwal', aoa, [5, 10, 11, 12, 14, 28, 18, 28]]]);
+      await saveXlsx('Jadwal_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Jadwal', aoa, [5, 10, 11, 12, 8, 14, 28, 18, 28]]]);
       ok.value = jadwalTampil.value.length + ' jadwal diekspor';
     });
     const templateJadwal = () => run(async () => {
       const adm = user.value.role === 'ADMIN';
-      const head = ['Hari', 'Jam Mulai', 'Jam Selesai', 'Kelas', 'Mapel'].concat(adm ? ['Username Guru'] : []);
-      const contoh = [['Senin', '07:00', '08:30', 'X TKJ 1', 'Matematika', 'budi.santoso'], ['Senin', '08:30', '10:00', 'X TKJ 1', 'Bahasa Indonesia', 'siti.aminah'], ['Selasa', '07:00', '09:00', 'XI TM 1', 'Dasar Kejuruan', 'budi.santoso']].map(r => adm ? r : r.slice(0, 5));
+      const head = ['Hari', 'Jam Mulai', 'Jam Selesai', 'Kelas', 'Mapel', 'Blok'].concat(adm ? ['Username Guru'] : []);
+      const contoh = [['Senin', '07:00', '08:30', 'X TKJ 1', 'Matematika', 'A', 'budi.santoso'], ['Senin', '07:00', '08:30', 'X TKJ 1', 'Bahasa Indonesia', 'B', 'siti.aminah'], ['Selasa', '07:00', '09:00', 'XI TM 1', 'Dasar Kejuruan', '', 'budi.santoso']].map(r => adm ? r : r.slice(0, 6));
       const petunjuk = [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Jadwal"; hapus baris contoh.'], ['2. Hari: Senin sampai Sabtu.'], ['3. Jam mulai dan jam selesai berformat 24 jam, mis. 07:00 dan 08:30. Jam selesai harus lebih besar dari jam mulai.'], ['4. Kelas harus sudah ada (lihat sheet "Daftar Kelas"). Mapel bebas; penulisan disamakan dengan mapel yang sudah ada.'],
         adm ? ['5. Username Guru: lihat sheet "Daftar Guru" (nama lengkap guru juga diterima bila unik).'] : ['5. Jadwal otomatis atas nama Anda.'],
-        ['Baris yang bentrok (guru atau kelas pada hari dan jam yang beririsan) dan baris yang sudah ada akan dilewati. Jadwal lama tidak diubah.']];
-      const sheets = [['Data Jadwal', [head].concat(contoh), adm ? [10, 11, 12, 14, 28, 18] : [10, 11, 12, 14, 28]], ['Petunjuk', petunjuk, [110]], ['Daftar Kelas', [['Kelas']].concat(kelasNama.value.map(k => [k])), [20]]];
+        ['6. Blok: isi A atau B bila pelajaran hanya berlangsung pada pekan Blok A / Blok B; kosongkan bila berlaku setiap minggu. Pelajaran Blok A dan Blok B boleh memakai jam yang sama.'],
+        ['Baris yang bentrok (guru atau kelas pada hari dan jam yang beririsan, pada blok yang sama) dan baris yang sudah ada akan dilewati. Jadwal lama tidak diubah.']];
+      const sheets = [['Data Jadwal', [head].concat(contoh), adm ? [10, 11, 12, 14, 28, 8, 18] : [10, 11, 12, 14, 28, 8]], ['Petunjuk', petunjuk, [110]], ['Daftar Kelas', [['Kelas']].concat(kelasNama.value.map(k => [k])), [20]]];
       if (adm) sheets.push(['Daftar Guru', [['Username', 'Nama']].concat(guru.value.map(g => [g.username, g.nama])), [20, 34]]);
       await saveXlsx('Template_Impor_Jadwal.xlsx', sheets);
     });
@@ -1675,7 +1692,7 @@ const app = createApp({
         const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
         const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
         const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
-        const c = { hari: col(['hari']), mulai: col(['jammulai', 'mulai', 'awal']), selesai: col(['jamselesai', 'selesai', 'akhir']), jam: col(['jam', 'waktu', 'jampelajaran']), kelas: col(['kelas', 'rombel']), mapel: col(['mapel', 'matapelajaran', 'pelajaran']) };
+        const c = { hari: col(['hari']), mulai: col(['jammulai', 'mulai', 'awal']), selesai: col(['jamselesai', 'selesai', 'akhir']), jam: col(['jam', 'waktu', 'jampelajaran']), kelas: col(['kelas', 'rombel']), mapel: col(['mapel', 'matapelajaran', 'pelajaran']), blok: col(['blok', 'jadwalblok']) };
         const cg = hd.map((h, i) => ['usernameguru', 'username', 'user', 'kodeguru', 'guru', 'namaguru', 'nama'].indexOf(h) >= 0 ? i : -1).filter(i => i >= 0);
         const adm = user.value.role === 'ADMIN', dua = c.mulai >= 0 && c.selesai >= 0;
         if (c.hari < 0 || c.kelas < 0 || c.mapel < 0 || (!dua && c.jam < 0)) throw new Error('Baris pertama harus berisi judul kolom Hari, Jam Mulai, Jam Selesai, Kelas, dan Mapel. Gunakan tombol "Unduh template".');
@@ -1688,11 +1705,11 @@ const app = createApp({
         kelasNama.value.forEach(k => kmap[spasi(k).toLowerCase()] = k);
         jadwal.value.forEach(j => { const k = spasi(j.mapel).toLowerCase(); if (!mmap[k]) mmap[k] = j.mapel; });
         guru.value.forEach(g => { gU[String(g.username).toLowerCase()] = g; const n = spasi(g.nama).toLowerCase(); if (gN[n]) gDup.add(n); else gN[n] = g; });
-        const byG = {}, byK = {}, ada = new Map(), taruh = (m, k, a, no) => (m[k] = m[k] || []).push({ a, no });
+        const BK = b => b ? [b] : ['A', 'B'], byG = {}, byK = {}, ada = new Map(), taruh = (m, k, a, no) => (m[k] = m[k] || []).push({ a, no });
         jadwal.value.forEach(j => {
           const a = rentangJam(j.jam), jk = a ? a.join('-') : String(j.jam);
-          ada.set([j.hari, jk, j.kelas, spasi(j.mapel).toLowerCase(), j.guru].join('|'), 0);
-          if (a) { taruh(byG, j.hari + '|' + j.guru, a, 0); taruh(byK, j.hari + '|' + j.kelas, a, 0); }
+          ada.set([j.hari, jk, j.kelas, spasi(j.mapel).toLowerCase(), j.guru, j.blok || ''].join('|'), 0);
+          if (a) BK(j.blok || '').forEach(bk => { taruh(byG, j.hari + '|' + j.guru + '|' + bk, a, 0); taruh(byK, j.hari + '|' + j.kelas + '|' + bk, a, 0); });
         });
         const out = [];
         aoa.slice(1).forEach((r, i) => {
@@ -1700,6 +1717,7 @@ const app = createApp({
           const rawJam = dua ? [norm(r[c.mulai]), norm(r[c.selesai])] : norm(r[c.jam]).split(/\s*(?:-|\u2013|\u2014|s\/d|sd|sampai)\s*/i);
           const mu = hhmm(rawJam[0]), se = hhmm(rawJam[1]), rawKelas = spasi(r[c.kelas]);
           const o = { no: i + 2, hari: hariDari(r[c.hari]), mulai: mu, selesai: se, jam: mu && se ? mu + '-' + se : '', kelas: kmap[rawKelas.toLowerCase()] || '', mapel: spasi(r[c.mapel]).slice(0, 100), guru: '', guruNama: '', st: 'baru', msg: '' };
+          const rb = c.blok >= 0 ? norm(r[c.blok]).toUpperCase().replace(/^BLOK\s*/, '') : '', blokOk = ['', 'A', 'B', '-', 'SEMUA', 'SETIAP MINGGU', 'AB'].includes(rb); o.blok = rb === 'A' || rb === 'B' ? rb : ''; o.dBlok = o.blok ? 'Blok ' + o.blok : 'Tiap minggu';
           o.dHari = o.hari || norm(r[c.hari]); o.dJam = o.jam || rawJam.filter(Boolean).join(' - '); o.dKelas = o.kelas || rawKelas;
           if (o.mapel) { const k = o.mapel.toLowerCase(); if (mmap[k]) o.mapel = mmap[k]; else mmap[k] = o.mapel; } // ejaan pertama dipakai
           o.dMapel = o.mapel;
@@ -1711,20 +1729,21 @@ const app = createApp({
           if (g) { o.guru = String(g.username); o.guruNama = g.nama; }
           o.dGuru = o.guruNama || vals[0] || '';
           const bad = m => { o.st = 'error'; o.msg = m; };
-          if (!o.hari) bad('Hari tidak valid (Senin-Sabtu)');
+          if (!blokOk) bad('Blok harus A, B, atau kosong');
+          else if (!o.hari) bad('Hari tidak valid (Senin-Sabtu)');
           else if (!mu || !se) bad('Jam mulai/selesai tidak valid (contoh 07:00)');
           else if (mu >= se) bad('Jam selesai harus lebih besar dari jam mulai');
           else if (!o.kelas) bad(rawKelas ? 'Kelas "' + rawKelas + '" belum ada' : 'Kelas kosong');
           else if (!o.mapel) bad('Mapel kosong');
           else if (!g) bad(amb ? 'Nama guru ganda; pakai username' : 'Guru tidak ditemukan');
           else {
-            const a = [menit(mu), menit(se)], key = [o.hari, a.join('-'), o.kelas, o.mapel.toLowerCase(), o.guru].join('|');
+            const a = [menit(mu), menit(se)], key = [o.hari, a.join('-'), o.kelas, o.mapel.toLowerCase(), o.guru, o.blok].join('|');
             if (ada.has(key)) { o.st = 'ada'; o.msg = ada.get(key) ? 'Sama dengan baris ' + ada.get(key) : 'Sudah ada di jadwal'; }
             else {
-              const g1 = (byG[o.hari + '|' + o.guru] || []).find(x => tumpang(a, x.a)), k1 = (byK[o.hari + '|' + o.kelas] || []).find(x => tumpang(a, x.a));
+              const g1 = BK(o.blok).map(bk => (byG[o.hari + '|' + o.guru + '|' + bk] || []).find(x => tumpang(a, x.a))).find(Boolean), k1 = BK(o.blok).map(bk => (byK[o.hari + '|' + o.kelas + '|' + bk] || []).find(x => tumpang(a, x.a))).find(Boolean);
               if (g1) bad('Bentrok: guru sudah mengajar pada jam itu' + (g1.no ? ' (baris ' + g1.no + ')' : ''));
               else if (k1) bad('Bentrok: kelas ' + o.kelas + ' sudah punya pelajaran pada jam itu' + (k1.no ? ' (baris ' + k1.no + ')' : ''));
-              else { ada.set(key, o.no); taruh(byG, o.hari + '|' + o.guru, a, o.no); taruh(byK, o.hari + '|' + o.kelas, a, o.no); }
+              else { ada.set(key, o.no); BK(o.blok).forEach(bk => { taruh(byG, o.hari + '|' + o.guru + '|' + bk, a, o.no); taruh(byK, o.hari + '|' + o.kelas + '|' + bk, a, o.no); }); }
             }
           }
           out.push(o);
@@ -1734,12 +1753,12 @@ const app = createApp({
       });
     }
     const doImportJadwal = () => run(async () => {
-      const list = jimp.rows.filter(r => r.st === 'baru').map(r => ({ no: r.no, hari: r.hari, mulai: r.mulai, selesai: r.selesai, kelas: r.kelas, mapel: r.mapel, guru: r.guru }));
+      const list = jimp.rows.filter(r => r.st === 'baru').map(r => ({ no: r.no, hari: r.hari, mulai: r.mulai, selesai: r.selesai, kelas: r.kelas, mapel: r.mapel, guru: r.guru, blok: r.blok }));
       const lewatLokal = jimpCount.value.ada; let baru = 0, lewat = 0, gagal = [], lama = false;
       const perBaris = async part => { // server belum diperbarui (tanpa jadwalImport): simpan satu per satu lewat jadwalSave
         const d = { baru: 0, lewat: 0, gagal: [] };
         for (const r of part) {
-          try { await api('jadwalSave', { j: { hari: r.hari, kelas: r.kelas, mapel: r.mapel, mulai: r.mulai, selesai: r.selesai, guru: r.guru } }); d.baru++; }
+          try { await api('jadwalSave', { j: { hari: r.hari, kelas: r.kelas, mapel: r.mapel, mulai: r.mulai, selesai: r.selesai, guru: r.guru, blok: r.blok } }); d.baru++; }
           catch (e) { if (/^(NETWORK|TIMEOUT|NONJSON)$|Sesi/.test(e.message)) throw e; d.gagal.push({ no: r.no, msg: niceErr(e.message) }); }
         }
         return d;
@@ -2055,7 +2074,7 @@ const app = createApp({
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
-      jhari, jq, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, jimp, jimpCount, exportJadwal, templateJadwal, pickJadwalFile, doImportJadwal, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax,
+      jhari, jq, jblok, blokInfo, bf2, BLOK_CLS, blokLbl, saveBlok, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, jimp, jimpCount, exportJadwal, templateJadwal, pickJadwalFile, doImportJadwal, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax,
       leger, lk, lkelas, dokumen, showD, df, loadDok, loadLeger, saveDok, delDok,
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
