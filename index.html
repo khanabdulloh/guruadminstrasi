@@ -1173,6 +1173,16 @@ const { createApp, ref, reactive, computed } = Vue;
 const EMB = window.self !== window.top; // tertanam di iframe Blogger
 const toTop = () => { if (EMB) { window.scrollTo(0, 0); parent.postMessage({ calmScrollTop: true }, '*'); } };
 const LOGO = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiD-8YPFS6i86EyZZNDUhwuam5ro_mtc9So2muvB7EDWz1Zp6rarLubvVS3vfVVoto_S6SaHlIPPnmNaddUugGUztWkJYhDwwT8CU1BcUuq9TNyxnHKa6B44iDBx6LjR1-z3r7_C34jviaWeOYgk4bNJHsziPV4KR5mQjY69HVhyphenhyphenR3STD4xp-b46x_HeR4/s160/An8Em6pLCtVUNFZTK-rgdQG9pKiDxE1AR7m_1QO_5slD3C5qFXYq7S9suI1ztpViB_aUnbOGE2-Y71AU9SF3GjQzZ09xbw5aat-JT_7ptJ4VcfdGeJ73DWbHD9IDtVHa_16MjCj09HJ4eGBvZMo-removebg-preview.png';
+/* Ikon aplikasi (tab browser, layar utama HP, PWA) memakai LOGO yang sama dengan halaman login; Blogger menyajikan ukuran lain lewat segmen /sNNN/. */
+(function () { try {
+  if (!/^https?:$/.test(location.protocol)) return;
+  const u = n => LOGO.replace('/s160/', '/s' + n + '/');
+  const ic = (rel, h, t) => { let l = document.querySelector('link[rel="' + rel + '"]'); if (!l) { l = document.createElement('link'); l.rel = rel; document.head.appendChild(l); } l.href = h; if (t) l.type = t; };
+  ic('icon', u(192), 'image/png'); ic('apple-touch-icon', u(180));
+  const base = location.href.split('#')[0].split('?')[0], l = document.querySelector('link[rel="manifest"]');
+  if (l) l.href = URL.createObjectURL(new Blob([JSON.stringify({ name: 'Portal Akademik SMK CALM', short_name: 'SMK CALM', start_url: base, scope: new URL('./', base).href, display: 'standalone', background_color: '#0b3d91', theme_color: '#0b3d91', lang: 'id',
+    icons: [{ src: u(192), sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: u(512), sizes: '512x512', type: 'image/png', purpose: 'any' }] })], { type: 'application/manifest+json' }));
+} catch (e) { /* ikon bawaan tetap dipakai */ } })();
 
 const app = createApp({
   setup() {
