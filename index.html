@@ -1194,6 +1194,36 @@ table tbody tr:hover{background:#f8fafc}
         <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showKurangi=false" class="btn-o">Batal</button><button @click="saveKurangi" :disabled="busy" class="btn-p">Simpan pengurangan</button></div>
       </div></div>
     </section>
+    <!-- Pengurangan Poin -->
+    <section v-if="view==='pengurangan'">
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <div class="mr-auto"><h2 class="h2 !mb-0">Pengurangan Poin</h2><p class="text-sm text-slate-500 mt-1">Catat pengurangan setelah pembinaan dan perubahan perilaku yang terverifikasi. Riwayat pelanggaran asli tetap tersimpan.</p></div>
+        <select v-model="plq.kelas" @change="loadPl" class="inp"><option value="">Semua kelas</option><option v-for="k in pel.kelas" :key="k">{{k}}</option></select>
+        <input v-model.trim="plq.q" @keyup.enter="loadPl" placeholder="Cari siswa / pelanggaran, lalu Enter" class="inp">
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+        <div class="card"><b class="n">{{penguranganSiswa.length}}</b>Siswa dengan catatan poin</div>
+        <div class="card"><b class="n text-amber-600">{{penguranganSiswa.filter(x=>x.totalEfektif>=pel.ambang).length}}</b>Masih warning / evaluasi khusus</div>
+        <div class="card"><b class="n text-emerald-700">{{penguranganSiswa.reduce((a,x)=>a+x.totalPengurangan,0)}}</b>Total poin yang dikurangi</div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-left"><tr><th class="p-3">Siswa</th><th>Kelas</th><th class="text-center">Total pelanggaran</th><th class="text-center">Sudah dikurangi</th><th class="text-center">Total efektif</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr v-for="r in penguranganSiswa" :key="r.nis" class="border-t align-top">
+              <td class="p-3 font-semibold">{{r.nama}}<span class="block text-xs font-normal text-slate-400">NIS {{r.nis}}</span></td>
+              <td>{{r.kelas}}</td><td class="text-center">{{r.totalPelanggaran}}</td><td class="text-center text-emerald-700 font-bold">{{r.totalPengurangan}}</td>
+              <td class="text-center font-extrabold" :class="r.totalEfektif>=pel.ambang?'text-rose-600':'text-blue-900'">{{r.totalEfektif}}</td>
+              <td><span v-if="r.totalEfektif>=pel.ambang" class="text-xs font-bold text-rose-700">Warning / evaluasi khusus</span><span v-else-if="r.totalEfektif>=26" class="text-xs font-bold text-amber-700">Berat</span><span v-else class="text-xs text-slate-500">Di bawah ambang berat</span></td>
+              <td class="pr-3 whitespace-nowrap"><button @click="openKurangi(r)" class="text-emerald-700 font-bold">Kurangi poin</button></td>
+            </tr>
+            <tr v-if="!penguranganSiswa.length"><td colspan="7" class="p-5 text-slate-500">Belum ada siswa dengan catatan pelanggaran yang dapat dikurangi.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-slate-500 mt-2">Total efektif = total pelanggaran dikurangi seluruh transaksi pengurangan yang tercatat. Pengurangan tidak menghapus atau mengubah histori pelanggaran.</p>
+    </section>
+
     <!-- PKL / Prakerin -->
     <section v-if="view==='pkl'">
       <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">PKL / Prakerin</h2>
@@ -1362,12 +1392,12 @@ const app = createApp({
     const acc = { KEPSEK: 'bg-violet-600 text-white', ADMIN: 'bg-navy-700 text-white', GURU: 'bg-emerald-600 text-white', STAF: 'bg-sky-600 text-white', SISWA: 'bg-amber-400 text-slate-900', ORTU: 'bg-blue-600 text-white', BK: 'bg-rose-600 text-white' };
     const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600', ORTU: 'from-navy-900 to-sky-600', BK: 'from-navy-900 to-violet-600' };
     const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Kelola administrasi persuratan, layanan, arsip, dan data sekolah.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.', ORTU: 'Pantau kehadiran, nilai, dan catatan bimbingan anak Anda.', BK: 'Catat pelanggaran dan pantau poin tata tertib siswa.' };
-    const quick = { KEPSEK: ['notif', 'monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['notif', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'bimbingan', 'konseling', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal', 'perangkat', 'notif'], STAF: ['notif', 'suratmasuk', 'suratkeluar', 'disposisi', 'layanan', 'rekapadmin'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya', 'notif'], ORTU: ['anak', 'notif'], BK: ['notif', 'konseling', 'pelanggaran'] };
+    const quick = { KEPSEK: ['notif', 'monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['notif', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'bimbingan', 'konseling', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal', 'perangkat', 'notif'], STAF: ['notif', 'suratmasuk', 'suratkeluar', 'disposisi', 'layanan', 'rekapadmin'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya', 'notif'], ORTU: ['anak', 'notif'], BK: ['notif', 'konseling', 'pelanggaran', 'pengurangan'] };
     const clock = ref(''), tick = () => { if (document.hidden) return; const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' }); document.querySelectorAll('.clk').forEach(e => { if (e.textContent !== t) e.textContent = t; }); };
     tick(); setInterval(tick, 1000); // ubah DOM langsung: tidak memicu render ulang seluruh aplikasi tiap detik
     const mnav = ref(false);
-    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali Kelas', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', pkl: 'PKL / Prakerin', tahun: 'Tahun Ajaran', sandi: 'Ganti Sandi', anak: 'Data Anak', notif: 'Pemberitahuan', pelanggaran: 'Pelanggaran Siswa', konseling: 'Konseling BK', perangkat: 'Perangkat Ajar' };
-    const MENU = { ADMIN: ['dashboard', 'notif', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'notif', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'dokumen', 'sandi'], STAF: ['dashboard', 'notif', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'notif', 'konseling', 'pelanggaran', 'sandi'] };
+    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali Kelas', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', pkl: 'PKL / Prakerin', tahun: 'Tahun Ajaran', sandi: 'Ganti Sandi', anak: 'Data Anak', notif: 'Pemberitahuan', pelanggaran: 'Pelanggaran Siswa', pengurangan: 'Pengurangan Poin', konseling: 'Konseling BK', perangkat: 'Perangkat Ajar' };
+    const MENU = { ADMIN: ['dashboard', 'notif', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pengurangan', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'notif', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'dokumen', 'sandi'], STAF: ['dashboard', 'notif', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'notif', 'konseling', 'pelanggaran', 'pengurangan', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -1389,7 +1419,7 @@ const app = createApp({
     ICON.rapor = ICON.nilaisaya; ICON.log = ICON.riwayat; ICON.tahun = ICON.jadwal;
     ICON.pkl = '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>';
     ICON.monitor = '<path d="M3 12h4l3-8 4 16 3-8h4"/>';
-    ICON.perangkat = ICON.dokumen; ICON.notif = '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>'; ICON.pelanggaran = '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/>'; ICON.konseling = '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="M8 12h8M12 8v8"/>'; ICON.anak = ICON.siswa;
+    ICON.perangkat = ICON.dokumen; ICON.notif = '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>'; ICON.pelanggaran = '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/>'; ICON.pengurangan = '<path d="M12 3v18M3 12h18"/><path d="M7 7h10M7 17h10"/>'; ICON.konseling = '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="M8 12h8M12 8v8"/>'; ICON.anak = ICON.siswa;
     ICON.akun = '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14 9l2 2"/>'; ICON.suratmasuk = ICON.dokumen; ICON.suratkeluar = ICON.dokumen; ICON.disposisi = ICON.bimbingan; ICON.arsip = ICON.dokumen; ICON.layanan = ICON.dokumen; ICON.mutasi = ICON.siswa; ICON.cetaksurat = ICON.dokumen; ICON.rekapadmin = ICON.leger;
     const MS = { dashboard: 'Dashboard TU', siswa: 'Data Siswa', guru: 'Data Guru/PTK', suratmasuk: 'Surat Masuk', suratkeluar: 'Surat Keluar', disposisi: 'Disposisi', arsip: 'Arsip Dokumen', layanan: 'Layanan Administrasi', mutasi: 'Mutasi Siswa', cetaksurat: 'Cetak Surat', rekapadmin: 'Rekap Administrasi' };
     const menu = computed(() => user.value ? MENU[user.value.role].filter(k => !user.value.wajib || k === 'sandi').map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || M[k] })) : []);
@@ -1526,6 +1556,7 @@ const app = createApp({
       if (k === 'anak') { const d = await api('ortuData'); if (view.value !== k) return; anak.value = d; atab.value = 'hadir'; }
       if (k === 'notif') { const l = await api('notifList'); if (view.value !== k) return; nlist.value = l; await api('notifBaca'); notifN.value = 0; }
       if (k === 'pelanggaran') { Object.assign(plq, { kelas: '', bulan: '', q: '' }); await fetchPl(); }
+      if (k === 'pengurangan') { Object.assign(plq, { kelas: '', bulan: '', q: '' }); await fetchPl(); }
       if (k === 'konseling') { Object.assign(ksq, { kelas: '', bulan: '', q: '' }); await fetchKonseling(); }
       if (k === 'izin') await fetchIz();
       if (k === 'catatan') { guru.value = await api('guruList'); await fetchCg(); }
@@ -2192,6 +2223,7 @@ const app = createApp({
     const perluTindak = computed(() => { const m = new Map(), t = pel.value.total || {}; pel.value.rows.forEach(r => { if (!m.has(r.nis)) m.set(r.nis, { nis: r.nis, nama: r.nama, kelas: r.kelas, total: t[r.nis] || 0 }); }); return [...m.values()].filter(x => x.total >= pel.value.ambang).sort((a, c) => c.total - a.total); });
     const pelRingkasan = computed(() => { const seen = new Set(), t = pel.value.total || {}; let berat = 0, warning = 0; pel.value.rows.forEach(r => { const nis = String(r.nis); if (seen.has(nis)) return; seen.add(nis); const n = Number(t[nis] || 0); if (n >= pel.value.ambang) warning++; else if (n >= 26) berat++; }); return { catatan: pel.value.rows.length, siswa: seen.size, berat, warning }; });
     const butirSaran = computed(() => [...new Set(pel.value.rows.map(r => r.butir))].sort());
+    const penguranganSiswa = computed(() => { const m = new Map(), t = pel.value.total || {}, bruto = pel.value.totalPelanggaran || {}, kurang = pel.value.pengurangan || {}; pel.value.rows.forEach(r => { const nis = String(r.nis); if (m.has(nis)) return; m.set(nis, { nis, nama: String(r.nama), kelas: String(r.kelas), totalPelanggaran: Number(bruto[nis] || 0), totalPengurangan: Number(kurang[nis] || 0), totalEfektif: Number(t[nis] || 0) }); }); return [...m.values()].sort((a,b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama)); });
 
     /* ====== Konseling BK ====== */
     const konseling = ref({ kelas: [], rows: [] }), ksq = reactive({ kelas: '', bulan: '', q: '' }), showKonseling = ref(false), konselingSiswa = ref([]);
@@ -2297,7 +2329,7 @@ const app = createApp({
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai,
       antreSaya, kirimAntre, buangAntre, pwa, pasang, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
-      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPanduanPel, printPelanggaran, openPl, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu };
+      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPanduanPel, printPelanggaran, openPl, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu };
   }
 });
 app.component('kop', { props: ['k'], template: `<div class="flex items-center gap-3 border-b-4 border-double border-slate-800 pb-2 mb-3">
