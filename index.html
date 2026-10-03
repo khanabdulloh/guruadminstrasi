@@ -1444,7 +1444,7 @@ const app = createApp({
       if (err.value) toTop(); else if (ok.value) { const m = ok.value; toTop(); setTimeout(() => { if (ok.value === m) ok.value = ''; }, 7000); }
     }
     const login = () => run(async () => {
-      const d = await api('login', { username: f.username, password: f.password });
+      const d = await api('login', { username: f.username, password: f.password, expectedRole: loginRole.value });
       token.value = d.token; user.value = d.user; f.password = '';
       sessionStorage.setItem('tk', d.token); sessionStorage.setItem('us', JSON.stringify(d.user));
       go('dashboard'); // go() mengarahkan ke Ganti Sandi bila sandi awal belum diganti
