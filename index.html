@@ -765,12 +765,12 @@ table tbody tr:hover{background:#f8fafc}
       <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">BIMBINGAN WALI - {{bulan}}</p></div>
       <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><h2 class="h2 !mb-0 mr-auto">Bimbingan Wali</h2>
         <input type="month" v-model="bulan" @change="loadBimb" class="inp"><input v-model.trim="q" @keyup.enter="loadBimb" placeholder="Cari, lalu Enter" class="inp">
-        <button @click="printPage" class="btn-o">Cetak</button><button v-if="bk.length" @click="openB" class="btn-p">Tambah catatan</button></div>
-      <p v-if="!bk.length" class="text-sm text-slate-500 mb-4">Anda belum ditetapkan sebagai wali kelas. Admin menetapkannya di menu Kelola Kelas.</p>
+        <button @click="printPage" class="btn-o">Cetak</button><button v-if="(user.role==='ADMIN'||user.role==='GURU')&&bk.length" @click="openB" class="btn-p">Tambah catatan</button></div>
+      <p v-if="user.role==='GURU'&&!bk.length" class="text-sm text-slate-500 mb-4">Anda belum ditetapkan sebagai wali kelas. Admin menetapkannya di menu Kelola Kelas.</p>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Siswa</th><th>Kelas</th><th>Catatan</th><th>Solusi</th><th class="noprint"></th></tr></thead>
         <tbody><tr v-for="b in bimb" :key="b.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{b.tanggal}}</td><td>{{b.nama}}</td><td>{{b.kelas}}</td><td>{{b.catatan}}</td><td>{{b.solusi}}</td>
-          <td class="pr-3 noprint"><button @click="delBimb(b)" class="text-rose-600 font-bold">Hapus</button></td></tr>
+          <td class="pr-3 noprint"><button v-if="user.role==='ADMIN'||user.role==='GURU'" @click="delBimb(b)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!bimb.length"><td colspan="6" class="p-4 text-slate-500">Belum ada catatan pada bulan ini.</td></tr></tbody></table></div>
       <div class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
       <div v-if="showB" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
@@ -787,10 +787,15 @@ table tbody tr:hover{background:#f8fafc}
     <!-- Catatan bimbingan (siswa) -->
     <section v-if="view==='bimbingansaya'">
       <h2 class="h2">Catatan Bimbingan</h2>
-      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+      <div class="flex flex-wrap gap-2 mb-3"><button @click="bimbTab='wali'" :class="bimbTab==='wali'?'btn-p':'btn-o'">Bimbingan Wali Kelas</button><button @click="bimbTab='bk'" :class="bimbTab==='bk'?'btn-p':'btn-o'">Konseling Guru BK</button></div>
+      <div v-if="bimbTab==='wali'" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Catatan</th><th>Solusi</th><th>Oleh</th></tr></thead>
         <tbody><tr v-for="b in bimb" :key="b.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{b.tanggal}}</td><td>{{b.catatan}}</td><td>{{b.solusi}}</td><td>{{b.olehNama}}</td></tr>
-        <tr v-if="!bimb.length"><td colspan="4" class="p-4 text-slate-500">Belum ada catatan bimbingan.</td></tr></tbody></table></div>
+        <tr v-if="!bimb.length"><td colspan="4" class="p-4 text-slate-500">Belum ada catatan bimbingan wali kelas.</td></tr></tbody></table></div>
+      <div v-else class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Jenis</th><th>Topik / masalah</th><th>Catatan</th><th>Tindak lanjut</th><th>Status</th><th>Oleh</th></tr></thead>
+        <tbody><tr v-for="b in konseling.rows" :key="b.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{b.tanggal}}</td><td>{{b.jenis}}</td><td>{{b.topik}}</td><td>{{b.catatan}}</td><td>{{b.tindakLanjut||'-'}}</td><td>{{b.status}}</td><td>{{b.olehNama}}</td></tr>
+        <tr v-if="!konseling.rows.length"><td colspan="7" class="p-4 text-slate-500">Belum ada catatan konseling BK.</td></tr></tbody></table></div>
     </section>
 
     <!-- Pengaturan sekolah (admin) -->
@@ -1079,10 +1084,17 @@ table tbody tr:hover{background:#f8fafc}
             <thead class="bg-slate-50 text-left"><tr><th class="p-3">Mata pelajaran</th><th>Tujuan pembelajaran</th><th>Jenis</th><th>Skor</th></tr></thead>
             <tbody><tr v-for="(r,i) in anak.nilai" :key="i" class="border-t"><td class="p-3">{{r.mapel}}</td><td>{{r.tp}}</td><td>{{r.jenis}}</td><td class="font-bold">{{r.skor}}</td></tr>
             <tr v-if="!anak.nilai.length"><td colspan="4" class="p-4 text-slate-500">Belum ada nilai.</td></tr></tbody></table></div></div>
-        <div v-if="atab==='bimb'" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-          <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Catatan</th><th>Solusi</th><th>Oleh</th></tr></thead>
-          <tbody><tr v-for="(b,i) in anak.bimbingan" :key="i" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{b.tanggal}}</td><td>{{b.catatan}}</td><td>{{b.solusi}}</td><td>{{b.olehNama}}</td></tr>
-          <tr v-if="!anak.bimbingan.length"><td colspan="4" class="p-4 text-slate-500">Belum ada catatan bimbingan.</td></tr></tbody></table></div>
+        <div v-if="atab==='bimb'">
+          <div class="flex flex-wrap gap-2 mb-3"><button @click="bimbTab='wali'" :class="bimbTab==='wali'?'btn-p':'btn-o'">Bimbingan Wali Kelas</button><button @click="bimbTab='bk'" :class="bimbTab==='bk'?'btn-p':'btn-o'">Konseling Guru BK</button></div>
+          <div v-if="bimbTab==='wali'" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+            <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Catatan</th><th>Solusi</th><th>Oleh</th></tr></thead>
+            <tbody><tr v-for="(b,i) in anak.bimbingan" :key="i" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{b.tanggal}}</td><td>{{b.catatan}}</td><td>{{b.solusi}}</td><td>{{b.olehNama}}</td></tr>
+            <tr v-if="!anak.bimbingan.length"><td colspan="4" class="p-4 text-slate-500">Belum ada catatan bimbingan wali kelas.</td></tr></tbody></table></div>
+          <div v-else class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+            <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Jenis</th><th>Topik / masalah</th><th>Catatan</th><th>Tindak lanjut</th><th>Status</th><th>Oleh</th></tr></thead>
+            <tbody><tr v-for="(b,i) in anak.konseling" :key="i" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{b.tanggal}}</td><td>{{b.jenis}}</td><td>{{b.topik}}</td><td>{{b.catatan}}</td><td>{{b.tindakLanjut||'-'}}</td><td>{{b.status}}</td><td>{{b.olehNama}}</td></tr>
+            <tr v-if="!anak.konseling.length"><td colspan="7" class="p-4 text-slate-500">Belum ada catatan konseling BK.</td></tr></tbody></table></div>
+        </div>
       </template>
     </section>
 
@@ -1332,7 +1344,7 @@ const app = createApp({
     tick(); setInterval(tick, 1000); // ubah DOM langsung: tidak memicu render ulang seluruh aplikasi tiap detik
     const mnav = ref(false);
     const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', pkl: 'PKL / Prakerin', tahun: 'Tahun Ajaran', sandi: 'Ganti Sandi', anak: 'Data Anak', notif: 'Pemberitahuan', pelanggaran: 'Pelanggaran Siswa', konseling: 'Konseling BK', perangkat: 'Perangkat Ajar' };
-    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'pelanggaran', 'pkl', 'perangkat', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'konseling', 'pelanggaran', 'sandi'] };
+    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'konseling', 'pelanggaran', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -1479,10 +1491,10 @@ const app = createApp({
       if (k === 'monitor') { const r = await Promise.all([fetchMon(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; }
       if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; pilIdx.value = ''; }
       if (k === 'jurnal') { const r = await Promise.all([canWrite.value ? api('pilihanNilai') : null, api('pengaturanGet'), fetchJ()]); if (r[0]) pil.value = r[0]; cfg.value = r[1]; }
-      if (k === 'bimbingan') { [bk.value, cfg.value] = await Promise.all([api('bimbinganKelas'), api('pengaturanGet'), fetchB()]); }
+      if (k === 'bimbingan') { const r = await Promise.all([user.value.role === 'KEPSEK' ? null : api('bimbinganKelas'), api('pengaturanGet'), fetchB()]); bk.value = r[0] || []; cfg.value = r[1]; }
       if (k === 'pengaturan') { const r = await Promise.all([api('pengaturanGet'), api('backupStatus').catch(() => null), api('akademikGet').catch(() => null), api('kunciGet').catch(() => null), api('ukuranData').catch(() => null)]); ukd.value = r[4]; cfg.value = r[0]; { const bi = await api('blokInfo').catch(() => null); if (bi) { blokInfo.value = bi; Object.assign(bf2, { acuan: bi.acuan, blok: bi.blokAcuan, minggu: bi.minggu }); } } backupUrl.value = ''; bk2.value = r[1]; ak.value = r[2]; kunci.value = r[3]; }
       if (k === 'log') logs.value = await api('logList');
-      if (k === 'bimbingansaya') await fetchB();
+      if (k === 'bimbingansaya') { bimbTab.value = 'wali'; await Promise.all([fetchB(), fetchKonseling()]); }
       if (k === 'leger') { [cfg.value, lk.value] = await Promise.all([api('pengaturanGet'), api('legerKelas')]); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
       if (k === 'dokumen') await fetchD();
       if (k === 'perangkat') { const r = await Promise.all([fetchPa(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; paf.mapel = paf.jenis = ''; }
@@ -2128,7 +2140,7 @@ const app = createApp({
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { mnav.value = false; showS.value = showK.value = showJd.value = showG.value = showJ.value = showB.value = showD.value = kred.show = showP.value = showPg.value = showAg.value = showPk.value = showKonseling.value = false; jp.value = null; if (!busy.value) imp.show = gimp.show = jimp.show = false; } });
     /* ====== v4.6: portal orang tua, pemberitahuan, pelanggaran (BK) ====== */
-    const anak = ref(null), atab = ref('hadir'), nlist = ref([]), notifN = ref(0);
+    const anak = ref(null), atab = ref('hadir'), bimbTab = ref('wali'), nlist = ref([]), notifN = ref(0);
     const anakMapel = computed(() => { const g = {}; ((anak.value && anak.value.nilai) || []).forEach(r => (g[r.mapel] = g[r.mapel] || []).push(Number(r.skor))); return Object.keys(g).sort().map(m => ({ mapel: m, rata: Math.round(g[m].reduce((a, b) => a + b, 0) / g[m].length * 10) / 10, n: g[m].length })); });
     const pel = ref({ kelas: [], ambang: 50, total: {}, rows: [] }), plq = reactive({ kelas: '', bulan: '', q: '' }), showPl = ref(false), plsiswa = ref([]);
     const plf = reactive({ tanggal: hari0, kelas: '', nis: '', butir: '', poin: '', catatan: '', tindakan: '' });
@@ -2254,7 +2266,7 @@ const app = createApp({
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai,
       antreSaya, kirimAntre, buangAntre, pwa, pasang, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
-      anak, atab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, plf, canPel, loadPl, openPl, pickKelasPl, savePl, delPl, perluTindak, butirSaran, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu };
+      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, plf, canPel, loadPl, openPl, pickKelasPl, savePl, delPl, perluTindak, butirSaran, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu };
   }
 });
 app.component('kop', { props: ['k'], template: `<div class="flex items-center gap-3 border-b-4 border-double border-slate-800 pb-2 mb-3">
