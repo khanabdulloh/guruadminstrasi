@@ -1092,8 +1092,8 @@ table tbody tr:hover{background:#f8fafc}
             <tr v-if="!anak.bimbingan.length"><td colspan="4" class="p-4 text-slate-500">Belum ada catatan bimbingan wali kelas.</td></tr></tbody></table></div>
           <div v-else class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
             <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Jenis</th><th>Topik / masalah</th><th>Catatan</th><th>Tindak lanjut</th><th>Status</th><th>Oleh</th></tr></thead>
-            <tbody><tr v-for="(b,i) in anak.konseling" :key="i" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{b.tanggal}}</td><td>{{b.jenis}}</td><td>{{b.topik}}</td><td>{{b.catatan}}</td><td>{{b.tindakLanjut||'-'}}</td><td>{{b.status}}</td><td>{{b.olehNama}}</td></tr>
-            <tr v-if="!anak.konseling.length"><td colspan="7" class="p-4 text-slate-500">Belum ada catatan konseling BK.</td></tr></tbody></table></div>
+            <tbody><tr v-for="(b,i) in (anak.konseling || [])" :key="i" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{b.tanggal}}</td><td>{{b.jenis}}</td><td>{{b.topik}}</td><td>{{b.catatan}}</td><td>{{b.tindakLanjut||'-'}}</td><td>{{b.status}}</td><td>{{b.olehNama}}</td></tr>
+            <tr v-if="!(anak.konseling || []).length"><td colspan="7" class="p-4 text-slate-500">Belum ada catatan konseling BK.</td></tr></tbody></table></div>
         </div>
       </template>
     </section>
