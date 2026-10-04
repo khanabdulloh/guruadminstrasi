@@ -1331,7 +1331,27 @@ table tbody tr:hover{background:#f8fafc}
       <div class="grid grid-cols-2 gap-3"><label class="lb">Mulai<input type="date" v-model="af.tanggal" :min="hari0" class="inp w-full mt-1"></label><label class="lb">Selesai (opsional)<input type="date" v-model="af.sampai" :min="af.tanggal||hari0" class="inp w-full mt-1"></label></div>
       <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p>
       <div class="flex justify-end gap-2 mt-4"><button @click="showAg=false" class="btn-o">Batal</button><button @click="saveAg" :disabled="busy||!af.judul||!af.tanggal" class="btn-p">Simpan</button></div></div></div>
-    <footer class="mt-10 pb-4 text-center text-xs text-slate-400 noprint">&copy; 2026 SMKS Ciledug Al-Musaddadiyah Garut</footer>
+    <div v-if="showPwaHelp" role="dialog" aria-modal="true" aria-labelledby="pwaHelpTitle" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-50 noprint" @keydown.esc="tutupPwaHelp">
+      <div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+        <div class="flex items-start gap-3">
+          <div class="h-11 w-11 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/><path d="M12 6v7m0 0-3-3m3 3 3-3"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 id="pwaHelpTitle" class="font-extrabold text-blue-900">Instalasi Portal</h3>
+            <p class="text-sm text-slate-600 mt-1">Fitur instalasi belum tersedia pada perangkat atau browser yang sedang digunakan.</p>
+          </div>
+          <button @click="tutupPwaHelp" class="text-2xl leading-none font-bold px-2 text-slate-500 hover:text-slate-800" aria-label="Tutup">&times;</button>
+        </div>
+        <div class="mt-4 rounded-xl bg-slate-50 border border-slate-200 p-3 text-sm text-slate-600">
+          <p class="font-semibold text-slate-700 mb-1">Silakan coba:</p>
+          <ul class="list-disc pl-5 space-y-1"><li>gunakan browser versi terbaru;</li><li>pastikan koneksi internet aktif;</li><li>pada perangkat yang mendukung, gunakan menu browser untuk memilih <b>Instal aplikasi</b> atau <b>Tambahkan ke layar utama</b>.</li></ul>
+        </div>
+        <div class="flex justify-end mt-4"><button @click="tutupPwaHelp" class="btn-p">Tutup</button></div>
+      </div>
+    </div>
+
+"    <footer class="mt-10 pb-4 text-center text-xs text-slate-400 noprint">&copy; 2026 SMKS Ciledug Al-Musaddadiyah Garut</footer>
   </main>
 </div>
 </div>
@@ -1456,9 +1476,10 @@ const app = createApp({
     window.addEventListener('online', () => kirimAntre(false));
     Vue.watch(() => user.value && user.value.username, u => { if (u) setTimeout(() => kirimAntre(false), 1500); });
     setInterval(() => { if (navigator.onLine && antreSaya.value.some(x => !x.galat)) kirimAntre(true); }, 60000);
-    const pwa = ref(!!window.__pwa), ukd = ref(null);
+    const pwa = ref(!!window.__pwa), showPwaHelp = ref(false), ukd = ref(null);
     window.addEventListener('pwa-ready', () => { pwa.value = true; });
-    const pasang = async () => { const e = window.__pwa; if (!e) { alert('Instalasi Portal Akademik\n\nPerangkat atau browser saat ini belum mendukung instalasi aplikasi.'); return; } e.prompt(); try { await e.userChoice; } catch (x) { /* abaikan */ } window.__pwa = null; pwa.value = false; };
+    const pasang = async () => { const e = window.__pwa; if (!e) { showPwaHelp.value = true; return; } e.prompt(); try { await e.userChoice; } catch (x) { /* abaikan */ } window.__pwa = null; pwa.value = false; };
+    const tutupPwaHelp = () => { showPwaHelp.value = false; };
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]);
     const cfg = ref({ kop: { logoKiri: '', logoKanan: '', baris: [] }, ttd: { kota: '', jabatan: '', nama: '', nip: '' } }), resetTxt = ref(''), backupUrl = ref('');
@@ -2325,7 +2346,7 @@ const app = createApp({
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai,
-      antreSaya, kirimAntre, buangAntre, pwa, pasang, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
+      antreSaya, kirimAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
       anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu };
   }
 });
