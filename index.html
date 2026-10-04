@@ -159,6 +159,14 @@ table tbody tr:hover{background:#f8fafc}
         <p class="text-white/90 text-sm mt-2">{{sub[user.role]}}</p>
       </div>
       <div class="flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
+      <div class="rounded-2xl bg-white border border-sky-200 shadow-sm p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div class="h-11 w-11 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/><path d="M12 6v7m0 0-3-3m3 3 3-3"/></svg>
+        </div>
+        <div class="flex-1 min-w-0"><h3 class="font-extrabold text-slate-800">Pasang Portal di HP</h3><p class="text-sm text-slate-500">Buka Portal Akademik lebih cepat dari layar utama seperti aplikasi.</p></div>
+        <button v-if="pwa" @click="pasang" class="btn-p whitespace-nowrap">Instal di HP</button>
+        <span v-else class="text-xs text-slate-500 sm:max-w-xs">Jika tombol instal belum muncul, gunakan menu browser <b>⋮</b> lalu pilih <b>Tambahkan ke layar utama</b>.</span>
+      </div>
       <div v-if="dash.blok" class="rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-sm px-4 py-3 mb-4 flex items-center gap-2 flex-wrap"><span>Jadwal minggu ini: <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="BLOK_CLS[dash.blok.aktif]">Blok {{dash.blok.aktif}}</span></span><span>&middot; Minggu depan: <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="BLOK_CLS[dash.blok.depan]">Blok {{dash.blok.depan}}</span></span></div>
       <div v-if="dash.izinMenunggu" class="rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto"><b>{{dash.izinMenunggu}}</b> pengajuan izin siswa menunggu persetujuan Anda.</span><button @click="go('izin')" class="btn-o !py-1 text-xs">Tinjau</button></div>
       <div v-if="dash.izinSaya&&dash.izinSaya.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-sky-500"><h3 class="font-bold mb-2">Status izin saya</h3>
