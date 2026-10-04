@@ -163,7 +163,7 @@ table tbody tr:hover{background:#f8fafc}
         <div class="h-11 w-11 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
           <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/><path d="M12 6v7m0 0-3-3m3 3 3-3"/></svg>
         </div>
-        <div class="flex-1 min-w-0"><h3 class="font-extrabold text-slate-800">Pasang Portal di HP</h3><p class="text-sm text-slate-500">Buka Portal Akademik lebih cepat dari layar utama seperti aplikasi.</p></div>
+        <div class="flex-1 min-w-0"><h3 class="font-extrabold text-slate-800">Pasang Portal</h3><p class="text-sm text-slate-500">Buka Portal Akademik lebih cepat seperti aplikasi.</p></div>
         <button @click="pasang" class="btn-p whitespace-nowrap">{{pwa ? 'Instal di HP' : 'Cara Instal'}}</button>
         <span v-if="!pwa" class="text-xs text-slate-500 sm:max-w-xs">Jika instalasi otomatis belum tersedia, tombol akan menampilkan petunjuk sesuai browser.</span>
       </div>
@@ -1341,7 +1341,7 @@ table tbody tr:hover{background:#f8fafc}
 // Ganti dengan URL Web App hasil deploy Apps Script
 const API_URL = 'https://script.google.com/macros/s/AKfycbwcfPzDxCsJxXTFSRH-R6x2rZEt5goThRhqhWG4hqLE4_0Z6ZD3Icu8sjOoRbDtgwobVw/exec';
 const { createApp, ref, reactive, computed } = Vue;
-const EMB = window.self !== window.top; // tertanam di iframe Blogger
+const EMB = window.self !== window.top;
 const toTop = () => { if (EMB) { window.scrollTo(0, 0); parent.postMessage({ calmScrollTop: true }, '*'); } };
 const LOGO = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiD-8YPFS6i86EyZZNDUhwuam5ro_mtc9So2muvB7EDWz1Zp6rarLubvVS3vfVVoto_S6SaHlIPPnmNaddUugGUztWkJYhDwwT8CU1BcUuq9TNyxnHKa6B44iDBx6LjR1-z3r7_C34jviaWeOYgk4bNJHsziPV4KR5mQjY69HVhyphenhyphenR3STD4xp-b46x_HeR4/s160/An8Em6pLCtVUNFZTK-rgdQG9pKiDxE1AR7m_1QO_5slD3C5qFXYq7S9suI1ztpViB_aUnbOGE2-Y71AU9SF3GjQzZ09xbw5aat-JT_7ptJ4VcfdGeJ73DWbHD9IDtVHa_16MjCj09HJ4eGBvZMo-removebg-preview.png';
 /* Ikon aplikasi (tab browser, layar utama HP, PWA) memakai LOGO yang sama dengan halaman login; Blogger menyajikan ukuran lain lewat segmen /sNNN/. */
@@ -1458,7 +1458,7 @@ const app = createApp({
     setInterval(() => { if (navigator.onLine && antreSaya.value.some(x => !x.galat)) kirimAntre(true); }, 60000);
     const pwa = ref(!!window.__pwa), ukd = ref(null);
     window.addEventListener('pwa-ready', () => { pwa.value = true; });
-    const pasang = async () => { const e = window.__pwa; if (!e) { alert('Instalasi Portal Akademik\n\nPerangkat atau browser yang digunakan belum mendukung fitur instalasi aplikasi. Silakan gunakan perangkat atau browser yang mendukung instalasi aplikasi.'); return; } e.prompt(); try { await e.userChoice; } catch (x) { /* abaikan */ } window.__pwa = null; pwa.value = false; };
+    const pasang = async () => { const e = window.__pwa; if (!e) { alert('Instalasi Portal Akademik\n\nPerangkat atau browser saat ini belum mendukung instalasi aplikasi.'); return; } e.prompt(); try { await e.userChoice; } catch (x) { /* abaikan */ } window.__pwa = null; pwa.value = false; };
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]);
     const cfg = ref({ kop: { logoKiri: '', logoKanan: '', baris: [] }, ttd: { kota: '', jabatan: '', nama: '', nip: '' } }), resetTxt = ref(''), backupUrl = ref('');
@@ -2306,7 +2306,7 @@ const app = createApp({
 
     new MutationObserver(ms => { for (const m of ms) for (const nd of m.addedNodes) { if (nd.nodeType === 1 && nd.classList && nd.classList.contains('modal-wrap')) { const el = nd.querySelector('input:not([disabled]):not([type=checkbox]),select,textarea'); if (el) setTimeout(() => el.focus(), 30); } } }).observe(document.getElementById('app'), { childList: true, subtree: true });
     if (user.value) go('dashboard');
-    // Bantu iframe Blogger menyesuaikan tinggi (pasang listener 'message' di sisi Blogger)
+    // Bantu halaman tertanam menyesuaikan tinggi melalui pesan antar-frame
     // Tinggi dihitung dari isi aplikasi (bukan tinggi jendela) agar tidak terpotong; modal tinggi ikut diperhitungkan
     if (EMB) setInterval(() => {
       if (document.hidden) return;
