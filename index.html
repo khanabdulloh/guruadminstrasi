@@ -1458,7 +1458,7 @@ const app = createApp({
     setInterval(() => { if (navigator.onLine && antreSaya.value.some(x => !x.galat)) kirimAntre(true); }, 60000);
     const pwa = ref(!!window.__pwa), ukd = ref(null);
     window.addEventListener('pwa-ready', () => { pwa.value = true; });
-    const pasang = async () => { const e = window.__pwa; if (!e) { alert('Instalasi otomatis belum tersedia di browser ini. Di Chrome/Edge, buka menu ⋮ lalu pilih \"Instal Portal Akademik SMK CALM\" atau \"Tambahkan ke layar utama\".'); return; } e.prompt(); try { await e.userChoice; } catch (x) { /* abaikan */ } window.__pwa = null; pwa.value = false; };
+    const pasang = async () => { const e = window.__pwa; if (!e) { alert('Instalasi Portal Akademik\n\nPerangkat atau browser yang digunakan belum mendukung fitur instalasi aplikasi. Silakan gunakan perangkat atau browser yang mendukung instalasi aplikasi.'); return; } e.prompt(); try { await e.userChoice; } catch (x) { /* abaikan */ } window.__pwa = null; pwa.value = false; };
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]);
     const cfg = ref({ kop: { logoKiri: '', logoKanan: '', baris: [] }, ttd: { kota: '', jabatan: '', nama: '', nip: '' } }), resetTxt = ref(''), backupUrl = ref('');
