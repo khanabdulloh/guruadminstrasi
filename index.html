@@ -1539,7 +1539,15 @@ const app = createApp({
       if (user.value.wajib) k = 'sandi';
       if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
       view.value = k; dash.value = null; q.value = ''; toTop();
-      if (k === 'dashboard') { const side = Promise.all([fetchPeng(), fetchAg()]); const d = await api('dashboard'); if (view.value !== k) return; dash.value = d; dashAt = Date.now(); Vue.nextTick(tick); belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0; await side; }
+      if (k === 'dashboard') {
+        // Data utama dashboard ditampilkan segera. Pengumuman & agenda tetap
+        // dimuat paralel, tetapi tidak lagi menahan status loading dashboard.
+        Promise.all([fetchPeng(), fetchAg()]).catch(() => {});
+        const d = await api('dashboard');
+        if (view.value !== k) return;
+        dash.value = d; dashAt = Date.now(); Vue.nextTick(tick);
+        belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0;
+      }
       if (k === 'presensi') {
         [cfg.value, pilih.value] = await Promise.all([api('pengaturanGet'), api('presensiPilihan')]); ptab.value = canInput.value ? 'input' : 'rekap';
         rows.value = []; rk.value = null; prRes.value = pgRes.value = prwRes.value = null; Object.assign(pi, { tanggal: hari0, kelas: '', mapel: '', ada: false });
