@@ -1540,13 +1540,13 @@ const app = createApp({
       if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
       view.value = k; dash.value = null; q.value = ''; toTop();
       if (k === 'dashboard') {
-        // Data utama dashboard ditampilkan segera. Pengumuman & agenda tetap
-        // dimuat paralel, tetapi tidak lagi menahan status loading dashboard.
-        Promise.all([fetchPeng(), fetchAg()]).catch(() => {});
-        const d = await api('dashboard');
-        if (view.value !== k) return;
-        dash.value = d; dashAt = Date.now(); Vue.nextTick(tick);
-        belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0;
+        // Stale-while-revalidate: tampilkan salinan terakhir (<5 menit) seketika, lalu segarkan dari server (server membawa pengumuman & agenda sekaligus).
+        const ck = 'dc_' + user.value.username, pakai = d => { dash.value = d; dashAt = Date.now(); Vue.nextTick(tick); belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0; if (Array.isArray(d.peng)) peng.value = d.peng; if (Array.isArray(d.agenda)) agenda.value = d.agenda; };
+        try { const c = JSON.parse(sessionStorage.getItem(ck) || 'null'); if (c && c.d && Date.now() - c.t < 300000) pakai(c.d); } catch (e) { /* salinan rusak: abaikan */ }
+        const d = await api('dashboard'); if (view.value !== k) return; pakai(d);
+        try { sessionStorage.setItem(ck, JSON.stringify({ t: Date.now(), d })); } catch (e) { /* penyimpanan penuh: lewati */ }
+        if (!Array.isArray(d.peng)) await fetchPeng(); // server lama belum membawa pengumuman/agenda: ambil terpisah seperti sebelumnya
+        if (!Array.isArray(d.agenda)) await fetchAg();
       }
       if (k === 'presensi') {
         [cfg.value, pilih.value] = await Promise.all([api('pengaturanGet'), api('presensiPilihan')]); ptab.value = canInput.value ? 'input' : 'rekap';
@@ -1595,7 +1595,7 @@ const app = createApp({
     document.addEventListener('visibilitychange', async () => {
       if (document.visibilityState !== 'visible' || !user.value || view.value !== 'dashboard' || !dash.value || busy.value || Date.now() - dashAt < 45000) return;
       dashAt = Date.now();
-      try { const d = await api('dashboard'); if (view.value === 'dashboard' && user.value) { dash.value = d; belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0; } } catch (e) { /* diam: pemuatan ulang manual tetap tersedia */ }
+      try { const d = await api('dashboard'); if (view.value === 'dashboard' && user.value) { dash.value = d; belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0; if (Array.isArray(d.peng)) peng.value = d.peng; if (Array.isArray(d.agenda)) agenda.value = d.agenda; try { sessionStorage.setItem('dc_' + user.value.username, JSON.stringify({ t: Date.now(), d })); } catch (e2) { /* lewati */ } } } catch (e) { /* diam: pemuatan ulang manual tetap tersedia */ }
     });
     const ganti = () => run(async () => {
       if (!pw.lama) throw new Error('Isi sandi lama'); if (pw.baru.length < 6) throw new Error('Sandi baru minimal 6 karakter');
