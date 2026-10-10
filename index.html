@@ -34,10 +34,14 @@
   body.cetak-pelanggaran aside,body.cetak-pelanggaran .noprint,body.cetak-pelanggaran .modal-wrap{display:none!important}
   body.cetak-pelanggaran section{display:block!important;page:pelanggaran;width:100%!important;margin:0!important;padding:0!important}
   body.cetak-pelanggaran section>div{box-shadow:none!important;border-color:#d1d5db!important;border-radius:0!important}
-  body.cetak-pelanggaran section .hidden.print\:block{display:block!important}
-  body.cetak-pelanggaran section .hidden.print\:grid{display:grid!important}
+  body.cetak-pelanggaran .pel-print-heading{display:block!important}
+  body.cetak-pelanggaran .pel-print-summary{display:grid!important}
+  body.cetak-pelanggaran .pel-print-notes{display:block!important}
   body.cetak-pelanggaran .pel-print-heading{margin:0 0 8pt!important;padding:0 0 6pt!important;border-bottom:1.5pt solid #243b5a!important}
-  body.cetak-pelanggaran .pel-print-heading>kop{display:block;margin-bottom:5pt}
+  /* Komponen Vue <kop> dirender sebagai elemen div, bukan tag kop. */
+  body.cetak-pelanggaran .pel-print-heading>div:first-child{display:block!important;width:100%!important;margin-bottom:5pt!important}
+  body.cetak-pelanggaran .pel-print-heading>div:first-child img{display:block!important;max-width:64px!important;max-height:64px!important;object-fit:contain!important}
+  body.cetak-pelanggaran .pel-print-heading .pel-print-title{display:block!important}
   body.cetak-pelanggaran .pel-print-title{text-align:center;font-size:13pt;line-height:1.25;font-weight:800;letter-spacing:.25pt;margin:8pt 0 7pt!important;text-decoration:none!important}
   body.cetak-pelanggaran .pel-print-meta{display:flex;justify-content:space-between;gap:12pt;flex-wrap:wrap;font-size:8pt;margin-bottom:2pt}
   body.cetak-pelanggaran .pel-print-summary{grid-template-columns:repeat(4,minmax(0,1fr));gap:6pt!important;margin:0 0 8pt!important}
@@ -1537,7 +1541,7 @@ const app = createApp({
     const jf = reactive({ hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '', blok: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
 
     // Daftar putih aksi BACA (idempoten): hanya ini yang boleh diulang otomatis saat jaringan putus. Aksi baru default-nya TIDAK diulang (aman).
-    const READ = new Set(['perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
+    const READ = new Set(['perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
     const SAFE = a => READ.has(a);
     async function api(action, p = {}) {
       let r, t;
@@ -1624,7 +1628,15 @@ const app = createApp({
       if (k === 'nilaisaya') nilaiSaya.value = await api('nilaiSaya');
       if (k === 'anak') { const d = await api('ortuData'); if (view.value !== k) return; anak.value = d; atab.value = 'hadir'; }
       if (k === 'notif') { const l = await api('notifList'); if (view.value !== k) return; nlist.value = l; await api('notifBaca'); notifN.value = 0; }
-      if (k === 'pelanggaran' || k === 'pengurangan') { Object.assign(plq, { kelas: '', bulan: '', q: '' }); await fetchPl(); }
+      if (k === 'pelanggaran') {
+        Object.assign(plq, { kelas: '', bulan: '', q: '' });
+        const r = await Promise.all([fetchPl(), api('kopCetakGet').catch(() => api('pengaturanGet').catch(() => null))]);
+        if (r[1]) {
+          if (r[1].kop) cfg.value.kop = r[1].kop;
+          if (r[1].ttd) cfg.value.ttd = r[1].ttd;
+        }
+      }
+      if (k === 'pengurangan') { Object.assign(plq, { kelas: '', bulan: '', q: '' }); await fetchPl(); }
       if (k === 'konseling') { Object.assign(ksq, { kelas: '', bulan: '', q: '' }); await fetchKonseling(); }
       if (k === 'izin') await fetchIz();
       if (k === 'catatan') { guru.value = await api('guruList'); await fetchCg(); }
@@ -2275,7 +2287,31 @@ const app = createApp({
     const openPl = () => { err.value = ok.value = ''; Object.assign(plf, { tanggal: hari0, kelas: '', nis: '', masterKey: '', butir: '', poin: '', catatan: '', tindakan: '' }); plsiswa.value = []; showPl.value = true; };
     const openPanduanPel = () => run(async () => { panduanPel.value = await api('pelanggaranPanduan'); showPanduanPel.value = true; });
     const applyMasterPl = () => { const i = Number(plf.masterKey); const r = Number.isInteger(i) && panduanPel.value.master[i] ? panduanPel.value.master[i] : null; if (!r) return; plf.butir = r.butir; plf.poin = r.poin; plf.tindakan = r.tindakan; };
-    const printPelanggaran = () => { if (!pel.value.rows.length) return; document.body.classList.add('cetak-pelanggaran'); window.addEventListener('afterprint', () => document.body.classList.remove('cetak-pelanggaran'), { once: true }); window.print(); };
+    const printPelanggaran = async () => {
+      if (!pel.value.rows.length) return;
+      // Ambil ulang kop tepat sebelum mencetak; jika endpoint khusus gagal, gunakan pengaturan umum.
+      const setting = await api('kopCetakGet').catch(() => api('pengaturanGet').catch(() => null));
+      if (setting) {
+        if (setting.kop) cfg.value.kop = setting.kop;
+        if (setting.ttd) cfg.value.ttd = setting.ttd;
+      }
+      await Vue.nextTick();
+      document.body.classList.add('cetak-pelanggaran');
+      await Vue.nextTick();
+      const heading = document.querySelector('.pel-print-heading');
+      const imgs = heading ? Array.from(heading.querySelectorAll('img')) : [];
+      await Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+        const done = () => resolve();
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+        setTimeout(done, 1800);
+      })));
+      const cleanup = () => document.body.classList.remove('cetak-pelanggaran');
+      window.addEventListener('afterprint', cleanup, { once: true });
+      window.print();
+      // Fallback untuk browser yang tidak memicu afterprint.
+      setTimeout(cleanup, 60000);
+    };
     let plsReq = 0;
     const pickKelasPl = () => run(async () => { plf.nis = ''; const rid = ++plsReq, k = plf.kelas, d = k ? await api('bkSiswa', { kelas: k }) : []; if (rid === plsReq) plsiswa.value = d; });
     const savePl = () => run(async () => {
