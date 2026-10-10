@@ -245,58 +245,73 @@ table tbody tr:hover{background:#f8fafc}
 </style>
 
 <style id="calm-table-polish-css">
-/* SMK CALM — penyelarasan tabel lintas dashboard; tidak mengubah struktur atau logika aplikasi */
-.calm-table-polish table {
+/* SMK CALM — audit tabel lintas dashboard. Presentasi saja; tidak mengubah logika/handler. */
+.calm-table-polish table:not(.calm-table-print) {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   font-size: 13px;
   line-height: 1.5;
   color: #334155;
   font-variant-numeric: tabular-nums;
 }
-.calm-table-polish table thead th {
-  padding: 12px 14px;
+.calm-table-polish table:not(.calm-table-print) thead th {
+  padding: 11px 13px;
   background: #f1f5f9;
   color: #334155;
   font-size: 11px;
   font-weight: 800;
   line-height: 1.4;
-  letter-spacing: .035em;
-  text-align: left;
+  letter-spacing: .025em;
   vertical-align: middle;
   border-bottom: 1px solid #dbe3ee;
   white-space: normal;
+  overflow-wrap: break-word;
 }
-.calm-table-polish table tbody td {
-  padding: 11px 14px;
+/* Pertahankan alignment semantik yang sudah ditetapkan oleh kelas pada template. */
+.calm-table-polish table:not(.calm-table-print) thead th:not(.text-center):not(.text-right):not(.text-left) { text-align: left; }
+.calm-table-polish table:not(.calm-table-print) thead th.text-center { text-align: center !important; }
+.calm-table-polish table:not(.calm-table-print) thead th.text-right { text-align: right !important; }
+.calm-table-polish table:not(.calm-table-print) thead th.text-left { text-align: left !important; }
+.calm-table-polish table:not(.calm-table-print) tbody td {
+  padding: 10px 13px;
   vertical-align: middle;
   border-bottom: 1px solid #e8edf3;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   word-break: normal;
 }
-.calm-table-polish table tbody tr:last-child td { border-bottom: 0; }
-.calm-table-polish table tbody tr.align-top > td { vertical-align: top; }
-.calm-table-polish table tbody tr:hover { background-color: #f8fafc; }
-.calm-table-polish table th:first-child,
-.calm-table-polish table td:first-child { padding-left: 16px; }
-.calm-table-polish table th:last-child,
-.calm-table-polish table td:last-child { padding-right: 16px; }
-.calm-table-polish table td.whitespace-nowrap,
-.calm-table-polish table th.whitespace-nowrap { white-space: nowrap; }
-.calm-table-polish table td button { vertical-align: middle; line-height: 1.5; }
-.calm-table-polish table input,
-.calm-table-polish table select { max-width: 100%; }
+.calm-table-polish table:not(.calm-table-print) tbody tr:last-child td { border-bottom: 0; }
+.calm-table-polish table:not(.calm-table-print) tbody tr.align-top > td { vertical-align: top; }
+.calm-table-polish table:not(.calm-table-print) tbody tr:hover { background-color: #f8fafc; }
+.calm-table-polish table:not(.calm-table-print) th:first-child,
+.calm-table-polish table:not(.calm-table-print) td:first-child { padding-left: 15px; }
+.calm-table-polish table:not(.calm-table-print) th:last-child,
+.calm-table-polish table:not(.calm-table-print) td:last-child { padding-right: 15px; }
+.calm-table-polish table:not(.calm-table-print) td.whitespace-nowrap,
+.calm-table-polish table:not(.calm-table-print) th.whitespace-nowrap { white-space: nowrap; }
+.calm-table-polish table:not(.calm-table-print) td button { vertical-align: middle; line-height: 1.45; }
+.calm-table-polish table:not(.calm-table-print) input,
+.calm-table-polish table:not(.calm-table-print) select { max-width: 100%; min-width: 0; }
+/* Tabel rapor cetak harus mempertahankan layout dokumen, bukan gaya tabel dashboard. */
+.calm-table-polish .rapor-wrap table.calm-table-print { width: auto; max-width: none; border-collapse: separate; font-size: inherit; line-height: inherit; color: inherit; font-variant-numeric: normal; }
+.calm-table-polish .rapor-wrap table.calm-table-print th,
+.calm-table-polish .rapor-wrap table.calm-table-print td { padding: revert; background: revert; color: inherit; font-size: inherit; font-weight: revert; letter-spacing: normal; text-align: revert; vertical-align: revert; border: revert; overflow-wrap: normal; }
+.calm-table-polish .rapor-wrap table.calm-table-print tbody tr:hover { background: transparent; }
 @media (max-width: 640px) {
-  .calm-table-polish table { font-size: 12px; }
-  .calm-table-polish table thead th { padding: 10px 11px; font-size: 10px; }
-  .calm-table-polish table tbody td { padding: 10px 11px; }
+  .calm-table-polish table:not(.calm-table-print) { font-size: 12px; }
+  .calm-table-polish table:not(.calm-table-print) thead th { padding: 9px 10px; font-size: 10px; }
+  .calm-table-polish table:not(.calm-table-print) tbody td { padding: 9px 10px; }
+  .calm-table-polish table:not(.calm-table-print) th:first-child,
+  .calm-table-polish table:not(.calm-table-print) td:first-child { padding-left: 12px; }
+  .calm-table-polish table:not(.calm-table-print) th:last-child,
+  .calm-table-polish table:not(.calm-table-print) td:last-child { padding-right: 12px; }
 }
 @media print {
-  .calm-table-polish table { font-size: 10pt; }
-  .calm-table-polish table thead th,
-  .calm-table-polish table tbody td { padding: 6px 8px; }
+  .calm-table-polish table:not(.calm-table-print) { font-size: 9pt; }
+  .calm-table-polish table:not(.calm-table-print) thead th,
+  .calm-table-polish table:not(.calm-table-print) tbody td { padding: 5px 7px; }
+  .calm-table-polish table:not(.calm-table-print) tbody tr:hover { background: transparent; }
 }
-
 </style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
@@ -1578,11 +1593,11 @@ table tbody tr:hover{background:#f8fafc}
       <div class="flex justify-end gap-2 mt-4"><button @click="showPg=false" class="btn-o">Batal</button><button @click="savePeng" :disabled="busy||!pf.judul||!pf.isi" class="btn-p">Publikasikan</button></div></div></div>
     <div v-if="rp&&view==='rapor'" class="rapor-wrap"><div v-for="s in rp.siswa" :key="s.nis" class="rapor-page">
       <kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">LAPORAN HASIL BELAJAR (RAPOR)</p>
-      <table class="text-sm mb-3"><tr><td class="pr-3">Nama</td><td>: {{s.nama}}</td><td class="pl-8 pr-3">Kelas</td><td>: {{rp.kelas}}</td></tr><tr><td>NIS</td><td>: {{s.nis}}</td><td class="pl-8">Semester</td><td>: {{rpMeta.sem}} {{rpMeta.tahun}}</td></tr></table>
-      <table class="w-full text-sm border-collapse mb-3"><thead><tr class="bg-slate-100"><th class="border p-1">No</th><th class="border p-1 text-left">Mata Pelajaran</th><th class="border p-1">KKM</th><th class="border p-1">Nilai</th><th class="border p-1">Keterangan</th></tr></thead><tbody>
+      <table class="text-sm mb-3 calm-table-print"><tr><td class="pr-3">Nama</td><td>: {{s.nama}}</td><td class="pl-8 pr-3">Kelas</td><td>: {{rp.kelas}}</td></tr><tr><td>NIS</td><td>: {{s.nis}}</td><td class="pl-8">Semester</td><td>: {{rpMeta.sem}} {{rpMeta.tahun}}</td></tr></table>
+      <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1">No</th><th class="border p-1 text-left">Mata Pelajaran</th><th class="border p-1">KKM</th><th class="border p-1">Nilai</th><th class="border p-1">Keterangan</th></tr></thead><tbody>
         <tr v-for="(m,i) in rp.mapel" :key="m"><td class="border p-1 text-center">{{i+1}}</td><td class="border p-1">{{m}}</td><td class="border p-1 text-center">{{kkmR(m)}}</td><td class="border p-1 text-center font-bold">{{s.nilai[m]==null?'-':s.nilai[m]}}</td><td class="border p-1 text-center">{{s.nilai[m]==null?'-':s.nilai[m]>=kkmR(m)?'Tuntas':'Belum tuntas'}}</td></tr>
         <tr class="font-bold"><td class="border p-1" colspan="3">Rata-rata</td><td class="border p-1 text-center">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td></tr></tbody></table>
-      <table class="text-sm border-collapse mb-3"><thead><tr class="bg-slate-100"><th class="border p-1 px-3" colspan="4">Kehadiran (hari)</th></tr></thead><tbody><tr><td class="border p-1 px-3">Sakit: {{s.hadir.S}}</td><td class="border p-1 px-3">Izin: {{s.hadir.I}}</td><td class="border p-1 px-3">Alpa: {{s.hadir.A}}</td><td class="border p-1 px-3">Dispensasi: {{s.hadir.D}}</td></tr></tbody></table>
+      <table class="text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1 px-3" colspan="4">Kehadiran (hari)</th></tr></thead><tbody><tr><td class="border p-1 px-3">Sakit: {{s.hadir.S}}</td><td class="border p-1 px-3">Izin: {{s.hadir.I}}</td><td class="border p-1 px-3">Alpa: {{s.hadir.A}}</td><td class="border p-1 px-3">Dispensasi: {{s.hadir.D}}</td></tr></tbody></table>
       <div class="border p-2 text-sm mb-4" style="min-height:3rem"><b>Catatan wali kelas:</b> {{rpCat[s.nis]||'-'}}</div>
       <div class="flex justify-between text-sm mt-6"><div class="text-center w-56"><div>Wali Kelas</div><div class="h-16"></div><div class="font-bold underline">{{rp.waliNama||'.....................'}}</div></div>
         <div class="text-center w-56"><div>{{cfg.ttd.kota}}, {{tglCetak}}</div><div>{{cfg.ttd.jabatan}}</div><div class="h-16"></div><div class="font-bold underline">{{cfg.ttd.nama||'.....................'}}</div><div v-if="cfg.ttd.nip">NIP. {{cfg.ttd.nip}}</div></div></div>
