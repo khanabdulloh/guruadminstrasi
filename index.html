@@ -23,7 +23,27 @@
 .embedded .min-h-screen,.embedded aside{min-height:0}.embedded aside{height:auto!important;position:static!important;max-height:none!important}.embedded .login-wrap{min-height:680px}.embedded .modal-box{margin:1rem auto auto}
 .kartu-wrap,.rapor-wrap{display:none}
 @page rapor{size:A4 portrait;margin:15mm}
-@media print{body.cetak-rapor main>*:not(.rapor-wrap){display:none!important}body.cetak-rapor .rapor-wrap{display:block;page:rapor}.rapor-page{break-after:page;page-break-after:always}}
+@page pelanggaran{size:A4 landscape;margin:12mm}
+@media print{
+  body.cetak-rapor main>*:not(.rapor-wrap){display:none!important}
+  body.cetak-rapor .rapor-wrap{display:block;page:rapor}
+  .rapor-page{break-after:page;page-break-after:always}
+  body.cetak-pelanggaran{background:#fff!important;color:#111827!important;font-size:9pt}
+  body.cetak-pelanggaran main{padding:0!important;max-width:none!important}
+  body.cetak-pelanggaran main>*:not(section){display:none!important}
+  body.cetak-pelanggaran aside,body.cetak-pelanggaran .noprint,body.cetak-pelanggaran .modal-wrap{display:none!important}
+  body.cetak-pelanggaran section{display:block!important;page:pelanggaran}
+  body.cetak-pelanggaran section>div{box-shadow:none!important;border-color:#d1d5db!important}
+  body.cetak-pelanggaran section .hidden.print\\:block{display:block!important}
+  body.cetak-pelanggaran section .hidden.print\\:grid{display:grid!important}
+  body.cetak-pelanggaran table{width:100%;border-collapse:collapse;font-size:8pt;table-layout:auto}
+  body.cetak-pelanggaran thead{display:table-header-group}
+  body.cetak-pelanggaran tr{break-inside:avoid;page-break-inside:avoid}
+  body.cetak-pelanggaran th,body.cetak-pelanggaran td{border:1px solid #9ca3af!important;padding:5px 6px!important;color:#111827!important;vertical-align:top}
+  body.cetak-pelanggaran th{background:#e5e7eb!important;font-weight:700}
+  body.cetak-pelanggaran .overflow-x-auto{overflow:visible!important}
+  body.cetak-pelanggaran button{display:none!important}
+}
 button:disabled{cursor:not-allowed}
 :focus-visible{outline:3px solid rgba(245,158,11,.75);outline-offset:2px}
 .btn-o:hover:not(:disabled){background:#eef3fb}.btn-o:disabled{opacity:.5}
@@ -1154,21 +1174,21 @@ table tbody tr:hover{background:#f8fafc}
 
     <!-- Pelanggaran & poin tata tertib (BK) -->
     <section v-if="view==='pelanggaran'">
-      <div class="flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Pelanggaran Siswa</h2>
+      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><h2 class="h2 !mb-0 mr-auto">Pelanggaran Siswa</h2>
         <select v-model="plq.kelas" @change="loadPl" class="inp"><option value="">Semua kelas</option><option v-for="k in pel.kelas" :key="k">{{k}}</option></select>
         <input type="month" v-model="plq.bulan" @change="loadPl" class="inp"><input v-model.trim="plq.q" @keyup.enter="loadPl" placeholder="Cari, lalu Enter" class="inp">
         <button @click="openPanduanPel" class="btn-o">Panduan & FAQ</button><button @click="printPelanggaran" :disabled="!pel.rows.length" class="btn-o disabled:opacity-50">Cetak / PDF</button><button v-if="canPel" @click="openPl" class="btn-p">Tambah catatan</button></div>
-      <div v-if="perluTindak.length" class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm px-4 py-3 mb-4"><b>Warning / evaluasi khusus</b> (total poin &ge; {{pel.ambang}}):
+      <div v-if="perluTindak.length" class="noprint rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm px-4 py-3 mb-4><b>Warning / evaluasi khusus</b> (total poin &ge; {{pel.ambang}}):
         <span v-for="s in perluTindak" :key="s.nis" class="inline-block mr-3">{{s.nama}} ({{s.kelas}}) <b>{{s.total}}</b></span></div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 noprint"><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Catatan</div><div class="text-xl font-extrabold text-blue-900">{{pelRingkasan.catatan}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Siswa terlibat</div><div class="text-xl font-extrabold text-blue-900">{{pelRingkasan.siswa}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Berat</div><div class="text-xl font-extrabold text-amber-700">{{pelRingkasan.berat}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Warning</div><div class="text-xl font-extrabold text-rose-700">{{pelRingkasan.warning}}</div></div></div>
       <div class="hidden print:grid grid-cols-4 gap-2 mb-3 text-sm"><div><b>Catatan:</b> {{pelRingkasan.catatan}}</div><div><b>Siswa:</b> {{pelRingkasan.siswa}}</div><div><b>Berat:</b> {{pelRingkasan.berat}}</div><div><b>Warning:</b> {{pelRingkasan.warning}}</div></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Siswa</th><th>Kelas</th><th>Pelanggaran</th><th>Poin</th><th>Total efektif</th><th>Tindakan</th><th>Oleh</th><th v-if="canPel"></th></tr></thead>
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Siswa</th><th>Kelas</th><th>Pelanggaran</th><th>Poin</th><th>Total efektif</th><th>Tindakan</th><th>Oleh</th><th v-if="canPel" class="noprint"></th></tr></thead>
         <tbody><tr v-for="r in pel.rows" :key="r.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{r.tanggal}}</td><td>{{r.nama}}</td><td>{{r.kelas}}</td><td>{{r.butir}}<span v-if="r.catatan" class="block text-xs text-slate-500">{{r.catatan}}</span></td>
           <td class="font-bold">{{r.poin}}</td><td><b :class="(pel.total[r.nis]||0)>=pel.ambang?'text-rose-600':''">{{pel.total[r.nis]||0}}</b><span v-if="pel.pengurangan && pel.pengurangan[r.nis]" class="block text-xs text-emerald-700">−{{pel.pengurangan[r.nis]}} pengurangan</span></td><td>{{r.tindakan}}</td><td>{{r.olehNama}}</td>
           <td v-if="canPel" class="pr-3 whitespace-nowrap"><button @click="openKurangi(r)" class="text-emerald-700 font-bold mr-3">Kurangi poin</button><button @click="delPl(r)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!pel.rows.length"><td :colspan="canPel?9:8" class="p-4 text-slate-500">Belum ada catatan pelanggaran.</td></tr></tbody></table></div>
-      <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">LAPORAN PELANGGARAN SISWA & POIN BK</p><p class="text-sm mb-3">Kelas: {{plq.kelas||'Semua Kelas'}} &middot; Periode: {{plq.bulan||'Semua'}} &middot; Dicetak: {{hari0}}</p></div>
+      <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">LAPORAN RESMI PELANGGARAN SISWA DAN POIN BK</p><p class="text-sm mb-3">Satuan Pendidikan: SMKS Ciledug Al-Musaddadiyah Garut &middot; Kelas: {{plq.kelas||'Semua Kelas'}} &middot; Periode: {{plq.bulan||'Semua'}} &middot; Dicetak: {{hari0}}</p></div>
       <p class="text-xs text-slate-500 mt-2 noprint">Total efektif = total pelanggaran dikurangi transaksi pengurangan poin yang tercatat. Riwayat pelanggaran tidak dihapus. Pada HP, gunakan geser tabel ke samping bila diperlukan. Guru BK hanya dapat menghapus catatan miliknya; admin dapat menghapus semuanya.</p>
       <div class="hidden print:block mt-4"><p class="text-xs text-slate-500">Kategori berdasarkan total poin: Ringan 1-10, Sedang 11-25, Berat 26-49, Warning/Evaluasi Khusus mulai 50. Warning bukan keputusan DO otomatis; tata tertib sekolah tetap menjadi acuan.</p><ttd :t="cfg.ttd"></ttd></div>
       <div v-if="showPanduanPel" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -1415,7 +1435,7 @@ const app = createApp({
     tick(); setInterval(tick, 1000); // ubah DOM langsung: tidak memicu render ulang seluruh aplikasi tiap detik
     const mnav = ref(false);
     const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', pkl: 'PKL / Prakerin', tahun: 'Tahun Ajaran', sandi: 'Ganti Sandi', anak: 'Data Anak', notif: 'Pemberitahuan', pelanggaran: 'Pelanggaran Siswa', pengurangan: 'Pengurangan Poin', konseling: 'Konseling BK', perangkat: 'Perangkat Ajar' };
-    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'notif', 'konseling', 'pelanggaran', 'pengurangan', 'sandi'] };
+    const MENU = { ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'notif', 'bimbingan', 'konseling', 'pelanggaran', 'pengurangan', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -1571,7 +1591,7 @@ const app = createApp({
       if (k === 'monitor') { const r = await Promise.all([fetchMon(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; }
       if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; pilIdx.value = ''; }
       if (k === 'jurnal') { const r = await Promise.all([canWrite.value ? api('pilihanNilai') : null, api('pengaturanGet'), fetchJ()]); if (r[0]) pil.value = r[0]; cfg.value = r[1]; }
-      if (k === 'bimbingan') { const r = await Promise.all([user.value.role === 'KEPSEK' ? null : api('bimbinganKelas'), api('pengaturanGet'), fetchB()]); bk.value = r[0] || []; cfg.value = r[1]; }
+      if (k === 'bimbingan') { const r = await Promise.all([['ADMIN','GURU'].includes(user.value.role) ? api('bimbinganKelas') : null, ['ADMIN','GURU','KEPSEK'].includes(user.value.role) ? api('pengaturanGet').catch(() => null) : null, fetchB()]); bk.value = r[0] || []; if (r[1]) cfg.value = r[1]; }
       if (k === 'pengaturan') { const r = await Promise.all([api('pengaturanGet'), api('backupStatus').catch(() => null), api('akademikGet').catch(() => null), api('kunciGet').catch(() => null), api('ukuranData').catch(() => null)]); ukd.value = r[4]; cfg.value = r[0]; { const bi = await api('blokInfo').catch(() => null); if (bi) { blokInfo.value = bi; Object.assign(bf2, { acuan: bi.acuan, blok: bi.blokAcuan, minggu: bi.minggu }); } } backupUrl.value = ''; bk2.value = r[1]; ak.value = r[2]; kunci.value = r[3]; }
       if (k === 'log') logs.value = await api('logList');
       if (k === 'bimbingansaya') { bimbTab.value = 'wali'; await Promise.all([fetchB(), fetchKonseling()]); }
@@ -2254,7 +2274,7 @@ const app = createApp({
     /* ====== Konseling BK ====== */
     const konseling = ref({ kelas: [], rows: [] }), ksq = reactive({ kelas: '', bulan: '', q: '' }), showKonseling = ref(false), konselingSiswa = ref([]);
     const kfBK = reactive({ id: '', tanggal: hari0, kelas: '', nis: '', jenis: 'Belajar', topik: '', catatan: '', tindakLanjut: '', status: 'Baru', jadwalBerikutnya: '' });
-    const canKonseling = computed(() => !!user.value && ['ADMIN', 'BK'].includes(user.value.role));
+    const canKonseling = computed(() => !!user.value && ['ADMIN', 'BK'].includes(user.value.role)); // GURU wali kelas dan KEPSEK hanya membaca
     const JENIS_KONSELING = ['Belajar', 'Pribadi', 'Sosial', 'Karier', 'Keluarga', 'Disiplin', 'Lainnya'];
     const STATUS_KONSELING = ['Baru', 'Berjalan', 'Monitoring', 'Selesai'];
     let konselingReq = 0, konselingSiswaReq = 0;
