@@ -7,7 +7,7 @@
   "background_color": "#0b3d91",
   "theme_color": "#0b3d91",
   "lang": "id",
-  "description": "Portal Akademik SMK CALM",
+  "description": "Presensi, nilai, jurnal mengajar, dan bimbingan SMKS Ciledug Al-Musaddadiyah Garut.",
   "icons": [
     {
       "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiD-8YPFS6i86EyZZNDUhwuam5ro_mtc9So2muvB7EDWz1Zp6rarLubvVS3vfVVoto_S6SaHlIPPnmNaddUugGUztWkJYhDwwT8CU1BcUuq9TNyxnHKa6B44iDBx6LjR1-z3r7_C34jviaWeOYgk4bNJHsziPV4KR5mQjY69HVhyphenhyphenR3STD4xp-b46x_HeR4/s192/An8Em6pLCtVUNFZTK-rgdQG9pKiDxE1AR7m_1QO_5slD3C5qFXYq7S9suI1ztpViB_aUnbOGE2-Y71AU9SF3GjQzZ09xbw5aat-JT_7ptJ4VcfdGeJ73DWbHD9IDtVHa_16MjCj09HJ4eGBvZMo-removebg-preview.png",
@@ -22,5 +22,8 @@
       "purpose": "any"
     }
   ],
-  "id": "./"
+  "id": "./",
+  "categories": [
+    "education"
+  ]
 }
