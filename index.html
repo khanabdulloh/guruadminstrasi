@@ -313,6 +313,118 @@ table tbody tr:hover{background:#f8fafc}
   .calm-table-polish table:not(.calm-table-print) tbody tr:hover { background: transparent; }
 }
 </style>
+
+<style id="calm-table-audit-fix-v2">
+/* Audit lanjutan: sembunyikan kontrol saat mencetak tabel dan rapikan tabel BK. */
+@media print {
+  body.cetak-tabel .noprint,
+  body.cetak-tabel .modal-wrap,
+  body.cetak-tabel aside,
+  body.cetak-tabel button,
+  body.cetak-tabel input,
+  body.cetak-tabel select,
+  body.cetak-tabel textarea {
+    display: none !important;
+  }
+  body.cetak-tabel main {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  /* Kolom Aksi yang berisi tombol tidak ikut tercetak. Baris kosong ber-colspan tetap dipertahankan. */
+  body.cetak-tabel table:has(tbody td button) thead th:last-child,
+  body.cetak-tabel table:has(tbody td button) tbody tr:not(:has(td[colspan])) td:last-child,
+  body.cetak-pelanggaran table:has(tbody td button) thead th:last-child,
+  body.cetak-pelanggaran table:has(tbody td button) tbody tr:not(:has(td[colspan])) td:last-child {
+    display: none !important;
+  }
+  body.cetak-tabel table button,
+  body.cetak-pelanggaran table button {
+    display: none !important;
+  }
+  body.cetak-tabel .overflow-x-auto,
+  body.cetak-pelanggaran .overflow-x-auto {
+    overflow: visible !important;
+  }
+  body.cetak-tabel .bk-audit-table,
+  body.cetak-pelanggaran .bk-audit-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: auto !important;
+  }
+}
+.calm-table-polish .bk-audit-table {
+  width: 100%;
+  min-width: 1040px;
+  table-layout: fixed;
+}
+.calm-table-polish .bk-audit-table th,
+.calm-table-polish .bk-audit-table td {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.calm-table-polish .bk-konseling-table { min-width: 1190px; }
+.calm-table-polish .bk-konseling-table th:nth-child(1),
+.calm-table-polish .bk-konseling-table td:nth-child(1) { width: 92px; }
+.calm-table-polish .bk-konseling-table th:nth-child(2),
+.calm-table-polish .bk-konseling-table td:nth-child(2) { width: 150px; }
+.calm-table-polish .bk-konseling-table th:nth-child(3),
+.calm-table-polish .bk-konseling-table td:nth-child(3) { width: 78px; }
+.calm-table-polish .bk-konseling-table th:nth-child(4),
+.calm-table-polish .bk-konseling-table td:nth-child(4) { width: 120px; }
+.calm-table-polish .bk-konseling-table th:nth-child(5),
+.calm-table-polish .bk-konseling-table td:nth-child(5) { width: 260px; }
+.calm-table-polish .bk-konseling-table th:nth-child(6),
+.calm-table-polish .bk-konseling-table td:nth-child(6) { width: 100px; }
+.calm-table-polish .bk-konseling-table th:nth-child(7),
+.calm-table-polish .bk-konseling-table td:nth-child(7) { width: 125px; }
+.calm-table-polish .bk-konseling-table th:nth-child(8),
+.calm-table-polish .bk-konseling-table td:nth-child(8) { width: 135px; }
+.calm-table-polish .bk-konseling-table th:nth-child(9),
+.calm-table-polish .bk-konseling-table td:nth-child(9) { width: 130px; }
+
+.calm-table-polish .bk-pelanggaran-table { min-width: 1210px; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(1),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(1) { width: 92px; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(2),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(2) { width: 155px; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(3),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(3) { width: 75px; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(4),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(4) { width: 245px; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(5),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(5) { width: 62px; text-align: center; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(6),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(6) { width: 110px; text-align: center; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(7),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(7) { width: 180px; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(8),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(8) { width: 135px; }
+.calm-table-polish .bk-pelanggaran-table th:nth-child(9),
+.calm-table-polish .bk-pelanggaran-table td:nth-child(9) { width: 155px; }
+
+.calm-table-polish .bk-pengurangan-table { min-width: 850px; }
+.calm-table-polish .bk-pengurangan-table th:nth-child(1),
+.calm-table-polish .bk-pengurangan-table td:nth-child(1) { width: 190px; }
+.calm-table-polish .bk-pengurangan-table th:nth-child(2),
+.calm-table-polish .bk-pengurangan-table td:nth-child(2) { width: 85px; }
+.calm-table-polish .bk-pengurangan-table th:nth-child(3),
+.calm-table-polish .bk-pengurangan-table td:nth-child(3) { width: 145px; }
+.calm-table-polish .bk-pengurangan-table th:nth-child(4),
+.calm-table-polish .bk-pengurangan-table td:nth-child(4) { width: 145px; }
+.calm-table-polish .bk-pengurangan-table th:nth-child(5),
+.calm-table-polish .bk-pengurangan-table td:nth-child(5) { width: 150px; }
+.calm-table-polish .bk-pengurangan-table th:nth-child(6),
+.calm-table-polish .bk-pengurangan-table td:nth-child(6) { width: 135px; }
+
+@media (max-width: 640px) {
+  .calm-table-polish .bk-audit-table { font-size: 12px; }
+  .calm-table-polish .bk-audit-table th,
+  .calm-table-polish .bk-audit-table td { padding: 8px 9px; }
+}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
@@ -1404,7 +1516,7 @@ table tbody tr:hover{background:#f8fafc}
         <button v-if="canKonseling" @click="openKonseling" class="btn-p">Tambah konseling</button>
       </div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
-        <table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Siswa</th><th>Kelas</th><th>Jenis</th><th>Topik / masalah</th><th>Status</th><th>Jadwal berikutnya</th><th>Dicatat oleh</th><th v-if="canKonseling">Aksi</th></tr></thead>
+        <table class="w-full text-sm bk-audit-table bk-konseling-table"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Siswa</th><th>Kelas</th><th>Jenis</th><th>Topik / masalah</th><th>Status</th><th>Jadwal berikutnya</th><th>Dicatat oleh</th><th v-if="canKonseling" class="noprint">Aksi</th></tr></thead>
           <tbody><tr v-for="r in konseling.rows" :key="r.id" class="border-t align-top">
             <td class="p-3 whitespace-nowrap">{{r.tanggal}}</td><td class="font-semibold">{{r.nama}}<span class="block text-xs font-normal text-slate-400">{{r.nis}}</span></td><td>{{r.kelas}}</td><td>{{r.jenis}}</td>
             <td class="min-w-[14rem]"><b>{{r.topik}}</b><span class="block text-xs text-slate-500 mt-1 whitespace-pre-line">{{r.catatan}}</span><span v-if="r.tindakLanjut" class="block text-xs text-sky-700 mt-1"><b>Tindak lanjut:</b> {{r.tindakLanjut}}</span></td>
@@ -1442,11 +1554,11 @@ table tbody tr:hover{background:#f8fafc}
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 noprint"><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Catatan</div><div class="text-xl font-extrabold text-blue-900">{{pelRingkasan.catatan}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Siswa terlibat</div><div class="text-xl font-extrabold text-blue-900">{{pelRingkasan.siswa}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Berat</div><div class="text-xl font-extrabold text-amber-700">{{pelRingkasan.berat}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Perlu evaluasi</div><div class="text-xl font-extrabold text-rose-700">{{pelRingkasan.warning}}</div></div></div>
       <div class="hidden print:block pel-print-heading"><kop :k="cfg.kop"></kop><h2 class="pel-print-title">LAPORAN PELANGGARAN SISWA DAN POIN BIMBINGAN KONSELING</h2><div class="pel-print-meta"><span><b>Kelas:</b> {{plq.kelas||'Semua kelas'}}</span><span><b>Periode:</b> {{plq.bulan||'Semua periode'}}</span><span><b>Dicetak:</b> {{hari0}}</span></div></div>
       <div class="hidden print:grid grid-cols-4 gap-2 mb-3 text-sm pel-print-summary"><div><b>Jumlah catatan</b><span>{{pelRingkasan.catatan}}</span></div><div><b>Siswa terlibat</b><span>{{pelRingkasan.siswa}}</span></div><div><b>Kategori berat</b><span>{{pelRingkasan.berat}}</span></div><div><b>Perlu evaluasi</b><span>{{pelRingkasan.warning}}</span></div></div>
-      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto pel-print-table"><table class="w-full text-sm">
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto pel-print-table"><table class="w-full text-sm bk-audit-table bk-pelanggaran-table">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Siswa</th><th>Kelas</th><th>Pelanggaran</th><th>Poin</th><th>Total poin efektif</th><th>Tindakan</th><th>Dicatat oleh</th><th v-if="canPel" class="noprint">Aksi</th></tr></thead>
         <tbody><tr v-for="r in pel.rows" :key="r.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{r.tanggal}}</td><td>{{r.nama}}</td><td>{{r.kelas}}</td><td>{{r.butir}}<span v-if="r.catatan" class="block text-xs text-slate-500">{{r.catatan}}</span></td>
           <td class="font-bold">{{r.poin}}</td><td><b :class="(pel.total[r.nis]||0)>=pel.ambang?'text-rose-600':''">{{pel.total[r.nis]||0}}</b><span v-if="pel.pengurangan && pel.pengurangan[r.nis]" class="block text-xs text-emerald-700">−{{pel.pengurangan[r.nis]}} pengurangan</span></td><td>{{r.tindakan}}</td><td>{{r.olehNama}}</td>
-          <td v-if="canPel" class="pr-3 whitespace-nowrap"><button @click="openKurangi(r)" class="text-emerald-700 font-bold mr-3">Kurangi poin</button><button @click="delPl(r)" class="text-rose-600 font-bold">Hapus</button></td></tr>
+          <td v-if="canPel" class="pr-3 whitespace-nowrap noprint"><button @click="openKurangi(r)" class="text-emerald-700 font-bold mr-3">Kurangi poin</button><button @click="delPl(r)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!pel.rows.length"><td :colspan="canPel?9:8" class="p-4 text-slate-500">Belum ada catatan pelanggaran.</td></tr></tbody></table></div>
       <p class="text-xs text-slate-500 mt-2 noprint">Total efektif = total pelanggaran dikurangi transaksi pengurangan poin yang tercatat. Riwayat pelanggaran tidak dihapus. Pada HP, gunakan geser tabel ke samping bila diperlukan. Guru BK hanya dapat menghapus catatan miliknya; admin dapat menghapus semuanya.</p>
       <div class="hidden print:block pel-print-notes"><p><b>Keterangan:</b> Total poin efektif adalah total poin pelanggaran setelah dikurangi transaksi pengurangan poin yang tercatat.</p><p>Kategori total poin: Ringan 1–10, Sedang 11–25, Berat 26–49, Peringatan/Evaluasi Khusus mulai 50. Status peringatan bukan keputusan DO otomatis; tindak lanjut tetap mengacu pada tata tertib sekolah.</p><div v-if="user.role==='BK'" class="pel-print-signature"><div>{{hari0}}</div><div class="pel-print-signature-role">Guru Bimbingan dan Konseling</div><div class="pel-print-signature-space"></div><div class="pel-print-signature-name">{{user.nama||'................................'}}</div></div><ttd v-else :t="cfg.ttd"></ttd></div>
@@ -1486,7 +1598,7 @@ table tbody tr:hover{background:#f8fafc}
       <div class="flex flex-wrap items-center gap-3 mb-4"><div class="mr-auto"><h2 class="h2 !mb-0">Pengurangan Poin</h2><p class="text-sm text-slate-500 mt-1">Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.</p></div>
         <select v-model="plq.kelas" @change="loadPl" class="inp"><option value="">Semua kelas</option><option v-for="k in pel.kelas" :key="k">{{k}}</option></select><input v-model.trim="plq.q" @keyup.enter="loadPl" placeholder="Cari siswa / pelanggaran" class="inp">
       </div>
-      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Siswa</th><th>Kelas</th><th>Total pelanggaran</th><th>Sudah dikurangi</th><th>Total poin efektif</th><th>Aksi</th></tr></thead>
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm bk-audit-table bk-pengurangan-table"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Siswa</th><th>Kelas</th><th>Total pelanggaran</th><th>Sudah dikurangi</th><th>Total poin efektif</th><th class="noprint">Aksi</th></tr></thead>
         <tbody><tr v-for="s in penguranganSiswa" :key="s.nis" class="border-t"><td class="p-3 font-semibold">{{s.nama}}<span class="block text-xs text-slate-400">{{s.nis}}</span></td><td>{{s.kelas}}</td><td>{{s.totalPelanggaran}}</td><td class="text-emerald-700 font-bold">−{{s.totalPengurangan}}</td><td class="font-extrabold" :class="s.totalEfektif>=pel.ambang?'text-rose-600':''">{{s.totalEfektif}}</td><td class="pr-3"><button @click="openKurangi(s)" class="text-emerald-700 font-bold">Kurangi poin</button></td></tr>
         <tr v-if="!penguranganSiswa.length"><td colspan="6" class="p-4 text-slate-500">Belum ada siswa dengan catatan pelanggaran yang cocok.</td></tr></tbody></table></div>
       <p class="text-xs text-slate-500 mt-2">Pengurangan tidak menghapus catatan pelanggaran. Sistem hanya menghitung total efektif dari akumulasi pelanggaran dikurangi transaksi pengurangan.</p>
@@ -2003,7 +2115,11 @@ const app = createApp({
 
     const fetchJ = async () => jurnal.value = await api('jurnalList', { bulan: bulan.value, q: q.value });
     const fetchB = async () => bimb.value = await api('bimbinganList', { bulan: bulan.value, q: q.value });
-    const loadJurnal = () => run(fetchJ), loadBimb = () => run(fetchB), printPage = () => window.print();
+    const loadJurnal = () => run(fetchJ), loadBimb = () => run(fetchB), printPage = () => {
+      document.body.classList.add('cetak-tabel');
+      window.addEventListener('afterprint', () => document.body.classList.remove('cetak-tabel'), { once: true });
+      window.print();
+    };
     const saveJurnal = () => run(async () => {
       if (jr.id) await api('jurnalEdit', { id: jr.id, tanggal: jr.tanggal, materi: jr.materi, catatan: jr.catatan });
       else { const p = pil.value[jr.pi]; if (!p) throw new Error('Pilih kelas dan mapel'); await api('jurnalSave', { tanggal: jr.tanggal, ...p, materi: jr.materi, catatan: jr.catatan }); }
