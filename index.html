@@ -23,25 +23,47 @@
 .embedded .min-h-screen,.embedded aside{min-height:0}.embedded aside{height:auto!important;position:static!important;max-height:none!important}.embedded .login-wrap{min-height:680px}.embedded .modal-box{margin:1rem auto auto}
 .kartu-wrap,.rapor-wrap{display:none}
 @page rapor{size:A4 portrait;margin:15mm}
-@page pelanggaran{size:A4 landscape;margin:12mm}
+@page pelanggaran{size:A4 landscape;margin:10mm 11mm 12mm}
 @media print{
   body.cetak-rapor main>*:not(.rapor-wrap){display:none!important}
   body.cetak-rapor .rapor-wrap{display:block;page:rapor}
   .rapor-page{break-after:page;page-break-after:always}
-  body.cetak-pelanggaran{background:#fff!important;color:#111827!important;font-size:9pt}
-  body.cetak-pelanggaran main{padding:0!important;max-width:none!important}
+  body.cetak-pelanggaran{background:#fff!important;color:#172033!important;font-size:8.5pt;line-height:1.35;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.cetak-pelanggaran main{padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
   body.cetak-pelanggaran main>*:not(section){display:none!important}
   body.cetak-pelanggaran aside,body.cetak-pelanggaran .noprint,body.cetak-pelanggaran .modal-wrap{display:none!important}
-  body.cetak-pelanggaran section{display:block!important;page:pelanggaran}
-  body.cetak-pelanggaran section>div{box-shadow:none!important;border-color:#d1d5db!important}
-  body.cetak-pelanggaran section .hidden.print\\:block{display:block!important}
-  body.cetak-pelanggaran section .hidden.print\\:grid{display:grid!important}
-  body.cetak-pelanggaran table{width:100%;border-collapse:collapse;font-size:8pt;table-layout:auto}
+  body.cetak-pelanggaran section{display:block!important;page:pelanggaran;width:100%!important;margin:0!important;padding:0!important}
+  body.cetak-pelanggaran section>div{box-shadow:none!important;border-color:#d1d5db!important;border-radius:0!important}
+  body.cetak-pelanggaran section .hidden.print\:block{display:block!important}
+  body.cetak-pelanggaran section .hidden.print\:grid{display:grid!important}
+  body.cetak-pelanggaran .pel-print-heading{margin:0 0 8pt!important;padding:0 0 6pt!important;border-bottom:1.5pt solid #243b5a!important}
+  body.cetak-pelanggaran .pel-print-heading>kop{display:block;margin-bottom:5pt}
+  body.cetak-pelanggaran .pel-print-title{text-align:center;font-size:13pt;line-height:1.25;font-weight:800;letter-spacing:.25pt;margin:8pt 0 7pt!important;text-decoration:none!important}
+  body.cetak-pelanggaran .pel-print-meta{display:flex;justify-content:space-between;gap:12pt;flex-wrap:wrap;font-size:8pt;margin-bottom:2pt}
+  body.cetak-pelanggaran .pel-print-summary{grid-template-columns:repeat(4,minmax(0,1fr));gap:6pt!important;margin:0 0 8pt!important}
+  body.cetak-pelanggaran .pel-print-summary>div{border:1px solid #b9c4d2;padding:5pt 7pt;display:flex;justify-content:space-between;gap:6pt;align-items:center;background:#f5f7fa!important}
+  body.cetak-pelanggaran .pel-print-summary b{font-size:7.5pt;font-weight:600}
+  body.cetak-pelanggaran .pel-print-summary span{font-size:10pt;font-weight:800}
+  body.cetak-pelanggaran .pel-print-table{overflow:visible!important;border:0!important;margin:0!important}
+  body.cetak-pelanggaran table{width:100%!important;border-collapse:collapse!important;font-size:7.4pt!important;table-layout:fixed!important}
   body.cetak-pelanggaran thead{display:table-header-group}
+  body.cetak-pelanggaran tbody{display:table-row-group}
   body.cetak-pelanggaran tr{break-inside:avoid;page-break-inside:avoid}
-  body.cetak-pelanggaran th,body.cetak-pelanggaran td{border:1px solid #9ca3af!important;padding:5px 6px!important;color:#111827!important;vertical-align:top}
-  body.cetak-pelanggaran th{background:#e5e7eb!important;font-weight:700}
-  body.cetak-pelanggaran .overflow-x-auto{overflow:visible!important}
+  body.cetak-pelanggaran th,body.cetak-pelanggaran td{border:.6pt solid #9aa7b7!important;padding:4pt 4.5pt!important;color:#172033!important;vertical-align:top!important;overflow-wrap:anywhere;word-break:normal}
+  body.cetak-pelanggaran th{background:#e8edf3!important;font-size:7.2pt!important;font-weight:800!important;text-align:left}
+  body.cetak-pelanggaran th:nth-child(1){width:8%}
+  body.cetak-pelanggaran th:nth-child(2){width:13%}
+  body.cetak-pelanggaran th:nth-child(3){width:8%}
+  body.cetak-pelanggaran th:nth-child(4){width:24%}
+  body.cetak-pelanggaran th:nth-child(5){width:5%}
+  body.cetak-pelanggaran th:nth-child(6){width:9%}
+  body.cetak-pelanggaran th:nth-child(7){width:16%}
+  body.cetak-pelanggaran th:nth-child(8){width:10%}
+  body.cetak-pelanggaran th.noprint,body.cetak-pelanggaran td.noprint{display:none!important}
+  body.cetak-pelanggaran tbody tr:nth-child(even){background:#f8fafc!important}
+  body.cetak-pelanggaran .pel-print-notes{margin-top:8pt!important;padding-top:5pt;border-top:1px solid #b9c4d2;font-size:7.5pt;color:#39465a}
+  body.cetak-pelanggaran .pel-print-notes p{margin:0 0 3pt!important}
+  body.cetak-pelanggaran .pel-print-notes ttd{display:block;margin-top:10pt;break-inside:avoid;page-break-inside:avoid}
   body.cetak-pelanggaran button{display:none!important}
 }
 button:disabled{cursor:not-allowed}
@@ -1181,16 +1203,16 @@ table tbody tr:hover{background:#f8fafc}
       <div v-if="perluTindak.length" class="noprint rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm px-4 py-3 mb-4><b>Warning / evaluasi khusus</b> (total poin &ge; {{pel.ambang}}):
         <span v-for="s in perluTindak" :key="s.nis" class="inline-block mr-3">{{s.nama}} ({{s.kelas}}) <b>{{s.total}}</b></span></div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 noprint"><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Catatan</div><div class="text-xl font-extrabold text-blue-900">{{pelRingkasan.catatan}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Siswa terlibat</div><div class="text-xl font-extrabold text-blue-900">{{pelRingkasan.siswa}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Berat</div><div class="text-xl font-extrabold text-amber-700">{{pelRingkasan.berat}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Warning</div><div class="text-xl font-extrabold text-rose-700">{{pelRingkasan.warning}}</div></div></div>
-      <div class="hidden print:grid grid-cols-4 gap-2 mb-3 text-sm"><div><b>Catatan:</b> {{pelRingkasan.catatan}}</div><div><b>Siswa:</b> {{pelRingkasan.siswa}}</div><div><b>Berat:</b> {{pelRingkasan.berat}}</div><div><b>Warning:</b> {{pelRingkasan.warning}}</div></div>
-      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+      <div class="hidden print:block pel-print-heading"><kop :k="cfg.kop"></kop><h2 class="pel-print-title">LAPORAN PELANGGARAN SISWA DAN POIN BIMBINGAN KONSELING</h2><div class="pel-print-meta"><span><b>Kelas:</b> {{plq.kelas||'Semua kelas'}}</span><span><b>Periode:</b> {{plq.bulan||'Semua periode'}}</span><span><b>Dicetak:</b> {{hari0}}</span></div></div>
+      <div class="hidden print:grid grid-cols-4 gap-2 mb-3 text-sm pel-print-summary"><div><b>Jumlah catatan</b><span>{{pelRingkasan.catatan}}</span></div><div><b>Siswa terlibat</b><span>{{pelRingkasan.siswa}}</span></div><div><b>Kategori berat</b><span>{{pelRingkasan.berat}}</span></div><div><b>Perlu evaluasi</b><span>{{pelRingkasan.warning}}</span></div></div>
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto pel-print-table"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Siswa</th><th>Kelas</th><th>Pelanggaran</th><th>Poin</th><th>Total efektif</th><th>Tindakan</th><th>Oleh</th><th v-if="canPel" class="noprint"></th></tr></thead>
         <tbody><tr v-for="r in pel.rows" :key="r.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{r.tanggal}}</td><td>{{r.nama}}</td><td>{{r.kelas}}</td><td>{{r.butir}}<span v-if="r.catatan" class="block text-xs text-slate-500">{{r.catatan}}</span></td>
           <td class="font-bold">{{r.poin}}</td><td><b :class="(pel.total[r.nis]||0)>=pel.ambang?'text-rose-600':''">{{pel.total[r.nis]||0}}</b><span v-if="pel.pengurangan && pel.pengurangan[r.nis]" class="block text-xs text-emerald-700">−{{pel.pengurangan[r.nis]}} pengurangan</span></td><td>{{r.tindakan}}</td><td>{{r.olehNama}}</td>
           <td v-if="canPel" class="pr-3 whitespace-nowrap"><button @click="openKurangi(r)" class="text-emerald-700 font-bold mr-3">Kurangi poin</button><button @click="delPl(r)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!pel.rows.length"><td :colspan="canPel?9:8" class="p-4 text-slate-500">Belum ada catatan pelanggaran.</td></tr></tbody></table></div>
-      <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">LAPORAN RESMI PELANGGARAN SISWA DAN POIN BK</p><p class="text-sm mb-3">Satuan Pendidikan: SMKS Ciledug Al-Musaddadiyah Garut &middot; Kelas: {{plq.kelas||'Semua Kelas'}} &middot; Periode: {{plq.bulan||'Semua'}} &middot; Dicetak: {{hari0}}</p></div>
       <p class="text-xs text-slate-500 mt-2 noprint">Total efektif = total pelanggaran dikurangi transaksi pengurangan poin yang tercatat. Riwayat pelanggaran tidak dihapus. Pada HP, gunakan geser tabel ke samping bila diperlukan. Guru BK hanya dapat menghapus catatan miliknya; admin dapat menghapus semuanya.</p>
-      <div class="hidden print:block mt-4"><p class="text-xs text-slate-500">Kategori berdasarkan total poin: Ringan 1-10, Sedang 11-25, Berat 26-49, Warning/Evaluasi Khusus mulai 50. Warning bukan keputusan DO otomatis; tata tertib sekolah tetap menjadi acuan.</p><ttd :t="cfg.ttd"></ttd></div>
+      <div class="hidden print:block pel-print-notes"><p><b>Keterangan:</b> Total efektif adalah total poin pelanggaran setelah dikurangi transaksi pengurangan poin yang tercatat.</p><p>Kategori total poin: Ringan 1–10, Sedang 11–25, Berat 26–49, Warning/Evaluasi Khusus mulai 50. Status warning bukan keputusan DO otomatis; tindak lanjut tetap mengacu pada tata tertib sekolah.</p><ttd :t="cfg.ttd"></ttd></div>
       <div v-if="showPanduanPel" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center gap-3 mb-4"><h3 class="font-extrabold text-blue-900 mr-auto">Panduan Poin & FAQ BK</h3><button @click="showPanduanPel=false" class="btn-o">Tutup</button></div>
         <p class="text-sm text-slate-600 mb-4">Panduan awal untuk membantu Guru BK. <b>Bukan pengganti tata tertib resmi sekolah.</b> Jika ada perbedaan, tata tertib sekolah yang berlaku menjadi acuan.</p>
