@@ -38,9 +38,13 @@
   body.cetak-pelanggaran .pel-print-summary{display:grid!important}
   body.cetak-pelanggaran .pel-print-notes{display:block!important}
   body.cetak-pelanggaran .pel-print-heading{margin:0 0 8pt!important;padding:0 0 6pt!important;border-bottom:1.5pt solid #243b5a!important}
-  /* Komponen Vue <kop> dirender sebagai elemen div, bukan tag kop. */
-  body.cetak-pelanggaran .pel-print-heading>div:first-child{display:block!important;width:100%!important;margin-bottom:5pt!important}
-  body.cetak-pelanggaran .pel-print-heading>div:first-child img{display:block!important;max-width:64px!important;max-height:64px!important;object-fit:contain!important}
+  /* Komponen Vue <kop> dirender sebagai div. Grid tiga kolom menjaga logo kiri/kanan tetap di tempat dan teks kop tepat di tengah saat dicetak. */
+  body.cetak-pelanggaran .pel-print-heading>div:first-child{display:grid!important;grid-template-columns:48pt minmax(0,1fr) 48pt!important;align-items:center!important;column-gap:8pt!important;width:100%!important;margin:0 0 5pt!important;padding:0 0 6pt!important;border-bottom:2pt double #243b5a!important;box-sizing:border-box!important}
+  body.cetak-pelanggaran .pel-print-heading>div:first-child>div:first-child,
+  body.cetak-pelanggaran .pel-print-heading>div:first-child>div:last-child{display:flex!important;align-items:center!important;justify-content:center!important;width:48pt!important;min-width:48pt!important;max-width:48pt!important}
+  body.cetak-pelanggaran .pel-print-heading>div:first-child>div:nth-child(2){display:block!important;min-width:0!important;width:100%!important;text-align:center!important;overflow-wrap:anywhere!important}
+  body.cetak-pelanggaran .pel-print-heading>div:first-child img{display:block!important;width:44pt!important;height:44pt!important;max-width:44pt!important;max-height:44pt!important;object-fit:contain!important;margin:0 auto!important}
+  body.cetak-pelanggaran .pel-print-heading>div:first-child>div:nth-child(2)>div{line-height:1.2!important}
   body.cetak-pelanggaran .pel-print-heading .pel-print-title{display:block!important}
   body.cetak-pelanggaran .pel-print-title{text-align:center;font-size:13pt;line-height:1.25;font-weight:800;letter-spacing:.25pt;margin:8pt 0 7pt!important;text-decoration:none!important}
   body.cetak-pelanggaran .pel-print-meta{display:flex;justify-content:space-between;gap:12pt;flex-wrap:wrap;font-size:8pt;margin-bottom:2pt}
@@ -67,7 +71,10 @@
   body.cetak-pelanggaran tbody tr:nth-child(even){background:#f8fafc!important}
   body.cetak-pelanggaran .pel-print-notes{margin-top:8pt!important;padding-top:5pt;border-top:1px solid #b9c4d2;font-size:7.5pt;color:#39465a}
   body.cetak-pelanggaran .pel-print-notes p{margin:0 0 3pt!important}
-  body.cetak-pelanggaran .pel-print-notes ttd{display:block;margin-top:10pt;break-inside:avoid;page-break-inside:avoid}
+  body.cetak-pelanggaran .pel-print-signature{width:190pt;margin:14pt 0 0 auto;text-align:center;font-size:8pt;line-height:1.35;break-inside:avoid;page-break-inside:avoid}
+  body.cetak-pelanggaran .pel-print-signature-role{margin-top:2pt}
+  body.cetak-pelanggaran .pel-print-signature-space{height:44pt}
+  body.cetak-pelanggaran .pel-print-signature-name{display:inline-block;min-width:145pt;padding-top:2pt;border-top:.6pt solid #172033;font-weight:800;text-decoration:underline;text-underline-offset:2pt}
   body.cetak-pelanggaran button{display:none!important}
 }
 button:disabled{cursor:not-allowed}
@@ -1216,7 +1223,7 @@ table tbody tr:hover{background:#f8fafc}
           <td v-if="canPel" class="pr-3 whitespace-nowrap"><button @click="openKurangi(r)" class="text-emerald-700 font-bold mr-3">Kurangi poin</button><button @click="delPl(r)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!pel.rows.length"><td :colspan="canPel?9:8" class="p-4 text-slate-500">Belum ada catatan pelanggaran.</td></tr></tbody></table></div>
       <p class="text-xs text-slate-500 mt-2 noprint">Total efektif = total pelanggaran dikurangi transaksi pengurangan poin yang tercatat. Riwayat pelanggaran tidak dihapus. Pada HP, gunakan geser tabel ke samping bila diperlukan. Guru BK hanya dapat menghapus catatan miliknya; admin dapat menghapus semuanya.</p>
-      <div class="hidden print:block pel-print-notes"><p><b>Keterangan:</b> Total efektif adalah total poin pelanggaran setelah dikurangi transaksi pengurangan poin yang tercatat.</p><p>Kategori total poin: Ringan 1–10, Sedang 11–25, Berat 26–49, Warning/Evaluasi Khusus mulai 50. Status warning bukan keputusan DO otomatis; tindak lanjut tetap mengacu pada tata tertib sekolah.</p><ttd :t="cfg.ttd"></ttd></div>
+      <div class="hidden print:block pel-print-notes"><p><b>Keterangan:</b> Total efektif adalah total poin pelanggaran setelah dikurangi transaksi pengurangan poin yang tercatat.</p><p>Kategori total poin: Ringan 1–10, Sedang 11–25, Berat 26–49, Warning/Evaluasi Khusus mulai 50. Status warning bukan keputusan DO otomatis; tindak lanjut tetap mengacu pada tata tertib sekolah.</p><div class="pel-print-signature"><div>{{hari0}}</div><div class="pel-print-signature-role">Guru Bimbingan dan Konseling</div><div class="pel-print-signature-space"></div><div class="pel-print-signature-name">{{user.nama||'................................'}}</div></div></div>
       <div v-if="showPanduanPel" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center gap-3 mb-4"><h3 class="font-extrabold text-blue-900 mr-auto">Panduan Poin & FAQ BK</h3><button @click="showPanduanPel=false" class="btn-o">Tutup</button></div>
         <p class="text-sm text-slate-600 mb-4">Panduan awal untuk membantu Guru BK. <b>Bukan pengganti tata tertib resmi sekolah.</b> Jika ada perbedaan, tata tertib sekolah yang berlaku menjadi acuan.</p>
