@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Portal Akademik SMK CALM</title>
-<meta name="theme-color" content="#0b3d91"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMK CALM">
+<meta name="theme-color" content="#0b3d91"><meta name="color-scheme" content="light"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMK CALM">
 <script>window.__pwa=null;addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__pwa=e;dispatchEvent(new Event('pwa-ready'))});if('serviceWorker' in navigator&&location.protocol==='https:'&&window.self===window.top)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})</script>
 <script>if(window.self!==window.top)document.documentElement.classList.add("embedded")</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin><link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script><script>window.Vue||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.38/vue.global.prod.min.js"><\/script>')</script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}
 .login-bg{background:radial-gradient(1200px 600px at 10% -10%,#1b56c0 0%,transparent 60%),radial-gradient(900px 500px at 110% 110%,#134aa8 0%,transparent 55%),linear-gradient(160deg,#0b3d91 0%,#072a66 55%,#041536 100%)}
 .login-bg::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,#000,transparent 85%);-webkit-mask-image:linear-gradient(to bottom,#000,transparent 85%)}
@@ -423,6 +423,198 @@ table tbody tr:hover{background:#f8fafc}
   .calm-table-polish .bk-audit-table th,
   .calm-table-polish .bk-audit-table td { padding: 8px 9px; }
 }
+</style>
+
+<style id="portal-design-v2">
+/* Desain v2 — hanya presentasi. Template, handler, dan API tidak diubah.
+   Blok A: utilitas Tailwind yang dipakai template tetapi tidak ada di CSS terkompilasi (bug tata letak).
+   Blok B: penyempurnaan visual khusus layar; seluruhnya di dalam @media screen sehingga cetak tidak terpengaruh. */
+
+/* ===== A. Utilitas yang hilang ===== */
+.bg-blue-50{background-color:#eff6ff}
+.text-sky-600{color:#0284c7}
+.hover\:text-slate-800:hover{color:#1e293b}
+.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.h-20{height:5rem}
+.mt-12{margin-top:3rem}
+.p-8{padding:2rem}
+.pl-5{padding-left:1.25rem}
+.leading-7{line-height:1.75rem}
+.list-disc{list-style-type:disc}
+.space-y-3>:not([hidden])~:not([hidden]){margin-top:.75rem;margin-bottom:0}
+.max-w-xs{max-width:20rem}
+.max-w-lg{max-width:32rem}
+.min-w-\[14rem\]{min-width:14rem}
+.max-h-\[90vh\]{max-height:90vh}
+@media (min-width:640px){.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:max-w-xs{max-width:20rem}}
+@media print{.print\:grid{display:grid}}
+
+/* ===== B. Penyempurnaan visual (layar) ===== */
+@media screen {
+  :root{--navy:#0b3d91;--navy-d:#061f4d;--line:#e3e9f2;--bg:#f4f6fb;--ink:#1e2b44;--muted:#64748b}
+  body.calm-table-polish{background-color:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  ::selection{background:#fde68a;color:#0f172a}
+
+  /* --- Bilah samping --- */
+  aside[aria-label="Menu utama"]{
+    background-image:linear-gradient(180deg,#0a2a63 0%,#061f4d 40%,#041636 100%);
+    border-right:1px solid rgba(255,255,255,.06);
+    padding:1.1rem .8rem;
+    scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.22) transparent}
+  aside[aria-label="Menu utama"]>div.hidden{padding:0 .4rem 1rem;margin-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.09)}
+  aside[aria-label="Menu utama"]>div.hidden img{width:2.9rem;height:2.9rem;padding:.3rem;background:#fff;border-radius:.85rem;margin-bottom:.6rem;box-shadow:0 6px 16px -6px rgba(0,0,0,.5)}
+  aside[aria-label="Menu utama"]>div.hidden p{letter-spacing:-.01em;font-size:1.05rem}
+  aside[aria-label="Menu utama"]>button{
+    width:100%;border-radius:.75rem;padding:.62rem .8rem;font-size:.875rem;font-weight:600;line-height:1.25rem;
+    transition:background-color .15s ease,color .15s ease,box-shadow .15s ease}
+  aside[aria-label="Menu utama"]>button:not(.text-amber-400){color:#cbd5e6}
+  aside[aria-label="Menu utama"]>button:not([aria-current="page"]):hover{background-color:rgba(255,255,255,.075);color:#fff}
+  aside[aria-label="Menu utama"]>button[aria-current="page"]{background:rgba(255,255,255,.13);color:#fff;box-shadow:inset 3px 0 0 #fbbf24}
+  aside[aria-label="Menu utama"]>button[aria-current="page"] svg{color:#fcd34d;opacity:1}
+  aside[aria-label="Menu utama"]>button.text-amber-400{font-weight:700}
+
+  header.sticky.md\:hidden{background-image:linear-gradient(90deg,#061f4d,#0a2a63);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 4px 14px -8px rgba(0,0,0,.6)}
+
+  /* Menu seluler: panel melayang di bawah header, konten di bawahnya tidak bergeser */
+  @media (max-width:767px){
+    html:not(.embedded) aside[aria-label="Menu utama"]{
+      position:fixed;top:3.5rem;left:0;right:0;z-index:35;
+      max-height:calc(100vh - 3.5rem);max-height:calc(100dvh - 3.5rem);
+      border-right:0;border-bottom:1px solid rgba(255,255,255,.1);
+      box-shadow:0 28px 48px -12px rgba(2,10,30,.55)}
+  }
+
+  /* --- Area konten --- */
+  main#utama{padding-bottom:calc(2.5rem + env(safe-area-inset-bottom,0px))}
+  @media (min-width:768px){main#utama{padding-bottom:calc(3rem + env(safe-area-inset-bottom,0px))}}
+  main#utama>div.hidden.md\:flex{padding-bottom:.9rem;margin-bottom:1.1rem;border-bottom:1px solid var(--line)}
+  main#utama>div.hidden.md\:flex .text-slate-500{font-weight:600;color:#475569}
+
+  .h2{font-size:1.4rem;line-height:1.3;letter-spacing:-.03em;color:var(--navy-d)}
+
+  /* Banner utama dasbor */
+  main section>.bg-gradient-to-r.rounded-2xl{
+    position:relative;overflow:hidden;border-radius:1.25rem;padding:1.4rem 1.25rem;
+    box-shadow:0 14px 30px -16px rgba(6,31,77,.55)}
+  @media (min-width:640px){main section>.bg-gradient-to-r.rounded-2xl{padding:1.75rem 2rem}}
+  main section>.bg-gradient-to-r.rounded-2xl::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(480px 200px at 100% 0%,rgba(255,255,255,.18),transparent 70%),linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+    background-size:auto,40px 40px,40px 40px;
+    -webkit-mask-image:linear-gradient(100deg,transparent 15%,#000 100%);mask-image:linear-gradient(100deg,transparent 15%,#000 100%)}
+  main section>.bg-gradient-to-r.rounded-2xl>*{position:relative}
+  main section>.bg-gradient-to-r.rounded-2xl h2{font-size:1.7rem;line-height:1.2;letter-spacing:-.03em;margin:.2rem 0 .3rem}
+  main section>.bg-gradient-to-r.rounded-2xl>p:first-child{font-weight:700;letter-spacing:.01em}
+
+  /* Kartu statistik */
+  .card{border-radius:1rem;padding:1.05rem 1.15rem;font-size:.8125rem;line-height:1.35;color:var(--muted);border:1px solid var(--line);box-shadow:0 1px 2px rgba(15,35,65,.04)}
+  .card:hover{box-shadow:0 1px 2px rgba(15,35,65,.04)}
+  .card .n{font-size:1.95rem;line-height:1.15;letter-spacing:-.035em;margin-bottom:.2rem;font-variant-numeric:tabular-nums}
+
+  /* Panel putih */
+  main section .bg-white.rounded-2xl.shadow-sm{border:1px solid var(--line);box-shadow:0 1px 2px rgba(15,35,65,.04),0 6px 16px -10px rgba(15,35,65,.08)}
+  /* Perbaikan: polish lama menimpa seluruh sisi border sehingga aksen kiri berwarna hilang; dipulihkan di sini */
+  main section .bg-white.rounded-2xl.shadow-sm.border-l-4{border-left-width:4px}
+  main section .bg-white.rounded-2xl.shadow-sm.border-sky-500{border-left-color:#0ea5e9}
+  main section .bg-white.rounded-2xl.shadow-sm.border-amber-400{border-left-color:#fbbf24}
+  main section .bg-white.rounded-2xl.shadow-sm.border-navy-700{border-left-color:#0b3d91}
+  main section .bg-white.rounded-2xl.shadow-sm.border-violet-500{border-left-color:#8b5cf6}
+  main section h3{letter-spacing:-.01em}
+
+  /* Tombol */
+  .btn-p,.btn-o{border-radius:.75rem;font-size:.875rem;font-weight:700}
+  .btn-p{background-image:linear-gradient(180deg,#134aa8,#0b3d91);box-shadow:0 1px 2px rgba(6,31,77,.25),inset 0 1px 0 rgba(255,255,255,.14)}
+  .btn-p:hover:not(:disabled){background-image:linear-gradient(180deg,#0f3f94,#082f70);transform:none;box-shadow:0 6px 14px -6px rgba(6,31,77,.5),inset 0 1px 0 rgba(255,255,255,.12)}
+  .btn-p:active:not(:disabled){transform:translateY(1px)}
+  .btn-o{border-color:#cfd9e8;color:#0b3d91;background:#fff}
+  .btn-o:hover:not(:disabled){border-color:#8fa9cf;background:#f2f6fc}
+  :focus-visible{outline:2px solid #f59e0b;outline-offset:2px}
+
+  /* Isian formulir */
+  .lb{text-transform:none;font-size:.78rem;letter-spacing:0;font-weight:700;color:#475569}
+  .inp{min-height:2.6rem;border-radius:.7rem;border-color:#d3dce9;font-size:.9rem}
+  .inp:hover{border-color:#b4c3d8}
+  .lb .inp{font-weight:500;color:var(--ink)}
+  .inp:focus,.fld:focus{border-color:#2f62b3;box-shadow:0 0 0 3px rgba(11,61,145,.14)}
+  select.inp{
+    -webkit-appearance:none;-moz-appearance:none;appearance:none;padding-right:2.2rem;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 8l4.5 4.5L14.5 8'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right .7rem center;background-size:1.05rem}
+  .fld{border-radius:.85rem;border-color:#d3dce9}
+  .fld:hover{border-color:#b4c3d8}
+
+  /* Tab, tabel, jendela dialog */
+  .tab{font-weight:700}
+  .tab-on{background:rgba(11,61,145,.06)}
+  body.calm-table-polish main section table:not(.border-collapse) thead th{background:#f6f8fc;color:#475569;border-bottom:1px solid var(--line)}
+  body.calm-table-polish main section table:not(.border-collapse) tbody tr:hover{background:#f4f8fe}
+  .overflow-x-auto,.overflow-auto{scrollbar-width:thin}
+  .modal-wrap{-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .modal-box{border-radius:1.15rem;box-shadow:0 30px 70px -20px rgba(15,23,42,.45);animation:modalIn .18s ease-out both}
+  @keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+
+  /* Pesan sistem */
+  main#utama>p[role="alert"],main#utama>p[role="status"]{border-radius:.9rem;font-weight:500;box-shadow:0 10px 26px -12px rgba(15,35,65,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+
+  /* --- Tahap 2: hilangkan kesan lama di seluruh menu --- */
+  /* Aksi baris (Ubah / Hapus / Setujui): dari teks tebal polos menjadi tombol lembut */
+  main section button.text-blue-800.font-bold,
+  main section button.text-rose-600.font-bold,
+  main section button.text-emerald-700.font-bold{
+    padding:.2rem .65rem;margin-right:.3rem;border-radius:.5rem;font-size:.78rem;line-height:1.25rem;font-weight:700;
+    transition:background-color .15s ease,color .15s ease}
+  main section button.text-blue-800.font-bold{background:#eef3fb}
+  main section button.text-blue-800.font-bold:hover{background:#dce8f8;color:#082f70}
+  main section button.text-rose-600.font-bold{background:#fff1f2}
+  main section button.text-rose-600.font-bold:hover{background:#ffe0e4;color:#be123c}
+  main section button.text-emerald-700.font-bold{background:#ecfdf5}
+  main section button.text-emerald-700.font-bold:hover{background:#d1fae5;color:#047857}
+  main section tbody tr.border-t{border-top-color:#e8edf3}
+
+  /* Tab menjadi kontrol segmen */
+  [role="tablist"]{background:#e8eef6;border:0;padding:.25rem;border-radius:.9rem;width:fit-content;max-width:100%;gap:.15rem}
+  .tab{border-bottom-width:0;border-radius:.65rem;padding:.45rem .95rem;color:#52627a}
+  .tab:hover{color:#0b3d91}
+  .tab-on,.tab-on:hover{background:#fff;color:#0b3d91;box-shadow:0 1px 3px rgba(15,35,65,.14)}
+
+  /* Judul panel dan dialog */
+  main section .bg-white h3.font-bold,main section .bg-white h3.font-extrabold{font-size:1rem;line-height:1.4;font-weight:700;color:var(--navy-d)}
+  .modal-box>h3:first-child{font-size:1.1rem;line-height:1.4;font-weight:700;letter-spacing:-.02em;color:var(--navy-d);padding-bottom:.85rem;margin-bottom:1.1rem;border-bottom:1px solid var(--line)}
+  .modal-box .flex.justify-end.gap-2.mt-4{margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--line)}
+
+  /* Lencana status */
+  main span.rounded-full.font-bold{letter-spacing:.005em;box-shadow:inset 0 0 0 1px rgba(15,35,65,.07)}
+
+  /* Tombol simpan utama (amber) */
+  main section button.hover\:bg-amber-600{
+    border-radius:.8rem;background-image:linear-gradient(180deg,#fbbf24,#f59e0b);
+    box-shadow:0 10px 18px -12px rgba(217,119,6,.9),inset 0 1px 0 rgba(255,255,255,.35)}
+  main section button.hover\:bg-amber-600:hover:not(:disabled){filter:brightness(.95)}
+
+  /* Judul di dalam bilah alat tidak diberi garis pendek di bawahnya */
+  main section>div>.h2{border-bottom:0;padding-bottom:0}
+
+  /* Bobot huruf lebih ringan agar terasa modern */
+  .h2{font-weight:700}
+  .card .n{font-weight:700}
+  main section>.bg-gradient-to-r.rounded-2xl h2{font-weight:700}
+
+  /* --- Halaman masuk --- */
+  .login-wrap .login-bg h1{letter-spacing:-.04em}
+  .login-wrap .login-bg .grid>div{background:rgba(255,255,255,.08);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:1rem}
+  .login-wrap .rounded-3xl.shadow-xl{border-radius:1.5rem;border-color:rgba(203,213,225,.55);box-shadow:0 30px 60px -28px rgba(6,31,77,.4),0 2px 6px rgba(6,31,77,.05)}
+  .login-wrap .rounded-3xl h2{letter-spacing:-.03em}
+  .login-wrap [role="radio"]{border-radius:1rem;border-color:#dbe3ef;transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}
+  .login-wrap [role="radio"][aria-checked="true"]{border-color:#0b3d91;box-shadow:0 0 0 3px rgba(11,61,145,.12)}
+  .login-wrap .rounded-3xl button.w-full.bg-navy-700{
+    border-radius:.9rem;background-image:linear-gradient(180deg,#134aa8,#0b3d91);
+    box-shadow:0 12px 22px -12px rgba(11,61,145,.75),inset 0 1px 0 rgba(255,255,255,.15)}
+  .login-wrap .rounded-3xl button.w-full.bg-navy-700:hover:not(:disabled){filter:brightness(.93)}
+  .login-wrap .rounded-3xl button.w-full.bg-navy-700:active:not(:disabled){transform:translateY(1px)}
+}
+
+/* Gerak dikurangi: indikator muat tetap berputar pelan agar status "sedang memproses" tetap terlihat */
+@media (prefers-reduced-motion:reduce){.spin{animation:sp 1.6s linear infinite!important}}
 </style>
 
 </head>
@@ -1762,7 +1954,7 @@ const LOGO = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiD-8YPF
   const ic = (rel, h, t) => { let l = document.querySelector('link[rel="' + rel + '"]'); if (!l) { l = document.createElement('link'); l.rel = rel; document.head.appendChild(l); } l.href = h; if (t) l.type = t; };
   ic('icon', u(192), 'image/png'); ic('apple-touch-icon', u(180));
   const base = location.href.split('#')[0].split('?')[0], l = document.querySelector('link[rel="manifest"]');
-  if (l) l.href = URL.createObjectURL(new Blob([JSON.stringify({ name: 'Portal Akademik SMK CALM', short_name: 'SMK CALM', start_url: base, scope: new URL('./', base).href, display: 'standalone', background_color: '#0b3d91', theme_color: '#0b3d91', lang: 'id',
+  if (l) l.href = URL.createObjectURL(new Blob([JSON.stringify({ name: 'Portal Akademik SMK CALM', short_name: 'SMK CALM', start_url: base, scope: new URL('./', base).href, display: 'standalone', background_color: '#0b3d91', theme_color: '#0b3d91', lang: 'id', description: 'Presensi, nilai, jurnal mengajar, dan bimbingan SMKS Ciledug Al-Musaddadiyah Garut.', categories: ['education'],
     icons: [{ src: u(192), sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: u(512), sizes: '512x512', type: 'image/png', purpose: 'any' }] })], { type: 'application/manifest+json' }));
 } catch (e) { /* ikon bawaan tetap dipakai */ } })();
 
