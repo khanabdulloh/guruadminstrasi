@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0b3d91"><meta name="color-scheme" content="light"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SMK CALM">
 <script>window.__pwa=null;addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__pwa=e;dispatchEvent(new Event('pwa-ready'))});if('serviceWorker' in navigator&&location.protocol==='https:'&&window.self===window.top)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})</script>
 <script>if(window.self!==window.top)document.documentElement.classList.add("embedded")</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin><link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://script.google.com" crossorigin><link rel="preconnect" href="https://script.googleusercontent.com" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin><link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script><script>window.Vue||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.38/vue.global.prod.min.js"><\/script>')</script>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}
@@ -1919,7 +1919,23 @@ const app = createApp({
     // Daftar putih aksi BACA (idempoten): hanya ini yang boleh diulang otomatis saat jaringan putus. Aksi baru default-nya TIDAK diulang (aman).
     const READ = new Set(['perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
     const SAFE = a => READ.has(a);
+    // Cache baca sisi klien (memori saja, maks 60 dtk): data master/konfigurasi yang dibuka berulang antar-menu.
+    // Setiap aksi TULIS (di luar daftar baca) mengosongkan cache sebelum & sesudah; hasil selalu salinan baru (JSON.parse).
+    const CC = new Map(), CC_TTL = 60000;
+    const CC_OK = new Set(['pengaturanGet', 'kelasDetail', 'kelasSemua', 'guruList', 'siswaList', 'jadwalList', 'blokInfo', 'pilihanNilai', 'presensiPilihan', 'raporPilihan', 'bimbinganKelas', 'pengumumanList', 'agendaList', 'akademikGet', 'kunciGet', 'legerKelas']);
+    const NOWRITE = a => SAFE(a) || a === 'blokInfo' || a === 'ukuranData';
     async function api(action, p = {}) {
+      if (!CC_OK.has(action)) {
+        const w = !NOWRITE(action); if (w) CC.clear();
+        try { return await apiNet(action, p); } finally { if (w) CC.clear(); }
+      }
+      const k = action + '|' + JSON.stringify(p), hit = CC.get(k);
+      if (hit && Date.now() - hit.t < CC_TTL) return JSON.parse(await hit.pr);
+      const ent = { t: Date.now(), pr: apiNet(action, p).then(d => JSON.stringify(d === undefined ? null : d)) };
+      CC.set(k, ent); ent.pr.catch(() => { if (CC.get(k) === ent) CC.delete(k); }); // gagal: jangan disimpan
+      return JSON.parse(await ent.pr);
+    }
+    async function apiNet(action, p = {}) {
       let r, t;
       for (let n = 0; ; n++) {
         const ac = new AbortController(), to = setTimeout(() => ac.abort(), 60000);
@@ -1955,7 +1971,7 @@ const app = createApp({
       sessionStorage.setItem('tk', d.token); sessionStorage.setItem('us', JSON.stringify(d.user));
       go('dashboard'); // go() mengarahkan ke Ganti Sandi bila sandi awal belum diganti
     });
-    function logout() { token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
+    function logout() { CC.clear(); token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
     let dashAt = 0;
     const go = k => run(async () => {
       if (user.value.wajib) k = 'sandi';
@@ -1967,6 +1983,7 @@ const app = createApp({
         try { const c = JSON.parse(sessionStorage.getItem(ck) || 'null'); if (c && c.d && Date.now() - c.t < 300000) pakai(c.d); } catch (e) { /* salinan rusak: abaikan */ }
         const d = await api('dashboard'); if (view.value !== k) return; pakai(d);
         try { sessionStorage.setItem(ck, JSON.stringify({ t: Date.now(), d })); } catch (e) { /* penyimpanan penuh: lewati */ }
+        if (['ADMIN', 'GURU', 'KEPSEK', 'STAF'].includes(user.value.role)) api('pengaturanGet').catch(() => { /* pemanasan opsional */ });
         if (!Array.isArray(d.peng)) await fetchPeng(); // server lama belum membawa pengumuman/agenda: ambil terpisah seperti sebelumnya
         if (!Array.isArray(d.agenda)) await fetchAg();
       }
@@ -1994,7 +2011,7 @@ const app = createApp({
       if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; pilIdx.value = ''; }
       if (k === 'jurnal') { const r = await Promise.all([canWrite.value ? api('pilihanNilai') : null, api('pengaturanGet'), fetchJ()]); if (r[0]) pil.value = r[0]; cfg.value = r[1]; }
       if (k === 'bimbingan') { const r = await Promise.all([['ADMIN','GURU'].includes(user.value.role) ? api('bimbinganKelas') : null, ['ADMIN','GURU','KEPSEK'].includes(user.value.role) ? api('pengaturanGet').catch(() => null) : null, fetchB()]); bk.value = r[0] || []; if (r[1]) cfg.value = r[1]; }
-      if (k === 'pengaturan') { const r = await Promise.all([api('pengaturanGet'), api('backupStatus').catch(() => null), api('akademikGet').catch(() => null), api('kunciGet').catch(() => null), api('ukuranData').catch(() => null)]); ukd.value = r[4]; cfg.value = r[0]; { const bi = await api('blokInfo').catch(() => null); if (bi) { blokInfo.value = bi; Object.assign(bf2, { acuan: bi.acuan, blok: bi.blokAcuan, minggu: bi.minggu }); } } backupUrl.value = ''; bk2.value = r[1]; ak.value = r[2]; kunci.value = r[3]; }
+      if (k === 'pengaturan') { const r = await Promise.all([api('pengaturanGet'), api('backupStatus').catch(() => null), api('akademikGet').catch(() => null), api('kunciGet').catch(() => null), api('ukuranData').catch(() => null), api('blokInfo').catch(() => null)]); ukd.value = r[4]; cfg.value = r[0]; { const bi = r[5]; if (bi) { blokInfo.value = bi; Object.assign(bf2, { acuan: bi.acuan, blok: bi.blokAcuan, minggu: bi.minggu }); } } backupUrl.value = ''; bk2.value = r[1]; ak.value = r[2]; kunci.value = r[3]; }
       if (k === 'log') logs.value = await api('logList');
       if (k === 'bimbingansaya') { bimbTab.value = 'wali'; await Promise.all([fetchB(), fetchKonseling()]); }
       if (k === 'leger') { [cfg.value, lk.value] = await Promise.all([api('pengaturanGet'), api('legerKelas')]); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
@@ -2015,7 +2032,7 @@ const app = createApp({
       if (k === 'pengurangan') { Object.assign(plq, { kelas: '', bulan: '', q: '' }); await fetchPl(); }
       if (k === 'konseling') { Object.assign(ksq, { kelas: '', bulan: '', q: '' }); await fetchKonseling(); }
       if (k === 'izin') await fetchIz();
-      if (k === 'catatan') { guru.value = await api('guruList'); await fetchCg(); }
+      if (k === 'catatan') { const r = await Promise.all([api('guruList'), fetchCg()]); guru.value = r[0]; }
       if (k === 'catatansaya') { await fetchCg(); await api('catatanGuruBaca'); belumBaca.value = 0; }
       if (k === 'pkl') { const r = await Promise.all([api('pklList'), user.value.role === 'ADMIN' ? api('siswaList') : null, user.value.role === 'ADMIN' ? api('guruList') : null]); pkl.value = r[0]; if (r[1]) siswa.value = r[1]; if (r[2]) guru.value = r[2]; pq.value = ''; jp.value = null; }
       if (k === 'tahun') { const r = await Promise.all([api('pengaturanGet'), api('kelasDetail'), api('alumniList'), api('riwayatList', {})]); cfg.value = r[0]; Object.assign(ta, r[0].tahun || {}); kelasAll.value = r[1]; alumni.value = r[2]; rw.value = r[3]; rwSel.value = rwq.value = aq.value = ''; rwLabel.value = ((ta.tahun || '') + ' ' + (ta.semester || '')).trim(); Object.assign(ll, { kelas: '', tahun: '', txt: '' }); }
