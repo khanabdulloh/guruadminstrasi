@@ -617,6 +617,202 @@ table tbody tr:hover{background:#f8fafc}
 @media (prefers-reduced-motion:reduce){.spin{animation:sp 1.6s linear infinite!important}}
 </style>
 
+
+<style id="calm-dashboard-modern-v2">
+/* Lapisan visual tambahan saja: tidak mengubah template Vue, API, data, atau event handler. */
+@media screen {
+  :root { --calm-ink:#172b4d; --calm-muted:#64748b; --calm-line:#e4eaf2; --calm-blue:#123f7a; }
+  body.calm-table-polish { background:#f3f6fb; color:var(--calm-ink); }
+  /* Navigasi utama */
+  body.calm-table-polish > #app > div > aside,
+  body.calm-table-polish #app aside[aria-label="Menu utama"] {
+    background:linear-gradient(180deg,#0b2347 0%,#0a1d3a 100%) !important;
+    border-right:1px solid rgba(255,255,255,.08);
+    box-shadow:5px 0 24px rgba(15,35,65,.06);
+    padding:1.15rem .85rem;
+  }
+  #app aside[aria-label="Menu utama"] > div:first-child {
+    padding:.45rem .65rem 1.15rem;
+    margin-bottom:1rem;
+    border-bottom:1px solid rgba(255,255,255,.12);
+  }
+  #app aside[aria-label="Menu utama"] > div:first-child img {
+    width:2.8rem;height:2.8rem; padding:.25rem;
+    background:#fff;border-radius:.85rem;box-shadow:0 4px 12px rgba(0,0,0,.12);
+  }
+  #app aside[aria-label="Menu utama"] > button {
+    min-height:43px; margin-bottom:.25rem; padding:.72rem .8rem;
+    border:1px solid transparent; border-radius:.75rem;
+    color:#dbe6f5; font-size:.82rem; letter-spacing:.005em;
+    transition:background .18s ease,border-color .18s ease,transform .18s ease;
+  }
+  #app aside[aria-label="Menu utama"] > button:hover {
+    background:rgba(255,255,255,.085); border-color:rgba(255,255,255,.08);
+    transform:translateX(2px);
+  }
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"] {
+    background:linear-gradient(105deg,#1d4f91,#173d70) !important;
+    color:#fff !important; border-color:rgba(147,197,253,.2);
+    box-shadow:inset 3px 0 #f2c66d,0 5px 14px rgba(0,0,0,.12) !important;
+  }
+  #app aside[aria-label="Menu utama"] > button svg { opacity:.92; }
+  /* Area kerja dan identitas pengguna */
+  #app main#utama { max-width:none; padding:1.6rem clamp(1rem,2.4vw,2.4rem) 3rem; }
+  #app main#utama > .hidden.md\:flex.items-center {
+    min-height:42px; padding:0 0 1rem; margin-bottom:1.35rem;
+    border-bottom:1px solid #e4eaf2;
+  }
+  #app main#utama section { animation:calmEnter .24s ease-out both; }
+  @keyframes calmEnter { from{opacity:.65;transform:translateY(4px)} to{opacity:1;transform:none} }
+  /* Kartu dashboard dan panel */
+  #app main#utama .card {
+    position:relative; overflow:hidden; min-height:112px;
+    padding:1.15rem 1.2rem; border-radius:1rem;
+    border:1px solid #e4eaf2; background:#fff;
+    box-shadow:0 3px 12px rgba(18,42,78,.035);
+  }
+  #app main#utama .card .n {
+    display:block; margin-bottom:.35rem; font-size:1.9rem;
+    line-height:1.15; letter-spacing:-.045em; color:#183b68;
+  }
+  #app main#utama section .rounded-2xl.bg-white,
+  #app main#utama section .bg-white.rounded-2xl {
+    border-color:#e3eaf3;
+  }
+  #app main#utama section .bg-gradient-to-r.text-white {
+    position:relative; isolation:isolate; overflow:hidden;
+    min-height:155px; padding:1.7rem 1.8rem;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:1.15rem; box-shadow:0 10px 26px rgba(13,48,92,.12);
+  }
+  #app main#utama section .bg-gradient-to-r.text-white:after {
+    content:"";position:absolute;z-index:-1;width:230px;height:230px;
+    right:-65px;top:-100px;border:1px solid rgba(255,255,255,.13);
+    border-radius:50%;box-shadow:0 0 0 24px rgba(255,255,255,.035),0 0 0 50px rgba(255,255,255,.025);
+    pointer-events:none;
+  }
+  #app main#utama section .bg-gradient-to-r.text-white h2 {
+    margin:.35rem 0 .25rem; font-size:clamp(1.45rem,2.2vw,2rem);
+    letter-spacing:-.04em; line-height:1.2;
+  }
+  #app main#utama section .h2 {
+    color:#183b68; font-size:1.22rem; font-weight:800;
+    letter-spacing:-.025em; margin-bottom:1rem;
+  }
+  /* Tombol dan kontrol lebih konsisten */
+  #app main#utama button, #app main#utama .btn-p, #app main#utama .btn-o {
+    transition:box-shadow .16s ease,transform .16s ease,background-color .16s ease;
+  }
+  #app main#utama .btn-p { box-shadow:0 3px 8px rgba(18,63,122,.13); }
+  #app main#utama .btn-o { background:#fff; }
+  #app main#utama .btn-p:hover:not(:disabled),
+  #app main#utama .btn-o:hover:not(:disabled) { transform:translateY(-1px); }
+  #app main#utama input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  #app main#utama select,#app main#utama textarea {
+    border-radius:.7rem;
+  }
+  /* Header perangkat kecil */
+  #app header.md\:hidden {
+    background:linear-gradient(110deg,#0b2347,#123f7a);
+    box-shadow:0 4px 16px rgba(10,29,58,.15);
+    min-height:58px;
+  }
+  @media (min-width:768px) {
+    #app aside[aria-label="Menu utama"] { width:254px; }
+  }
+  @media (max-width:767px) {
+    #app main#utama { padding:1rem .85rem 2rem; }
+    #app main#utama section .bg-gradient-to-r.text-white { padding:1.3rem; min-height:140px; }
+    #app main#utama .card { min-height:98px; padding:.9rem; }
+    #app main#utama .card .n { font-size:1.65rem; }
+    #app aside[aria-label="Menu utama"] { border-radius:0 0 1rem 1rem; }
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  #app main#utama section { animation:none !important; }
+  #app aside[aria-label="Menu utama"] > button { transition:none !important; }
+}
+</style>
+
+<style id="calm-final-polish-v3">
+/* Lapisan akhir (hanya layar): menyatukan token, menutup konflik antar-lapisan, dan memperbaiki kenyamanan pakai.
+   Tidak menyentuh template, data, API, maupun aturan cetak. */
+@media screen {
+  :root{--c-navy:#0b3d91;--c-navy-d:#061f4d;--c-ink:#172b4d;--c-muted:#5b6b82;--c-line:#e4eaf2;--c-surface:#fff;--c-bg:#f3f6fb;--c-focus:#f59e0b;--r-card:1rem;--sh-card:0 1px 2px rgba(15,35,65,.04),0 8px 20px -14px rgba(15,35,65,.14)}
+  html{scroll-behavior:smooth;scroll-padding-top:4.5rem;-webkit-text-size-adjust:100%}
+  body.calm-table-polish{background:var(--c-bg);color:var(--c-ink);text-rendering:optimizeLegibility}
+
+  /* Tipografi: satu bobot judul yang konsisten (lapisan sebelumnya saling menimpa 700/800) */
+  #app main#utama section .h2,.h2{font-weight:700;color:var(--c-navy-d);letter-spacing:-.025em}
+  #app main#utama .card .n{font-weight:700;color:var(--c-navy-d);font-variant-numeric:tabular-nums}
+  table{font-variant-numeric:tabular-nums}
+
+  /* Kartu & panel: bayangan halus yang seragam, naik sedikit saat disorot */
+  #app main#utama .card,#app main#utama section .bg-white.rounded-2xl{box-shadow:var(--sh-card);border-color:var(--c-line)}
+  #app main#utama .card{transition:box-shadow .2s ease,transform .2s ease}
+  @media (hover:hover){#app main#utama .card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(15,35,65,.05),0 14px 28px -16px rgba(15,35,65,.22)}}
+
+  /* Tabel: header lengket di dalam wadah gulir, baris selang-seling lembut */
+  #app main#utama section table:not(.border-collapse) thead th{position:sticky;top:0;z-index:1;font-weight:700;font-size:.75rem;letter-spacing:.02em;text-transform:none}
+  #app main#utama section table:not(.border-collapse) tbody tr:nth-child(even){background:#fafcfe}
+  #app main#utama section table:not(.border-collapse) tbody tr:hover{background:#f1f6fd}
+  #app main#utama section table:not(.border-collapse) td,#app main#utama section table:not(.border-collapse) th{padding-top:.6rem;padding-bottom:.6rem}
+
+  /* Bilah kemajuan */
+  #app main#utama .h-2.rounded-full,#app main#utama .h-1.rounded-full{overflow:hidden}
+  #app main#utama .h-2.rounded-full>div,#app main#utama .h-1.rounded-full>div{transition:width .5s cubic-bezier(.2,.8,.2,1)}
+
+  /* Fokus: jelas untuk papan ketik, tidak mengganggu klik mouse */
+  :focus:not(:focus-visible){outline:none}
+  :focus-visible{outline:2px solid var(--c-focus);outline-offset:2px;border-radius:.5rem}
+  .inp:focus-visible,.fld:focus-visible{outline:none}
+
+  /* Status tombol */
+  button:disabled,.btn-p:disabled,.btn-o:disabled{cursor:not-allowed;opacity:.55;filter:saturate(.7)}
+  .btn-p,.btn-o{min-height:2.5rem;display:inline-flex;align-items:center;justify-content:center;gap:.4rem}
+
+  /* Pemilih tanggal / isian angka rapi */
+  input[type=date],input[type=number],input[type=time]{font-variant-numeric:tabular-nums}
+  input::placeholder,textarea::placeholder{color:#94a3b8}
+
+  /* Dialog: tidak melebihi layar, isi bisa digulir, aman di area poni */
+  .modal-wrap{padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom))}
+  .modal-box{max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain}
+
+  /* Bilah gulir tipis dan halus */
+  *{scrollbar-width:thin;scrollbar-color:#c3cedd transparent}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:#c3cedd;border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:#a5b4c9}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  /* Kartu "Pasang Portal": tidak tampil bila sudah dipasang sebagai aplikasi */
+  @media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){.pwa-card{display:none!important}}
+
+  /* Seluler */
+  @media (max-width:767px){
+    /* header 58px (lapisan dasbor) -> panel menu mulai tepat di bawahnya, tanpa celah/tumpang-tindih */
+    html:not(.embedded) #app aside[aria-label="Menu utama"]{top:58px;max-height:calc(100vh - 58px);max-height:calc(100dvh - 58px);overflow-y:auto;z-index:35}
+    /* 16px mencegah browser iOS memperbesar layar saat mengetik */
+    .inp,.fld,select,textarea,input:not([type=checkbox]):not([type=radio]){font-size:16px}
+    .inp,select.inp{min-height:2.75rem}
+    .btn-p,.btn-o{min-height:2.75rem}
+    #app aside[aria-label="Menu utama"]>button{min-height:46px}
+    [role="tablist"]{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+    .tab{flex:0 0 auto}
+    .modal-box{border-radius:1.15rem 1.15rem 0 0;margin:auto 0 0}
+    .modal-wrap{align-items:flex-end;padding-bottom:0}
+  }
+  @media (min-width:1280px){#app main#utama{max-width:1600px;margin-inline:auto}}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  #app main#utama .card,#app main#utama .card:hover{transition:none!important;transform:none!important}
+  #app aside[aria-label="Menu utama"]>button:hover{transform:none!important}
+  .modal-box{animation:none!important}
+}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
@@ -742,7 +938,7 @@ table tbody tr:hover{background:#f8fafc}
         <p class="text-white/90 text-sm mt-2">{{sub[user.role]}}</p>
       </div>
       <div class="flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
-      <div class="rounded-2xl bg-white border border-sky-200 shadow-sm p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div class="pwa-card noprint rounded-2xl bg-white border border-sky-200 shadow-sm p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
         <div class="h-11 w-11 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
           <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/><path d="M12 6v7m0 0-3-3m3 3 3-3"/></svg>
         </div>
@@ -1741,7 +1937,7 @@ table tbody tr:hover{background:#f8fafc}
         <select v-model="plq.kelas" @change="loadPl" class="inp"><option value="">Semua kelas</option><option v-for="k in pel.kelas" :key="k">{{k}}</option></select>
         <input type="month" v-model="plq.bulan" @change="loadPl" class="inp"><input v-model.trim="plq.q" @keyup.enter="loadPl" placeholder="Cari, lalu Enter" class="inp">
         <button @click="openPanduanPel" class="btn-o">Panduan & FAQ</button><button @click="printPelanggaran" :disabled="!pel.rows.length" class="btn-o disabled:opacity-50">Cetak / PDF</button><button v-if="canPel" @click="openPl" class="btn-p">Tambah catatan</button></div>
-      <div v-if="perluTindak.length" class="noprint rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm px-4 py-3 mb-4><b>Peringatan / evaluasi khusus</b> (total poin &ge; {{pel.ambang}}):
+      <div v-if="perluTindak.length" class="noprint rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm px-4 py-3 mb-4"><b>Peringatan / evaluasi khusus</b> (total poin &ge; {{pel.ambang}}):
         <span v-for="s in perluTindak" :key="s.nis" class="inline-block mr-3">{{s.nama}} ({{s.kelas}}) <b>{{s.total}}</b></span></div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 noprint"><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Catatan</div><div class="text-xl font-extrabold text-blue-900">{{pelRingkasan.catatan}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Siswa terlibat</div><div class="text-xl font-extrabold text-blue-900">{{pelRingkasan.siswa}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Berat</div><div class="text-xl font-extrabold text-amber-700">{{pelRingkasan.berat}}</div></div><div class="rounded-2xl bg-white border p-3"><div class="text-xs text-slate-500">Perlu evaluasi</div><div class="text-xl font-extrabold text-rose-700">{{pelRingkasan.warning}}</div></div></div>
       <div class="hidden print:block pel-print-heading"><kop :k="cfg.kop"></kop><h2 class="pel-print-title">LAPORAN PELANGGARAN SISWA DAN POIN BIMBINGAN KONSELING</h2><div class="pel-print-meta"><span><b>Kelas:</b> {{plq.kelas||'Semua kelas'}}</span><span><b>Periode:</b> {{plq.bulan||'Semua periode'}}</span><span><b>Dicetak:</b> {{hari0}}</span></div></div>
