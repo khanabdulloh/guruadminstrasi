@@ -9,7 +9,7 @@
 <script>if(window.self!==window.top)document.documentElement.classList.add("embedded")</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin><link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script><script>window.Vue||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.38/vue.global.prod.min.js"><\/script>')</script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>body{font-family:'Plus Jakarta Sans',system-ui,sans-serif}[v-cloak]{display:none}@page{size:A4 landscape;margin:12mm}@media print{aside,.noprint{display:none!important}main{padding:0!important;max-width:none!important}body{background:#fff}}
 .login-bg{background:radial-gradient(1200px 600px at 10% -10%,#1b56c0 0%,transparent 60%),radial-gradient(900px 500px at 110% 110%,#134aa8 0%,transparent 55%),linear-gradient(160deg,#0b3d91 0%,#072a66 55%,#041536 100%)}
 .login-bg::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,#000,transparent 85%);-webkit-mask-image:linear-gradient(to bottom,#000,transparent 85%)}
@@ -549,12 +549,12 @@ table tbody tr:hover{background:#f8fafc}
   body.calm-table-polish main section table:not(.border-collapse) thead th{background:#f6f8fc;color:#475569;border-bottom:1px solid var(--line)}
   body.calm-table-polish main section table:not(.border-collapse) tbody tr:hover{background:#f4f8fe}
   .overflow-x-auto,.overflow-auto{scrollbar-width:thin}
-  .modal-wrap{-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .modal-wrap{}
   .modal-box{border-radius:1.15rem;box-shadow:0 30px 70px -20px rgba(15,23,42,.45);animation:modalIn .18s ease-out both}
   @keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
 
   /* Pesan sistem */
-  main#utama>p[role="alert"],main#utama>p[role="status"]{border-radius:.9rem;font-weight:500;box-shadow:0 10px 26px -12px rgba(15,35,65,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  main#utama>p[role="alert"],main#utama>p[role="status"]{border-radius:.9rem;font-weight:500;box-shadow:0 10px 26px -12px rgba(15,35,65,.35);}
 
   /* --- Tahap 2: hilangkan kesan lama di seluruh menu --- */
   /* Aksi baris (Ubah / Hapus / Setujui): dari teks tebal polos menjadi tombol lembut */
@@ -601,7 +601,7 @@ table tbody tr:hover{background:#f8fafc}
 
   /* --- Halaman masuk --- */
   .login-wrap .login-bg h1{letter-spacing:-.04em}
-  .login-wrap .login-bg .grid>div{background:rgba(255,255,255,.08);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:1rem}
+  .login-wrap .login-bg .grid>div{background:rgba(255,255,255,.08);border-radius:1rem}
   .login-wrap .rounded-3xl.shadow-xl{border-radius:1.5rem;border-color:rgba(203,213,225,.55);box-shadow:0 30px 60px -28px rgba(6,31,77,.4),0 2px 6px rgba(6,31,77,.05)}
   .login-wrap .rounded-3xl h2{letter-spacing:-.03em}
   .login-wrap [role="radio"]{border-radius:1rem;border-color:#dbe3ef;transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}
@@ -616,203 +616,127 @@ table tbody tr:hover{background:#f8fafc}
 /* Gerak dikurangi: indikator muat tetap berputar pelan agar status "sedang memproses" tetap terlihat */
 @media (prefers-reduced-motion:reduce){.spin{animation:sp 1.6s linear infinite!important}}
 </style>
-
-
-<style id="calm-dashboard-modern-v2">
-/* Lapisan visual tambahan saja: tidak mengubah template Vue, API, data, atau event handler. */
-@media screen {
-  :root { --calm-ink:#172b4d; --calm-muted:#64748b; --calm-line:#e4eaf2; --calm-blue:#123f7a; }
-  body.calm-table-polish { background:#f3f6fb; color:var(--calm-ink); }
-  /* Navigasi utama */
-  body.calm-table-polish > #app > div > aside,
-  body.calm-table-polish #app aside[aria-label="Menu utama"] {
-    background:linear-gradient(180deg,#0b2347 0%,#0a1d3a 100%) !important;
-    border-right:1px solid rgba(255,255,255,.08);
-    box-shadow:5px 0 24px rgba(15,35,65,.06);
-    padding:1.15rem .85rem;
-  }
-  #app aside[aria-label="Menu utama"] > div:first-child {
-    padding:.45rem .65rem 1.15rem;
-    margin-bottom:1rem;
-    border-bottom:1px solid rgba(255,255,255,.12);
-  }
-  #app aside[aria-label="Menu utama"] > div:first-child img {
-    width:2.8rem;height:2.8rem; padding:.25rem;
-    background:#fff;border-radius:.85rem;box-shadow:0 4px 12px rgba(0,0,0,.12);
-  }
-  #app aside[aria-label="Menu utama"] > button {
-    min-height:43px; margin-bottom:.25rem; padding:.72rem .8rem;
-    border:1px solid transparent; border-radius:.75rem;
-    color:#dbe6f5; font-size:.82rem; letter-spacing:.005em;
-    transition:background .18s ease,border-color .18s ease,transform .18s ease;
-  }
-  #app aside[aria-label="Menu utama"] > button:hover {
-    background:rgba(255,255,255,.085); border-color:rgba(255,255,255,.08);
-    transform:translateX(2px);
-  }
-  #app aside[aria-label="Menu utama"] > button[aria-current="page"] {
-    background:linear-gradient(105deg,#1d4f91,#173d70) !important;
-    color:#fff !important; border-color:rgba(147,197,253,.2);
-    box-shadow:inset 3px 0 #f2c66d,0 5px 14px rgba(0,0,0,.12) !important;
-  }
-  #app aside[aria-label="Menu utama"] > button svg { opacity:.92; }
-  /* Area kerja dan identitas pengguna */
-  #app main#utama { max-width:none; padding:1.6rem clamp(1rem,2.4vw,2.4rem) 3rem; }
-  #app main#utama > .hidden.md\:flex.items-center {
-    min-height:42px; padding:0 0 1rem; margin-bottom:1.35rem;
-    border-bottom:1px solid #e4eaf2;
-  }
-  #app main#utama section { animation:calmEnter .24s ease-out both; }
-  @keyframes calmEnter { from{opacity:.65;transform:translateY(4px)} to{opacity:1;transform:none} }
-  /* Kartu dashboard dan panel */
-  #app main#utama .card {
-    position:relative; overflow:hidden; min-height:112px;
-    padding:1.15rem 1.2rem; border-radius:1rem;
-    border:1px solid #e4eaf2; background:#fff;
-    box-shadow:0 3px 12px rgba(18,42,78,.035);
-  }
-  #app main#utama .card .n {
-    display:block; margin-bottom:.35rem; font-size:1.9rem;
-    line-height:1.15; letter-spacing:-.045em; color:#183b68;
-  }
-  #app main#utama section .rounded-2xl.bg-white,
-  #app main#utama section .bg-white.rounded-2xl {
-    border-color:#e3eaf3;
-  }
-  #app main#utama section .bg-gradient-to-r.text-white {
-    position:relative; isolation:isolate; overflow:hidden;
-    min-height:155px; padding:1.7rem 1.8rem;
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:1.15rem; box-shadow:0 10px 26px rgba(13,48,92,.12);
-  }
-  #app main#utama section .bg-gradient-to-r.text-white:after {
-    content:"";position:absolute;z-index:-1;width:230px;height:230px;
-    right:-65px;top:-100px;border:1px solid rgba(255,255,255,.13);
-    border-radius:50%;box-shadow:0 0 0 24px rgba(255,255,255,.035),0 0 0 50px rgba(255,255,255,.025);
-    pointer-events:none;
-  }
-  #app main#utama section .bg-gradient-to-r.text-white h2 {
-    margin:.35rem 0 .25rem; font-size:clamp(1.45rem,2.2vw,2rem);
-    letter-spacing:-.04em; line-height:1.2;
-  }
-  #app main#utama section .h2 {
-    color:#183b68; font-size:1.22rem; font-weight:800;
-    letter-spacing:-.025em; margin-bottom:1rem;
-  }
-  /* Tombol dan kontrol lebih konsisten */
-  #app main#utama button, #app main#utama .btn-p, #app main#utama .btn-o {
-    transition:box-shadow .16s ease,transform .16s ease,background-color .16s ease;
-  }
-  #app main#utama .btn-p { box-shadow:0 3px 8px rgba(18,63,122,.13); }
-  #app main#utama .btn-o { background:#fff; }
-  #app main#utama .btn-p:hover:not(:disabled),
-  #app main#utama .btn-o:hover:not(:disabled) { transform:translateY(-1px); }
-  #app main#utama input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
-  #app main#utama select,#app main#utama textarea {
-    border-radius:.7rem;
-  }
-  /* Header perangkat kecil */
-  #app header.md\:hidden {
-    background:linear-gradient(110deg,#0b2347,#123f7a);
-    box-shadow:0 4px 16px rgba(10,29,58,.15);
-    min-height:58px;
-  }
-  @media (min-width:768px) {
-    #app aside[aria-label="Menu utama"] { width:254px; }
-  }
-  @media (max-width:767px) {
-    #app main#utama { padding:1rem .85rem 2rem; }
-    #app main#utama section .bg-gradient-to-r.text-white { padding:1.3rem; min-height:140px; }
-    #app main#utama .card { min-height:98px; padding:.9rem; }
-    #app main#utama .card .n { font-size:1.65rem; }
-    #app aside[aria-label="Menu utama"] { border-radius:0 0 1rem 1rem; }
-  }
-}
-@media (prefers-reduced-motion:reduce) {
-  #app main#utama section { animation:none !important; }
-  #app aside[aria-label="Menu utama"] > button { transition:none !important; }
-}
-</style>
-
-<style id="calm-final-polish-v3">
-/* Lapisan akhir (hanya layar): menyatukan token, menutup konflik antar-lapisan, dan memperbaiki kenyamanan pakai.
-   Tidak menyentuh template, data, API, maupun aturan cetak. */
-@media screen {
-  :root{--c-navy:#0b3d91;--c-navy-d:#061f4d;--c-ink:#172b4d;--c-muted:#5b6b82;--c-line:#e4eaf2;--c-surface:#fff;--c-bg:#f3f6fb;--c-focus:#f59e0b;--r-card:1rem;--sh-card:0 1px 2px rgba(15,35,65,.04),0 8px 20px -14px rgba(15,35,65,.14)}
-  html{scroll-behavior:smooth;scroll-padding-top:4.5rem;-webkit-text-size-adjust:100%}
-  body.calm-table-polish{background:var(--c-bg);color:var(--c-ink);text-rendering:optimizeLegibility}
-
-  /* Tipografi: satu bobot judul yang konsisten (lapisan sebelumnya saling menimpa 700/800) */
-  #app main#utama section .h2,.h2{font-weight:700;color:var(--c-navy-d);letter-spacing:-.025em}
-  #app main#utama .card .n{font-weight:700;color:var(--c-navy-d);font-variant-numeric:tabular-nums}
+<style id="calm-ui-v4">
+/* UI v4 — modern, ringan. Hanya layar; tanpa blur/filter/animasi berat; tanpa perubahan template, data, API, atau aturan cetak. */
+@media screen{
+  :root{--navy:#0b3d91;--navy-d:#061f4d;--ink:#18263f;--mut:#5b6b82;--line:#e6ebf3;--bg:#f6f8fc;--card:#fff;--ring:#f59e0b;--rad:1rem;--sh:0 1px 2px rgba(15,35,65,.05)}
+  html{scroll-padding-top:4.5rem}
+  body.calm-table-polish{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .font-extrabold{font-weight:700} /* bobot 800 tidak dimuat; samakan agar tidak jatuh ke huruf sintetis */
   table{font-variant-numeric:tabular-nums}
 
-  /* Kartu & panel: bayangan halus yang seragam, naik sedikit saat disorot */
-  #app main#utama .card,#app main#utama section .bg-white.rounded-2xl{box-shadow:var(--sh-card);border-color:var(--c-line)}
-  #app main#utama .card{transition:box-shadow .2s ease,transform .2s ease}
-  @media (hover:hover){#app main#utama .card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(15,35,65,.05),0 14px 28px -16px rgba(15,35,65,.22)}}
+  /* Navigasi samping: gelap datar, item berbentuk pil */
+  #app aside[aria-label="Menu utama"]{background:#0a2250;border-right:0;padding:1.1rem .75rem;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+  @media(min-width:768px){#app aside[aria-label="Menu utama"]{width:15.5rem}}
+  #app aside[aria-label="Menu utama"]>div:first-child{padding:.3rem .6rem 1rem;margin-bottom:.9rem;border-bottom:1px solid rgba(255,255,255,.1)}
+  #app aside[aria-label="Menu utama"]>div:first-child img{width:2.75rem;height:2.75rem;padding:.3rem;background:#fff;border-radius:.8rem;box-shadow:none}
+  #app aside[aria-label="Menu utama"]>button{min-height:2.7rem;margin-bottom:.2rem;padding:.6rem .85rem;border:0;border-radius:.7rem;color:#c9d6ea;font-size:.84rem;font-weight:600;transition:background-color .12s,color .12s}
+  #app aside[aria-label="Menu utama"]>button:hover{background:rgba(255,255,255,.08);color:#fff;transform:none}
+  #app aside[aria-label="Menu utama"]>button[aria-current="page"]{background:#fff;color:var(--navy-d);box-shadow:none}
+  #app aside[aria-label="Menu utama"]>button[aria-current="page"] svg{color:var(--navy);opacity:1}
+  #app aside[aria-label="Menu utama"]>button.text-amber-400{color:#fcd34d}
+  #app header.sticky.md\:hidden{background:#0a2250;border-bottom:0;box-shadow:0 2px 8px rgba(6,31,77,.25);min-height:58px}
 
-  /* Tabel: header lengket di dalam wadah gulir, baris selang-seling lembut */
-  #app main#utama section table:not(.border-collapse) thead th{position:sticky;top:0;z-index:1;font-weight:700;font-size:.75rem;letter-spacing:.02em;text-transform:none}
-  #app main#utama section table:not(.border-collapse) tbody tr:nth-child(even){background:#fafcfe}
-  #app main#utama section table:not(.border-collapse) tbody tr:hover{background:#f1f6fd}
-  #app main#utama section table:not(.border-collapse) td,#app main#utama section table:not(.border-collapse) th{padding-top:.6rem;padding-bottom:.6rem}
+  /* Area kerja */
+  #app main#utama{max-width:none;padding:1.5rem clamp(1rem,2.4vw,2.5rem) calc(3rem + env(safe-area-inset-bottom,0px))}
+  @media(min-width:1280px){#app main#utama{max-width:1600px;margin-inline:auto}}
+  #app main#utama>div.hidden.md\:flex{padding:0 0 1rem;margin-bottom:1.25rem;border-bottom:1px solid var(--line)}
+  #app main#utama section{animation:fadeIn .18s ease-out both}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .h2,#app main#utama section .h2{font-size:1.35rem;line-height:1.3;font-weight:700;letter-spacing:-.025em;color:var(--navy-d)}
 
-  /* Bilah kemajuan */
-  #app main#utama .h-2.rounded-full,#app main#utama .h-1.rounded-full{overflow:hidden}
-  #app main#utama .h-2.rounded-full>div,#app main#utama .h-1.rounded-full>div{transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  /* Banner dasbor: gradasi tunggal, satu lingkaran dekoratif */
+  #app main#utama section .bg-gradient-to-r.text-white{position:relative;overflow:hidden;isolation:isolate;min-height:9rem;padding:1.6rem 1.75rem;border-radius:1.25rem;border:0;box-shadow:none;background-image:linear-gradient(115deg,#082a66 0%,#0b3d91 55%,#1a62c4 100%)}
+  #app main#utama section .bg-gradient-to-r.text-white::before{display:none}
+  #app main#utama section .bg-gradient-to-r.text-white::after{content:"";position:absolute;z-index:-1;width:16rem;height:16rem;right:-4rem;top:-6rem;border-radius:50%;background:rgba(255,255,255,.07);box-shadow:none}
+  #app main#utama section .bg-gradient-to-r.text-white h2{font-size:clamp(1.4rem,2.2vw,1.9rem);line-height:1.2;font-weight:700;letter-spacing:-.03em;margin:.3rem 0 .25rem}
 
-  /* Fokus: jelas untuk papan ketik, tidak mengganggu klik mouse */
-  :focus:not(:focus-visible){outline:none}
-  :focus-visible{outline:2px solid var(--c-focus);outline-offset:2px;border-radius:.5rem}
-  .inp:focus-visible,.fld:focus-visible{outline:none}
+  /* Kartu & panel: datar, garis halus */
+  #app main#utama .card,#app main#utama section .bg-white.rounded-2xl{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);box-shadow:var(--sh)}
+  #app main#utama section .bg-white.rounded-2xl.border-l-4{border-left-width:4px}
+  #app main#utama section .bg-white.rounded-2xl.border-sky-500{border-left-color:#0ea5e9}
+  #app main#utama section .bg-white.rounded-2xl.border-amber-400{border-left-color:#fbbf24}
+  #app main#utama section .bg-white.rounded-2xl.border-navy-700{border-left-color:#0b3d91}
+  #app main#utama section .bg-white.rounded-2xl.border-violet-500{border-left-color:#8b5cf6}
+  #app main#utama .card{min-height:6.5rem;padding:1.1rem 1.2rem;font-size:.8125rem;color:var(--mut);contain:content}
+  #app main#utama .card .n{font-size:1.9rem;line-height:1.15;font-weight:700;letter-spacing:-.04em;color:var(--navy-d);margin-bottom:.3rem;font-variant-numeric:tabular-nums}
+  #app main#utama section .bg-white h3{font-size:1rem;line-height:1.4;font-weight:700;color:var(--navy-d)}
 
-  /* Status tombol */
-  button:disabled,.btn-p:disabled,.btn-o:disabled{cursor:not-allowed;opacity:.55;filter:saturate(.7)}
-  .btn-p,.btn-o{min-height:2.5rem;display:inline-flex;align-items:center;justify-content:center;gap:.4rem}
+  /* Tombol: datar & tegas */
+  .btn-p,.btn-o{min-height:2.55rem;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border-radius:.7rem;font-size:.875rem;font-weight:700;transition:background-color .12s,border-color .12s,box-shadow .12s}
+  .btn-p{background:var(--navy);background-image:none;box-shadow:none;color:#fff}
+  .btn-p:hover:not(:disabled){background:#082f70;background-image:none;box-shadow:0 4px 10px -4px rgba(6,31,77,.5);transform:none}
+  .btn-p:active:not(:disabled){background:#061f4d}
+  .btn-o{background:#fff;border:1px solid #d3dcea;color:var(--navy)}
+  .btn-o:hover:not(:disabled){background:#f1f5fb;border-color:#9fb4d3;transform:none}
+  button:disabled{cursor:not-allowed;opacity:.55}
+  #app main#utama section button.hover\:bg-amber-600{background:#f59e0b;background-image:none;border-radius:.75rem;box-shadow:none}
+  #app main#utama section button.hover\:bg-amber-600:hover:not(:disabled){background:#d97706;filter:none}
 
-  /* Pemilih tanggal / isian angka rapi */
-  input[type=date],input[type=number],input[type=time]{font-variant-numeric:tabular-nums}
+  /* Isian */
+  .inp,.fld,select.inp{min-height:2.6rem;border:1px solid #d3dcea;border-radius:.7rem;background-color:#fff;font-size:.9rem}
+  .inp:hover,.fld:hover{border-color:#aebdd3}
+  .inp:focus,.fld:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,61,145,.15);outline:0}
+  .lb{text-transform:none;letter-spacing:0;font-size:.78rem;font-weight:700;color:#475569}
   input::placeholder,textarea::placeholder{color:#94a3b8}
+  :focus:not(:focus-visible){outline:0}
+  :focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+  .inp:focus-visible,.fld:focus-visible{outline:0}
 
-  /* Dialog: tidak melebihi layar, isi bisa digulir, aman di area poni */
-  .modal-wrap{padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom))}
-  .modal-box{max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain}
+  /* Tab segmen */
+  [role="tablist"]{background:#e9eef6;border:0;padding:.25rem;border-radius:.85rem;width:fit-content;max-width:100%;gap:.15rem}
+  .tab{border-bottom-width:0;border-radius:.6rem;padding:.45rem .95rem;font-weight:700;color:#52627a}
+  .tab:hover{color:var(--navy)}
+  .tab-on,.tab-on:hover{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(15,35,65,.12)}
 
-  /* Bilah gulir tipis dan halus */
-  *{scrollbar-width:thin;scrollbar-color:#c3cedd transparent}
-  ::-webkit-scrollbar{width:8px;height:8px}
-  ::-webkit-scrollbar-thumb{background:#c3cedd;border-radius:8px}
-  ::-webkit-scrollbar-thumb:hover{background:#a5b4c9}
-  ::-webkit-scrollbar-track{background:transparent}
+  /* Tabel */
+  #app main#utama section table:not(.border-collapse) thead th{position:sticky;top:0;z-index:1;background:#f5f8fc;color:#475569;font-size:.75rem;font-weight:700;border-bottom:1px solid var(--line)}
+  #app main#utama section table:not(.border-collapse) tbody tr:hover{background:#f3f7fd}
+  #app main#utama section table:not(.border-collapse) td,#app main#utama section table:not(.border-collapse) th{padding-top:.6rem;padding-bottom:.6rem}
+  #app main#utama section tbody tr.border-t{border-top-color:#edf1f6}
+  #app main#utama section button.text-blue-800.font-bold,#app main#utama section button.text-rose-600.font-bold,#app main#utama section button.text-emerald-700.font-bold{padding:.2rem .65rem;margin-right:.3rem;border-radius:.5rem;font-size:.78rem}
+  #app main#utama section button.text-blue-800.font-bold{background:#eef3fb}
+  #app main#utama section button.text-rose-600.font-bold{background:#fff1f2}
+  #app main#utama section button.text-emerald-700.font-bold{background:#ecfdf5}
+  .h-2.rounded-full>div,.h-1.rounded-full>div{transition:width .35s ease}
 
-  /* Kartu "Pasang Portal": tidak tampil bila sudah dipasang sebagai aplikasi */
-  @media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){.pwa-card{display:none!important}}
+  /* Dialog & pesan: ringan, tanpa blur */
+  .modal-wrap{background:rgba(10,25,55,.55);padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom))}
+  .modal-box{border-radius:1.15rem;box-shadow:0 20px 48px -16px rgba(15,23,42,.45);max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain;animation:fadeIn .15s ease-out both}
+  .modal-box>h3:first-child{font-size:1.1rem;font-weight:700;letter-spacing:-.02em;color:var(--navy-d);padding-bottom:.85rem;margin-bottom:1.1rem;border-bottom:1px solid var(--line)}
+  .modal-box .flex.justify-end.gap-2.mt-4{margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--line)}
+  #app main#utama>p[role="alert"],#app main#utama>p[role="status"]{border-radius:.85rem;font-weight:500;box-shadow:0 8px 20px -10px rgba(15,35,65,.4)}
+  #app main span.rounded-full.font-bold{box-shadow:inset 0 0 0 1px rgba(15,35,65,.07)}
+
+  /* Login: tanpa blur */
+  .login-wrap .login-bg .grid>div{background:rgba(255,255,255,.1);border-radius:1rem}
+  .login-wrap .rounded-3xl.shadow-xl{border-radius:1.5rem;box-shadow:0 18px 40px -22px rgba(6,31,77,.4)}
+  .login-wrap [role="radio"]{border-radius:1rem;transition:border-color .12s,box-shadow .12s}
+  .login-wrap [role="radio"][aria-checked="true"]{border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,61,145,.12)}
+  .login-wrap .rounded-3xl button.w-full.bg-navy-700{background-image:none;border-radius:.9rem;box-shadow:none}
+
+  /* Utilitas yang dipakai template tetapi tidak ada di CSS terkompilasi */
+  .pwa-card{margin-bottom:1rem}
+  @media(display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){.pwa-card{display:none!important}}
 
   /* Seluler */
-  @media (max-width:767px){
-    /* header 58px (lapisan dasbor) -> panel menu mulai tepat di bawahnya, tanpa celah/tumpang-tindih */
-    html:not(.embedded) #app aside[aria-label="Menu utama"]{top:58px;max-height:calc(100vh - 58px);max-height:calc(100dvh - 58px);overflow-y:auto;z-index:35}
-    /* 16px mencegah browser iOS memperbesar layar saat mengetik */
+  @media(max-width:767px){
+    #app main#utama{padding:1rem .85rem calc(2rem + env(safe-area-inset-bottom,0px))}
+    html:not(.embedded) #app aside[aria-label="Menu utama"]{position:fixed;top:58px;left:0;right:0;z-index:35;max-height:calc(100vh - 58px);max-height:calc(100dvh - 58px);overflow-y:auto;border-radius:0 0 1rem 1rem;box-shadow:0 20px 36px -12px rgba(2,10,30,.5)}
+    #app aside[aria-label="Menu utama"]>button{min-height:2.9rem}
+    #app main#utama section .bg-gradient-to-r.text-white{padding:1.25rem;min-height:8.5rem}
+    #app main#utama .card{min-height:5.8rem;padding:.9rem}
+    #app main#utama .card .n{font-size:1.6rem}
     .inp,.fld,select,textarea,input:not([type=checkbox]):not([type=radio]){font-size:16px}
-    .inp,select.inp{min-height:2.75rem}
-    .btn-p,.btn-o{min-height:2.75rem}
-    #app aside[aria-label="Menu utama"]>button{min-height:46px}
-    [role="tablist"]{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+    .inp,select.inp,.btn-p,.btn-o{min-height:2.75rem}
+    [role="tablist"]{overflow-x:auto;flex-wrap:nowrap}
     .tab{flex:0 0 auto}
     .modal-box{border-radius:1.15rem 1.15rem 0 0;margin:auto 0 0}
     .modal-wrap{align-items:flex-end;padding-bottom:0}
   }
-  @media (min-width:1280px){#app main#utama{max-width:1600px;margin-inline:auto}}
 }
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  #app main#utama .card,#app main#utama .card:hover{transition:none!important;transform:none!important}
-  #app aside[aria-label="Menu utama"]>button:hover{transform:none!important}
-  .modal-box{animation:none!important}
-}
+@media(prefers-reduced-motion:reduce){#app main#utama section,.modal-box{animation:none!important}}
 </style>
-
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
