@@ -1390,7 +1390,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         </div>
         <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan data rapor</button><button @click="cetakRapor('')" :disabled="!rp.siswa.length" class="btn-o">Cetak semua rapor</button></div>
         <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-          <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>NISN</th><th>Rata-rata</th><th>&lt; KKTP</th><th>S/I/A</th><th>Ekstrakurikuler <span class="font-normal text-slate-400">(1 baris = 1 kegiatan: Pramuka - Baik)</span></th><th>Kokurikuler <span class="font-normal text-slate-400">(dimensi Profil Lulusan)</span></th><th>Catatan wali kelas</th><th></th></tr></thead>
+          <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>NISN</th><th>Rata-rata</th><th>&lt; KKTP</th><th>S/I/A</th><th>Ekstrakurikuler <span class="font-normal text-slate-400">(1 baris = 1 kegiatan: Pramuka - Baik)</span></th><th>Kokurikuler <span class="font-normal text-slate-400">(dimensi Profil Lulusan)</span></th><th>Catatan wali kelas</th><th class="noprint text-center whitespace-nowrap">Aksi</th></tr></thead>
           <tbody><tr v-for="(s,i) in rp.siswa" :key="s.nis" class="border-t align-top">
             <td class="p-3">{{i+1}}</td><td class="min-w-[9rem]">{{s.nama}}</td>
             <td class="p-2 font-mono text-sm">{{s.nisn||'-'}}</td>
@@ -1398,7 +1398,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
             <td class="pr-2"><textarea v-model="rpF[s.nis].ekskul" rows="2" maxlength="300" :disabled="!bolehEditR" class="w-full min-w-[11rem] border border-slate-200 rounded p-1 text-xs"></textarea></td>
             <td class="pr-2"><textarea v-model="rpF[s.nis].kokurikuler" rows="2" maxlength="400" placeholder="Tema/kegiatan &amp; dimensi: keimanan &amp; ketakwaan, kewargaan, penalaran kritis, kreativitas, kolaborasi, kemandirian, kesehatan, komunikasi" :disabled="!bolehEditR" class="w-full min-w-[11rem] border border-slate-200 rounded p-1 text-xs"></textarea></td>
             <td class="pr-2"><textarea v-model="rpF[s.nis].catatan" rows="2" maxlength="300" :disabled="!bolehEditR" class="w-full min-w-[12rem] border border-slate-200 rounded p-1 text-xs"></textarea></td>
-            <td class="pr-3"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button></td></tr>
+            <td class="pr-3 noprint text-center whitespace-nowrap"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button></td></tr>
           <tr v-if="!rp.siswa.length"><td colspan="10" class="p-4 text-slate-500">Belum ada siswa di kelas ini.</td></tr></tbody></table></div>
         <p class="text-xs text-slate-500 mt-2">Kehadiran dihitung per hari (status terburuk dari semua sesi hari itu). Capaian kompetensi pada rapor disusun otomatis dari ketercapaian tiap Tujuan Pembelajaran (TP): rata-rata skor sumatif TP dibandingkan KKTP TP tersebut, atau status asesmen formatif bila TP belum punya nilai sumatif. Nilai rapor dibulatkan ke bilangan bulat.</p>
       </template>
