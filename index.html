@@ -588,7 +588,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON.keluar"></svg><span>Keluar</span></button>
   </aside>
 
-  <main id="utama" class="flex-1 min-w-0 p-4 pb-10 md:p-8 md:pb-12 max-w-7xl">
+  <main id="utama" class="calm-table-polish flex-1 min-w-0 p-4 pb-10 md:p-8 md:pb-12 max-w-7xl">
     <div class="hidden md:flex items-center gap-2 mb-4 noprint"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span><span class="text-sm text-slate-500">{{user.nama}}</span></div>
     <p v-if="err" role="alert" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-rose-50 border border-rose-200 shadow text-rose-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{err}}</span><button @click="err=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
     <p v-if="ok" role="status" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 shadow text-emerald-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{ok}}</span><button @click="ok=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
