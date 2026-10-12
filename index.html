@@ -22,13 +22,14 @@
 .modal-wrap{display:flex;justify-content:center;align-items:flex-start;overflow-y:auto}.modal-box{margin:auto}
 .embedded .min-h-screen,.embedded aside{min-height:0}.embedded aside{height:auto!important;position:static!important;max-height:none!important}.embedded .login-wrap{min-height:680px}.embedded .modal-box{margin:1rem auto auto}
 .kartu-wrap,.rapor-wrap{display:none}
+.rapor-wm{position:absolute;top:34%;left:0;right:0;text-align:center;font-size:110pt;font-weight:800;color:rgba(0,0,0,.08);transform:rotate(-30deg);pointer-events:none}
 @page rapor{size:A4 portrait;margin:15mm}
 @page pelanggaran{size:A4 landscape;margin:10mm 11mm 12mm}
 @media print{
   body.cetak-rapor main>*:not(.rapor-wrap){display:none!important}
   body.cetak-rapor .rapor-wrap{display:block;page:rapor}
   .rapor-page{break-after:page;page-break-after:always}
-  .rapor-page{font-size:10pt;line-height:1.35;color:#000}
+  .rapor-page{font-size:10pt;line-height:1.35;color:#000;position:relative}
   .rapor-page tr{break-inside:avoid;page-break-inside:avoid}.rapor-page thead{display:table-header-group}
   .rapor-page .bg-slate-100,.rapor-page .bg-slate-50{background:#e8edf3!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   body.cetak-pelanggaran{background:#fff!important;color:#172033!important;font-size:8.5pt;line-height:1.35;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -1280,7 +1281,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
           <button @click="savePengaturan" :disabled="busy" class="btn-p mt-5">Simpan pengaturan</button>
         </div>
         <div>
-          <div v-if="ak" class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-1">Bobot nilai &amp; KKTP</h3><p class="text-xs text-slate-500 mb-3">Bobot menentukan nilai akhir mapel di Leger dan Rapor (0 = jenis tidak dipakai). KKTP (Kriteria Ketercapaian Tujuan Pembelajaran) di sini adalah <b>batas nilai &ldquo;sudah mencapai tujuan&rdquo;</b>: umum untuk semua mapel, dan dapat diubah per mapel. Sebagai acuan interval: 0&ndash;40 belum mencapai (remedial seluruh bagian), 41&ndash;65 belum mencapai (remedial bagian tertentu), 66&ndash;85 sudah mencapai, 86&ndash;100 sudah mencapai (pengayaan). Sebelum disimpan, Leger memakai rata-rata biasa.</p>
+          <div v-if="ak" class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-1">Bobot nilai &amp; KKTP</h3><p class="text-xs text-slate-500 mb-3">Nilai akhir = rata-rata berbobot tiga komponen: Sumatif Lingkup Materi (bobot Harian + Tugas + Praktik dijumlahkan), Sumatif Tengah Semester (bobot UTS), dan Sumatif Akhir Semester (bobot UAS). Rumus yang sama dipakai di Leger, Rapor, dan Rekap Mapel; tiap komponen dibulatkan dulu, dan bobot dinormalkan pada komponen yang sudah ada nilainya (0 = tidak dipakai). KKTP (Kriteria Ketercapaian Tujuan Pembelajaran) di sini adalah <b>batas nilai &ldquo;sudah mencapai tujuan&rdquo;</b>: umum untuk semua mapel, dan dapat diubah per mapel. Sebagai acuan interval: 0&ndash;40 belum mencapai (remedial seluruh bagian), 41&ndash;65 belum mencapai (remedial bagian tertentu), 66&ndash;85 sudah mencapai, 86&ndash;100 sudah mencapai (pengayaan). Sebelum disimpan, dipakai bobot bawaan 60 : 20 : 20 (SLM : STS : SAS).</p>
             <div class="grid grid-cols-5 gap-2 mb-3"><label v-for="j in JENIS" :key="j" class="lb">{{jl(j)}}<input type="number" min="0" max="100" v-model.number="ak.bobot[j]" class="inp w-full mt-1"></label></div>
             <label class="lb">KKTP umum <input type="number" min="0" max="100" v-model.number="ak.def" class="inp w-24 ml-2"></label>
             <div class="mt-3 max-h-48 overflow-y-auto"><div v-for="m in ak.mapel" :key="m" class="flex items-center gap-2 text-sm py-1"><span class="flex-1">{{m}}</span><input type="number" min="0" max="100" v-model="ak.map[m]" placeholder="umum" class="inp w-20 !py-1"></div></div>
@@ -1346,15 +1347,18 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <div v-else class="flex flex-wrap gap-2 mb-4"><button v-for="t in rpTabs" :key="t.k" @click="gantiTabR(t.k)" :class="rpTab===t.k?'btn-p':'btn-o'">{{t.t}}</button></div>
 
       <!-- Filter bersama: Data & Cetak, Kenaikan Kelas -->
-      <div v-if="(rpTab==='data'||rpTab==='naik')&&rpPil.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
+      <div v-if="(rpTab==='data'||rpTab==='naik'||rpTab==='validasi')&&rpPil.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
         <label class="lb">Kelas<select v-model="rpKelas" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Kelas --</option><option v-for="k in rpPil" :key="k">{{k}}</option></select></label>
-        <label v-if="rpTab==='data'" class="lb">Jenis rapor<select v-model="rpMeta.periode" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="SAS">Akhir Semester (SAS)</option><option value="STS">Tengah Semester (STS)</option></select></label>
+        <label v-if="rpTab==='data'||rpTab==='validasi'" class="lb">Jenis rapor<select v-model="rpMeta.periode" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="SAS">Akhir Semester (SAS)</option><option value="STS">Tengah Semester (STS)</option></select></label>
         <label class="lb">Semester<select v-model="rpMeta.sem" @change="loadRapor" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select></label>
         <label class="lb">Tahun ajaran<select v-model="rpMeta.tahun" @change="loadRapor" class="inp w-full mt-1 normal-case"><option v-for="t in opsiTahun(rpMeta.tahun)" :key="t" :value="t">{{t}}</option></select></label>
       </div>
 
       <!-- TAB: Data & Cetak -->
       <template v-if="rpTab==='data'&&rp">
+        <div v-if="rp.status==='Final'" class="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-3"><b>FINAL</b> &middot; difinalkan {{rp.finalTanggal}}. Nilai pada rapor ini adalah salinan saat difinalkan<span v-if="rp.periode==='SAS'">; catatan, ekstrakurikuler, kokurikuler, dan keputusan wali terkunci</span>.</div>
+        <div v-else-if="rp.bukanAktif" class="text-sm text-rose-800 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 mb-3"><b>DRAF</b> &middot; nilai di server bukan untuk {{rpMeta.sem}} {{rpMeta.tahun}} (semester aktif berbeda). Angka di bawah <b>bukan</b> nilai periode ini; rapor tidak dapat dicetak atau difinalkan sebelum difinalkan pada periodenya.</div>
+        <div v-else class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3"><b>DRAF</b> &middot; belum difinalkan; angka dihitung dari nilai yang ada saat ini. Kunci lewat tab Validasi &amp; Finalisasi setelah semua nilai lengkap.</div>
         <div v-if="rp.kosongMapel.length" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">Mapel terjadwal tetapi <b>belum ada nilai sama sekali</b>: {{rp.kosongMapel.join(', ')}}.</div>
         <div v-if="rp.lengkap.length" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3"><b>Kelengkapan nilai</b> (jumlah siswa yang belum ada nilainya):
           <ul class="list-disc pl-5 mt-1"><li v-for="x in rp.lengkap" :key="x.mapel">{{x.mapel}}:<span v-if="x.tanpaSLM"> sumatif lingkup materi {{x.tanpaSLM}},</span><span v-if="x.tanpaSTS"> STS {{x.tanpaSTS}},</span><span v-if="x.tanpaSAS"> SAS {{x.tanpaSAS}}</span></li></ul></div>
@@ -1379,9 +1383,41 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <p class="text-xs text-slate-500 mt-2">Kehadiran dihitung per hari (status terburuk dari semua sesi hari itu). Capaian kompetensi pada rapor disusun otomatis dari ketercapaian tiap Tujuan Pembelajaran (TP): rata-rata skor sumatif TP dibandingkan KKTP TP tersebut, atau status asesmen formatif bila TP belum punya nilai sumatif. Nilai rapor dibulatkan ke bilangan bulat.</p>
       </template>
 
+      <!-- TAB: Validasi & Finalisasi -->
+      <template v-if="rpTab==='validasi'">
+        <p v-if="!rp" class="text-sm text-slate-500">Pilih kelas untuk memeriksa kesiapan rapor.</p>
+        <template v-else>
+          <div v-if="rp.status==='Final'" class="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-3"><b>FINAL</b> &middot; difinalkan {{rp.finalTanggal}}. Nilai pada rapor ini adalah salinan saat difinalkan<span v-if="rp.periode==='SAS'">; catatan, ekstrakurikuler, kokurikuler, dan keputusan wali terkunci</span>.</div>
+          <div v-else-if="rp.bukanAktif" class="text-sm text-rose-800 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 mb-3"><b>DRAF</b> &middot; nilai di server bukan untuk {{rpMeta.sem}} {{rpMeta.tahun}} (semester aktif berbeda), sehingga rapor ini tidak dapat difinalkan.</div>
+          <div v-else class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3"><b>DRAF</b> &middot; belum difinalkan.</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-sm mb-3">
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg">{{rp.siswa.length}}</div><div class="text-xs text-slate-500">Siswa</div></div>
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg">{{rp.mapel.length}}</div><div class="text-xs text-slate-500">Mapel bernilai</div></div>
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg" :class="rp.lengkap.length+rp.kosongMapel.length?'text-rose-600':'text-emerald-700'">{{rp.lengkap.length+rp.kosongMapel.length}}</div><div class="text-xs text-slate-500">Mapel belum lengkap</div></div>
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg">{{rp.status==='Final'?'Final':'Draf'}}</div><div class="text-xs text-slate-500">Status</div></div></div>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button @click="periksaRapor" :disabled="busy||!rp.siswa.length" class="btn-o">Periksa kesiapan</button>
+            <button v-if="rpPeran&&!rpFinal" @click="finalkanRapor(false)" :disabled="busy||!rp.siswa.length||rp.bukanAktif" class="btn-p">Finalkan rapor</button>
+            <button v-if="rpPeran&&!rpFinal&&rpBisaPaksa" @click="finalkanRapor(true)" :disabled="busy" class="btn-o">Finalkan dengan pengecualian (Admin)</button>
+            <button v-if="user&&user.role==='ADMIN'&&rpFinal" @click="bukaFinalRapor" :disabled="busy" class="btn-o">Buka kembali (Admin)</button></div>
+          <template v-if="rpCek">
+            <div v-if="rpCek.status==='Final'" class="text-sm text-emerald-800 bg-emerald-50 rounded-xl px-3 py-2 mb-3">Rapor ini sudah final; tidak ada yang perlu diperiksa.</div>
+            <template v-else>
+              <div v-if="rpCek.blok.length" class="text-sm text-rose-800 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 mb-3"><b>Harus diperbaiki sebelum difinalkan</b>
+                <ul class="list-disc pl-5 mt-1"><li v-for="(x,i) in rpCek.blok" :key="i">{{x.pesan}}</li></ul></div>
+              <div v-if="rpCek.info.length" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3"><b>Perlu diperhatikan</b> (tidak menghalangi finalisasi)
+                <ul class="list-disc pl-5 mt-1"><li v-for="(x,i) in rpCek.info" :key="i">{{x.pesan}}</li></ul></div>
+              <p v-if="!rpCek.blok.length" class="text-sm text-emerald-800 bg-emerald-50 rounded-xl px-3 py-2 mb-3">Siap difinalkan.</p>
+            </template>
+          </template>
+          <p class="text-xs text-slate-500 mt-2">Finalisasi menyimpan nilai, kehadiran, dan rekomendasi tiap siswa sebagai salinan tetap, sehingga rapor tetap dapat dicetak ulang walau nilai semester di-reset atau siswa sudah naik kelas/lulus. Rapor SAS yang sudah final juga mengunci catatan dan keputusan wali. Kekurangan nilai pada siswa tertentu (mis. siswa pindahan) hanya dapat dikecualikan oleh Admin; nilai di luar 0&ndash;100 harus diperbaiki dulu. Koreksi setelah final: Admin membuka kembali rapor (nilai harus masih ada di sistem).</p>
+        </template>
+      </template>
+
       <!-- TAB: Kenaikan Kelas -->
       <template v-if="rpTab==='naik'">
         <template v-if="rp">
+          <p v-if="rpFinal&&rp.periode==='SAS'" class="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-3">Rapor SAS kelas ini sudah <b>FINAL</b>, sehingga keputusan terkunci. Admin dapat membukanya kembali di tab Validasi &amp; Finalisasi.</p>
           <p v-if="rpMeta.sem!=='Genap'" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">Keputusan kenaikan kelas dicatat pada <b>Semester Genap</b>. Ubah pilihan semester ke Genap.</p>
           <p class="text-xs text-slate-500 mb-2">Kriteria kenaikan kelas ditetapkan oleh satuan pendidikan (KKTP tidak otomatis menjadi syarat naik kelas). Rekomendasi sistem memakai nilai akhir SAS: kelas {{rp.tingkat==='XII'?'XII dinyatakan lulus':'dinaikkan'}} bila mapel yang belum mencapai KKTP &le; <b>{{rp.ketentuan.maksBelum}}</b> dan kehadiran &ge; <b>{{rp.ketentuan.minHadir}}%</b> (diatur Admin). Keputusan akhir tetap pada wali kelas &amp; rapat dewan guru.</p>
           <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="terapkanRek" :disabled="!rp.siswa.length" class="btn-o">Terapkan rekomendasi sistem</button><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan keputusan</button></div>
@@ -1396,7 +1432,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         </template>
         <div v-if="user&&user.role==='ADMIN'" class="bg-white rounded-2xl shadow-sm p-5 mt-6">
           <h3 class="font-bold mb-1">Proses kenaikan kelas &amp; kelulusan (Admin)</h3>
-          <p class="text-xs text-slate-500 mb-3">Memproses keputusan <b>Semester Genap</b> seluruh kelas: siswa <b>Naik</b> dipindah ke kelas tujuan, siswa <b>Lulus</b> dipindah ke Alumni (akun login dihapus), <b>Tidak Naik/Tidak Lulus</b> tetap. Salinan &ldquo;siswa - kelas&rdquo; disimpan otomatis ke Riwayat sebelum proses. Urutan yang disarankan: (1) cetak semua rapor, (2) proses di sini, (3) ubah Tahun Ajaran, (4) Reset Semester.</p>
+          <p class="text-xs text-slate-500 mb-3">Memproses keputusan <b>Semester Genap</b> seluruh kelas: siswa <b>Naik</b> dipindah ke kelas tujuan, siswa <b>Lulus</b> dipindah ke Alumni (akun login dihapus), <b>Tidak Naik/Tidak Lulus</b> tetap. Salinan &ldquo;siswa - kelas&rdquo; disimpan otomatis ke Riwayat sebelum proses. Urutan yang disarankan: (1) finalkan rapor SAS Genap semua kelas (tab Validasi &amp; Finalisasi), (2) cetak semua rapor, (3) proses di sini, (4) ubah Tahun Ajaran, (5) Reset Semester.</p>
           <button @click="loadNaik" class="btn-o mb-3">Periksa kesiapan</button>
           <template v-if="rnaik">
             <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-sm mb-3"><div v-for="(v,kk) in rnaik.ringkas" :key="kk" class="rounded-xl bg-slate-50 p-2"><div class="font-bold text-lg">{{v}}</div><div class="text-xs text-slate-500">{{kk}}</div></div></div>
@@ -1840,6 +1876,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p>
       <div class="flex justify-end gap-2 mt-4"><button @click="showPg=false" class="btn-o">Batal</button><button @click="savePeng" :disabled="busy||!pf.judul||!pf.isi" class="btn-p">Publikasikan</button></div></div></div>
     <div v-if="rp&&view==='rapor'&&rpTab!=='rekap'&&rpTab!=='atur'" class="rapor-wrap"><div v-for="s in rpList" :key="s.nis" class="rapor-page">
+      <div v-if="rp.status!=='Final'" class="rapor-wm">DRAF</div><p v-if="rp.status!=='Final'" class="text-center text-xs font-bold" style="letter-spacing:.1em">DRAF &ndash; BELUM DIFINALKAN</p>
       <kop :k="cfg.kop"></kop>
       <p class="text-center font-bold underline mt-2">{{rp.periode==='STS'?'LAPORAN KEMAJUAN HASIL BELAJAR':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}}</p>
       <p class="text-center text-sm mb-3">{{rp.periode==='STS'?'Sumatif Tengah Semester':'Sumatif Akhir Semester'}} {{rpMeta.sem}} &middot; Tahun Ajaran {{rpMeta.tahun}}</p>
@@ -2049,7 +2086,7 @@ const app = createApp({
     const jf = reactive({ hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '', blok: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
 
     // Daftar putih aksi BACA (idempoten): hanya ini yang boleh diulang otomatis saat jaringan putus. Aksi baru default-nya TIDAK diulang (aman).
-    const READ = new Set(['formatifGet', 'kktpTpGet', 'raporRekapMapel', 'raporCfgGet', 'naikPreview', 'perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
+    const READ = new Set(['formatifGet', 'kktpTpGet', 'raporRekapMapel', 'raporCfgGet', 'raporCek', 'naikPreview', 'perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
     const SAFE = a => READ.has(a);
     // Cache baca sisi klien (memori saja, maks 60 dtk): data master/konfigurasi yang dibuka berulang antar-menu.
     // Setiap aksi TULIS (di luar daftar baca) mengosongkan cache sebelum & sesudah; hasil selalu salinan baru (JSON.parse).
@@ -2149,7 +2186,7 @@ const app = createApp({
       if (k === 'leger') { [cfg.value, lk.value] = await Promise.all([api('pengaturanGet'), api('legerKelas')]); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
       if (k === 'dokumen') await fetchD();
       if (k === 'perangkat') { const r = await Promise.all([fetchPa(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; paf.mapel = paf.jenis = ''; }
-      if (k === 'rapor') { const r = await Promise.all([api('pengaturanGet'), api('raporPilihan'), user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU') ? api('pilihanNilai') : null]); cfg.value = r[0]; rpPil.value = r[1]; if (r[2]) pil.value = r[2]; rp.value = null; rpKelas.value = ''; rkp.value = null; rkpIdx.value = ''; rcf.value = null; rnaik.value = null; const t = cfg.value.tahun; if (t && t.tahun) { rpMeta.tahun = t.tahun; rpMeta.sem = t.semester; } else if (!rpMeta.tahun) rpMeta.tahun = opsiTahun()[2]; rpTab.value = rpTabs.value.length ? rpTabs.value[0].k : 'data'; if (rpTab.value === 'atur') loadRc(); }
+      if (k === 'rapor') { const r = await Promise.all([api('pengaturanGet'), api('raporPilihan'), user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU') ? api('pilihanNilai') : null]); cfg.value = r[0]; rpPil.value = r[1]; if (r[2]) pil.value = r[2]; rp.value = null; rpKelas.value = ''; rkp.value = null; rkpIdx.value = ''; rcf.value = null; rnaik.value = null; rpCek.value = null; const t = cfg.value.tahun; if (t && t.tahun) { rpMeta.tahun = t.tahun; rpMeta.sem = t.semester; } else if (!rpMeta.tahun) rpMeta.tahun = opsiTahun()[2]; rpTab.value = rpTabs.value.length ? rpTabs.value[0].k : 'data'; if (rpTab.value === 'atur') loadRc(); }
       if (k === 'nilaisaya') nilaiSaya.value = await api('nilaiSaya');
       if (k === 'anak') { const d = await api('ortuData'); if (view.value !== k) return; anak.value = d; atab.value = 'hadir'; }
       if (k === 'notif') { const l = await api('notifList'); if (view.value !== k) return; nlist.value = l; await api('notifBaca'); notifN.value = 0; }
@@ -2699,8 +2736,10 @@ const app = createApp({
     /* ====== Rapor (Kurikulum Merdeka: STS, SAS, kenaikan kelas) ====== */
     const rpPil = ref([]), rpKelas = ref(''), rp = ref(null), rpF = reactive({}), rpInfo = reactive({ kompetensi: '', nipWali: '', tanggal: '' }), rpMeta = reactive({ sem: 'Ganjil', tahun: '', periode: 'SAS' });
     const rpTab = ref('data'), rpSatu = ref(''), rkp = ref(null), rkpIdx = ref(''), rkpPer = ref('SAS'), rcf = ref(null), rnaik = ref(null), rnaikTxt = ref('');
-    const bolehEditR = computed(() => !!user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU'));
-    const rpTabs = computed(() => { const t = [], r = user.value && user.value.role; if (rpPil.value.length) { t.push({ k: 'data', t: 'Data & Cetak Rapor' }); t.push({ k: 'naik', t: 'Kenaikan Kelas' }); } if (r === 'ADMIN' || r === 'GURU') t.push({ k: 'rekap', t: 'Rekap Nilai Mapel' }); if (r === 'ADMIN') t.push({ k: 'atur', t: 'Pengaturan Rapor' }); return t; });
+    const rpPeran = computed(() => !!user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU')), rpFinal = computed(() => !!rp.value && rp.value.status === 'Final'), rpCek = ref(null);
+    const bolehEditR = computed(() => rpPeran.value && !(rpFinal.value && rp.value.periode === 'SAS')); // rapor SAS final: data wali terkunci
+    const rpBisaPaksa = computed(() => !!user.value && user.value.role === 'ADMIN' && !!rpCek.value && rpCek.value.status !== 'Final' && rpCek.value.blok.length > 0 && rpCek.value.blok.every(x => x.jenis === 'nilaiKosong' || x.jenis === 'mapelKosong'));
+    const rpTabs = computed(() => { const t = [], r = user.value && user.value.role; if (rpPil.value.length) { t.push({ k: 'data', t: 'Data & Cetak Rapor' }); t.push({ k: 'validasi', t: 'Validasi & Finalisasi' }); t.push({ k: 'naik', t: 'Kenaikan Kelas' }); } if (r === 'ADMIN' || r === 'GURU') t.push({ k: 'rekap', t: 'Rekap Nilai Mapel' }); if (r === 'ADMIN') t.push({ k: 'atur', t: 'Pengaturan Rapor' }); return t; });
     const tglPanjangR = s => /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     const tglPendekR = s => /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : (s || '-');
     const tglRapor = computed(() => tglPanjangR(rpInfo.tanggal) || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }));
@@ -2716,29 +2755,56 @@ const app = createApp({
     };
     const cekTahunR = () => { const t = String(rpMeta.tahun || ''); if (!/^\d{4}\/\d{4}$/.test(t) || Number(t.slice(5)) !== Number(t.slice(0, 4)) + 1) throw new Error('Tahun ajaran harus berformat 2026/2027 (tahun berurutan)'); };
     let rpReq = 0;
-    const loadRapor = () => run(async () => {
+    const muatRapor = async () => {
       const rid = ++rpReq, k = rpKelas.value; if (k) cekTahunR();
       const d = k ? await api('raporData', { kelas: k, periode: rpTab.value === 'naik' ? 'SAS' : rpMeta.periode, tahun: rpMeta.tahun, semester: rpMeta.sem }) : null;
       if (rid !== rpReq) return;
       Object.keys(rpF).forEach(x => delete rpF[x]);
       if (d) { d.siswa.forEach(s => { rpF[s.nis] = { nisn: s.nisn, ekskul: s.ekskul, kokurikuler: s.kokurikuler, catatan: s.catatan, keputusan: s.keputusan, kelasTujuan: s.kelasTujuan }; }); Object.assign(rpInfo, { kompetensi: d.info.kompetensi || '', nipWali: d.info.nipWali || '', tanggal: d.info.tanggal || '' }); }
-      rp.value = d; rpSatu.value = '';
-    });
-    const gantiTabR = k => { rpTab.value = k; err.value = ok.value = ''; if (k === 'rekap' && !rkp.value && rkpIdx.value !== '') loadRekap(); if (k === 'atur' && !rcf.value) loadRc(); if ((k === 'data' || k === 'naik') && rpKelas.value) loadRapor(); };
+      rp.value = d; rpSatu.value = ''; rpCek.value = null;
+    };
+    const loadRapor = () => run(muatRapor);
+    const gantiTabR = k => { rpTab.value = k; err.value = ok.value = ''; if (k === 'rekap' && !rkp.value && rkpIdx.value !== '') loadRekap(); if (k === 'atur' && !rcf.value) loadRc(); if ((k === 'data' || k === 'naik' || k === 'validasi') && rpKelas.value) loadRapor(); };
+    const kirimRapor = () => api('raporSimpan', { kelas: rp.value.kelas, tahun: rp.value.tahun, semester: rp.value.semester, info: { kompetensi: rpInfo.kompetensi, nipWali: rpInfo.nipWali, tanggal: rpInfo.tanggal },
+      rows: rp.value.siswa.map(s => Object.assign({ nis: s.nis }, rpF[s.nis])) });
     const simpanRapor = () => run(async () => {
       if (!rp.value) return;
-      const d = await api('raporSimpan', { kelas: rp.value.kelas, tahun: rpMeta.tahun, semester: rpMeta.sem, info: { kompetensi: rpInfo.kompetensi, nipWali: rpInfo.nipWali, tanggal: rpInfo.tanggal },
-        rows: rp.value.siswa.map(s => Object.assign({ nis: s.nis }, rpF[s.nis])) });
+      const d = await kirimRapor();
       ok.value = 'Data rapor tersimpan (' + d.tersimpan + ' siswa)' + (d.dikunci ? '; ' + d.dikunci + ' siswa sudah diproses kenaikan kelasnya dan tidak diubah' : '') + '.';
     });
     const terapkanRek = () => { if (rp.value) rp.value.siswa.forEach(s => { if (!s.diproses) { rpF[s.nis].keputusan = s.rek.keputusan; if (s.rek.keputusan === 'Naik' && !rpF[s.nis].kelasTujuan) rpF[s.nis].kelasTujuan = s.kelasTujuan; } }); };
     const cetakRapor = nis => {
       if (!rp.value || !rp.value.siswa.length) return;
-      if ((rp.value.lengkap.length || rp.value.kosongMapel.length) && !confirm('Masih ada nilai yang belum lengkap. Tetap cetak?')) return;
+      if (rp.value.bukanAktif && rp.value.status !== 'Final') { err.value = 'Rapor tidak dapat dicetak: nilai di server bukan untuk ' + rpMeta.sem + ' ' + rpMeta.tahun + ' dan rapor periode ini belum difinalkan.'; toTop(); return; }
+      if ((rp.value.status !== 'Final' || rp.value.lengkap.length || rp.value.kosongMapel.length) && !confirm((rp.value.status !== 'Final' ? 'Rapor ini masih berstatus DRAF dan akan dicetak dengan tanda DRAF' : 'Rapor final')
+        + ((rp.value.lengkap.length || rp.value.kosongMapel.length) ? '; masih ada nilai yang belum lengkap' : '') + '. Tetap cetak?')) return;
       rpSatu.value = nis || ''; document.body.classList.add('cetak-rapor');
       window.addEventListener('afterprint', () => { document.body.classList.remove('cetak-rapor'); rpSatu.value = ''; }, { once: true });
       Vue.nextTick(() => setTimeout(() => window.print(), 60));
     };
+    const periksaRapor = () => run(async () => {
+      if (!rp.value) return;
+      rpCek.value = await api('raporCek', { kelas: rp.value.kelas, periode: rp.value.periode, tahun: rp.value.tahun, semester: rp.value.semester });
+    });
+    const finalkanRapor = paksa => run(async () => {
+      if (!rp.value || !rpPeran.value) return;
+      const d0 = rp.value, sas = d0.periode === 'SAS', nm = d0.kelas + ' - ' + (sas ? 'SAS' : 'STS') + ' ' + d0.semester + ' ' + d0.tahun;
+      if (!confirm('Finalkan rapor ' + nm + '?\n\nData rapor yang sedang diisi disimpan lebih dulu, lalu nilai semua siswa disimpan permanen sebagai salinan'
+        + (sas ? '. Catatan, ekstrakurikuler, kokurikuler, dan keputusan wali tidak dapat diubah lagi kecuali rapor dibuka kembali oleh admin' : '') + '.'
+        + (paksa === true ? '\n\nPENGECUALIAN: kekurangan nilai akan difinalkan apa adanya.' : ''))) return;
+      await kirimRapor();
+      const d = await api('raporFinalisasi', { kelas: d0.kelas, periode: d0.periode, tahun: d0.tahun, semester: d0.semester, paksa: paksa === true });
+      await muatRapor();
+      ok.value = 'Rapor ' + nm + ' difinalkan (' + d.final + ' siswa)' + (d.paksa ? ' dengan pengecualian' : '') + '.';
+    });
+    const bukaFinalRapor = () => run(async () => {
+      if (!rp.value || !user.value || user.value.role !== 'ADMIN') return;
+      const d0 = rp.value, t = prompt('Membuka rapor menghapus salinan nilai final dan mengembalikannya menjadi DRAF (dihitung ulang dari nilai yang ada saat ini). Bila nilai semester ini sudah di-reset, nilai rapor ini TIDAK dapat dipulihkan.\n\nKetik BUKA untuk melanjutkan:');
+      if (t !== 'BUKA') return;
+      const d = await api('raporBukaFinal', { kelas: d0.kelas, periode: d0.periode, tahun: d0.tahun, semester: d0.semester, konfirmasi: t });
+      await muatRapor();
+      ok.value = 'Rapor dibuka kembali (' + d.dibuka + ' baris salinan dihapus). Status: Draf.';
+    });
     const loadRekap = () => run(async () => { const p = pil.value[rkpIdx.value]; rkp.value = p ? await api('raporRekapMapel', { kelas: p.kelas, mapel: p.mapel, periode: rkpPer.value }) : null; });
     const loadRc = () => run(async () => { const d = await api('raporCfgGet'); d.mapel.forEach(m => { if (!d.kel[m]) d.kel[m] = { g: 'Umum', o: '' }; }); rcf.value = d; });
     const simpanRc = () => run(async () => { await api('raporCfgSimpan', { kel: rcf.value.kel, maksBelum: rcf.value.maksBelum, minHadir: rcf.value.minHadir }); ok.value = 'Pengaturan rapor tersimpan.'; });
@@ -3012,7 +3078,7 @@ const app = createApp({
       const nh = Math.ceil(h) + 24; if (nh !== window.__lh) { window.__lh = nh; parent.postMessage({ calmHeight: nh }, '*'); }
     }, 600);
 
-    return { pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, rpList, rpGrup, rkp, rkpIdx, rkpPer, rcf, rnaik, rnaikTxt, bolehEditR, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, rpList, rpGrup, rkp, rkpIdx, rkpPer, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
