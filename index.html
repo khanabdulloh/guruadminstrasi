@@ -1350,7 +1350,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <label class="lb">Kelas<select v-model="rpKelas" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Kelas --</option><option v-for="k in rpPil" :key="k">{{k}}</option></select></label>
         <label v-if="rpTab==='data'" class="lb">Jenis rapor<select v-model="rpMeta.periode" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="SAS">Akhir Semester (SAS)</option><option value="STS">Tengah Semester (STS)</option></select></label>
         <label class="lb">Semester<select v-model="rpMeta.sem" @change="loadRapor" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select></label>
-        <label class="lb">Tahun ajaran<input v-model.trim="rpMeta.tahun" @change="loadRapor" placeholder="2026/2027" class="inp w-full mt-1 normal-case"></label>
+        <label class="lb">Tahun ajaran<select v-model="rpMeta.tahun" @change="loadRapor" class="inp w-full mt-1 normal-case"><option v-for="t in opsiTahun(rpMeta.tahun)" :key="t" :value="t">{{t}}</option></select></label>
       </div>
 
       <!-- TAB: Data & Cetak -->
@@ -1792,7 +1792,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <h2 class="h2">Tahun Ajaran, Riwayat Kelas &amp; Alumni</h2>
       <div class="grid lg:grid-cols-2 gap-4 mb-4">
         <div class="bg-white rounded-2xl shadow-sm p-5"><h3 class="font-bold mb-3">Tahun ajaran aktif</h3>
-          <div class="grid grid-cols-2 gap-2"><input v-model.trim="ta.tahun" maxlength="9" placeholder="2026/2027" class="inp"><select v-model="ta.semester" class="inp"><option>Ganjil</option><option>Genap</option></select></div>
+          <div class="grid grid-cols-2 gap-2"><select v-model="ta.tahun" class="inp"><option value="">-- Tahun ajaran --</option><option v-for="t in opsiTahun(ta.tahun)" :key="t" :value="t">{{t}}</option></select><select v-model="ta.semester" class="inp"><option>Ganjil</option><option>Genap</option></select></div>
           <button @click="saveTa" :disabled="busy" class="btn-p mt-3">Simpan</button><p class="text-xs text-slate-500 mt-2">Menjadi isian awal pada cetak rapor.</p>
           <h3 class="font-bold mt-6 mb-1">Simpan riwayat kelas</h3><p class="text-xs text-slate-500 mb-2">Menyimpan salinan siswa dan kelasnya saat ini. Lakukan sebelum naik kelas atau meluluskan. Label yang sama akan ditimpa.</p>
           <div class="flex gap-2"><input v-model.trim="rwLabel" maxlength="40" placeholder="mis. 2026/2027 Ganjil" class="inp flex-1 min-w-0"><button @click="arsipRw" :disabled="busy||rwLabel.length<3" class="btn-p">Simpan</button></div></div>
@@ -2149,7 +2149,7 @@ const app = createApp({
       if (k === 'leger') { [cfg.value, lk.value] = await Promise.all([api('pengaturanGet'), api('legerKelas')]); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
       if (k === 'dokumen') await fetchD();
       if (k === 'perangkat') { const r = await Promise.all([fetchPa(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; paf.mapel = paf.jenis = ''; }
-      if (k === 'rapor') { const r = await Promise.all([api('pengaturanGet'), api('raporPilihan'), user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU') ? api('pilihanNilai') : null]); cfg.value = r[0]; rpPil.value = r[1]; if (r[2]) pil.value = r[2]; rp.value = null; rpKelas.value = ''; rkp.value = null; rkpIdx.value = ''; rcf.value = null; rnaik.value = null; const t = cfg.value.tahun; if (t && t.tahun) { rpMeta.tahun = t.tahun; rpMeta.sem = t.semester; } rpTab.value = rpTabs.value.length ? rpTabs.value[0].k : 'data'; if (rpTab.value === 'atur') loadRc(); }
+      if (k === 'rapor') { const r = await Promise.all([api('pengaturanGet'), api('raporPilihan'), user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU') ? api('pilihanNilai') : null]); cfg.value = r[0]; rpPil.value = r[1]; if (r[2]) pil.value = r[2]; rp.value = null; rpKelas.value = ''; rkp.value = null; rkpIdx.value = ''; rcf.value = null; rnaik.value = null; const t = cfg.value.tahun; if (t && t.tahun) { rpMeta.tahun = t.tahun; rpMeta.sem = t.semester; } else if (!rpMeta.tahun) rpMeta.tahun = opsiTahun()[2]; rpTab.value = rpTabs.value.length ? rpTabs.value[0].k : 'data'; if (rpTab.value === 'atur') loadRc(); }
       if (k === 'nilaisaya') nilaiSaya.value = await api('nilaiSaya');
       if (k === 'anak') { const d = await api('ortuData'); if (view.value !== k) return; anak.value = d; atab.value = 'hadir'; }
       if (k === 'notif') { const l = await api('notifList'); if (view.value !== k) return; nlist.value = l; await api('notifBaca'); notifN.value = 0; }
@@ -2708,6 +2708,12 @@ const app = createApp({
     const barisR = t => String(t || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 6).map(x => { const i = x.search(/\s[-\u2013|]\s/); return i < 0 ? { a: x, b: '' } : { a: x.slice(0, i).trim(), b: x.slice(i + 3).trim() }; });
     const rpGrup = computed(() => { if (!rp.value) return []; let n = 0; return ['Umum', 'Kejuruan', 'Muatan Lokal'].map(g => ({ g: g, items: rp.value.mapel.filter(m => m.grup === g).map(m => Object.assign({ no: ++n }, m)) })).filter(x => x.items.length); });
     const rpList = computed(() => rp.value ? (rpSatu.value ? rp.value.siswa.filter(s => s.nis === rpSatu.value) : rp.value.siswa) : []);
+    const opsiTahun = cur => { // tahun ajaran dimulai Juli: dari 2 tahun lalu sampai 6 tahun ke depan; nilai tersimpan di luar rentang tetap ikut tampil
+      const d = new Date(), y0 = d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1, a = [];
+      for (let y = y0 - 2; y <= y0 + 6; y++) a.push(y + '/' + (y + 1));
+      if (cur && /^\d{4}\/\d{4}$/.test(cur) && a.indexOf(cur) < 0) { a.push(cur); a.sort(); }
+      return a;
+    };
     const cekTahunR = () => { const t = String(rpMeta.tahun || ''); if (!/^\d{4}\/\d{4}$/.test(t) || Number(t.slice(5)) !== Number(t.slice(0, 4)) + 1) throw new Error('Tahun ajaran harus berformat 2026/2027 (tahun berurutan)'); };
     let rpReq = 0;
     const loadRapor = () => run(async () => {
@@ -3015,7 +3021,7 @@ const app = createApp({
       leger, lk, lkelas, dokumen, showD, df, loadDok, loadLeger, saveDok, delDok,
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
-      editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai, nMode, frows, kt, saveFormatif, saveKktp, setSemuaF, jl, cekTahunR,
+      editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai, nMode, frows, kt, saveFormatif, saveKktp, setSemuaF, jl, cekTahunR, opsiTahun,
       antreSaya, kirimAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
       anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu };
   }
