@@ -76,11 +76,11 @@
   body.cetak-pelanggaran tbody tr:nth-child(even){background:#f8fafc!important}
   body.cetak-pelanggaran .pel-print-notes{margin-top:8pt!important;padding-top:5pt;border-top:1px solid #b9c4d2;font-size:7.5pt;color:#39465a}
   body.cetak-pelanggaran .pel-print-notes p{margin:0 0 3pt!important}
-  body.cetak-pelanggaran .pel-print-signature{width:210pt;margin:14pt 68pt 0 auto;text-align:center;font-size:9pt;line-height:1.4;break-inside:avoid;page-break-inside:avoid}
-  body.cetak-pelanggaran .pel-print-signature-date{text-align:center;white-space:nowrap;margin-bottom:2pt}
+  body.cetak-pelanggaran .pel-print-signature{width:210pt;margin:14pt 36pt 0 auto;text-align:center;font-size:9pt;line-height:1.4;break-inside:avoid;page-break-inside:avoid}
+  body.cetak-pelanggaran .pel-print-signature-date{text-align:right;white-space:nowrap;margin-bottom:2pt}
   body.cetak-pelanggaran .pel-print-signature-role{text-align:center;margin-top:2pt}
   body.cetak-pelanggaran .pel-print-signature-role{margin-top:2pt}
-  body.cetak-pelanggaran .pel-print-signature-space{height:32pt}
+  body.cetak-pelanggaran .pel-print-signature-space{height:44pt}
   body.cetak-pelanggaran .pel-print-signature-name{display:inline-block;min-width:145pt;padding-top:2pt;border-top:0!important;font-weight:800;text-decoration:none!important}
   body.cetak-pelanggaran button{display:none!important}
 }
@@ -1495,8 +1495,8 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
             <label class="lb">Minimal kehadiran (%)<input type="number" min="0" max="100" v-model.number="rcf.minHadir" class="inp w-full mt-1"></label></div>
           <p class="text-xs text-slate-500 mt-2">Bobot nilai dan KKTP per mapel diatur di menu Pengaturan (Akademik). Kop surat &amp; Kepala Sekolah diatur di Pengaturan (Kop &amp; Tanda Tangan).</p></div>
         <div class="bg-white rounded-2xl shadow-sm overflow-x-auto mb-4"><h3 class="font-bold p-4 pb-1">Kelompok &amp; urutan mata pelajaran pada rapor</h3><p class="text-xs text-slate-500 px-4 pb-2">Mapel tanpa pengaturan masuk kelompok Umum. Urutan: angka kecil tampil lebih dulu dalam kelompoknya.</p>
-          <table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Mata pelajaran</th><th>Kelompok</th><th>Urutan</th></tr></thead><tbody>
-            <tr v-for="m in rcf.mapel" :key="m" class="border-t"><td class="p-3">{{m}}</td><td><select v-model="rcf.kel[m].g" class="inp normal-case"><option v-for="g in rcf.grup" :key="g">{{g}}</option></select></td><td><input type="number" min="0" max="999" v-model="rcf.kel[m].o" class="w-20 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
+          <table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama/kode asli</th><th style="min-width:260px">Nama mata pelajaran pada rapor</th><th>Kelompok</th><th>Urutan</th></tr></thead><tbody>
+            <tr v-for="m in rcf.mapel" :key="m" class="border-t"><td class="p-3 font-medium">{{m}}</td><td class="p-2"><input type="text" maxlength="100" :value="rcf.nama[m]||m" @input="rcf.nama[m]=$event.target.value" class="inp w-full normal-case" :aria-label="'Nama rapor untuk '+m" placeholder="Nama lengkap mata pelajaran"></td><td class="p-2"><select v-model="rcf.kel[m].g" class="inp normal-case"><option v-for="g in rcf.grup" :key="g">{{g}}</option></select></td><td class="p-2"><input type="number" min="0" max="999" v-model="rcf.kel[m].o" class="w-20 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
         <button @click="simpanRc" :disabled="busy" class="btn-p">Simpan pengaturan rapor</button>
       </template>
     </section>
@@ -1914,7 +1914,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <template v-else><th class="border p-1" style="width:9%">Nilai Akhir</th><th class="border p-1" style="width:7%">Predikat</th><th class="border p-1" style="width:44%">Capaian Kompetensi</th></template></tr></thead>
         <tbody v-for="g in rpGrup" :key="g.g">
           <tr class="font-bold"><td class="border p-1 bg-slate-50" :colspan="rp.periode==='STS'?7:6">Kelompok Mata Pelajaran {{g.g}}</td></tr>
-          <tr v-for="m in g.items" :key="m.nama"><td class="border p-1 text-center">{{m.no}}</td><td class="border p-1">{{m.nama}}</td><td class="border p-1 text-center">{{m.kkm}}</td>
+          <tr v-for="m in g.items" :key="m.nama"><td class="border p-1 text-center">{{m.no}}</td><td class="border p-1">{{m.label||m.nama}}</td><td class="border p-1 text-center">{{m.kkm}}</td>
             <template v-if="rp.periode==='STS'"><td class="border p-1 text-center">{{nv(s,m.nama,'slm')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'sts')}}</td><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{s.nilai[m.nama]?(s.nilai[m.nama].akhir>=m.kkm?'Tuntas':'Belum tuntas'):'-'}}</td></template>
             <template v-else><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'pred')}}</td><td class="border p-1 text-xs" style="text-align:justify">{{s.nilai[m.nama]&&s.nilai[m.nama].desk||'-'}}</td></template></tr></tbody>
         <tbody><tr class="font-bold"><td class="border p-1" colspan="3">Rata-rata</td><td class="border p-1 text-center" :colspan="rp.periode==='STS'?3:1">{{s.rata==null?'-':s.rata}}</td><td class="border p-1" :colspan="rp.periode==='STS'?1:2"></td></tr></tbody></table>
@@ -2856,8 +2856,8 @@ const app = createApp({
       ok.value = 'Rapor dibuka kembali (' + d.dibuka + ' baris salinan dihapus). Status: Draf.';
     });
     const loadRekap = () => run(async () => { const p = pil.value[rkpIdx.value]; rkp.value = p ? await api('raporRekapMapel', { kelas: p.kelas, mapel: p.mapel, periode: rkpPer.value }) : null; });
-    const loadRc = () => run(async () => { const d = await api('raporCfgGet'); d.mapel.forEach(m => { if (!d.kel[m]) d.kel[m] = { g: 'Umum', o: '' }; }); rcf.value = d; });
-    const simpanRc = () => run(async () => { await api('raporCfgSimpan', { kel: rcf.value.kel, maksBelum: rcf.value.maksBelum, minHadir: rcf.value.minHadir }); ok.value = 'Pengaturan rapor tersimpan.'; });
+    const loadRc = () => run(async () => { const d = await api('raporCfgGet'); d.mapel.forEach(m => { if (!d.kel[m]) d.kel[m] = { g: 'Umum', o: '' }; }); d.nama = d.nama || {}; d.mapel.forEach(m => { if (!d.nama[m]) d.nama[m] = m; }); rcf.value = d; });
+    const simpanRc = () => run(async () => { await api('raporCfgSimpan', { kel: rcf.value.kel, nama: rcf.value.nama, maksBelum: rcf.value.maksBelum, minHadir: rcf.value.minHadir }); ok.value = 'Pengaturan rapor tersimpan.'; });
     const loadNaik = () => run(async () => { cekTahunR(); rnaik.value = await api('naikPreview', { tahun: rpMeta.tahun }); });
     const prosesNaik = () => run(async () => {
       cekTahunR(); const d = await api('naikProses', { tahun: rpMeta.tahun, konfirmasi: rnaikTxt.value }); rnaikTxt.value = '';
