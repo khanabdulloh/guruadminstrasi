@@ -968,7 +968,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <!-- Form tambah/ubah -->
       <div v-if="showS" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{sf.edit?'Ubah siswa':'Tambah siswa'}}</h3>
-        <label class="lb">ID Login siswa (internal; tidak dicetak di rapor)</label><input v-model.trim="sf.nis" :disabled="sf.edit" placeholder="ID login siswa" class="inp w-full mt-1 mb-3 disabled:bg-slate-100"><label class="lb">NISN <span class="font-normal text-slate-400">(opsional, 10 digit; hanya Admin yang dapat mengubah)</span></label><input v-model.trim="sf.nisn" maxlength="10" inputmode="numeric" placeholder="Masukkan NISN" class="inp w-full mt-1 mb-3">
+        <label class="lb">NISN <span class="font-normal text-slate-400">(10 digit angka; hanya Admin yang dapat mengubah)</span></label><input v-model.trim="sf.nisn" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" placeholder="Masukkan 10 digit NISN" class="inp w-full mt-1 mb-3">
         <input v-model.trim="sf.nama" placeholder="Nama lengkap" class="inp w-full mb-3">
         <div class="flex gap-3 mb-3"><select v-model="sf.gender" class="inp"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
           <select v-model="sf.kelas" class="inp flex-1"><option value="">Pilih kelas</option><option v-for="k in kelasAll" :value="k.kelas">{{k.kelas}}</option></select></div>
@@ -990,11 +990,11 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
             <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">{{impCount.baru}} baru</span>
             <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{impCount.ubah}} sudah ada</span>
             <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">{{impCount.error}} bermasalah (dilewati)</span></div>
-          <label class="flex items-center gap-2 text-sm mb-3"><input type="checkbox" v-model="imp.update"> Perbarui data siswa yang ID Login-nya sudah ada</label>
+          <label class="flex items-center gap-2 text-sm mb-3"><input type="checkbox" v-model="imp.update"> Perbarui data siswa dengan NISN yang sudah terdaftar</label>
           <div class="overflow-auto border rounded-xl max-h-80"><table class="w-full text-xs">
-            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>ID Login</th><th>NISN</th><th>Nama</th><th>Jenis kelamin</th><th>Kelas</th><th>Status</th></tr></thead>
+            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>NISN</th><th>Nama</th><th>Jenis kelamin</th><th>Kelas</th><th>Status</th></tr></thead>
             <tbody><tr v-for="r in imp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
-              <td class="p-2">{{r.no}}</td><td>{{r.nis}}</td><td>{{r.nisn||'-'}}</td><td>{{r.nama}}</td><td>{{r.gender}}</td><td>{{r.kelas}}</td>
+              <td class="p-2">{{r.no}}</td><td>{{r.nisn||'-'}}</td><td>{{r.nama}}</td><td>{{r.gender}}</td><td>{{r.kelas}}</td>
               <td :class="r.st==='error'?'text-rose-600':r.st==='ubah'?'text-blue-800':'text-emerald-700'">{{r.st==='error'?r.msg:r.st==='ubah'?'Diperbarui':'Baru'}}</td></tr></tbody></table></div>
           <p v-if="imp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{imp.rows.length}}; semua baris tetap diproses.</p>
           <p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p>
@@ -1795,7 +1795,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <tr v-if="!penguranganSiswa.length"><td colspan="6" class="p-4 text-slate-500">Belum ada siswa dengan catatan pelanggaran yang cocok.</td></tr></tbody></table></div>
       <p class="text-xs text-slate-500 mt-2">Pengurangan tidak menghapus catatan pelanggaran. Sistem hanya menghitung total efektif dari akumulasi pelanggaran dikurangi transaksi pengurangan.</p>
       <div v-if="showKurangi" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center gap-3 mb-4"><div class="mr-auto"><h3 class="font-extrabold text-blue-900">Kurangi poin</h3><p class="text-sm text-slate-500">{{kpf.nama}} · {{kpf.nis}} · {{kpf.kelas}}</p></div><button @click="showKurangi=false" class="btn-o">Tutup</button></div>
+        <div class="flex items-center gap-3 mb-4"><div class="mr-auto"><h3 class="font-extrabold text-blue-900">Kurangi poin</h3><p class="text-sm text-slate-500">{{kpf.nama}} · NISN {{labelNisn(kpf.nis)}} · {{kpf.kelas}}</p></div><button @click="showKurangi=false" class="btn-o">Tutup</button></div>
         <div class="grid grid-cols-3 gap-2 mb-4 text-sm"><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Total pelanggaran</div><b>{{kurangiInfo.totalPelanggaran}}</b></div><div class="rounded-xl bg-emerald-50 p-3"><div class="text-xs text-slate-500">Sudah dikurangi</div><b class="text-emerald-700">{{kurangiInfo.totalPengurangan}}</b></div><div class="rounded-xl bg-blue-50 p-3"><div class="text-xs text-slate-500">Total efektif</div><b class="text-blue-900">{{kurangiInfo.totalEfektif}}</b></div></div>
         <div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="kpf.tanggal" :max="hari0" class="inp w-full mt-1"></label><label class="lb">Jumlah pengurangan<input type="number" min="1" max="100" step="1" v-model="kpf.jumlah" class="inp w-full mt-1"></label></div>
         <label class="lb block mt-3">Alasan<textarea v-model.trim="kpf.alasan" maxlength="300" rows="2" placeholder="Dasar pemberian pengurangan poin" class="inp w-full mt-1"></textarea></label>
@@ -2267,14 +2267,14 @@ const app = createApp({
     }
     const exportSiswa = () => run(async () => {
       const list = siswaTampil.value.slice().sort((a, b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
-      const aoa = [['No', 'ID Login (internal)', 'NISN', 'Nama', 'L/P', 'Kelas', 'Kontak']].concat(list.map((s, i) => [i + 1, String(s.nis), String(s.nisn || ''), s.nama, s.gender, s.kelas, s.kontak]));
-      await saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 20, 16, 32, 5, 12, 18]]]);
+      const aoa = [['No', 'NISN', 'Nama', 'L/P', 'Kelas', 'Kontak']].concat(list.map((s, i) => [i + 1, String(s.nisn || ''), s.nama, s.gender, s.kelas, s.kontak]));
+      await saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 16, 32, 5, 12, 18]]]);
       ok.value = list.length + ' siswa diekspor';
     });
     const templateSiswa = () => run(async () => {
       await saveXlsx('Template_Impor_Siswa.xlsx', [
-        ['Data Siswa', [['ID Login (internal)', 'NISN', 'Nama', 'L/P', 'Kelas', 'Kontak'], ['siswa001', '0012345678', 'Contoh Siswa Satu', 'L', 'X TKJ 1', '081234567890'], ['siswa002', '0012345679', 'Contoh Siswa Dua', 'P', 'X TKJ 1', '']], [20, 16, 32, 6, 14, 18]],
-        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Siswa"; hapus dua baris contoh.'], ['2. Kolom wajib: ID Login (internal), Nama, dan Kelas. NISN opsional; jika diisi harus 10 digit. L/P diisi L atau P (kosong dianggap L).'], ['3. ID Login internal menjaga kecocokan akun dan riwayat lama; jangan diubah pada siswa yang sudah ada. Template lama dengan kolom NIS masih didukung untuk kompatibilitas internal.'], ['4. Format ID Login dan NISN sebagai Teks agar angka 0 di depan tidak hilang.'], ['5. Kelas baru otomatis dibuat. Akun login siswa baru dibuat otomatis dengan sandi acak.']], [100]]]);
+        ['Data Siswa', [['NISN', 'Nama', 'L/P', 'Kelas', 'Kontak'], ['0012345678', 'Contoh Siswa Satu', 'L', 'X TKJ 1', '081234567890'], ['0012345679', 'Contoh Siswa Dua', 'P', 'X TKJ 1', '']], [16, 32, 6, 14, 18]],
+        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Siswa"; hapus dua baris contoh.'], ['2. Kolom wajib: NISN, Nama, dan Kelas. NISN harus tepat 10 digit angka. L/P diisi L atau P (kosong dianggap L).'], ['3. Untuk siswa baru, NISN digunakan sebagai username login. Untuk siswa lama, sistem mencocokkan NISN ke data master agar riwayat dan akun tetap terhubung.'], ['4. Format NISN sebagai Teks agar angka 0 di depan tidak hilang.'], ['5. Kelas baru otomatis dibuat. Akun login siswa baru dibuat otomatis dengan sandi acak.']], [100]]]);
     });
     const imp = reactive({ show: false, rows: [], file: '', update: true, done: null, creds: [] });
     const impCount = computed(() => { const c = { baru: 0, ubah: 0, error: 0 }; imp.rows.forEach(r => c[r.st]++); c.siap = c.baru + (imp.update ? c.ubah : 0); return c; });
@@ -2287,22 +2287,24 @@ const app = createApp({
         const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
         const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
         const c = { nis: col(['idlogin', 'idlogininternal', 'nis', 'nomorinduk', 'username']), nisn: col(['nisn']), nama: col(['nama', 'namasiswa', 'namalengkap']), jk: col(['lp', 'jk', 'gender', 'jeniskelamin']), kelas: col(['kelas', 'rombel']), kontak: col(['kontak', 'hp', 'telepon', 'telp', 'wa', 'nohp']) };
-        if (c.nis < 0 || c.nama < 0 || c.kelas < 0) throw new Error('Baris pertama harus berisi ID Login (internal), Nama, dan Kelas. Template lama dengan kolom NIS tetap didukung untuk kompatibilitas internal.');
+        if (c.nisn < 0 || c.nama < 0 || c.kelas < 0) throw new Error('Baris pertama harus berisi NISN, Nama, dan Kelas. Template lama dengan kolom ID Login/NIS tetap didukung.');
         const ada = new Set(siswa.value.map(x => String(x.nis))), seen = new Set(), seenNisn = new Set(), rows = [];
         aoa.slice(1).forEach((r, i) => {
           if (r.every(v => !norm(v))) return;
-          const g = norm(r[c.jk]).toUpperCase();
-          const o = { no: i + 2, nis: norm(r[c.nis]), nisn: c.nisn < 0 ? '' : norm(r[c.nisn]), nama: norm(r[c.nama]), gender: g.startsWith('P') ? 'P' : 'L', kelas: norm(r[c.kelas]), kontak: c.kontak < 0 ? '' : norm(r[c.kontak]), st: 'baru', msg: '' };
-          if (!o.nis) { o.st = 'error'; o.msg = 'ID Login kosong'; }
-          else if (/e\+/i.test(o.nis)) { o.st = 'error'; o.msg = 'ID Login berformat ilmiah; ubah kolom ke Teks'; }
-          else if (seen.has(o.nis)) { o.st = 'error'; o.msg = 'ID Login ganda di file'; }
-          else if (o.nisn && !/^\d{10}$/.test(o.nisn)) { o.st = 'error'; o.msg = 'NISN harus 10 digit angka'; }
-          else if (o.nisn && seenNisn.has(o.nisn)) { o.st = 'error'; o.msg = 'NISN ganda di file'; }
-          else if (o.nisn && siswa.value.some(s => String(s.nisn || '') === o.nisn && String(s.nis) !== o.nis)) { o.st = 'error'; o.msg = 'NISN sudah dipakai siswa lain'; }
+          const nisn = norm(r[c.nisn]), explicitKey = c.nis < 0 ? '' : norm(r[c.nis]);
+          const existing = siswa.value.find(s => String(s.nisn || '') === nisn);
+          const key = explicitKey || (existing ? String(existing.nis) : nisn);
+          const g = c.jk < 0 ? '' : norm(r[c.jk]).toUpperCase();
+          const o = { no: i + 2, nis: key, nisn, nama: norm(r[c.nama]), gender: g.startsWith('P') ? 'P' : 'L', kelas: norm(r[c.kelas]), kontak: c.kontak < 0 ? '' : norm(r[c.kontak]), st: 'baru', msg: '' };
+          if (!o.nisn || !/^\d{10}$/.test(o.nisn)) { o.st = 'error'; o.msg = 'NISN wajib 10 digit angka'; }
+          else if (seen.has(o.nis)) { o.st = 'error'; o.msg = 'NISN/ID siswa ganda di file'; }
+          else if (seenNisn.has(o.nisn)) { o.st = 'error'; o.msg = 'NISN ganda di file'; }
+          else if (siswa.value.some(s => String(s.nisn || '') === o.nisn && String(s.nis) !== o.nis) && !existing) { o.st = 'error'; o.msg = 'NISN sudah dipakai siswa lain'; }
           else if (!o.nama) { o.st = 'error'; o.msg = 'Nama kosong'; }
           else if (!o.kelas) { o.st = 'error'; o.msg = 'Kelas kosong'; }
+          else if (ada.has(o.nis) && !explicitKey && !existing && siswa.value.some(s => String(s.nis) === o.nis && String(s.nisn || '') !== o.nisn)) { o.st = 'error'; o.msg = 'NISN bertabrakan dengan kunci data siswa lain'; }
           else if (ada.has(o.nis)) o.st = 'ubah';
-          seen.add(o.nis); if (o.nisn) seenNisn.add(o.nisn); rows.push(o);
+          seen.add(o.nis); seenNisn.add(o.nisn); rows.push(o);
         });
         if (!rows.length) throw new Error('Tidak ada data siswa di file.');
         Object.assign(imp, { show: true, rows, file: f.name, update: true, done: null, creds: [] });
@@ -2327,7 +2329,9 @@ const app = createApp({
     });
     const editSiswa = s => { Object.assign(sf, { edit: !!s, nis: '', nisn: '', nama: '', gender: 'L', kelas: '', kontak: '' }, s || {}); showS.value = true; };
     const saveSiswa = () => run(async () => {
-      await api('siswaSave', { edit: sf.edit, s: { nis: sf.nis, nisn: sf.nisn, nama: sf.nama, gender: sf.gender, kelas: sf.kelas, kontak: sf.kontak } });
+      const nisn = String(sf.nisn || '').trim();
+      if (!/^\d{10}$/.test(nisn)) throw new Error('NISN wajib terdiri dari 10 digit angka');
+      await api('siswaSave', { edit: sf.edit, s: { nis: sf.edit ? sf.nis : nisn, nisn, nama: sf.nama, gender: sf.gender, kelas: sf.kelas, kontak: sf.kontak } });
       showS.value = false; siswa.value = await api('siswaList'); await refresh(); ok.value = 'Data siswa tersimpan';
     });
     const delSiswa = s => confirm('Hapus ' + s.nama + '? Akun login siswa ikut terhapus.') && run(async () => { await api('siswaDelete', { nis: s.nis }); siswa.value = await api('siswaList'); await refresh(); });
