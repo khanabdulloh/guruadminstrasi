@@ -1791,7 +1791,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <select v-model="plq.kelas" @change="loadPl" class="inp"><option value="">Semua kelas</option><option v-for="k in pel.kelas" :key="k">{{k}}</option></select><input v-model.trim="plq.q" @keyup.enter="loadPl" placeholder="Cari siswa / pelanggaran" class="inp">
       </div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm bk-audit-table bk-pengurangan-table"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Siswa</th><th>Kelas</th><th>Total pelanggaran</th><th>Sudah dikurangi</th><th>Total poin efektif</th><th class="noprint">Aksi</th></tr></thead>
-        <tbody><tr v-for="s in penguranganSiswa" :key="s.nis" class="border-t"><td class="p-3 font-semibold">{{s.nama}}<span class="block text-xs text-slate-400">{{labelNisn(s.nis, s.nisn)}}</span></td><td>{{s.kelas}}</td><td>{{s.totalPelanggaran}}</td><td class="text-emerald-700 font-bold">−{{s.totalPengurangan}}</td><td class="font-extrabold" :class="s.totalEfektif>=pel.ambang?'text-rose-600':''">{{s.totalEfektif}}</td><td class="pr-3"><button @click="openKurangi(s)" class="text-emerald-700 font-bold">Kurangi poin</button></td></tr>
+        <tbody><tr v-for="s in penguranganSiswa" :key="s.nis" class="border-t"><td class="p-3 font-semibold">{{s.nama}}<span class="block text-xs text-slate-400">{{labelNisn(s.nis, s.nisn)}}</span></td><td>{{s.kelas}}</td><td>{{s.totalPelanggaran}}</td><td class="text-emerald-700 font-bold">−{{s.totalPengurangan}}</td><td class="font-extrabold" :class="s.totalEfektif>=pel.ambang?'text-rose-600':''">{{s.totalEfektif}}</td><td class="pr-3 noprint"><button @click="openKurangi(s)" class="text-emerald-700 font-bold">Kurangi poin</button></td></tr>
         <tr v-if="!penguranganSiswa.length"><td colspan="6" class="p-4 text-slate-500">Belum ada siswa dengan catatan pelanggaran yang cocok.</td></tr></tbody></table></div>
       <p class="text-xs text-slate-500 mt-2">Pengurangan tidak menghapus catatan pelanggaran. Sistem hanya menghitung total efektif dari akumulasi pelanggaran dikurangi transaksi pengurangan.</p>
       <div v-if="showKurangi" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -2806,15 +2806,24 @@ const app = createApp({
       ok.value = 'Data rapor tersimpan (' + d.tersimpan + ' siswa)' + (d.dikunci ? '; ' + d.dikunci + ' siswa sudah diproses kenaikan kelasnya dan tidak diubah' : '') + '.';
     });
     const terapkanRek = () => { if (rp.value) rp.value.siswa.forEach(s => { if (!s.diproses) { rpF[s.nis].keputusan = s.rek.keputusan; if (s.rek.keputusan === 'Naik' && !rpF[s.nis].kelasTujuan) rpF[s.nis].kelasTujuan = s.kelasTujuan; } }); };
+    // Cegah klik ganda/handler berulang memunculkan konfirmasi cetak rapor berkali-kali.
+    let raporConfirmDebounceUntil = 0, raporPrintActive = false;
     const cetakRapor = nis => {
+      const now = Date.now();
+      if (raporPrintActive || now < raporConfirmDebounceUntil) return;
       if (!rp.value || !rp.value.siswa.length) return;
       if (rp.value.bukanAktif && rp.value.status !== 'Final') { err.value = 'Rapor tidak dapat dicetak: nilai di server bukan untuk ' + rpMeta.sem + ' ' + rpMeta.tahun + ' dan rapor periode ini belum difinalkan.'; toTop(); return; }
+      // Jendela debounce dimulai sebelum confirm, sehingga event klik ganda sesudah tombol
+      // pada dialog konfirmasi ditekan tidak membuka dialog kedua secara beruntun.
+      raporConfirmDebounceUntil = now + 900;
       if ((rp.value.status !== 'Final' || rp.value.lengkap.length || rp.value.kosongMapel.length) && !confirm((rp.value.status !== 'Final' ? 'Rapor ini masih berstatus DRAF dan akan dicetak dengan tanda DRAF' : 'Rapor final')
         + ((rp.value.lengkap.length || rp.value.kosongMapel.length) ? '; masih ada nilai yang belum lengkap' : '') + '. Tetap cetak?')) return;
+      raporPrintActive = true;
       rpSatu.value = nis || ''; document.body.classList.add('cetak-rapor');
       const cleanupRaporPrint = () => {
         document.body.classList.remove('cetak-rapor');
         rpSatu.value = '';
+        raporPrintActive = false;
         window.removeEventListener('afterprint', cleanupRaporPrint);
       };
       window.addEventListener('afterprint', cleanupRaporPrint, { once: true });
