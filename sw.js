@@ -1,16 +1,16 @@
-/* Service worker Portal Akademik SMK CALM v3
+/* Service worker Portal Akademik SMK CALM v4
  * - Halaman (navigasi): jaringan dulu (batas 4 dtk); bila lambat/offline, salinan terakhir dipakai → aplikasi tetap terbuka cepat
  *   walau sinyal lemah, dan salinan diperbarui di latar belakang.
  * - Aset statis (Vue, font, logo): stale-while-revalidate → buka lebih cepat, diperbarui di latar belakang.
  * - API Apps Script TIDAK pernah dicegat/di-cache (data selalu dari server; antrean offline ditangani aplikasi). */
-const VER = 'smk-calm-v3', SHELL = VER + '-shell', ASET = VER + '-aset';
+const VER = 'smk-calm-v4', SHELL = VER + '-shell', ASET = VER + '-aset';
 const CDN = ['unpkg.com', 'cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com', 'blogger.googleusercontent.com'];
 
 self.addEventListener('install', () => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
     const nama = await caches.keys();
-    await Promise.all(nama.filter(n => n.indexOf(VER) !== 0).map(n => caches.delete(n))); // buang cache versi lama (mis. smk-calm-v2)
+    await Promise.all(nama.filter(n => n.indexOf(VER) !== 0).map(n => caches.delete(n))); // buang cache versi lama (mis. smk-calm-v3)
     await self.clients.claim();
   })());
 });
