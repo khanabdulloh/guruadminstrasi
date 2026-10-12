@@ -28,6 +28,9 @@
   body.cetak-rapor main>*:not(.rapor-wrap){display:none!important}
   body.cetak-rapor .rapor-wrap{display:block;page:rapor}
   .rapor-page{break-after:page;page-break-after:always}
+  .rapor-page{font-size:10pt;line-height:1.35;color:#000}
+  .rapor-page tr{break-inside:avoid;page-break-inside:avoid}.rapor-page thead{display:table-header-group}
+  .rapor-page .bg-slate-100,.rapor-page .bg-slate-50{background:#e8edf3!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   body.cetak-pelanggaran{background:#fff!important;color:#172033!important;font-size:8.5pt;line-height:1.35;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   body.cetak-pelanggaran main{padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
   body.cetak-pelanggaran main>*:not(section){display:none!important}
@@ -1146,17 +1149,35 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     <section v-if="view==='nilai'">
       <h2 class="h2">Input Nilai</h2>
       <p v-if="!pil.length" class="text-sm text-slate-500">Belum ada jadwal untuk dinilai. Admin perlu mengisi menu Jadwal dulu.</p>
-      <div v-else class="flex flex-wrap gap-3 mb-4">
-        <select v-model="pilIdx" @change="loadNilai" class="inp"><option value="">Kelas - Mapel</option><option v-for="(p,i) in pil" :value="i">{{p.kelas}} - {{p.mapel}}</option></select>
-        <input v-model.trim="nm.tp" @change="loadNilai" placeholder="Tujuan pembelajaran" class="inp flex-1 min-w-[200px]">
-        <select v-model="nm.jenis" @change="loadNilai" class="inp"><option>Harian</option><option>Tugas</option><option>Praktik</option><option>UTS</option><option>UAS</option></select>
-      </div>
+      <template v-else>
+        <div class="flex flex-wrap gap-2 mb-2"><button @click="nMode='sumatif';loadNilai()" :class="nMode==='sumatif'?'btn-p':'btn-o'">Nilai Sumatif</button><button @click="nMode='formatif';loadNilai()" :class="nMode==='formatif'?'btn-p':'btn-o'">Asesmen Formatif (ketercapaian TP)</button></div>
+        <p class="text-xs text-slate-500 mb-3"><template v-if="nMode==='sumatif'">Nilai sumatif (angka 0-100) masuk perhitungan nilai rapor sesuai bobot. Satu TP dapat dinilai dengan beberapa bentuk sumatif lingkup materi (SLM) serta STS/SAS.</template><template v-else>Asesmen formatif tidak berupa angka rapor: catat apakah siswa <b>sudah/belum mencapai KKTP</b> pada TP ini. Status dipakai sebagai dasar menentukan kesiapan sumatif, remedial, dan deskripsi rapor bila TP belum punya nilai sumatif.</template></p>
+        <div class="flex flex-wrap gap-3 mb-4">
+          <select v-model="pilIdx" @change="loadNilai" class="inp"><option value="">Kelas - Mapel</option><option v-for="(p,i) in pil" :value="i">{{p.kelas}} - {{p.mapel}}</option></select>
+          <input v-model.trim="nm.tp" @change="loadNilai" placeholder="Tujuan pembelajaran" class="inp flex-1 min-w-[200px]">
+          <select v-if="nMode==='sumatif'" v-model="nm.jenis" @change="loadNilai" class="inp"><option v-for="j in JENIS" :key="j" :value="j">{{jl(j)}}</option></select>
+        </div>
+      </template>
       <p v-if="pairKunci" role="alert" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">Nilai kelas ini <b>dikunci</b> oleh admin{{user.role==='ADMIN'?' (sebagai admin Anda tetap bisa mengubah; tercatat di log)':'. Hubungi admin bila perlu perubahan'}}.</p>
-      <p v-if="pil.length&&!nrows.length" class="text-xs text-slate-500 mb-3">Pilih kelas - mapel, isi tujuan pembelajaran, lalu tekan Tab/Enter agar daftar siswa muncul. Setelah itu, Enter pada kolom skor berpindah ke siswa berikutnya.</p>
-      <div v-if="nrows.length" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+      <p v-if="pil.length&&!nrows.length&&!frows.length" class="text-xs text-slate-500 mb-3">Pilih kelas - mapel, isi tujuan pembelajaran, lalu tekan Tab/Enter agar daftar siswa muncul.<template v-if="nMode==='sumatif'"> Setelah itu, Enter pada kolom skor berpindah ke siswa berikutnya.</template></p>
+      <div v-if="kt.loaded" class="bg-white rounded-2xl shadow-sm p-4 mb-4"><h3 class="font-bold text-sm mb-2">KKTP untuk TP ini</h3>
+        <div class="grid sm:grid-cols-4 gap-3 items-end">
+          <label class="lb">Batas ketercapaian (0-100)<input type="number" min="0" max="100" v-model="kt.kktp" :placeholder="'bawaan mapel: '+kt.def" class="inp w-full mt-1"></label>
+          <label class="lb sm:col-span-2">Kriteria ketercapaian (opsional)<input v-model.trim="kt.kriteria" maxlength="300" placeholder="mis. mampu menyusun laporan dengan sistematika lengkap dan bahasa baku" class="inp w-full mt-1 normal-case"></label>
+          <button @click="saveKktp" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="btn-o">Simpan KKTP</button></div>
+        <p class="text-xs text-slate-500 mt-2">Kosongkan angka untuk memakai KKTP mapel ({{kt.def}}). KKTP TP dipakai pada deskripsi capaian rapor dan analisis TP; berlaku untuk semua kelas yang memakai TP yang sama pada mapel ini.</p></div>
+      <div v-if="nMode==='sumatif'&&nrows.length" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">NIS</th><th>Nama</th><th>Skor (0-100)</th></tr></thead>
         <tbody><tr v-for="r in nrows" :key="r.nis" class="border-t"><td class="p-3">{{r.nis}}</td><td>{{r.nama}}</td><td><input type="number" inputmode="decimal" min="0" max="100" v-model="r.skor" @keydown.enter.prevent="nextSkor($event)" data-skor class="w-24 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
-      <button v-if="nrows.length" @click="saveNilai" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="mt-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan nilai</button>
+      <button v-if="nMode==='sumatif'&&nrows.length" @click="saveNilai" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="mt-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan nilai</button>
+      <template v-if="nMode==='formatif'&&frows.length">
+        <div class="flex flex-wrap gap-2 mb-2"><button @click="setSemuaF('Sudah')" class="btn-o !min-h-[2rem] text-xs">Tandai semua sudah mencapai</button><button @click="setSemuaF('')" class="btn-o !min-h-[2rem] text-xs">Kosongkan semua</button>
+          <span class="text-xs text-slate-500 self-center">{{frows.filter(r=>r.status==='Sudah').length}} sudah &middot; {{frows.filter(r=>r.status==='Belum').length}} belum &middot; {{frows.filter(r=>!r.status).length}} belum dicatat</span></div>
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+          <thead class="bg-slate-50 text-left"><tr><th class="p-3">NIS</th><th>Nama</th><th>Ketercapaian TP</th></tr></thead>
+          <tbody><tr v-for="r in frows" :key="r.nis" class="border-t"><td class="p-3">{{r.nis}}</td><td>{{r.nama}}</td><td><select v-model="r.status" class="inp normal-case" :class="r.status==='Belum'?'text-rose-600':r.status==='Sudah'?'text-emerald-700':''"><option value="">Belum dicatat</option><option value="Sudah">Sudah mencapai KKTP</option><option value="Belum">Belum mencapai KKTP</option></select></td></tr></tbody></table></div>
+        <button @click="saveFormatif" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="mt-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan ketercapaian</button>
+      </template>
     </section>
 
     <!-- Nilai saya -->
@@ -1164,7 +1185,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <h2 class="h2">Nilai Saya</h2>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Mata pelajaran</th><th>Tujuan pembelajaran</th><th>Jenis</th><th>Skor</th></tr></thead>
-        <tbody><tr v-for="(r,i) in nilaiSaya" class="border-t"><td class="p-3">{{i+1}}</td><td>{{r.mapel}}</td><td>{{r.tp}}</td><td>{{r.jenis}}</td><td class="font-bold">{{r.skor}}</td></tr>
+        <tbody><tr v-for="(r,i) in nilaiSaya" class="border-t"><td class="p-3">{{i+1}}</td><td>{{r.mapel}}</td><td>{{r.tp}}</td><td>{{jl(r.jenis)}}</td><td class="font-bold">{{r.skor}}</td></tr>
         <tr v-if="!nilaiSaya.length"><td colspan="5" class="p-4 text-slate-500">Belum ada nilai.</td></tr></tbody></table></div>
     </section>
 
@@ -1259,11 +1280,11 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
           <button @click="savePengaturan" :disabled="busy" class="btn-p mt-5">Simpan pengaturan</button>
         </div>
         <div>
-          <div v-if="ak" class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-1">Bobot nilai &amp; KKM</h3><p class="text-xs text-slate-500 mb-3">Bobot menentukan nilai akhir mapel di Leger (0 = jenis tidak dipakai). Sebelum disimpan, Leger memakai rata-rata biasa.</p>
-            <div class="grid grid-cols-5 gap-2 mb-3"><label v-for="j in JENIS" :key="j" class="lb">{{j}}<input type="number" min="0" max="100" v-model.number="ak.bobot[j]" class="inp w-full mt-1"></label></div>
-            <label class="lb">KKM umum <input type="number" min="0" max="100" v-model.number="ak.def" class="inp w-24 ml-2"></label>
+          <div v-if="ak" class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-1">Bobot nilai &amp; KKTP</h3><p class="text-xs text-slate-500 mb-3">Bobot menentukan nilai akhir mapel di Leger dan Rapor (0 = jenis tidak dipakai). KKTP (Kriteria Ketercapaian Tujuan Pembelajaran) di sini adalah <b>batas nilai &ldquo;sudah mencapai tujuan&rdquo;</b>: umum untuk semua mapel, dan dapat diubah per mapel. Sebagai acuan interval: 0&ndash;40 belum mencapai (remedial seluruh bagian), 41&ndash;65 belum mencapai (remedial bagian tertentu), 66&ndash;85 sudah mencapai, 86&ndash;100 sudah mencapai (pengayaan). Sebelum disimpan, Leger memakai rata-rata biasa.</p>
+            <div class="grid grid-cols-5 gap-2 mb-3"><label v-for="j in JENIS" :key="j" class="lb">{{jl(j)}}<input type="number" min="0" max="100" v-model.number="ak.bobot[j]" class="inp w-full mt-1"></label></div>
+            <label class="lb">KKTP umum <input type="number" min="0" max="100" v-model.number="ak.def" class="inp w-24 ml-2"></label>
             <div class="mt-3 max-h-48 overflow-y-auto"><div v-for="m in ak.mapel" :key="m" class="flex items-center gap-2 text-sm py-1"><span class="flex-1">{{m}}</span><input type="number" min="0" max="100" v-model="ak.map[m]" placeholder="umum" class="inp w-20 !py-1"></div></div>
-            <button @click="saveAk" :disabled="busy" class="btn-p mt-3">Simpan bobot &amp; KKM</button></div>
+            <button @click="saveAk" :disabled="busy" class="btn-p mt-3">Simpan bobot &amp; KKTP</button></div>
           <div v-if="kunci" class="bg-white rounded-2xl shadow-sm p-5 mb-6"><h3 class="font-bold mb-1">Kunci nilai</h3><p class="text-xs text-slate-500 mb-3">Guru tidak dapat mengubah nilai kelas yang dikunci (admin tetap bisa, tercatat di Log). Kunci setelah rapor dibagikan.</p>
             <div class="max-h-40 overflow-y-auto mb-3"><label v-for="k in kunci.kelas" :key="k" class="flex items-center gap-2 text-sm py-1"><input type="checkbox" :value="k" v-model="kunci.terkunci"> {{k}}</label><p v-if="!kunci.kelas.length" class="text-xs text-slate-500">Belum ada kelas.</p></div>
             <button @click="saveKunci" :disabled="busy" class="btn-p">Simpan kunci</button></div>
@@ -1302,9 +1323,9 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <thead class="bg-slate-50 text-left"><tr><th class="p-2">No</th><th>NIS</th><th>Nama</th><th v-for="m in leger.mapel" :key="m">{{m}}</th><th>Rata-rata</th></tr></thead>
         <tbody><tr v-for="(r,i) in leger.siswa" :key="r.nis" class="border-t"><td class="p-2">{{i+1}}</td><td>{{r.nis}}</td><td>{{r.nama}}</td>
           <td v-for="m in leger.mapel" :key="m"   :class="r.nilai[m]!=null&&r.nilai[m]<kkmOf(m)?'text-rose-600 font-bold':''">{{r.nilai[m]==null?'-':r.nilai[m]}}</td><td class="font-bold">{{r.rata==null?'-':r.rata}}</td></tr></tbody></table></div>
-      <div v-if="remedial.length" class="bg-white rounded-2xl shadow-sm p-4 mt-4"><h3 class="font-bold mb-2">Daftar remedial <span class="text-xs font-normal text-slate-500">(nilai di bawah KKM)</span></h3>
-        <div v-for="r in remedial" :key="r.mapel" class="py-2 border-t first:border-t-0 text-sm"><b>{{r.mapel}}</b> <span class="text-slate-400">KKM {{r.kkm}}</span> &middot; {{r.list.length}} siswa<p class="text-slate-600">{{r.list.map(x=>x.nama+' ('+x.nilai+')').join(', ')}}</p></div></div>
-      <p v-if="leger.mapel.length" class="text-xs text-slate-500 mt-2">Setiap sel adalah nilai akhir mapel tersebut (berbobot bila bobot sudah diatur di Pengaturan, selain itu rata-rata seluruh skor). Rata-rata akhir adalah rata-rata dari mapel yang sudah bernilai. Angka merah = di bawah KKM mapel.</p>
+      <div v-if="remedial.length" class="bg-white rounded-2xl shadow-sm p-4 mt-4"><h3 class="font-bold mb-2">Daftar remedial <span class="text-xs font-normal text-slate-500">(nilai di bawah KKTP)</span></h3>
+        <div v-for="r in remedial" :key="r.mapel" class="py-2 border-t first:border-t-0 text-sm"><b>{{r.mapel}}</b> <span class="text-slate-400">KKTP {{r.kkm}}</span> &middot; {{r.list.length}} siswa<p class="text-slate-600">{{r.list.map(x=>x.nama+' ('+x.nilai+')').join(', ')}}</p></div></div>
+      <p v-if="leger.mapel.length" class="text-xs text-slate-500 mt-2">Setiap sel adalah nilai akhir mapel tersebut (berbobot bila bobot sudah diatur di Pengaturan, selain itu rata-rata seluruh skor). Rata-rata akhir adalah rata-rata dari mapel yang sudah bernilai. Angka merah = di bawah KKTP mapel.</p>
       <div v-if="leger.mapel.length" class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
     </section>
 
@@ -1319,21 +1340,105 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Rapor -->
     <section v-if="view==='rapor'">
-      <h2 class="h2">Rapor Siswa</h2>
-      <p v-if="!rpPil.length" class="text-sm text-slate-500">Rapor hanya dapat dicetak oleh wali kelas. Admin menetapkan wali di Kelola Kelas.</p>
-      <div v-else class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
+      <h2 class="h2">Rapor</h2>
+      <p class="text-xs text-slate-500 mb-3">Kurikulum Merdeka (Panduan Pembelajaran dan Asesmen revisi 2025): nilai akhir = Sumatif Lingkup Materi (Harian/Tugas/Praktik) + Sumatif Tengah Semester (UTS) + Sumatif Akhir Semester (UAS), dengan bobot &amp; KKTP dari Pengaturan Akademik.</p>
+      <p v-if="!rpTabs.length" class="text-sm text-slate-500">Rapor hanya dapat dicetak oleh wali kelas. Admin menetapkan wali di Kelola Kelas.</p>
+      <div v-else class="flex flex-wrap gap-2 mb-4"><button v-for="t in rpTabs" :key="t.k" @click="gantiTabR(t.k)" :class="rpTab===t.k?'btn-p':'btn-o'">{{t.t}}</button></div>
+
+      <!-- Filter bersama: Data & Cetak, Kenaikan Kelas -->
+      <div v-if="(rpTab==='data'||rpTab==='naik')&&rpPil.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
         <label class="lb">Kelas<select v-model="rpKelas" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Kelas --</option><option v-for="k in rpPil" :key="k">{{k}}</option></select></label>
-        <label class="lb">Semester<select v-model="rpMeta.sem" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select></label>
-        <label class="lb">Tahun ajaran<input v-model.trim="rpMeta.tahun" placeholder="2026/2027" class="inp w-full mt-1 normal-case"></label>
-        <button @click="cetakRapor" :disabled="!rp||!rp.siswa.length" class="btn-p">Cetak semua rapor</button></div>
-      <template v-if="rp">
-        <p v-if="!rp.mapel.length" class="text-sm text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mb-3">Belum ada nilai untuk kelas ini; rapor akan kosong pada bagian nilai.</p>
+        <label v-if="rpTab==='data'" class="lb">Jenis rapor<select v-model="rpMeta.periode" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="SAS">Akhir Semester (SAS)</option><option value="STS">Tengah Semester (STS)</option></select></label>
+        <label class="lb">Semester<select v-model="rpMeta.sem" @change="loadRapor" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select></label>
+        <label class="lb">Tahun ajaran<input v-model.trim="rpMeta.tahun" @change="loadRapor" placeholder="2026/2027" class="inp w-full mt-1 normal-case"></label>
+      </div>
+
+      <!-- TAB: Data & Cetak -->
+      <template v-if="rpTab==='data'&&rp">
+        <div v-if="rp.kosongMapel.length" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">Mapel terjadwal tetapi <b>belum ada nilai sama sekali</b>: {{rp.kosongMapel.join(', ')}}.</div>
+        <div v-if="rp.lengkap.length" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3"><b>Kelengkapan nilai</b> (jumlah siswa yang belum ada nilainya):
+          <ul class="list-disc pl-5 mt-1"><li v-for="x in rp.lengkap" :key="x.mapel">{{x.mapel}}:<span v-if="x.tanpaSLM"> sumatif lingkup materi {{x.tanpaSLM}},</span><span v-if="x.tanpaSTS"> STS {{x.tanpaSTS}},</span><span v-if="x.tanpaSAS"> SAS {{x.tanpaSAS}}</span></li></ul></div>
+        <p v-if="!rp.lengkap.length&&!rp.kosongMapel.length&&rp.mapel.length" class="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2 mb-3">Nilai semua mapel sudah lengkap untuk jenis rapor ini.</p>
+        <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-3 gap-3">
+          <label class="lb">Kompetensi keahlian<input v-model.trim="rpInfo.kompetensi" maxlength="100" :disabled="!bolehEditR" placeholder="mis. Teknik Komputer dan Jaringan" class="inp w-full mt-1 normal-case"></label>
+          <label class="lb">NIP/NUPTK wali kelas<input v-model.trim="rpInfo.nipWali" maxlength="30" :disabled="!bolehEditR" class="inp w-full mt-1 normal-case"></label>
+          <label class="lb">Tanggal rapor<input type="date" v-model="rpInfo.tanggal" :disabled="!bolehEditR" class="inp w-full mt-1"></label>
+        </div>
+        <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan data rapor</button><button @click="cetakRapor('')" :disabled="!rp.siswa.length" class="btn-o">Cetak semua rapor</button></div>
         <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-          <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>Rata-rata</th><th>Belum tuntas</th><th>S</th><th>I</th><th>A</th><th>Catatan wali kelas (tercetak di rapor)</th></tr></thead>
-          <tbody><tr v-for="(s,i) in rp.siswa" :key="s.nis" class="border-t"><td class="p-3">{{i+1}}</td><td>{{s.nama}}</td><td class="font-bold">{{s.rata==null?'-':s.rata}}</td><td :class="belumR(s)?'text-rose-600 font-bold':''">{{belumR(s)}} mapel</td><td>{{s.hadir.S}}</td><td>{{s.hadir.I}}</td><td>{{s.hadir.A}}</td>
-            <td class="pr-3"><input v-model="rpCat[s.nis]" maxlength="200" placeholder="opsional" class="w-full min-w-[12rem] border-b border-slate-200 py-1 focus:outline-none focus:border-blue-700"></td></tr>
-          <tr v-if="!rp.siswa.length"><td colspan="8" class="p-4 text-slate-500">Belum ada siswa di kelas ini.</td></tr></tbody></table></div>
-        <p class="text-xs text-slate-500 mt-2">Kehadiran dihitung per hari (status terburuk dari semua sesi hari itu). Catatan wali tidak disimpan di server; isi sebelum mencetak.</p>
+          <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>NISN</th><th>Rata-rata</th><th>&lt; KKTP</th><th>S/I/A</th><th>Ekstrakurikuler <span class="font-normal text-slate-400">(1 baris = 1 kegiatan: Pramuka - Baik)</span></th><th>Kokurikuler <span class="font-normal text-slate-400">(dimensi Profil Lulusan)</span></th><th>Catatan wali kelas</th><th></th></tr></thead>
+          <tbody><tr v-for="(s,i) in rp.siswa" :key="s.nis" class="border-t align-top">
+            <td class="p-3">{{i+1}}</td><td class="min-w-[9rem]">{{s.nama}}</td>
+            <td><input v-model.trim="rpF[s.nis].nisn" maxlength="20" inputmode="numeric" :disabled="!bolehEditR" class="w-28 border-b border-slate-200 py-1 focus:outline-none focus:border-blue-700"></td>
+            <td class="font-bold">{{s.rata==null?'-':s.rata}}</td><td :class="s.belum?'text-rose-600 font-bold':''">{{s.belum}}</td><td class="whitespace-nowrap">{{s.hadir.S}}/{{s.hadir.I}}/{{s.hadir.A}}</td>
+            <td class="pr-2"><textarea v-model="rpF[s.nis].ekskul" rows="2" maxlength="300" :disabled="!bolehEditR" class="w-full min-w-[11rem] border border-slate-200 rounded p-1 text-xs"></textarea></td>
+            <td class="pr-2"><textarea v-model="rpF[s.nis].kokurikuler" rows="2" maxlength="400" placeholder="Tema/kegiatan &amp; dimensi: keimanan &amp; ketakwaan, kewargaan, penalaran kritis, kreativitas, kolaborasi, kemandirian, kesehatan, komunikasi" :disabled="!bolehEditR" class="w-full min-w-[11rem] border border-slate-200 rounded p-1 text-xs"></textarea></td>
+            <td class="pr-2"><textarea v-model="rpF[s.nis].catatan" rows="2" maxlength="300" :disabled="!bolehEditR" class="w-full min-w-[12rem] border border-slate-200 rounded p-1 text-xs"></textarea></td>
+            <td class="pr-3"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button></td></tr>
+          <tr v-if="!rp.siswa.length"><td colspan="10" class="p-4 text-slate-500">Belum ada siswa di kelas ini.</td></tr></tbody></table></div>
+        <p class="text-xs text-slate-500 mt-2">Kehadiran dihitung per hari (status terburuk dari semua sesi hari itu). Capaian kompetensi pada rapor disusun otomatis dari ketercapaian tiap Tujuan Pembelajaran (TP): rata-rata skor sumatif TP dibandingkan KKTP TP tersebut, atau status asesmen formatif bila TP belum punya nilai sumatif. Nilai rapor dibulatkan ke bilangan bulat.</p>
+      </template>
+
+      <!-- TAB: Kenaikan Kelas -->
+      <template v-if="rpTab==='naik'">
+        <template v-if="rp">
+          <p v-if="rpMeta.sem!=='Genap'" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">Keputusan kenaikan kelas dicatat pada <b>Semester Genap</b>. Ubah pilihan semester ke Genap.</p>
+          <p class="text-xs text-slate-500 mb-2">Kriteria kenaikan kelas ditetapkan oleh satuan pendidikan (KKTP tidak otomatis menjadi syarat naik kelas). Rekomendasi sistem memakai nilai akhir SAS: kelas {{rp.tingkat==='XII'?'XII dinyatakan lulus':'dinaikkan'}} bila mapel yang belum mencapai KKTP &le; <b>{{rp.ketentuan.maksBelum}}</b> dan kehadiran &ge; <b>{{rp.ketentuan.minHadir}}%</b> (diatur Admin). Keputusan akhir tetap pada wali kelas &amp; rapat dewan guru.</p>
+          <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="terapkanRek" :disabled="!rp.siswa.length" class="btn-o">Terapkan rekomendasi sistem</button><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan keputusan</button></div>
+          <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+            <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>Rata-rata</th><th>&lt; KKTP</th><th>Hadir</th><th>Rekomendasi</th><th>Keputusan</th><th>Kelas tujuan</th></tr></thead>
+            <tbody><tr v-for="(s,i) in rp.siswa" :key="s.nis" class="border-t align-top">
+              <td class="p-3">{{i+1}}</td><td class="min-w-[9rem]">{{s.nama}}</td><td class="font-bold">{{s.rata==null?'-':s.rata}}</td><td :class="s.belum?'text-rose-600 font-bold':''">{{s.belum}}</td><td>{{s.pct==null?'-':s.pct+'%'}}</td>
+              <td class="text-xs"><span :class="/Tidak/.test(s.rek.keputusan)?'text-rose-600 font-bold':'text-emerald-700 font-bold'">{{s.rek.keputusan}}</span><div class="text-slate-500">{{s.rek.alasan.join('; ')}}</div></td>
+              <td><select v-model="rpF[s.nis].keputusan" :disabled="!bolehEditR||s.diproses" class="inp normal-case"><option value="">-- pilih --</option><option v-for="o in (rp.tingkat==='XII'?['Lulus','Tidak Lulus']:['Naik','Tidak Naik'])" :key="o">{{o}}</option></select><div v-if="s.diproses" class="text-xs text-slate-500">sudah diproses</div></td>
+              <td><input v-if="rpF[s.nis].keputusan==='Naik'" v-model.trim="rpF[s.nis].kelasTujuan" maxlength="40" :disabled="!bolehEditR||s.diproses" class="w-32 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"><span v-else class="text-slate-400">-</span></td></tr>
+            <tr v-if="!rp.siswa.length"><td colspan="8" class="p-4 text-slate-500">Belum ada siswa di kelas ini.</td></tr></tbody></table></div>
+        </template>
+        <div v-if="user&&user.role==='ADMIN'" class="bg-white rounded-2xl shadow-sm p-5 mt-6">
+          <h3 class="font-bold mb-1">Proses kenaikan kelas &amp; kelulusan (Admin)</h3>
+          <p class="text-xs text-slate-500 mb-3">Memproses keputusan <b>Semester Genap</b> seluruh kelas: siswa <b>Naik</b> dipindah ke kelas tujuan, siswa <b>Lulus</b> dipindah ke Alumni (akun login dihapus), <b>Tidak Naik/Tidak Lulus</b> tetap. Salinan &ldquo;siswa - kelas&rdquo; disimpan otomatis ke Riwayat sebelum proses. Urutan yang disarankan: (1) cetak semua rapor, (2) proses di sini, (3) ubah Tahun Ajaran, (4) Reset Semester.</p>
+          <button @click="loadNaik" class="btn-o mb-3">Periksa kesiapan</button>
+          <template v-if="rnaik">
+            <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-sm mb-3"><div v-for="(v,kk) in rnaik.ringkas" :key="kk" class="rounded-xl bg-slate-50 p-2"><div class="font-bold text-lg">{{v}}</div><div class="text-xs text-slate-500">{{kk}}</div></div></div>
+            <p v-if="rnaik.ringkas.Belum" class="text-xs text-amber-700 mb-2">{{rnaik.ringkas.Belum}} siswa belum diberi keputusan oleh wali kelas; mereka tidak diubah oleh proses ini.</p>
+            <div class="max-h-64 overflow-auto border rounded-xl mb-3"><table class="w-full text-xs"><thead class="bg-slate-50 text-left"><tr><th class="p-2">Nama</th><th>Kelas</th><th>Keputusan</th><th>Tujuan</th></tr></thead><tbody>
+              <tr v-for="x in rnaik.rows.filter(r=>r.keputusan)" :key="x.nis" class="border-t"><td class="p-2">{{x.nama}}</td><td>{{x.kelas}}</td><td>{{x.keputusan}}<span v-if="x.diproses" class="text-slate-400"> (selesai)</span></td><td>{{x.keputusan==='Naik'?x.kelasTujuan||'(kosong!)':'-'}}</td></tr></tbody></table></div>
+            <div class="flex flex-wrap gap-2 items-end"><label class="lb">Ketik <b>NAIK</b> untuk konfirmasi<input v-model.trim="rnaikTxt" class="inp mt-1 block" placeholder="NAIK"></label><button @click="prosesNaik" :disabled="busy||rnaikTxt!=='NAIK'" class="btn-p">Proses kenaikan kelas</button></div>
+          </template>
+        </div>
+      </template>
+
+      <!-- TAB: Rekap Nilai Mapel (guru) -->
+      <template v-if="rpTab==='rekap'">
+        <p v-if="!pil.length" class="text-sm text-slate-500">Belum ada jadwal mengajar.</p>
+        <div v-else class="flex flex-wrap gap-3 mb-4">
+          <select v-model="rkpIdx" @change="loadRekap" class="inp"><option value="">Kelas - Mapel</option><option v-for="(p,i) in pil" :value="i">{{p.kelas}} - {{p.mapel}}</option></select>
+          <select v-model="rkpPer" @change="loadRekap" class="inp"><option value="SAS">Nilai akhir semester (SAS)</option><option value="STS">Nilai sementara (STS)</option></select></div>
+        <template v-if="rkp">
+          <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-sm mb-3">
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg">{{rkp.kkm}}</div><div class="text-xs text-slate-500">KKTP</div></div>
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg">{{rkp.ringkas.rata==null?'-':rkp.ringkas.rata}}</div><div class="text-xs text-slate-500">Rata-rata</div></div>
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg text-emerald-700">{{rkp.ringkas.tuntas}}</div><div class="text-xs text-slate-500">Tuntas</div></div>
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg text-rose-600">{{rkp.ringkas.remedial}}</div><div class="text-xs text-slate-500">Remedial</div></div>
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg">{{rkp.ringkas.tertinggi==null?'-':rkp.ringkas.tertinggi}}</div><div class="text-xs text-slate-500">Tertinggi</div></div>
+            <div class="rounded-xl bg-white shadow-sm p-2"><div class="font-bold text-lg">{{rkp.ringkas.terendah==null?'-':rkp.ringkas.terendah}}</div><div class="text-xs text-slate-500">Terendah</div></div></div>
+          <div class="bg-white rounded-2xl shadow-sm overflow-x-auto mb-4"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>Rata SLM</th><th>STS</th><th>SAS</th><th>Nilai</th><th>Predikat</th><th>Status</th></tr></thead><tbody>
+            <tr v-for="(s,i) in rkp.siswa" :key="s.nis" class="border-t"><td class="p-3">{{i+1}}</td><td>{{s.nama}}</td><td>{{s.slm==null?'-':s.slm}}</td><td>{{s.sts==null?'-':s.sts}}</td><td>{{s.sas==null?'-':s.sas}}</td><td class="font-bold">{{s.akhir==null?'-':s.akhir}}</td><td>{{s.pred||'-'}}</td><td :class="s.status==='Remedial'?'text-rose-600 font-bold':s.status==='Tuntas'?'text-emerald-700':'text-slate-400'">{{s.status}}</td></tr></tbody></table></div>
+          <div v-if="rkp.tp.length" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><h3 class="font-bold p-4 pb-0">Analisis Tujuan Pembelajaran</h3><p class="text-xs text-slate-500 px-4 pb-2">Diurutkan dari rata-rata sumatif terendah; dasar perencanaan remedial/pengayaan. KKTP per TP diatur di menu Input Nilai.</p><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tujuan pembelajaran</th><th>KKTP</th><th>Rata-rata sumatif</th><th>Belum mencapai</th><th>Formatif (sudah/belum)</th></tr></thead><tbody>
+            <tr v-for="t in rkp.tp" :key="t.tp" class="border-t align-top"><td class="p-3">{{t.tp}}<div v-if="t.kriteria" class="text-xs text-slate-500">Kriteria: {{t.kriteria}}</div></td><td>{{t.kktp}}</td><td :class="t.rata!=null&&t.rata<t.kktp?'text-rose-600 font-bold':''">{{t.rata==null?'-':t.rata}}</td><td>{{t.n?t.belum+' / '+t.n:'-'}}</td><td>{{t.fSudah||t.fBelum?t.fSudah+' / '+t.fBelum:'-'}}</td></tr></tbody></table></div>
+        </template>
+      </template>
+
+      <!-- TAB: Pengaturan Rapor (admin) -->
+      <template v-if="rpTab==='atur'&&rcf">
+        <div class="bg-white rounded-2xl shadow-sm p-5 mb-4"><h3 class="font-bold mb-3">Ketentuan kenaikan kelas</h3>
+          <div class="grid sm:grid-cols-2 gap-3"><label class="lb">Maksimal mapel belum mencapai KKTP agar tetap naik<input type="number" min="0" max="20" v-model.number="rcf.maksBelum" class="inp w-full mt-1"></label>
+            <label class="lb">Minimal kehadiran (%)<input type="number" min="0" max="100" v-model.number="rcf.minHadir" class="inp w-full mt-1"></label></div>
+          <p class="text-xs text-slate-500 mt-2">Bobot nilai dan KKTP per mapel diatur di menu Pengaturan (Akademik). Kop surat &amp; Kepala Sekolah diatur di Pengaturan (Kop &amp; Tanda Tangan).</p></div>
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto mb-4"><h3 class="font-bold p-4 pb-1">Kelompok &amp; urutan mata pelajaran pada rapor</h3><p class="text-xs text-slate-500 px-4 pb-2">Mapel tanpa pengaturan masuk kelompok Umum. Urutan: angka kecil tampil lebih dulu dalam kelompoknya.</p>
+          <table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Mata pelajaran</th><th>Kelompok</th><th>Urutan</th></tr></thead><tbody>
+            <tr v-for="m in rcf.mapel" :key="m" class="border-t"><td class="p-3">{{m}}</td><td><select v-model="rcf.kel[m].g" class="inp normal-case"><option v-for="g in rcf.grup" :key="g">{{g}}</option></select></td><td><input type="number" min="0" max="999" v-model="rcf.kel[m].o" class="w-20 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
+        <button @click="simpanRc" :disabled="busy" class="btn-p">Simpan pengaturan rapor</button>
       </template>
     </section>
     <!-- Dokumen digital -->
@@ -1512,7 +1617,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
           <div class="flex flex-wrap gap-2 mb-3"><span v-for="m in anakMapel" :key="m.mapel" class="px-3 py-1 rounded-full bg-slate-100 text-sm">{{m.mapel}}: <b>{{m.rata}}</b></span></div>
           <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
             <thead class="bg-slate-50 text-left"><tr><th class="p-3">Mata pelajaran</th><th>Tujuan pembelajaran</th><th>Jenis</th><th>Skor</th></tr></thead>
-            <tbody><tr v-for="(r,i) in anak.nilai" :key="i" class="border-t"><td class="p-3">{{r.mapel}}</td><td>{{r.tp}}</td><td>{{r.jenis}}</td><td class="font-bold">{{r.skor}}</td></tr>
+            <tbody><tr v-for="(r,i) in anak.nilai" :key="i" class="border-t"><td class="p-3">{{r.mapel}}</td><td>{{r.tp}}</td><td>{{jl(r.jenis)}}</td><td class="font-bold">{{r.skor}}</td></tr>
             <tr v-if="!anak.nilai.length"><td colspan="4" class="p-4 text-slate-500">Belum ada nilai.</td></tr></tbody></table></div></div>
         <div v-if="atab==='bimb'">
           <div class="flex flex-wrap gap-2 mb-3"><button @click="bimbTab='wali'" :class="bimbTab==='wali'?'btn-p':'btn-o'">Bimbingan Wali Kelas</button><button @click="bimbTab='bk'" :class="bimbTab==='bk'?'btn-p':'btn-o'">Konseling Guru BK</button></div>
@@ -1734,16 +1839,43 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <label class="lb">Tayang sampai (opsional)<input type="date" v-model="pf.sampai" :min="hari0" class="inp w-full mt-1 normal-case"></label>
       <p v-if="err" class="text-sm text-rose-600 mt-3">{{err}}</p>
       <div class="flex justify-end gap-2 mt-4"><button @click="showPg=false" class="btn-o">Batal</button><button @click="savePeng" :disabled="busy||!pf.judul||!pf.isi" class="btn-p">Publikasikan</button></div></div></div>
-    <div v-if="rp&&view==='rapor'" class="rapor-wrap"><div v-for="s in rp.siswa" :key="s.nis" class="rapor-page">
-      <kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">LAPORAN HASIL BELAJAR (RAPOR)</p>
-      <table class="text-sm mb-3 calm-table-print"><tr><td class="pr-3">Nama</td><td>: {{s.nama}}</td><td class="pl-8 pr-3">Kelas</td><td>: {{rp.kelas}}</td></tr><tr><td>NIS</td><td>: {{s.nis}}</td><td class="pl-8">Semester</td><td>: {{rpMeta.sem}} {{rpMeta.tahun}}</td></tr></table>
-      <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1">No</th><th class="border p-1 text-left">Mata Pelajaran</th><th class="border p-1">KKM</th><th class="border p-1">Nilai</th><th class="border p-1">Keterangan</th></tr></thead><tbody>
-        <tr v-for="(m,i) in rp.mapel" :key="m"><td class="border p-1 text-center">{{i+1}}</td><td class="border p-1">{{m}}</td><td class="border p-1 text-center">{{kkmR(m)}}</td><td class="border p-1 text-center font-bold">{{s.nilai[m]==null?'-':s.nilai[m]}}</td><td class="border p-1 text-center">{{s.nilai[m]==null?'-':s.nilai[m]>=kkmR(m)?'Tuntas':'Belum tuntas'}}</td></tr>
-        <tr class="font-bold"><td class="border p-1" colspan="3">Rata-rata</td><td class="border p-1 text-center">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td></tr></tbody></table>
-      <table class="text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1 px-3" colspan="4">Kehadiran (hari)</th></tr></thead><tbody><tr><td class="border p-1 px-3">Sakit: {{s.hadir.S}}</td><td class="border p-1 px-3">Izin: {{s.hadir.I}}</td><td class="border p-1 px-3">Alpa: {{s.hadir.A}}</td><td class="border p-1 px-3">Dispensasi: {{s.hadir.D}}</td></tr></tbody></table>
-      <div class="border p-2 text-sm mb-4" style="min-height:3rem"><b>Catatan wali kelas:</b> {{rpCat[s.nis]||'-'}}</div>
-      <div class="flex justify-between text-sm mt-6"><div class="text-center w-56"><div>Wali Kelas</div><div class="h-16"></div><div class="font-bold underline">{{rp.waliNama||'.....................'}}</div></div>
-        <div class="text-center w-56"><div>{{cfg.ttd.kota}}, {{tglCetak}}</div><div>{{cfg.ttd.jabatan}}</div><div class="h-16"></div><div class="font-bold underline">{{cfg.ttd.nama||'.....................'}}</div><div v-if="cfg.ttd.nip">NIP. {{cfg.ttd.nip}}</div></div></div>
+    <div v-if="rp&&view==='rapor'&&rpTab!=='rekap'&&rpTab!=='atur'" class="rapor-wrap"><div v-for="s in rpList" :key="s.nis" class="rapor-page">
+      <kop :k="cfg.kop"></kop>
+      <p class="text-center font-bold underline mt-2">{{rp.periode==='STS'?'LAPORAN KEMAJUAN HASIL BELAJAR':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}}</p>
+      <p class="text-center text-sm mb-3">{{rp.periode==='STS'?'Sumatif Tengah Semester':'Sumatif Akhir Semester'}} {{rpMeta.sem}} &middot; Tahun Ajaran {{rpMeta.tahun}}</p>
+      <table class="text-sm mb-3 w-full calm-table-print"><tbody>
+        <tr><td style="width:24%">Nama Peserta Didik</td><td style="width:34%">: <b>{{s.nama}}</b></td><td style="width:16%">Kelas</td><td>: {{rp.kelas}}</td></tr>
+        <tr><td>NIS / NISN</td><td>: {{s.nis}} / {{rpF[s.nis].nisn||'-'}}</td><td>Fase</td><td>: {{rp.fase||'-'}}</td></tr>
+        <tr><td>Kompetensi Keahlian</td><td>: {{rpInfo.kompetensi||'-'}}</td><td>Semester</td><td>: {{rpMeta.sem}}</td></tr></tbody></table>
+      <p class="font-bold text-sm mb-1">A. Nilai Mata Pelajaran</p>
+      <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100">
+        <th class="border p-1" style="width:5%">No</th><th class="border p-1 text-left">Mata Pelajaran</th><th class="border p-1" style="width:7%">KKTP</th>
+        <template v-if="rp.periode==='STS'"><th class="border p-1" style="width:12%">Rata-rata Sumatif Lingkup Materi</th><th class="border p-1" style="width:11%">Sumatif Tengah Semester</th><th class="border p-1" style="width:10%">Nilai Sementara</th><th class="border p-1" style="width:14%">Keterangan</th></template>
+        <template v-else><th class="border p-1" style="width:9%">Nilai Akhir</th><th class="border p-1" style="width:7%">Predikat</th><th class="border p-1" style="width:44%">Capaian Kompetensi</th></template></tr></thead>
+        <tbody v-for="g in rpGrup" :key="g.g">
+          <tr class="font-bold"><td class="border p-1 bg-slate-50" :colspan="rp.periode==='STS'?7:6">Kelompok Mata Pelajaran {{g.g}}</td></tr>
+          <tr v-for="m in g.items" :key="m.nama"><td class="border p-1 text-center">{{m.no}}</td><td class="border p-1">{{m.nama}}</td><td class="border p-1 text-center">{{m.kkm}}</td>
+            <template v-if="rp.periode==='STS'"><td class="border p-1 text-center">{{nv(s,m.nama,'slm')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'sts')}}</td><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{s.nilai[m.nama]?(s.nilai[m.nama].akhir>=m.kkm?'Tuntas':'Belum tuntas'):'-'}}</td></template>
+            <template v-else><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'pred')}}</td><td class="border p-1 text-xs" style="text-align:justify">{{s.nilai[m.nama]&&s.nilai[m.nama].desk||'-'}}</td></template></tr></tbody>
+        <tbody><tr class="font-bold"><td class="border p-1" colspan="3">Rata-rata</td><td class="border p-1 text-center" :colspan="rp.periode==='STS'?3:1">{{s.rata==null?'-':s.rata}}</td><td class="border p-1" :colspan="rp.periode==='STS'?1:2"></td></tr></tbody></table>
+      <template v-if="rp.periode==='SAS'">
+        <template v-if="s.pkl"><p class="font-bold text-sm mb-1">B. Praktik Kerja Lapangan (PKL)</p>
+          <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1 text-left">Mitra DU/DI</th><th class="border p-1">Waktu Pelaksanaan</th><th class="border p-1" style="width:10%">Nilai</th></tr></thead><tbody>
+            <tr><td class="border p-1">{{s.pkl.industri||'-'}}</td><td class="border p-1 text-center">{{tglPendekR(s.pkl.mulai)}} s.d. {{tglPendekR(s.pkl.selesai)}}</td><td class="border p-1 text-center font-bold">{{s.pkl.nilai==null?'-':s.pkl.nilai}}</td></tr></tbody></table></template>
+        <p class="font-bold text-sm mb-1">{{s.pkl?'C':'B'}}. Ekstrakurikuler</p>
+        <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1" style="width:5%">No</th><th class="border p-1 text-left" style="width:40%">Kegiatan</th><th class="border p-1 text-left">Keterangan</th></tr></thead><tbody>
+          <tr v-for="(e,i) in barisR(rpF[s.nis].ekskul)" :key="i"><td class="border p-1 text-center">{{i+1}}</td><td class="border p-1">{{e.a}}</td><td class="border p-1">{{e.b}}</td></tr>
+          <tr v-if="!barisR(rpF[s.nis].ekskul).length"><td class="border p-1 text-center">-</td><td class="border p-1">-</td><td class="border p-1">-</td></tr></tbody></table>
+        <div class="border p-2 text-sm mb-3"><b>{{s.pkl?'D':'C'}}. Kokurikuler:</b> {{rpF[s.nis].kokurikuler||'-'}}</div>
+      </template>
+      <table class="text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1 px-3" colspan="4">Ketidakhadiran</th></tr></thead><tbody><tr><td class="border p-1 px-3">Sakit: {{s.hadir.S}} hari</td><td class="border p-1 px-3">Izin: {{s.hadir.I}} hari</td><td class="border p-1 px-3">Tanpa keterangan: {{s.hadir.A}} hari</td><td class="border p-1 px-3">Kehadiran: {{s.pct==null?'-':s.pct+'%'}}</td></tr></tbody></table>
+      <div class="border p-2 text-sm mb-3" style="min-height:3rem"><b>Catatan Wali Kelas:</b> {{rpF[s.nis].catatan||'-'}}</div>
+      <div v-if="rp.periode==='SAS'&&rpMeta.sem==='Genap'&&rpF[s.nis].keputusan" class="border-2 p-2 text-sm mb-3" style="break-inside:avoid"><b>Keputusan:</b> Berdasarkan hasil yang dicapai pada Semester Ganjil dan Genap Tahun Ajaran {{rpMeta.tahun}}, peserta didik dinyatakan:
+        <div class="text-center font-bold mt-1">{{rpF[s.nis].keputusan==='Naik'?'NAIK KE KELAS '+(rpF[s.nis].kelasTujuan||'.........'):rpF[s.nis].keputusan==='Tidak Naik'?'TINGGAL DI KELAS '+rp.kelas:rpF[s.nis].keputusan.toUpperCase()}}</div></div>
+      <div class="rapor-ttd text-sm mt-4" style="break-inside:avoid">
+        <div class="flex justify-between"><div class="text-center w-56"><div>&nbsp;</div><div>Orang Tua/Wali</div><div class="h-16"></div><div>..............................</div></div>
+          <div class="text-center w-56"><div>{{cfg.ttd.kota}}, {{tglRapor}}</div><div>Wali Kelas</div><div class="h-16"></div><div class="font-bold underline">{{rp.waliNama||'..............................'}}</div><div>NIP. {{rpInfo.nipWali||'..............'}}</div></div></div>
+        <div class="text-center mt-3"><div>Mengetahui,</div><div>{{cfg.ttd.jabatan||'Kepala Sekolah'}}</div><div class="h-16"></div><div class="font-bold underline">{{cfg.ttd.nama||'..............................'}}</div><div v-if="cfg.ttd.nip">NIP. {{cfg.ttd.nip}}</div></div></div>
     </div></div>
     <div v-if="kartu" class="kartu-wrap"><div v-for="s in kartu.siswa" :key="s.nis" class="kartu"><p class="font-bold">Portal Akademik SMK CALM</p><p>{{s.nama}} &middot; {{s.ket||kartu.kelas}}</p><p>Username{{s.ket?'':' (NIS)'}}: <b>{{s.nis}}</b></p><p>Sandi awal: <b>{{s.sandi||'sudah diganti, minta reset ke admin'}}</b></p></div></div>
     <div v-if="showAg" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
@@ -1917,7 +2049,7 @@ const app = createApp({
     const jf = reactive({ hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '', blok: '' }), nm = reactive({ tp: '', jenis: 'Harian' });
 
     // Daftar putih aksi BACA (idempoten): hanya ini yang boleh diulang otomatis saat jaringan putus. Aksi baru default-nya TIDAK diulang (aman).
-    const READ = new Set(['perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
+    const READ = new Set(['formatifGet', 'kktpTpGet', 'raporRekapMapel', 'raporCfgGet', 'naikPreview', 'perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'siswaList']);
     const SAFE = a => READ.has(a);
     // Cache baca sisi klien (memori saja, maks 60 dtk): data master/konfigurasi yang dibuka berulang antar-menu.
     // Setiap aksi TULIS (di luar daftar baca) mengosongkan cache sebelum & sesudah; hasil selalu salinan baru (JSON.parse).
@@ -2008,7 +2140,7 @@ const app = createApp({
       if (k === 'guru') { gq.value = grole.value = ''; await refreshGuru(); }
       if (k === 'akun') { akq.value = akrole.value = akkelas.value = ''; akpilih.value = []; await fetchAkun(); }
       if (k === 'monitor') { const r = await Promise.all([fetchMon(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; }
-      if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; pilIdx.value = ''; }
+      if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; frows.value = []; kt.loaded = false; nMode.value = 'sumatif'; pilIdx.value = ''; }
       if (k === 'jurnal') { const r = await Promise.all([canWrite.value ? api('pilihanNilai') : null, api('pengaturanGet'), fetchJ()]); if (r[0]) pil.value = r[0]; cfg.value = r[1]; }
       if (k === 'bimbingan') { const r = await Promise.all([['ADMIN','GURU'].includes(user.value.role) ? api('bimbinganKelas') : null, ['ADMIN','GURU','KEPSEK'].includes(user.value.role) ? api('pengaturanGet').catch(() => null) : null, fetchB()]); bk.value = r[0] || []; if (r[1]) cfg.value = r[1]; }
       if (k === 'pengaturan') { const r = await Promise.all([api('pengaturanGet'), api('backupStatus').catch(() => null), api('akademikGet').catch(() => null), api('kunciGet').catch(() => null), api('ukuranData').catch(() => null), api('blokInfo').catch(() => null)]); ukd.value = r[4]; cfg.value = r[0]; { const bi = r[5]; if (bi) { blokInfo.value = bi; Object.assign(bf2, { acuan: bi.acuan, blok: bi.blokAcuan, minggu: bi.minggu }); } } backupUrl.value = ''; bk2.value = r[1]; ak.value = r[2]; kunci.value = r[3]; }
@@ -2017,7 +2149,7 @@ const app = createApp({
       if (k === 'leger') { [cfg.value, lk.value] = await Promise.all([api('pengaturanGet'), api('legerKelas')]); lkelas.value = ''; leger.value = { mapel: [], siswa: [] }; }
       if (k === 'dokumen') await fetchD();
       if (k === 'perangkat') { const r = await Promise.all([fetchPa(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; paf.mapel = paf.jenis = ''; }
-      if (k === 'rapor') { [cfg.value, rpPil.value] = await Promise.all([api('pengaturanGet'), api('raporPilihan')]); rp.value = null; rpKelas.value = ''; const t = cfg.value.tahun; if (t && t.tahun) { rpMeta.tahun = t.tahun; rpMeta.sem = t.semester; } }
+      if (k === 'rapor') { const r = await Promise.all([api('pengaturanGet'), api('raporPilihan'), user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU') ? api('pilihanNilai') : null]); cfg.value = r[0]; rpPil.value = r[1]; if (r[2]) pil.value = r[2]; rp.value = null; rpKelas.value = ''; rkp.value = null; rkpIdx.value = ''; rcf.value = null; rnaik.value = null; const t = cfg.value.tahun; if (t && t.tahun) { rpMeta.tahun = t.tahun; rpMeta.sem = t.semester; } rpTab.value = rpTabs.value.length ? rpTabs.value[0].k : 'data'; if (rpTab.value === 'atur') loadRc(); }
       if (k === 'nilaisaya') nilaiSaya.value = await api('nilaiSaya');
       if (k === 'anak') { const d = await api('ortuData'); if (view.value !== k) return; anak.value = d; atab.value = 'hadir'; }
       if (k === 'notif') { const l = await api('notifList'); if (view.value !== k) return; nlist.value = l; await api('notifBaca'); notifN.value = 0; }
@@ -2148,11 +2280,28 @@ const app = createApp({
     const delKelas = k => confirm('Hapus kelas ' + k.kelas + '? Jadwal kelas ini ikut terhapus.') && run(async () => { await api('kelasDelete', { kelas: k.kelas }); await refresh(); });
     const delJadwal = j => confirm('Hapus jadwal ' + j.mapel + ' ' + j.kelas + '?') && run(async () => { await api('jadwalDelete', { id: j.id }); jadwal.value = await api('jadwalList'); });
     const nextSkor = e => { const a = [...document.querySelectorAll('input[data-skor]')], i = a.indexOf(e.target); (a[i + 1] || e.target).focus(); };
-    let nReq = 0, nKey = null; // nKey = kelas/mapel/TP/jenis yang BENAR-BENAR dimuat; simpan selalu memakai kunci ini, bukan isian form yang bisa sudah berubah
+    let nReq = 0, nKey = null, fKey = null; // nKey/fKey = kelas/mapel/TP(/jenis) yang BENAR-BENAR dimuat; simpan selalu memakai kunci ini, bukan isian form yang bisa sudah berubah
+    const nMode = ref('sumatif'), frows = ref([]), kt = reactive({ kktp: '', kriteria: '', def: 75, loaded: false });
+    const JL = { Harian: 'SLM - Tes/Harian', Tugas: 'SLM - Tugas/Proyek', Praktik: 'SLM - Praktik/Unjuk kerja', UTS: 'STS (UTS)', UAS: 'SAS (UAS)' }, jl = j => JL[j] || j; // SLM = Sumatif Lingkup Materi
     const loadNilai = () => {
-      nrows.value = []; nKey = null; const p = pil.value[pilIdx.value], rid = ++nReq;
-      if (p && nm.tp) run(async () => { const key = { ...p, tp: nm.tp, jenis: nm.jenis }, d = await api('nilaiGet', key); if (rid !== nReq) return; nrows.value = d; nKey = key; });
+      nrows.value = []; frows.value = []; nKey = fKey = null; kt.loaded = false; const p = pil.value[pilIdx.value], rid = ++nReq;
+      if (p && nm.tp) run(async () => {
+        const fm = nMode.value === 'formatif', key = { ...p, tp: nm.tp, jenis: nm.jenis };
+        const r = await Promise.all([api('kktpTpGet', { kelas: p.kelas, mapel: p.mapel, tp: nm.tp }), fm ? api('formatifGet', { kelas: p.kelas, mapel: p.mapel, tp: nm.tp }) : api('nilaiGet', key)]);
+        if (rid !== nReq) return;
+        Object.assign(kt, { kktp: r[0].kktp, kriteria: r[0].kriteria, def: r[0].def, loaded: true });
+        if (fm) { frows.value = r[1]; fKey = { kelas: p.kelas, mapel: p.mapel, tp: nm.tp }; } else { nrows.value = r[1]; nKey = key; }
+      });
     };
+    const saveFormatif = () => run(async () => {
+      if (!fKey || !frows.value.length) throw new Error('Daftar siswa belum dimuat. Isi tujuan pembelajaran lalu tekan Tab/Enter, tunggu daftar muncul, baru simpan.');
+      const d = await api('formatifSave', { ...fKey, rows: frows.value }); ok.value = d.tersimpan + ' status ketercapaian tersimpan';
+    });
+    const saveKktp = () => run(async () => {
+      const p = pil.value[pilIdx.value]; if (!p || !nm.tp) throw new Error('Pilih kelas - mapel dan isi tujuan pembelajaran dahulu');
+      await api('kktpTpSimpan', { kelas: p.kelas, mapel: p.mapel, tp: nm.tp, kktp: kt.kktp, kriteria: kt.kriteria }); ok.value = 'KKTP untuk TP ini tersimpan';
+    });
+    const setSemuaF = s => frows.value.forEach(r => { r.status = s; });
     const saveNilai = () => run(async () => {
       if (!nKey || !nrows.value.length) throw new Error('Daftar siswa belum dimuat untuk isian ini. Isi tujuan pembelajaran lalu tekan Tab/Enter, tunggu daftar muncul, baru simpan.');
       const bad = nrows.value.find(r => r.skor !== '' && r.skor != null && !(Number(r.skor) >= 0 && Number(r.skor) <= 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus antara 0 dan 100');
@@ -2527,7 +2676,7 @@ const app = createApp({
       await saveXlsx('Rekap_Presensi_' + (h ? pr.tanggal : pr.bulan) + '.xlsx', [['Rekap', aoa, [5, 12, 14, 22, 10, 8, 6, 6, 6, 6, 6, 9]]]); ok.value = 'Rekap diekspor';
     });
 
-    /* ====== v3.6: izin siswa, agenda, bobot & KKM, arsip ====== */
+    /* ====== v3.6: izin siswa, agenda, bobot & KKTP, arsip ====== */
     const izlist = ref([]), iz = reactive({ tanggal: hari0, jenis: 'I', alasan: '' }), fetchIz = async () => izlist.value = await api('izinList');
     const saveIzin = () => run(async () => { await api('izinSave', { ...iz }); iz.alasan = ''; await fetchIz(); ok.value = 'Pengajuan terkirim ke wali kelas'; });
     const putusIzin = (z, st) => run(async () => { await api('izinPutus', { id: z.id, status: st }); await fetchIz(); ok.value = 'Izin ' + st.toLowerCase(); });
@@ -2539,7 +2688,7 @@ const app = createApp({
     const JENIS = ['Harian', 'Tugas', 'Praktik', 'UTS', 'UAS'], ak = ref(null), resetLabel = ref('');
     const saveAk = () => run(async () => {
       const t = JENIS.reduce((a, j) => a + (Number(ak.value.bobot[j]) || 0), 0); if (t <= 0) throw new Error('Total bobot harus lebih dari 0');
-      await api('akademikSave', { bobot: ak.value.bobot, def: ak.value.def, map: ak.value.map }); ok.value = 'Bobot dan KKM tersimpan';
+      await api('akademikSave', { bobot: ak.value.bobot, def: ak.value.def, map: ak.value.map }); ok.value = 'Bobot dan KKTP tersimpan';
     });
     const kkmOf = m => { const k = leger.value.kkm; return k ? (k.map[m] != null ? k.map[m] : k.def) : 75; };
     const remedial = computed(() => leger.value.mapel.map(m => ({ mapel: m, kkm: kkmOf(m), list: leger.value.siswa.filter(r => r.nilai[m] != null && r.nilai[m] < kkmOf(m)).map(r => ({ nama: r.nama, nilai: r.nilai[m] })) })).filter(r => r.list.length));
@@ -2547,14 +2696,52 @@ const app = createApp({
     const logs = ref([]), lq = ref(''), AKSI = { ortuBuat: 'Buat akun orang tua', pelanggaranDelete: 'Hapus pelanggaran', nilaiSave: 'Ubah nilai', presensiHapus: 'Hapus presensi', siswaDelete: 'Hapus siswa', siswaPindah: 'Pindah kelas', guruDelete: 'Hapus akun', kelasDelete: 'Hapus kelas', jadwalDelete: 'Hapus jadwal', jadwalImport: 'Impor jadwal', jurnalDelete: 'Hapus jurnal', bimbinganDelete: 'Hapus bimbingan', akunReset: 'Reset sandi', resetSemester: 'Reset semester', kunciSimpan: 'Kunci nilai', pklDelete: 'Hapus penempatan PKL', pklNilai: 'Nilai PKL', riwayatArsip: 'Simpan riwayat kelas', luluskanKelas: 'Luluskan kelas' };
     const aksiLbl = a => AKSI[a] || a, logTampil = computed(() => { const t = lq.value.toLowerCase(); return logs.value.filter(l => !t || (l.nama + ' ' + l.username + ' ' + aksiLbl(l.aksi) + ' ' + l.detail).toLowerCase().includes(t)); });
     const pairKunci = computed(() => { const p = pil.value[pilIdx.value]; return !!(p && p.kunci); });
-    /* ====== Rapor ====== */
-    const rpPil = ref([]), rpKelas = ref(''), rp = ref(null), rpCat = reactive({}), rpMeta = reactive({ sem: 'Ganjil', tahun: '' });
-    const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-    const kkmR = m => { const k = rp.value && rp.value.kkm; return k ? (k.map[m] != null ? k.map[m] : k.def) : 75; };
-    const belumR = s => rp.value.mapel.filter(m => s.nilai[m] != null && s.nilai[m] < kkmR(m)).length;
+    /* ====== Rapor (Kurikulum Merdeka: STS, SAS, kenaikan kelas) ====== */
+    const rpPil = ref([]), rpKelas = ref(''), rp = ref(null), rpF = reactive({}), rpInfo = reactive({ kompetensi: '', nipWali: '', tanggal: '' }), rpMeta = reactive({ sem: 'Ganjil', tahun: '', periode: 'SAS' });
+    const rpTab = ref('data'), rpSatu = ref(''), rkp = ref(null), rkpIdx = ref(''), rkpPer = ref('SAS'), rcf = ref(null), rnaik = ref(null), rnaikTxt = ref('');
+    const bolehEditR = computed(() => !!user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU'));
+    const rpTabs = computed(() => { const t = [], r = user.value && user.value.role; if (rpPil.value.length) { t.push({ k: 'data', t: 'Data & Cetak Rapor' }); t.push({ k: 'naik', t: 'Kenaikan Kelas' }); } if (r === 'ADMIN' || r === 'GURU') t.push({ k: 'rekap', t: 'Rekap Nilai Mapel' }); if (r === 'ADMIN') t.push({ k: 'atur', t: 'Pengaturan Rapor' }); return t; });
+    const tglPanjangR = s => /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    const tglPendekR = s => /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : (s || '-');
+    const tglRapor = computed(() => tglPanjangR(rpInfo.tanggal) || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }));
+    const nv = (s, m, f) => { const x = s.nilai[m]; return x && x[f] != null && x[f] !== '' ? x[f] : '-'; };
+    const barisR = t => String(t || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 6).map(x => { const i = x.search(/\s[-\u2013|]\s/); return i < 0 ? { a: x, b: '' } : { a: x.slice(0, i).trim(), b: x.slice(i + 3).trim() }; });
+    const rpGrup = computed(() => { if (!rp.value) return []; let n = 0; return ['Umum', 'Kejuruan', 'Muatan Lokal'].map(g => ({ g: g, items: rp.value.mapel.filter(m => m.grup === g).map(m => Object.assign({ no: ++n }, m)) })).filter(x => x.items.length); });
+    const rpList = computed(() => rp.value ? (rpSatu.value ? rp.value.siswa.filter(s => s.nis === rpSatu.value) : rp.value.siswa) : []);
+    const cekTahunR = () => { const t = String(rpMeta.tahun || ''); if (!/^\d{4}\/\d{4}$/.test(t) || Number(t.slice(5)) !== Number(t.slice(0, 4)) + 1) throw new Error('Tahun ajaran harus berformat 2026/2027 (tahun berurutan)'); };
     let rpReq = 0;
-    const loadRapor = () => run(async () => { Object.keys(rpCat).forEach(k => delete rpCat[k]); const rid = ++rpReq, k = rpKelas.value, d = k ? await api('raporData', { kelas: k }) : null; if (rid === rpReq) rp.value = d; });
-    const cetakRapor = () => { if (!rp.value || !rp.value.siswa.length) return; document.body.classList.add('cetak-rapor'); window.addEventListener('afterprint', () => document.body.classList.remove('cetak-rapor'), { once: true }); window.print(); };
+    const loadRapor = () => run(async () => {
+      const rid = ++rpReq, k = rpKelas.value; if (k) cekTahunR();
+      const d = k ? await api('raporData', { kelas: k, periode: rpTab.value === 'naik' ? 'SAS' : rpMeta.periode, tahun: rpMeta.tahun, semester: rpMeta.sem }) : null;
+      if (rid !== rpReq) return;
+      Object.keys(rpF).forEach(x => delete rpF[x]);
+      if (d) { d.siswa.forEach(s => { rpF[s.nis] = { nisn: s.nisn, ekskul: s.ekskul, kokurikuler: s.kokurikuler, catatan: s.catatan, keputusan: s.keputusan, kelasTujuan: s.kelasTujuan }; }); Object.assign(rpInfo, { kompetensi: d.info.kompetensi || '', nipWali: d.info.nipWali || '', tanggal: d.info.tanggal || '' }); }
+      rp.value = d; rpSatu.value = '';
+    });
+    const gantiTabR = k => { rpTab.value = k; err.value = ok.value = ''; if (k === 'rekap' && !rkp.value && rkpIdx.value !== '') loadRekap(); if (k === 'atur' && !rcf.value) loadRc(); if ((k === 'data' || k === 'naik') && rpKelas.value) loadRapor(); };
+    const simpanRapor = () => run(async () => {
+      if (!rp.value) return;
+      const d = await api('raporSimpan', { kelas: rp.value.kelas, tahun: rpMeta.tahun, semester: rpMeta.sem, info: { kompetensi: rpInfo.kompetensi, nipWali: rpInfo.nipWali, tanggal: rpInfo.tanggal },
+        rows: rp.value.siswa.map(s => Object.assign({ nis: s.nis }, rpF[s.nis])) });
+      ok.value = 'Data rapor tersimpan (' + d.tersimpan + ' siswa)' + (d.dikunci ? '; ' + d.dikunci + ' siswa sudah diproses kenaikan kelasnya dan tidak diubah' : '') + '.';
+    });
+    const terapkanRek = () => { if (rp.value) rp.value.siswa.forEach(s => { if (!s.diproses) { rpF[s.nis].keputusan = s.rek.keputusan; if (s.rek.keputusan === 'Naik' && !rpF[s.nis].kelasTujuan) rpF[s.nis].kelasTujuan = s.kelasTujuan; } }); };
+    const cetakRapor = nis => {
+      if (!rp.value || !rp.value.siswa.length) return;
+      if ((rp.value.lengkap.length || rp.value.kosongMapel.length) && !confirm('Masih ada nilai yang belum lengkap. Tetap cetak?')) return;
+      rpSatu.value = nis || ''; document.body.classList.add('cetak-rapor');
+      window.addEventListener('afterprint', () => { document.body.classList.remove('cetak-rapor'); rpSatu.value = ''; }, { once: true });
+      Vue.nextTick(() => setTimeout(() => window.print(), 60));
+    };
+    const loadRekap = () => run(async () => { const p = pil.value[rkpIdx.value]; rkp.value = p ? await api('raporRekapMapel', { kelas: p.kelas, mapel: p.mapel, periode: rkpPer.value }) : null; });
+    const loadRc = () => run(async () => { const d = await api('raporCfgGet'); d.mapel.forEach(m => { if (!d.kel[m]) d.kel[m] = { g: 'Umum', o: '' }; }); rcf.value = d; });
+    const simpanRc = () => run(async () => { await api('raporCfgSimpan', { kel: rcf.value.kel, maksBelum: rcf.value.maksBelum, minHadir: rcf.value.minHadir }); ok.value = 'Pengaturan rapor tersimpan.'; });
+    const loadNaik = () => run(async () => { cekTahunR(); rnaik.value = await api('naikPreview', { tahun: rpMeta.tahun }); });
+    const prosesNaik = () => run(async () => {
+      cekTahunR(); const d = await api('naikProses', { tahun: rpMeta.tahun, konfirmasi: rnaikTxt.value }); rnaikTxt.value = '';
+      ok.value = 'Selesai: ' + d.naik + ' siswa naik kelas, ' + d.lulus + ' siswa lulus (masuk Alumni), ' + d.tetap + ' tetap. Lanjutkan dengan mengubah Tahun Ajaran dan Reset Semester.';
+      rnaik.value = await api('naikPreview', { tahun: rpMeta.tahun });
+    });
 
     /* ====== v3.5: cadangan otomatis ====== */
     const bk2 = ref(null);
@@ -2819,7 +3006,7 @@ const app = createApp({
       const nh = Math.ceil(h) + 24; if (nh !== window.__lh) { window.__lh = nh; parent.postMessage({ calmHeight: nh }, '*'); }
     }, 600);
 
-    return { pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpCat, rpMeta, tglCetak, kkmR, belumR, loadRapor, cetakRapor, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, rpList, rpGrup, rkp, rkpIdx, rkpPer, rcf, rnaik, rnaikTxt, bolehEditR, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
@@ -2828,7 +3015,7 @@ const app = createApp({
       leger, lk, lkelas, dokumen, showD, df, loadDok, loadLeger, saveDok, delDok,
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
-      editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai,
+      editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai, nMode, frows, kt, saveFormatif, saveKktp, setSemuaF, jl, cekTahunR,
       antreSaya, kirimAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
       anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu };
   }
