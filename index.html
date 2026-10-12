@@ -916,7 +916,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <section v-if="view==='cetaksurat'">
       <div class="noprint flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Cetak Surat</h2><select v-model="cs.jenis" class="inp"><option>Surat Keterangan Aktif</option><option>Surat Keterangan</option><option>Surat Pengantar</option><option>Surat Tugas</option><option>Undangan</option><option>Surat Izin</option></select><button @click="resetCetakSurat" class="btn-o">Kosongkan</button><button @click="printSurat" class="btn-p">Cetak</button></div>
-      <div class="noprint bg-white rounded-2xl shadow-sm p-5 grid lg:grid-cols-2 gap-3"><input v-model.trim="cs.nomor" placeholder="Nomor surat" class="inp"><input v-model.trim="cs.tanggal" type="date" class="inp"><input v-model.trim="cs.kepada" placeholder="Kepada / nama penerima" class="inp lg:col-span-2"><input v-model.trim="cs.perihal" placeholder="Perihal" class="inp lg:col-span-2"><textarea v-model.trim="cs.isi" rows="12" placeholder="Isi surat" class="inp lg:col-span-2"></textarea><div class="grid sm:grid-cols-2 gap-3 lg:col-span-2"><input v-model.trim="cs.namaTtd" placeholder="Nama penandatangan" class="inp"><input v-model.trim="cs.nipTtd" placeholder="NIP / identitas penandatangan" class="inp"></div></div>
+      <div class="noprint bg-white rounded-2xl shadow-sm p-5 grid lg:grid-cols-2 gap-3"><input v-model.trim="cs.nomor" placeholder="Nomor surat" class="inp"><input v-model.trim="cs.tanggal" type="date" class="inp"><input v-model.trim="cs.kepada" placeholder="Kepada / nama penerima" class="inp lg:col-span-2"><input v-model.trim="cs.perihal" placeholder="Perihal" class="inp lg:col-span-2"><textarea v-model.trim="cs.isi" rows="12" placeholder="Isi surat" class="inp lg:col-span-2"></textarea><div class="grid sm:grid-cols-2 gap-3 lg:col-span-2"><input v-model.trim="cs.namaTtd" placeholder="Nama penandatangan" class="inp"><input v-model.trim="cs.nipTtd" placeholder="NUPTK / identitas penandatangan" class="inp"></div></div>
       <div class="hidden print:block bg-white min-h-screen p-8"><kop :k="cfg.kop"></kop><div class="text-center mt-4"><h2 class="font-extrabold underline">{{cs.jenis.toUpperCase()}}</h2><p v-if="cs.nomor">Nomor: {{cs.nomor}}</p></div><p class="mt-8">{{cs.kepada?'Kepada Yth. '+cs.kepada:''}}</p><p v-if="cs.perihal" class="font-bold mt-3">Perihal: {{cs.perihal}}</p><p class="whitespace-pre-line leading-7 mt-5">{{cs.isi}}</p><div class="mt-12 ml-auto w-64 text-center"><p>{{cfg.ttd&&cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{fmtTgl(cs.tanggal)}}</p><p>{{cfg.ttd&&cfg.ttd.jabatan?cfg.ttd.jabatan:''}}</p><div class="h-20"></div><p class="font-bold underline">{{cs.namaTtd||cfg.ttd&&cfg.ttd.nama||'-'}}</p><p>{{cs.nipTtd||cfg.ttd&&cfg.ttd.nip||''}}</p></div></div>
     </section>
 
@@ -1276,7 +1276,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
           <h3 class="font-bold mt-6 mb-3">Penandatangan</h3>
           <div class="grid grid-cols-2 gap-2">
             <input v-model.trim="cfg.ttd.kota" placeholder="Kota" class="inp"><input v-model.trim="cfg.ttd.jabatan" placeholder="Jabatan" class="inp">
-            <input v-model.trim="cfg.ttd.nama" placeholder="Nama pejabat" class="inp"><input v-model.trim="cfg.ttd.nip" placeholder="NIP (opsional)" class="inp">
+            <input v-model.trim="cfg.ttd.nama" placeholder="Nama pejabat" class="inp"><input v-model.trim="cfg.ttd.nip" placeholder="NUPTK (opsional)" class="inp">
           </div>
           <button @click="savePengaturan" :disabled="busy" class="btn-p mt-5">Simpan pengaturan</button>
         </div>
@@ -1365,7 +1365,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <p v-if="!rp.lengkap.length&&!rp.kosongMapel.length&&rp.mapel.length" class="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2 mb-3">Nilai semua mapel sudah lengkap untuk jenis rapor ini.</p>
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-3 gap-3">
           <label class="lb">Kompetensi keahlian<input v-model.trim="rpInfo.kompetensi" maxlength="100" :disabled="!bolehEditR" placeholder="mis. Teknik Komputer dan Jaringan" class="inp w-full mt-1 normal-case"></label>
-          <label class="lb">NIP/NUPTK wali kelas<input v-model.trim="rpInfo.nipWali" maxlength="30" :disabled="!bolehEditR" class="inp w-full mt-1 normal-case"></label>
+          <label class="lb">NUPTK wali kelas<input v-model.trim="rpInfo.nipWali" maxlength="30" :disabled="!bolehEditR" class="inp w-full mt-1 normal-case"></label>
           <label class="lb">Tanggal rapor<input type="date" v-model="rpInfo.tanggal" :disabled="!bolehEditR" class="inp w-full mt-1"></label>
         </div>
         <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan data rapor</button><button @click="cetakRapor('')" :disabled="!rp.siswa.length" class="btn-o">Cetak semua rapor</button></div>
@@ -1911,8 +1911,8 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <div class="text-center font-bold mt-1">{{rpF[s.nis].keputusan==='Naik'?'NAIK KE KELAS '+(rpF[s.nis].kelasTujuan||'.........'):rpF[s.nis].keputusan==='Tidak Naik'?'TINGGAL DI KELAS '+rp.kelas:rpF[s.nis].keputusan.toUpperCase()}}</div></div>
       <div class="rapor-ttd text-sm mt-4" style="break-inside:avoid">
         <div class="flex justify-between"><div class="text-center w-56"><div>&nbsp;</div><div>Orang Tua/Wali</div><div class="h-16"></div><div>..............................</div></div>
-          <div class="text-center w-56"><div>{{cfg.ttd.kota}}, {{tglRapor}}</div><div>Wali Kelas</div><div class="h-16"></div><div class="font-bold underline">{{rp.waliNama||'..............................'}}</div><div>NIP. {{rpInfo.nipWali||'..............'}}</div></div></div>
-        <div class="text-center mt-3"><div>Mengetahui,</div><div>{{cfg.ttd.jabatan||'Kepala Sekolah'}}</div><div class="h-16"></div><div class="font-bold underline">{{cfg.ttd.nama||'..............................'}}</div><div v-if="cfg.ttd.nip">NIP. {{cfg.ttd.nip}}</div></div></div>
+          <div class="text-center w-56"><div>{{cfg.ttd.kota}}, {{tglRapor}}</div><div>Wali Kelas</div><div class="h-16"></div><div class="font-bold underline">{{rp.waliNama||'..............................'}}</div><div>NUPTK. {{rpInfo.nipWali||'..............'}}</div></div></div>
+        <div class="text-center mt-3"><div>Mengetahui,</div><div>{{cfg.ttd.jabatan||'Kepala Sekolah'}}</div><div class="h-16"></div><div class="font-bold underline">{{cfg.ttd.nama||'..............................'}}</div><div v-if="cfg.ttd.nip">NUPTK. {{cfg.ttd.nip}}</div></div></div>
     </div></div>
     <div v-if="kartu" class="kartu-wrap"><div v-for="s in kartu.siswa" :key="s.nis" class="kartu"><p class="font-bold">Portal Akademik SMK CALM</p><p>{{s.nama}} &middot; {{s.ket||kartu.kelas}}</p><p>Username{{s.ket?'':' (NIS)'}}: <b>{{s.nis}}</b></p><p>Sandi awal: <b>{{s.sandi||'sudah diganti, minta reset ke admin'}}</b></p></div></div>
     <div v-if="showAg" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20 noprint"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
@@ -3098,7 +3098,7 @@ app.component('kop', { props: ['k'], template: `<div class="flex items-center ga
   <div class="w-16 shrink-0"><img v-if="k.logoKanan" :src="k.logoKanan" class="h-16 w-16 object-contain" alt=""></div></div>` });
 app.component('ttd', { props: ['t'], data: () => ({ tgl: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) }),
   template: `<div class="text-sm w-64 ml-auto mt-8 text-center"><div>{{t.kota}}, {{tgl}}</div><div>{{t.jabatan}}</div><div class="h-16"></div>
-  <div class="font-bold underline">{{t.nama||'.....................'}}</div><div v-if="t.nip">NIP. {{t.nip}}</div></div>` });
+  <div class="font-bold underline">{{t.nama||'.....................'}}</div><div v-if="t.nip">NUPTK. {{t.nip}}</div></div>` });
 app.mount('#app');
 </script>
 </body>
