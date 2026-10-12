@@ -164,7 +164,9 @@ table tbody tr:hover{background:#f8fafc}
 </style>
 
 <style id="calm-table-audit-fix-v2">
-/* Audit lanjutan: sembunyikan kontrol saat mencetak tabel dan rapikan tabel BK. */
+/* Audit lanjutan: sembunyikan kontrol saat mencetak tabel dan rapikan tabel BK.
+   Listener afterprint juga dilepas saat cleanup manual agar tidak menumpuk pada browser
+   yang menutup dialog cetak tanpa mengirim event afterprint. */
 @media print {
   body.cetak-tabel .noprint,
   body.cetak-tabel .modal-wrap,
@@ -181,11 +183,12 @@ table tbody tr:hover{background:#f8fafc}
     padding: 0 !important;
     margin: 0 !important;
   }
-  /* Kolom Aksi yang berisi tombol tidak ikut tercetak. Baris kosong ber-colspan tetap dipertahankan. */
-  body.cetak-tabel table:has(tbody td button) thead th:last-child,
-  body.cetak-tabel table:has(tbody td button) tbody tr:not(:has(td[colspan])) td:last-child,
-  body.cetak-pelanggaran table:has(tbody td button) thead th:last-child,
-  body.cetak-pelanggaran table:has(tbody td button) tbody tr:not(:has(td[colspan])) td:last-child {
+  /* Sembunyikan kolom paling kanan hanya bila tombol aksi memang berada di sel paling kanan.
+     Ini mencegah kolom data ikut hilang pada tabel yang memiliki tombol di kolom lain. */
+  body.cetak-tabel table:has(tbody tr > td:last-child button) thead th:last-child,
+  body.cetak-tabel table:has(tbody tr > td:last-child button) tbody tr:not(:has(td[colspan])) > td:last-child,
+  body.cetak-pelanggaran table:has(tbody tr > td:last-child button) thead th:last-child,
+  body.cetak-pelanggaran table:has(tbody tr > td:last-child button) tbody tr:not(:has(td[colspan])) > td:last-child {
     display: none !important;
   }
   body.cetak-tabel table button,
@@ -266,6 +269,19 @@ table tbody tr:hover{background:#f8fafc}
 .calm-table-polish .bk-pengurangan-table td:nth-child(5) { width: 150px; }
 .calm-table-polish .bk-pengurangan-table th:nth-child(6),
 .calm-table-polish .bk-pengurangan-table td:nth-child(6) { width: 135px; }
+
+/* Perataan kolom numerik BK: angka berada pada sumbu yang sama agar mudah dibandingkan. */
+.calm-table-polish .bk-pengurangan-table th:nth-child(3),
+.calm-table-polish .bk-pengurangan-table td:nth-child(3),
+.calm-table-polish .bk-pengurangan-table th:nth-child(4),
+.calm-table-polish .bk-pengurangan-table td:nth-child(4),
+.calm-table-polish .bk-pengurangan-table th:nth-child(5),
+.calm-table-polish .bk-pengurangan-table td:nth-child(5) { text-align: center; }
+.calm-table-polish .bk-pengurangan-table td:nth-child(3),
+.calm-table-polish .bk-pengurangan-table td:nth-child(4),
+.calm-table-polish .bk-pengurangan-table td:nth-child(5) { font-variant-numeric: tabular-nums; }
+.calm-table-polish .bk-audit-table thead th { vertical-align: middle; line-height: 1.35; }
+.calm-table-polish .bk-audit-table tbody td { line-height: 1.45; }
 
 @media (max-width: 640px) {
   .calm-table-polish .bk-audit-table { font-size: 12px; }
@@ -2351,8 +2367,13 @@ const app = createApp({
     const fetchB = async () => bimb.value = await api('bimbinganList', { bulan: bulan.value, q: q.value });
     const loadJurnal = () => run(fetchJ), loadBimb = () => run(fetchB), printPage = () => {
       document.body.classList.add('cetak-tabel');
-      window.addEventListener('afterprint', () => document.body.classList.remove('cetak-tabel'), { once: true });
-      window.print();
+      const cleanup = () => {
+        document.body.classList.remove('cetak-tabel');
+        window.removeEventListener('afterprint', cleanup);
+      };
+      window.addEventListener('afterprint', cleanup, { once: true });
+      // Pastikan mode cetak dipulihkan setelah dialog ditutup, termasuk saat pengguna membatalkan.
+      try { window.print(); } finally { cleanup(); }
     };
     const saveJurnal = () => run(async () => {
       if (jr.id) await api('jurnalEdit', { id: jr.id, tanggal: jr.tanggal, materi: jr.materi, catatan: jr.catatan });
@@ -2779,8 +2800,13 @@ const app = createApp({
       if ((rp.value.status !== 'Final' || rp.value.lengkap.length || rp.value.kosongMapel.length) && !confirm((rp.value.status !== 'Final' ? 'Rapor ini masih berstatus DRAF dan akan dicetak dengan tanda DRAF' : 'Rapor final')
         + ((rp.value.lengkap.length || rp.value.kosongMapel.length) ? '; masih ada nilai yang belum lengkap' : '') + '. Tetap cetak?')) return;
       rpSatu.value = nis || ''; document.body.classList.add('cetak-rapor');
-      window.addEventListener('afterprint', () => { document.body.classList.remove('cetak-rapor'); rpSatu.value = ''; }, { once: true });
-      Vue.nextTick(() => setTimeout(() => window.print(), 60));
+      const cleanupRaporPrint = () => {
+        document.body.classList.remove('cetak-rapor');
+        rpSatu.value = '';
+        window.removeEventListener('afterprint', cleanupRaporPrint);
+      };
+      window.addEventListener('afterprint', cleanupRaporPrint, { once: true });
+      Vue.nextTick(() => setTimeout(() => { try { window.print(); } finally { cleanupRaporPrint(); } }, 60));
     };
     const periksaRapor = () => run(async () => {
       if (!rp.value) return;
@@ -2837,7 +2863,13 @@ const app = createApp({
       if (!skelas.value) throw new Error('Pilih kelas terlebih dahulu');
       const d = await api('kartuLogin', { kelas: skelas.value }); if (!d.siswa.length) throw new Error('Tidak ada siswa di kelas ini');
       kartu.value = d; await Vue.nextTick(); document.body.classList.add('cetak-kartu');
-      window.addEventListener('afterprint', () => { document.body.classList.remove('cetak-kartu'); kartu.value = null; }, { once: true }); window.print();
+      const cleanupKartuPrint = () => {
+        document.body.classList.remove('cetak-kartu');
+        kartu.value = null;
+        window.removeEventListener('afterprint', cleanupKartuPrint);
+      };
+      window.addEventListener('afterprint', cleanupKartuPrint, { once: true });
+      try { window.print(); } finally { cleanupKartuPrint(); }
     });
     const bukaJurnal = () => { err.value = ''; Object.assign(jr, { id: '', info: '', tanggal: hari0, pi: '', materi: '', catatan: '' }); showJ.value = true; };
     const editJurnal = j => { err.value = ''; Object.assign(jr, { id: j.id, info: j.kelas + ' - ' + j.mapel, tanggal: j.tanggal, pi: '', materi: j.materi, catatan: j.catatan }); showJ.value = true; };
@@ -2883,7 +2915,16 @@ const app = createApp({
     const waAkun = c => 'https://wa.me/' + noWa(c.kontak) + '?text=' + encodeURIComponent(teksAkun(c));
     const cetakKred = () => {
       kartu.value = { kelas: kred.judul, siswa: kred.list.map(c => ({ nis: c.username, nama: c.nama, sandi: c.sandi, ket: (ROLE_LBL[c.role] || '') + (c.kelas ? ' ' + c.kelas : '') || 'Akun' })) };
-      Vue.nextTick(() => { document.body.classList.add('cetak-kartu'); window.addEventListener('afterprint', () => { document.body.classList.remove('cetak-kartu'); kartu.value = null; }, { once: true }); window.print(); });
+      Vue.nextTick(() => {
+        document.body.classList.add('cetak-kartu');
+        const cleanupKartuPrint = () => {
+        document.body.classList.remove('cetak-kartu');
+        kartu.value = null;
+        window.removeEventListener('afterprint', cleanupKartuPrint);
+      };
+        window.addEventListener('afterprint', cleanupKartuPrint, { once: true });
+        try { window.print(); } finally { cleanupKartuPrint(); }
+      });
     };
     const unduhKred = () => run(async () => {
       await saveXlsx('Akun_Sandi_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Akun', [['Nama', 'Peran', 'Kelas', 'Username', 'Sandi']].concat(kred.list.map(c => [c.nama, ROLE_LBL[c.role] || '', c.kelas || '', String(c.username), String(c.sandi)])), [32, 16, 14, 20, 14]]]);
@@ -2962,11 +3003,13 @@ const app = createApp({
         img.addEventListener('error', done, { once: true });
         setTimeout(done, 1800);
       })));
-      const cleanup = () => document.body.classList.remove('cetak-pelanggaran');
+      const cleanup = () => {
+        document.body.classList.remove('cetak-pelanggaran');
+        window.removeEventListener('afterprint', cleanup);
+      };
       window.addEventListener('afterprint', cleanup, { once: true });
-      window.print();
-      // Fallback untuk browser yang tidak memicu afterprint.
-      setTimeout(cleanup, 60000);
+      // Pulihkan tampilan segera setelah dialog cetak ditutup, baik dicetak maupun dibatalkan.
+      try { window.print(); } finally { cleanup(); }
     };
     let plsReq = 0;
     const pickKelasPl = () => run(async () => { plf.nis = ''; const rid = ++plsReq, k = plf.kelas, d = k ? await api('bkSiswa', { kelas: k }) : []; if (rid === plsReq) plsiswa.value = d; });
