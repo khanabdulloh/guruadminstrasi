@@ -832,6 +832,71 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
   body.cetak-rapor .rapor-page .bg-slate-100,
   body.cetak-rapor .rapor-page .bg-slate-50 { background:#e9eef5!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 }
+
+/* v73: ratakan kolom identitas rapor; blok Kelas/Fase/Semester digeser ke kanan */
+@media print {
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id {
+    width:100%!important;
+    table-layout:fixed!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(1){width:22%!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(2){width:2%!important;text-align:center!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(3){width:35%!important;padding-left:3pt!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(4){width:14%!important;padding-left:10pt!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(5){width:2%!important;text-align:center!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(6){width:25%!important;padding-left:3pt!important}
+}
+
+</style>
+
+
+
+<style id="calm-rapor-table-alignment-v74">
+/* v74: perataan kolom isi rapor. Hanya aturan cetak; tidak mengubah data/perhitungan. */
+@media print {
+  body.cetak-rapor .rapor-page table.calm-table-print { width:100%!important; }
+  /* Nilai angka dan kolom indeks: center; nama/mapel dan uraian: left agar mudah dibaca. */
+  body.cetak-rapor .rapor-page .rapor-mapel th { text-align:center!important; vertical-align:middle!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel th:nth-child(2),
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(2) { text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel tbody tr td:first-child { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(3),
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(4),
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(5),
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(6) { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel td:last-child { text-align:left!important; vertical-align:top!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sas td:nth-child(4),
+  body.cetak-rapor .rapor-page .rapor-mapel-sas td:nth-child(5) { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel tbody tr.font-bold td { vertical-align:middle!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel tbody tr.font-bold td[colspan] { text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel > tbody:last-child td:first-child { text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-pkl th,
+  body.cetak-rapor .rapor-page .rapor-pkl td { vertical-align:middle!important; }
+  body.cetak-rapor .rapor-page .rapor-pkl th:nth-child(1),
+  body.cetak-rapor .rapor-page .rapor-pkl td:nth-child(1) { text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-pkl th:nth-child(2),
+  body.cetak-rapor .rapor-page .rapor-pkl td:nth-child(2),
+  body.cetak-rapor .rapor-page .rapor-pkl th:nth-child(3),
+  body.cetak-rapor .rapor-page .rapor-pkl td:nth-child(3) { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-ekskul th:first-child,
+  body.cetak-rapor .rapor-page .rapor-ekskul td:first-child { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-ekskul th:nth-child(2),
+  body.cetak-rapor .rapor-page .rapor-ekskul td:nth-child(2),
+  body.cetak-rapor .rapor-page .rapor-ekskul th:nth-child(3),
+  body.cetak-rapor .rapor-page .rapor-ekskul td:nth-child(3) { text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-kokurikuler th,
+  body.cetak-rapor .rapor-page .rapor-kokurikuler td { text-align:left!important; vertical-align:top!important; }
+  body.cetak-rapor .rapor-page .rapor-hadir { table-layout:fixed!important; }
+  body.cetak-rapor .rapor-page .rapor-hadir th { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-hadir td { text-align:center!important; width:25%!important; }
+  body.cetak-rapor .rapor-page .rapor-catatan { text-align:left!important; overflow-wrap:anywhere!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(1),
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(4) { text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(2),
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(5) { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(3),
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(6) { text-align:left!important; }
+}
 </style>
 
 </head>
