@@ -512,28 +512,28 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 <div id="app" v-cloak>
 
 <div v-if="busy" class="noprint fixed top-0 inset-x-0 h-1 bg-amber-400 animate-pulse z-50" role="progressbar" aria-label="Memuat"></div>
-<div v-if="raporCetakDialog" class="modal-wrap noprint fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/55 backdrop-blur-sm" role="presentation" @keydown.esc="batalCetakRapor">
-  <section class="modal-box w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200" role="alertdialog" aria-modal="true" aria-labelledby="judul-konfirmasi-cetak" aria-describedby="isi-konfirmasi-cetak">
-    <div class="px-6 pt-6 pb-4">
-      <div class="flex items-start gap-4">
-        <div class="grid h-12 w-12 shrink-0 place-items-center rounded-xl" :class="raporCetakDialog.draf || raporCetakDialog.belumLengkap ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'">
-          <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+<div v-if="raporCetakDialog" class="modal-wrap noprint fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm" role="presentation" @keydown.esc="batalCetakRapor">
+  <section class="modal-box w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200/80" role="alertdialog" aria-modal="true" aria-labelledby="judul-konfirmasi-cetak" aria-describedby="isi-konfirmasi-cetak">
+    <div class="px-6 pt-6 pb-5">
+      <div class="flex items-start gap-3">
+        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl" :class="raporCetakDialog.draf || raporCetakDialog.belumLengkap ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-700'">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
         </div>
-        <div class="min-w-0 flex-1">
-          <h3 id="judul-konfirmasi-cetak" class="text-lg font-extrabold tracking-tight text-slate-900">{{raporCetakDialog.judul}}</h3>
-          <p class="mt-1 text-sm text-slate-500">{{raporCetakDialog.periode}}</p>
+        <div class="min-w-0 flex-1 pt-0.5">
+          <h3 id="judul-konfirmasi-cetak" class="text-base font-bold tracking-tight text-slate-900">{{raporCetakDialog.judul}}</h3>
+          <p class="mt-1 text-xs font-medium text-slate-500">{{raporCetakDialog.periode}}</p>
         </div>
-        <button type="button" @click="batalCetakRapor" class="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup dialog"><span aria-hidden="true">✕</span></button>
+        <button type="button" @click="batalCetakRapor" class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup dialog"><span aria-hidden="true">✕</span></button>
       </div>
-      <div id="isi-konfirmasi-cetak" class="mt-5 space-y-3 text-sm leading-relaxed text-slate-700">
-        <p v-if="raporCetakDialog.draf">Rapor ini belum difinalisasi. Dokumen yang dicetak akan diberi penanda <b class="text-amber-700">DRAF</b> agar tidak disalahartikan sebagai rapor final.</p>
-        <p v-if="raporCetakDialog.belumLengkap">Masih terdapat nilai yang belum lengkap. Sebaiknya periksa kembali kelengkapan nilai sebelum mencetak.</p>
-        <p>Apakah Anda ingin tetap melanjutkan pencetakan?</p>
+      <div id="isi-konfirmasi-cetak" class="mt-5 space-y-2 text-sm leading-relaxed text-slate-600">
+        <p v-if="raporCetakDialog.draf">Rapor belum final dan akan dicetak dengan tanda <b class="font-semibold text-amber-700">DRAF</b>.</p>
+        <p v-if="raporCetakDialog.belumLengkap">Beberapa nilai belum lengkap.</p>
+        <p class="font-medium text-slate-800">Lanjutkan pencetakan?</p>
       </div>
     </div>
-    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-slate-100 bg-slate-50 px-6 py-4">
-      <button type="button" @click="batalCetakRapor" class="btn-o justify-center">Periksa kembali</button>
-      <button type="button" @click="lanjutCetakRapor" class="btn-p justify-center"><span class="inline-flex items-center gap-2"><svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>Tetap cetak rapor</span></button>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-slate-100 px-6 py-4">
+      <button type="button" @click="batalCetakRapor" class="btn-o justify-center">Batal</button>
+      <button type="button" @click="lanjutCetakRapor" class="btn-p justify-center"><span class="inline-flex items-center gap-2"><svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>Cetak rapor</span></button>
     </div>
   </section>
 </div>
