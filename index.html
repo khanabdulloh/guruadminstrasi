@@ -545,6 +545,24 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 .modal-box p.text-rose-600{padding:.5rem .75rem;border:1px solid #fecdd3;border-radius:var(--rad-s);background:#fff1f2;color:#be123c;font-size:.82rem;line-height:1.45}
 #app main#utama>p[role="alert"],#app main#utama>p[role="status"]{border-radius:var(--rad-s);font-weight:500;box-shadow:0 8px 20px -10px rgba(15,35,65,.35)}
 
+
+/* ===== Dialog konfirmasi cetak rapor: minimalis ===== */
+.cfm-wrap{display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-box.cfm{width:100%;max-width:22.5rem;margin:auto;padding:1.75rem 1.75rem 1.25rem;background:#fff;border:0;border-radius:1.25rem;overflow:visible;box-shadow:0 30px 60px -24px rgba(10,34,80,.45),0 0 0 1px rgba(10,34,80,.05)}
+.cfm-eyebrow{margin:0 0 .5rem;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.modal-box.cfm .cfm-title{position:static;margin:0;padding:0;background:none;border:0;border-radius:0;font-size:1.25rem;line-height:1.3;font-weight:700;letter-spacing:-.02em;color:var(--navy-d)}
+.cfm-list{margin:1rem 0 0;display:flex;flex-direction:column;gap:.5rem}
+.cfm-list li{position:relative;padding-left:1rem;font-size:.875rem;line-height:1.5;color:var(--mut)}
+.cfm-list li::before{content:"";position:absolute;left:0;top:.55em;width:.375rem;height:.375rem;border-radius:50%;background:#f59e0b}
+.cfm-list b{font-weight:600;color:#b45309}
+.cfm-actions{display:flex;justify-content:flex-end;align-items:center;gap:.25rem;margin-top:1.75rem}
+.cfm-ghost,.cfm-primary{min-height:2.5rem;padding:.5rem 1.1rem;border-radius:.75rem;font-size:.875rem;font-weight:600;transition:background-color .12s,color .12s}
+.cfm-ghost{color:var(--mut)}
+.cfm-ghost:hover{background:#f1f5f9;color:var(--ink)}
+.cfm-primary{background:var(--navy-d);color:#fff}
+.cfm-primary:hover{background:var(--navy)}
+@media(max-width:767px){.cfm-wrap{align-items:flex-end;padding:0}.modal-box.cfm{max-width:none;margin:0;border-radius:1.25rem 1.25rem 0 0;padding-bottom:max(1.25rem,env(safe-area-inset-bottom))}.cfm-actions{flex-direction:column-reverse;align-items:stretch}.cfm-actions button{width:100%}}
+
 /* ===== J. Halaman masuk ===== */
 .login-wrap .login-bg h1{font-size:3rem;font-weight:700;letter-spacing:-.035em}
 .login-wrap .login-bg .grid>div{background:none;border:0;border-top:1px solid rgba(255,255,255,.2);border-radius:0;padding:.75rem 0 0}
@@ -585,28 +603,17 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 <div id="app" v-cloak>
 
 <div v-if="busy" class="loadbar noprint" role="progressbar" aria-label="Memuat data" aria-busy="true"><i></i></div>
-<div v-if="raporCetakDialog" class="modal-wrap noprint fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm" role="presentation" @keydown.esc="batalCetakRapor">
-  <section class="modal-box w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200/80" role="alertdialog" aria-modal="true" aria-labelledby="judul-konfirmasi-cetak" aria-describedby="isi-konfirmasi-cetak">
-    <div class="px-6 pt-6 pb-5">
-      <div class="flex items-start gap-3">
-        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl" :class="raporCetakDialog.draf || raporCetakDialog.belumLengkap ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-700'">
-          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
-        </div>
-        <div class="min-w-0 flex-1 pt-0.5">
-          <h3 id="judul-konfirmasi-cetak" class="text-base font-bold tracking-tight text-slate-900">{{raporCetakDialog.judul}}</h3>
-          <p class="mt-1 text-xs font-medium text-slate-500">{{raporCetakDialog.periode}}</p>
-        </div>
-        <button type="button" @click="batalCetakRapor" class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup dialog"><span aria-hidden="true">✕</span></button>
-      </div>
-      <div id="isi-konfirmasi-cetak" class="mt-5 space-y-2 text-sm leading-relaxed text-slate-600">
-        <p v-if="raporCetakDialog.draf">Rapor belum final dan akan dicetak dengan tanda <b class="font-semibold text-amber-700">DRAF</b>.</p>
-        <p v-if="raporCetakDialog.belumLengkap">Beberapa nilai belum lengkap.</p>
-        <p class="font-medium text-slate-800">Lanjutkan pencetakan?</p>
-      </div>
-    </div>
-    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-slate-100 px-6 py-4">
-      <button type="button" @click="batalCetakRapor" class="btn-o justify-center">Batal</button>
-      <button type="button" @click="lanjutCetakRapor" class="btn-p justify-center"><span class="inline-flex items-center gap-2"><svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>Cetak rapor</span></button>
+<div v-if="raporCetakDialog" class="modal-wrap cfm-wrap noprint fixed inset-0 z-[100]" role="presentation" @keydown.esc="batalCetakRapor" @click.self="batalCetakRapor">
+  <section class="modal-box cfm" role="alertdialog" aria-modal="true" aria-labelledby="judul-konfirmasi-cetak" aria-describedby="isi-konfirmasi-cetak">
+    <p class="cfm-eyebrow">{{raporCetakDialog.periode}}</p>
+    <h3 id="judul-konfirmasi-cetak" class="cfm-title">{{raporCetakDialog.judul}}</h3>
+    <ul id="isi-konfirmasi-cetak" class="cfm-list">
+      <li v-if="raporCetakDialog.draf">Belum final. Rapor dicetak dengan tanda <b>DRAF</b>.</li>
+      <li v-if="raporCetakDialog.belumLengkap">Beberapa nilai belum lengkap.</li>
+    </ul>
+    <div class="cfm-actions">
+      <button type="button" @click="batalCetakRapor" class="cfm-ghost">Batal</button>
+      <button type="button" @click="lanjutCetakRapor" class="cfm-primary">Lanjut cetak</button>
     </div>
   </section>
 </div>
