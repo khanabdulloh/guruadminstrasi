@@ -899,6 +899,37 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
 }
 </style>
 
+
+<style id="calm-rapor-print-v75-final">
+/* v75: koreksi final untuk kolom identitas dan baris rata-rata rapor. */
+@media print {
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type {
+    width:100%!important; table-layout:fixed!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr td:nth-child(1) { width:20%!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr td:nth-child(2) { width:2%!important; text-align:center!important; padding:2pt 0!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr td:nth-child(3) { width:32%!important; padding-left:3pt!important; text-align:left!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr td:nth-child(4) { width:19%!important; padding-left:22pt!important; text-align:left!important; white-space:nowrap!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr td:nth-child(5) { width:2%!important; text-align:center!important; padding:2pt 0!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr td:nth-child(6) { width:25%!important; padding-left:3pt!important; text-align:left!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr td:nth-child(3),
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr td:nth-child(6) { overflow-wrap:normal!important; word-break:normal!important; }
+  /* Angka rata-rata berada di tengah sel secara eksplisit untuk STS maupun SAS. */
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-mapel > tbody:last-child > tr:last-child td {
+    vertical-align:middle!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-mapel > tbody:last-child > tr:last-child td:first-child {
+    text-align:center!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-mapel > tbody:last-child > tr:last-child td:nth-child(2) {
+    text-align:center!important; font-weight:700!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-mapel > tbody:last-child > tr:last-child td {
+    padding-left:3pt!important; padding-right:3pt!important;
+  }
+}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
