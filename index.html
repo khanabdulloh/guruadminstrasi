@@ -512,6 +512,31 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 <div id="app" v-cloak>
 
 <div v-if="busy" class="noprint fixed top-0 inset-x-0 h-1 bg-amber-400 animate-pulse z-50" role="progressbar" aria-label="Memuat"></div>
+<div v-if="raporCetakDialog" class="modal-wrap noprint fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/55 backdrop-blur-sm" role="presentation" @keydown.esc="batalCetakRapor">
+  <section class="modal-box w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200" role="alertdialog" aria-modal="true" aria-labelledby="judul-konfirmasi-cetak" aria-describedby="isi-konfirmasi-cetak">
+    <div class="px-6 pt-6 pb-4">
+      <div class="flex items-start gap-4">
+        <div class="grid h-12 w-12 shrink-0 place-items-center rounded-xl" :class="raporCetakDialog.draf || raporCetakDialog.belumLengkap ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'">
+          <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="judul-konfirmasi-cetak" class="text-lg font-extrabold tracking-tight text-slate-900">{{raporCetakDialog.judul}}</h3>
+          <p class="mt-1 text-sm text-slate-500">{{raporCetakDialog.periode}}</p>
+        </div>
+        <button type="button" @click="batalCetakRapor" class="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup dialog"><span aria-hidden="true">✕</span></button>
+      </div>
+      <div id="isi-konfirmasi-cetak" class="mt-5 space-y-3 text-sm leading-relaxed text-slate-700">
+        <p v-if="raporCetakDialog.draf">Rapor ini belum difinalisasi. Dokumen yang dicetak akan diberi penanda <b class="text-amber-700">DRAF</b> agar tidak disalahartikan sebagai rapor final.</p>
+        <p v-if="raporCetakDialog.belumLengkap">Masih terdapat nilai yang belum lengkap. Sebaiknya periksa kembali kelengkapan nilai sebelum mencetak.</p>
+        <p>Apakah Anda ingin tetap melanjutkan pencetakan?</p>
+      </div>
+    </div>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-slate-100 bg-slate-50 px-6 py-4">
+      <button type="button" @click="batalCetakRapor" class="btn-o justify-center">Periksa kembali</button>
+      <button type="button" @click="lanjutCetakRapor" class="btn-p justify-center"><span class="inline-flex items-center gap-2"><svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>Tetap cetak rapor</span></button>
+    </div>
+  </section>
+</div>
 <!-- LOGIN -->
 <div v-if="!user" class="login-wrap min-h-screen grid lg:grid-cols-[1.1fr_1fr]">
   <!-- Panel kiri -->
@@ -2821,6 +2846,7 @@ const app = createApp({
     const pairKunci = computed(() => { const p = pil.value[pilIdx.value]; return !!(p && p.kunci); });
     /* ====== Rapor (Kurikulum Merdeka: STS, SAS, kenaikan kelas) ====== */
     const rpPil = ref([]), rpKelas = ref(''), rp = ref(null), rpF = reactive({}), rpInfo = reactive({ kompetensi: '', nipWali: '', tanggal: '' }), rpMeta = reactive({ sem: 'Ganjil', tahun: '', periode: 'SAS' });
+    const raporCetakDialog = ref(null);
     const rpTab = ref('data'), rpSatu = ref(''), rkp = ref(null), rkpIdx = ref(''), rkpPer = ref('SAS'), rcf = ref(null), rnaik = ref(null), rnaikTxt = ref('');
     const rkpSumber = ref([]), rkpSumberNis = ref(''), rkpSumberBusy = ref(false);
     const rpPeran = computed(() => !!user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU')), rpFinal = computed(() => !!rp.value && rp.value.status === 'Final'), rpCek = ref(null);
@@ -2860,18 +2886,10 @@ const app = createApp({
       ok.value = 'Data rapor tersimpan (' + d.tersimpan + ' siswa)' + (d.dikunci ? '; ' + d.dikunci + ' siswa sudah diproses kenaikan kelasnya dan tidak diubah' : '') + '.';
     });
     const terapkanRek = () => { if (rp.value) rp.value.siswa.forEach(s => { if (!s.diproses) { rpF[s.nis].keputusan = s.rek.keputusan; if (s.rek.keputusan === 'Naik' && !rpF[s.nis].kelasTujuan) rpF[s.nis].kelasTujuan = s.kelasTujuan; } }); };
-    // Cegah klik ganda/handler berulang memunculkan konfirmasi cetak rapor berkali-kali.
+    // Konfirmasi cetak menggunakan modal internal agar tidak menampilkan identitas domain/frame browser.
     let raporConfirmDebounceUntil = 0, raporPrintActive = false;
-    const cetakRapor = nis => {
-      const now = Date.now();
-      if (raporPrintActive || now < raporConfirmDebounceUntil) return;
-      if (!rp.value || !rp.value.siswa.length) return;
-      if (rp.value.bukanAktif && rp.value.status !== 'Final') { err.value = 'Rapor tidak dapat dicetak: nilai di server bukan untuk ' + rpMeta.sem + ' ' + rpMeta.tahun + ' dan rapor periode ini belum difinalkan.'; toTop(); return; }
-      // Jendela debounce dimulai sebelum confirm, sehingga event klik ganda sesudah tombol
-      // pada dialog konfirmasi ditekan tidak membuka dialog kedua secara beruntun.
-      raporConfirmDebounceUntil = now + 900;
-      if ((rp.value.status !== 'Final' || rp.value.lengkap.length || rp.value.kosongMapel.length) && !confirm((rp.value.status !== 'Final' ? 'Rapor ini masih berstatus DRAF dan akan dicetak dengan tanda DRAF' : 'Rapor final')
-        + ((rp.value.lengkap.length || rp.value.kosongMapel.length) ? '; masih ada nilai yang belum lengkap' : '') + '. Tetap cetak?')) return;
+    const jalankanCetakRapor = nis => {
+      if (raporPrintActive) return;
       raporPrintActive = true;
       rpSatu.value = nis || ''; document.body.classList.add('cetak-rapor');
       const cleanupRaporPrint = () => {
@@ -2882,6 +2900,32 @@ const app = createApp({
       };
       window.addEventListener('afterprint', cleanupRaporPrint, { once: true });
       Vue.nextTick(() => setTimeout(() => { try { window.print(); } catch (e) { cleanupRaporPrint(); throw e; } }, 60));
+    };
+    const cetakRapor = nis => {
+      const now = Date.now();
+      if (raporPrintActive || raporCetakDialog.value || now < raporConfirmDebounceUntil) return;
+      if (!rp.value || !rp.value.siswa.length) return;
+      if (rp.value.bukanAktif && rp.value.status !== 'Final') { err.value = 'Rapor tidak dapat dicetak: nilai di server bukan untuk ' + rpMeta.sem + ' ' + rpMeta.tahun + ' dan rapor periode ini belum difinalkan.'; toTop(); return; }
+      const perluKonfirmasi = rp.value.status !== 'Final' || rp.value.lengkap.length || rp.value.kosongMapel.length;
+      raporConfirmDebounceUntil = now + 900;
+      if (perluKonfirmasi) {
+        raporCetakDialog.value = {
+          nis: nis || '',
+          judul: rp.value.status !== 'Final' ? 'Rapor masih berstatus DRAF' : 'Periksa kelengkapan rapor',
+          draf: rp.value.status !== 'Final',
+          belumLengkap: !!(rp.value.lengkap.length || rp.value.kosongMapel.length),
+          periode: (rp.value.periode || rpMeta.periode) + ' ' + (rp.value.semester || rpMeta.sem) + ' ' + (rp.value.tahun || rpMeta.tahun)
+        };
+        return;
+      }
+      jalankanCetakRapor(nis);
+    };
+    const batalCetakRapor = () => { raporCetakDialog.value = null; };
+    const lanjutCetakRapor = () => {
+      const d = raporCetakDialog.value;
+      if (!d || raporPrintActive) return;
+      raporCetakDialog.value = null;
+      jalankanCetakRapor(d.nis);
     };
     const periksaRapor = () => run(async () => {
       if (!rp.value) return;
@@ -3214,7 +3258,7 @@ const app = createApp({
       const nh = Math.ceil(h) + 24; if (nh !== window.__lh) { window.__lh = nh; parent.postMessage({ calmHeight: nh }, '*'); }
     }, 600);
 
-    return { pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, rpList, rpGrup, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, rpList, rpGrup, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
