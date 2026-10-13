@@ -1166,6 +1166,43 @@ body.cetak-rapor .rapor-page table.rapor-mapel tr.rapor-rata-row > td.rapor-rata
 @media(prefers-reduced-motion:reduce){.nl .seg button,.nl .inp,.nl .btn-p,.nl .btn-o{transition:none!important}}
 </style>
 
+
+<style id="calm-global-polish-v100">
+/* v100: penyelarasan visual global; CSS ringan, tanpa JS/aset/API baru. */
+:root{--calm-surface:#fff;--calm-page:#f4f7fb;--calm-border:#dfe6f0;--calm-ink:#172b4d;--calm-muted:#63728a;--calm-navy:#132c69;--calm-blue:#204397;--calm-focus:rgba(32,67,151,.14)}
+@media screen{
+ body{background:#f4f7fb;color:#253550;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+ #calm-app{color:#253550}
+ #calm-app main{background:transparent}
+ #calm-app h1,#calm-app h2,#calm-app h3,#calm-app h4{color:#172b4d;letter-spacing:-.018em}
+ #calm-app .card,#calm-app [class~="rounded-xl"],#calm-app [class~="rounded-2xl"]{border-color:#e0e7f1}
+ #calm-app .card{box-shadow:0 2px 8px rgba(19,44,105,.035)}
+ #calm-app input:not([type="checkbox"]):not([type="radio"]),#calm-app select,#calm-app textarea{border-color:#d6e0ee;border-radius:10px;color:#172b4d;background-color:#fff}
+ #calm-app input:not([type="checkbox"]):not([type="radio"]):focus,#calm-app select:focus,#calm-app textarea:focus{outline:0;border-color:#718dbb;box-shadow:0 0 0 3px var(--calm-focus)}
+ #calm-app input::placeholder,#calm-app textarea::placeholder{color:#98a6ba}
+ #calm-app button{transition:background-color .12s ease,border-color .12s ease,color .12s ease,box-shadow .12s ease}
+ #calm-app button:focus-visible,#calm-app a:focus-visible{outline:2px solid #7894c4;outline-offset:2px}
+ #calm-app .btn-p{background:#204397;color:#fff;box-shadow:0 1px 2px rgba(19,44,105,.12)}
+ #calm-app .btn-p:hover{background:#19367f}
+ #calm-app .btn-o{border-color:#cbd7e8;color:#24477f;background:#fff}
+ #calm-app .btn-o:hover{background:#f1f5fb;border-color:#aebfda}
+ #calm-app table{border-color:#e1e8f1}
+ #calm-app thead{color:#334968}
+ #calm-app th{font-weight:700;letter-spacing:.005em}
+ #calm-app tbody tr{border-color:#e8edf4}
+ #calm-app tbody tr:hover{background-color:#f6f8fc}
+ #calm-app hr{border-color:#e1e8f1}
+ #calm-app .bg-white{background-color:#fff}
+ #calm-app .text-slate-500{color:#65758d}
+ #calm-app .text-slate-600{color:#53647d}
+ #calm-app .border-slate-200{border-color:#e0e7f1}
+ #calm-app .bg-slate-50{background-color:#f6f8fc}
+ #calm-app .shadow-sm{--tw-shadow:0 2px 8px rgba(19,44,105,.045);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}
+}
+@media(max-width:767px){#calm-app main{min-width:0}#calm-app .card{border-radius:14px}}
+@media(prefers-reduced-motion:reduce){#calm-app *,#calm-app *::before,#calm-app *::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media print{body,#calm-app{background:#fff!important;color:#000!important}#calm-app button{box-shadow:none!important;transition:none!important}}
+</style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
