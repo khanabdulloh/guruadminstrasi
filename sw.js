@@ -10,7 +10,7 @@ self.addEventListener('install', () => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
     const nama = await caches.keys();
-    await Promise.all(nama.filter(n => n.indexOf(VER) !== 0).map(n => caches.delete(n))); // buang cache versi lama (mis. smk-calm-v3)
+    await Promise.all(nama.filter(n => n.startsWith('smk-calm-') && n.indexOf(VER) !== 0).map(n => caches.delete(n))); // hapus hanya cache milik Portal CALM versi lama
     await self.clients.claim();
   })());
 });
