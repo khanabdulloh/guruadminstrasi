@@ -54,8 +54,8 @@
   body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(5){width:2.5%!important;text-align:center!important;padding-left:0!important;padding-right:0!important}
   body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(6){width:21.5%!important;padding-left:5pt!important}
   /* Angka rata-rata harus benar-benar terpusat meski ada aturan umum tabel yang lebih kuat. */
-  body.cetak-rapor .rapor-page tr.rapor-rata-row>td:last-child,
-  body.cetak-rapor .rapor-page tr.rapor-rata-row>td:last-child *{text-align:center!important}
+  body.cetak-rapor .rapor-page tr.rapor-rata-row>td.rapor-rata-value,
+  body.cetak-rapor .rapor-page tr.rapor-rata-row>td.rapor-rata-value *{text-align:center!important}
   body.cetak-rapor .rapor-page tr.rapor-rata-row>td{vertical-align:middle!important}
   body.cetak-rapor .rapor-page table.calm-table-print:not(:first-of-type) th,
   body.cetak-rapor .rapor-page table.calm-table-print:not(:first-of-type) td{overflow-wrap:anywhere;hyphens:auto}
@@ -2562,7 +2562,7 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
           <tr v-for="m in g.items" :key="m.nama"><td class="border p-1 text-center">{{m.no}}</td><td class="border p-1">{{m.label||m.nama}}</td><td class="border p-1 text-center">{{m.kkm}}</td>
             <template v-if="rp.periode==='STS'"><td class="border p-1 text-center">{{nv(s,m.nama,'slm')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'sts')}}</td><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{s.nilai[m.nama]?(s.nilai[m.nama].akhir>=m.kkm?'Tuntas':'Belum tuntas'):'-'}}</td></template>
             <template v-else><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'pred')}}</td><td class="border p-1 text-xs" style="text-align:justify">{{s.nilai[m.nama]&&s.nilai[m.nama].desk||'-'}}</td></template></tr></tbody>
-        <tbody><tr class="font-bold rapor-rata-row"><td class="border p-1 text-center" colspan="3">Rata-rata</td><td class="border p-1 text-center" :colspan="rp.periode==='STS'?4:3">{{s.rata==null?'-':s.rata}}</td></tr></tbody></table>
+        <tbody><tr class="font-bold rapor-rata-row"><td class="border p-1 text-center" colspan="3">Rata-rata</td><template v-if="rp.periode==='STS'"><td class="border p-1"></td><td class="border p-1"></td><td class="border p-1 text-center rapor-rata-value">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td></template><template v-else><td class="border p-1 text-center rapor-rata-value">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td><td class="border p-1"></td></template></tr></tbody></table>
       <template v-if="rp.periode==='SAS'">
         <template v-if="s.pkl"><p class="font-bold text-sm mb-1">B. Praktik Kerja Lapangan (PKL)</p>
           <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-pkl"><thead><tr class="bg-slate-100"><th class="border p-1 text-left">Mitra DU/DI</th><th class="border p-1">Waktu Pelaksanaan</th><th class="border p-1" style="width:10%">Nilai</th></tr></thead><tbody>
