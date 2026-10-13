@@ -933,6 +933,30 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
 @media print { .rapor-mapel .rapor-rata-row > td { text-align: center !important; vertical-align: middle; } }
 </style>
 
+
+<style id="calm-rapor-print-fix-v85">
+/* v85: aturan kanonis untuk dua masalah cetak yang teridentifikasi. */
+@media print {
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id {
+    width:100% !important; table-layout:fixed !important;
+  }
+  /* Lebar total 100%; blok identitas kanan mulai setelah 63% area tabel. */
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id tr > td:nth-child(1) { width:23% !important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id tr > td:nth-child(2) { width:2.5% !important; text-align:center !important; padding-left:0 !important; padding-right:0 !important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id tr > td:nth-child(3) { width:37.5% !important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id tr > td:nth-child(4) { width:13% !important; padding-left:3pt !important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id tr > td:nth-child(5) { width:2.5% !important; text-align:center !important; padding-left:0 !important; padding-right:0 !important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id tr > td:nth-child(6) { width:21.5% !important; padding-left:5pt !important; }
+  /* Jangan mengandalkan .rapor-mapel: target langsung sel angka rata-rata. */
+  body.cetak-rapor .rapor-page table.rapor-mapel tr.rapor-rata-row > td.rapor-rata-value,
+  body.cetak-rapor .rapor-page table.rapor-mapel tr.rapor-rata-row > td.rapor-rata-value * {
+    text-align:center !important; text-align-last:center !important;
+  }
+  body.cetak-rapor .rapor-page table.rapor-mapel tr.rapor-rata-row > td { vertical-align:middle !important; }
+}
+/* Pratinjau layar mengikuti perataan angka pada PDF. */
+body.cetak-rapor .rapor-page table.rapor-mapel tr.rapor-rata-row > td.rapor-rata-value { text-align:center !important; }
+</style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
@@ -1045,10 +1069,14 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
       <p class="font-extrabold text-white">SMK CALM</p>
       <span class="inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span>
     </div>
-    <button v-for="m in menu" :key="m.k" @click="go(m.k);mnav=false" :aria-current="view===m.k?'page':null" class="group whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium md:mb-1 flex items-center gap-3 transition"
-      :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-white/10'">
-      <svg class="h-5 w-5 shrink-0 transition" :class="view===m.k?'':'opacity-70 group-hover:opacity-100'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON[m.k]"></svg>
-      <span>{{m.t}}</span><span v-if="m.k==='catatansaya'&&belumBaca" class="ml-auto text-[10px] font-bold bg-rose-500 text-white rounded-full px-1.5">{{belumBaca}}</span><span v-if="m.k==='notif'&&notifN" class="ml-auto text-[10px] font-bold bg-rose-500 text-white rounded-full px-1.5">{{notifN}}</span></button>
+    <section v-for="g in menuGroups" :key="g.label" class="mb-4 last:mb-0" :aria-label="g.label">
+      <h2 class="px-3 pt-2 pb-1.5 text-[10px] font-extrabold uppercase tracking-[.14em] text-slate-400/90">{{g.label}}</h2>
+      <button v-for="m in g.items" :key="m.k" @click="go(m.k);mnav=false" :aria-current="view===m.k?'page':null" class="group whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium md:mb-1 flex items-center gap-3 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        :class="view===m.k?acc[user.role]+' shadow-inner':'hover:bg-white/10'">
+        <svg class="h-5 w-5 shrink-0 transition" :class="view===m.k?'':'opacity-70 group-hover:opacity-100'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON[m.k]"></svg>
+        <span>{{m.t}}</span><span v-if="m.k==='catatansaya'&&belumBaca" class="ml-auto text-[10px] font-bold bg-rose-500 text-white rounded-full px-1.5">{{belumBaca}}</span><span v-if="m.k==='notif'&&notifN" class="ml-auto text-[10px] font-bold bg-rose-500 text-white rounded-full px-1.5">{{notifN}}</span>
+      </button>
+    </section>
     <button v-if="pwa" @click="pasang" class="whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm text-amber-400 hover:bg-white/10 md:mb-1 flex items-center gap-3"><svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg><span>Pasang di layar HP</span></button>
     <button @click="logout" class="whitespace-nowrap md:w-full text-left px-3 py-2.5 rounded-xl text-sm text-amber-400 hover:bg-white/10 md:mt-6 flex items-center gap-3">
       <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="ICON.keluar"></svg><span>Keluar</span></button>
@@ -2707,6 +2735,18 @@ const app = createApp({
     ICON.akun = '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14 9l2 2"/>'; ICON.suratmasuk = ICON.dokumen; ICON.suratkeluar = ICON.dokumen; ICON.disposisi = ICON.bimbingan; ICON.arsip = ICON.dokumen; ICON.layanan = ICON.dokumen; ICON.mutasi = ICON.siswa; ICON.cetaksurat = ICON.dokumen; ICON.cetakabsen = ICON.presensi; ICON.rekapadmin = ICON.leger;
     const MS = { dashboard: 'Dashboard TU', siswa: 'Data Siswa', guru: 'Data Guru/PTK', suratmasuk: 'Surat Masuk', suratkeluar: 'Surat Keluar', disposisi: 'Disposisi', arsip: 'Arsip Dokumen', layanan: 'Layanan Administrasi', mutasi: 'Mutasi Siswa', cetaksurat: 'Cetak Surat', cetakabsen: 'Cetak Absensi', rekapadmin: 'Rekap Administrasi' };
     const menu = computed(() => user.value ? MENU[user.value.role].filter(k => !user.value.wajib || k === 'sandi').map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || M[k] })) : []);
+    // Pengelompokan ini hanya mengatur tampilan; MENU, hak akses, dan go() tetap menjadi sumber perilaku navigasi.
+    const menuGroups = computed(() => {
+      const defs = [
+        { label: 'Ringkasan', keys: ['dashboard', 'monitor'] },
+        { label: 'Akademik', keys: ['jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'perangkat', 'pkl', 'riwayat', 'nilaisaya'] },
+        { label: 'Data & Pengguna', keys: ['kelas', 'siswa', 'guru', 'akun', 'tahun', 'pengaturan', 'log'] },
+        { label: 'Bimbingan & Komunikasi', keys: ['izin', 'bimbingan', 'bimbingansaya', 'konseling', 'pelanggaran', 'pengurangan', 'catatan', 'catatansaya', 'notif'] },
+        { label: 'Administrasi & Dokumen', keys: ['dokumen', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'cetakabsen', 'rekapadmin'] },
+        { label: 'Akun Saya', keys: ['anak', 'sandi'] }
+      ];
+      return defs.map(d => ({ label: d.label, items: menu.value.filter(m => d.keys.includes(m.k)) })).filter(g => g.items.length);
+    });
     const canEdit = computed(() => !!user.value && user.value.role === 'ADMIN'); // STAF hanya melihat & mengunduh
     const ROLE_LBL = { SISWA: 'Siswa', GURU: 'Guru', KEPSEK: 'Kepala sekolah', STAF: 'Staf', ORTU: 'Orang tua', BK: 'Guru BK' }, ROLE_CLS = { SISWA: 'bg-amber-100 text-amber-800', GURU: 'bg-emerald-100 text-emerald-700', KEPSEK: 'bg-violet-100 text-violet-700', STAF: 'bg-sky-100 text-sky-700', ORTU: 'bg-blue-100 text-blue-800', BK: 'bg-rose-100 text-rose-700' };
     const roleDari = t => /^(bk|bim|kons)/i.test(t) ? 'BK' : /^k/i.test(t) ? 'KEPSEK' : /^(s|t)/i.test(t) ? 'STAF' : 'GURU';
@@ -3922,7 +3962,7 @@ const app = createApp({
       }
     }
 
-    return { raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
