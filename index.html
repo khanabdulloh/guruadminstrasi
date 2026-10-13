@@ -651,13 +651,14 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 /* ===== Cetak absensi kelas ===== */
 .absen-ctl{display:grid;grid-template-columns:1fr;gap:.9rem}
 @media(min-width:768px){.absen-ctl{grid-template-columns:1.2fr 1fr 1.4fr 1fr}}
+.absen-tg{font-weight:400;font-size:.9em}
 .absen-act{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;margin-top:1rem}
 .absen-sheet{background:#fff;border:1px solid #e6ebf3;border-radius:.875rem;padding:1.25rem}
 .absen-title{margin:.5rem 0 .25rem;text-align:center;font-size:1rem;font-weight:700;letter-spacing:.05em;color:#0a2250}
 .absen-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:.2rem 1.5rem;margin-bottom:.8rem;font-size:.8rem;color:#475569}
 .absen-meta b{color:#111827;font-weight:600}
 .absen-scroll{overflow-x:auto}
-.absen-table{width:100%;min-width:1000px;table-layout:fixed;border-collapse:collapse;font-size:.72rem;color:#111827}
+.absen-table{width:100%;min-width:640px;table-layout:fixed;border-collapse:collapse;font-size:.72rem;color:#111827}
 .absen-table th,.absen-table td{height:1.6rem;padding:.1rem .15rem;border:1px solid #94a3b8;text-align:center;vertical-align:middle;overflow-wrap:anywhere}
 .absen-table thead th{background:#eef2f7;font-weight:700;color:#1e293b}
 .absen-table td.nm{padding-left:.4rem;text-align:left}
@@ -673,8 +674,8 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
   body.cetak-absen{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   body.cetak-absen .absen-sheet{padding:0;border:0;border-radius:0}
   body.cetak-absen .absen-scroll{overflow:visible}
-  body.cetak-absen .absen-table{min-width:0;width:100%;font-size:7.6pt}
-  body.cetak-absen .absen-table th,body.cetak-absen .absen-table td{height:15pt;padding:0 1pt;border:.5pt solid #444}
+  body.cetak-absen .absen-table{min-width:0;width:100%;font-size:9pt}
+  body.cetak-absen .absen-table th,body.cetak-absen .absen-table td{height:19pt;padding:0 1pt;border:.5pt solid #444}
   body.cetak-absen .absen-table td.nm{padding-left:3pt}
   body.cetak-absen .absen-table thead{display:table-header-group}
   body.cetak-absen .absen-table tr{break-inside:avoid;page-break-inside:avoid}
@@ -686,7 +687,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
   body.cetak-absen .absen-ttd{font-size:9pt;margin-top:10pt;break-inside:avoid;page-break-inside:avoid}
   body.cetak-absen .absen-ttd .sp{height:38pt}
 }
-@page absen{size:A4 landscape;margin:10mm}
+@page absen{size:A4 portrait;margin:12mm}
 
 @media print{
   /* Blok identitas rapor: rapat, dua pasang kolom, label redup dan nilai tegas */
@@ -1200,28 +1201,28 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <div class="absen-ctl">
           <label class="lb"><span class="nl-n">1</span>Kelas
             <select v-model="ca.kelas" class="inp w-full mt-1 normal-case"><option value="">Pilih kelas</option><option v-for="k in kelasAll" :key="k.kelas" :value="k.kelas">{{k.kelas}} ({{k.jumlah}} siswa)</option></select></label>
-          <label class="lb"><span class="nl-n">2</span>Bulan
-            <input type="month" v-model="ca.bulan" class="inp w-full mt-1"></label>
+          <label class="lb"><span class="nl-n">2</span>Minggu (pilih tanggal mana saja)
+            <input type="date" v-model="ca.tgl" class="inp w-full mt-1"></label>
           <label class="lb"><span class="nl-n">3</span>Keterangan <span class="font-normal text-slate-400">(opsional)</span>
             <input v-model.trim="ca.ket" maxlength="80" placeholder="mis. Mata pelajaran: Informatika" class="inp w-full mt-1 normal-case"></label>
           <label class="lb">Baris kosong tambahan
             <select v-model.number="ca.extra" class="inp w-full mt-1 normal-case"><option :value="0">Tanpa baris tambahan</option><option :value="2">2 baris</option><option :value="5">5 baris</option></select></label>
         </div>
-        <div class="absen-act"><p class="nl-hint">Kolom tanggal mengikuti bulan yang dipilih. Hari Minggu diberi warna abu. Kolom S, I, A untuk jumlah sakit, izin, dan alpa.</p><button @click="cetakAbsen" :disabled="!ca.kelas||!caSiswa.length" class="btn-p">Cetak absensi</button></div>
+        <div class="absen-act"><p class="nl-hint">Satu lembar untuk satu minggu, Senin sampai Jumat. Kolom S, I, A untuk jumlah sakit, izin, dan alpa.</p><button @click="cetakAbsen" :disabled="!ca.kelas||!caSiswa.length" class="btn-p">Cetak absensi</button></div>
       </div>
       <p v-if="!ca.kelas" class="nl-empty noprint">Pilih kelas untuk melihat pratinjau daftar hadir.</p>
       <p v-else-if="!caSiswa.length" class="nl-empty noprint">Belum ada siswa di kelas ini.</p>
       <div v-else class="absen-sheet">
         <kop :k="cfg.kop"></kop>
         <p class="absen-title">DAFTAR HADIR SISWA</p>
-        <div class="absen-meta"><span>Kelas: <b>{{ca.kelas}}</b></span><span>Bulan: <b>{{caBulanLabel}}</b></span><span v-if="cfg.tahun&&cfg.tahun.tahun">Tahun ajaran: <b>{{cfg.tahun.tahun}}</b></span><span>Wali kelas: <b>{{caWali||'-'}}</b></span><span v-if="ca.ket"><b>{{ca.ket}}</b></span></div>
+        <div class="absen-meta"><span>Kelas: <b>{{ca.kelas}}</b></span><span>Minggu: <b>{{caBulanLabel}}</b></span><span v-if="cfg.tahun&&cfg.tahun.tahun">Tahun ajaran: <b>{{cfg.tahun.tahun}}</b></span><span>Wali kelas: <b>{{caWali||'-'}}</b></span><span v-if="ca.ket"><b>{{ca.ket}}</b></span></div>
         <div class="absen-scroll"><table class="absen-table calm-table-print">
-          <colgroup><col style="width:26px"><col style="width:74px"><col style="width:168px"><col style="width:24px"><col v-for="h in caHari" :key="'c'+h.d"><col style="width:26px"><col style="width:26px"><col style="width:26px"></colgroup>
-          <thead><tr><th rowspan="2">No</th><th rowspan="2">NISN</th><th rowspan="2">Nama</th><th rowspan="2">L/P</th><th :colspan="caHari.length">Tanggal</th><th colspan="3">Jumlah</th></tr>
-            <tr><th v-for="h in caHari" :key="h.d" :class="h.mg?'mg':''">{{h.d}}</th><th>S</th><th>I</th><th>A</th></tr></thead>
+          <colgroup><col style="width:30px"><col style="width:84px"><col style="width:190px"><col style="width:28px"><col v-for="h in caHari" :key="'c'+h.d"><col style="width:30px"><col style="width:30px"><col style="width:30px"></colgroup>
+          <thead><tr><th rowspan="2">No</th><th rowspan="2">NISN</th><th rowspan="2">Nama</th><th rowspan="2">L/P</th><th :colspan="caHari.length">Kehadiran</th><th colspan="3">Jumlah</th></tr>
+            <tr><th v-for="h in caHari" :key="h.d">{{h.nama}}<br><span class="absen-tg">{{h.tgl}}/{{h.bln+1}}</span></th><th>S</th><th>I</th><th>A</th></tr></thead>
           <tbody>
-            <tr v-for="(s,i) in caSiswa" :key="s.nis"><td>{{i+1}}</td><td>{{s.nisn||'-'}}</td><td class="nm">{{s.nama}}</td><td>{{s.gender}}</td><td v-for="h in caHari" :key="h.d" :class="h.mg?'mg':''"></td><td></td><td></td><td></td></tr>
-            <tr v-for="n in ca.extra" :key="'x'+n"><td>{{caSiswa.length+n}}</td><td></td><td class="nm"></td><td></td><td v-for="h in caHari" :key="h.d" :class="h.mg?'mg':''"></td><td></td><td></td><td></td></tr>
+            <tr v-for="(s,i) in caSiswa" :key="s.nis"><td>{{i+1}}</td><td>{{s.nisn||'-'}}</td><td class="nm">{{s.nama}}</td><td>{{s.gender}}</td><td v-for="h in caHari" :key="h.d"></td><td></td><td></td><td></td></tr>
+            <tr v-for="n in ca.extra" :key="'x'+n"><td>{{caSiswa.length+n}}</td><td></td><td class="nm"></td><td></td><td v-for="h in caHari" :key="h.d"></td><td></td><td></td><td></td></tr>
           </tbody></table></div>
         <p class="absen-note">Keterangan: H = hadir, S = sakit, I = izin, A = alpa, D = dispensasi.</p>
         <div class="absen-ttd">
@@ -2369,7 +2370,7 @@ const app = createApp({
     const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600', ORTU: 'from-navy-900 to-sky-600', BK: 'from-navy-900 to-violet-600' };
     const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Kelola administrasi persuratan, layanan, arsip, dan data sekolah.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.', ORTU: 'Pantau kehadiran, nilai, dan catatan bimbingan anak Anda.', BK: 'Catat pelanggaran dan pantau poin tata tertib siswa.' };
     const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal', 'perangkat'], STAF: ['cetakabsen', 'suratmasuk', 'suratkeluar', 'disposisi', 'layanan'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya', 'notif'], ORTU: ['anak', 'notif'], BK: ['konseling', 'pelanggaran'] };
-    const DESK = {'dashboard': 'Ringkasan hari ini dan pintasan ke menu yang sering dipakai.', 'monitor': 'Ringkasan kehadiran, nilai, jurnal, dan kinerja guru sepanjang bulan.', 'catatan': 'Tulis catatan, apresiasi, atau arahan untuk guru.', 'catatansaya': 'Catatan, apresiasi, dan arahan dari pimpinan untuk Anda.', 'izin': 'Pengajuan izin dan sakit siswa beserta status persetujuannya.', 'kelas': 'Atur daftar kelas dan wali kelas.', 'siswa': 'Lihat dan kelola data siswa per kelas.', 'guru': 'Data guru dan tenaga kependidikan beserta akunnya.', 'akun': 'Buat akun, reset sandi, dan bagikan sandi awal pengguna.', 'jadwal': 'Jadwal pelajaran per hari dan per blok A/B.', 'presensi': 'Catat kehadiran siswa dan lihat rekap harian maupun bulanan.', 'nilai': 'Isi nilai sumatif atau catat ketercapaian tujuan pembelajaran (TP) siswa.', 'leger': 'Rekap nilai semua mata pelajaran dalam satu kelas.', 'rapor': 'Wali kelas menyiapkan, memfinalkan, dan mencetak rapor semester serta kenaikan kelas.', 'jurnal': 'Catat materi dan kegiatan pada setiap pertemuan mengajar.', 'bimbingan': 'Catatan bimbingan wali kelas untuk siswa.', 'bimbingansaya': 'Catatan bimbingan dari wali kelas dan guru BK untuk Anda.', 'pengaturan': 'Blok jadwal, kop surat, penandatangan, bobot nilai, dan kunci nilai.', 'dokumen': 'Simpan dan buka tautan dokumen resmi sekolah.', 'log': 'Riwayat tindakan pengguna di portal untuk keperluan pemeriksaan.', 'pkl': 'Data penempatan, jurnal, dan nilai PKL/Prakerin siswa.', 'tahun': 'Atur tahun ajaran, simpan riwayat kelas, dan luluskan siswa.', 'sandi': 'Gunakan sandi yang sulit ditebak dan jangan bagikan kepada siapa pun.', 'anak': 'Kehadiran, nilai, dan catatan bimbingan anak Anda.', 'notif': 'Pemberitahuan terbaru dari sekolah.', 'pelanggaran': 'Catat pelanggaran dan pantau poin tata tertib siswa.', 'pengurangan': 'Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.', 'konseling': 'Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.', 'perangkat': 'Pantau kelengkapan perangkat ajar guru dan unggah berkas yang diperlukan.', 'riwayat': 'Riwayat kehadiran Anda pada setiap mata pelajaran.', 'nilaisaya': 'Nilai Anda per mata pelajaran dan tujuan pembelajaran.', 'suratmasuk': 'Catat dan telusuri surat masuk beserta statusnya.', 'suratkeluar': 'Catat dan telusuri surat keluar.', 'disposisi': 'Teruskan surat masuk dengan instruksi dan batas waktu.', 'arsip': 'Arsip dokumen sekolah menurut kode, kategori, dan lokasi simpan.', 'layanan': 'Layanan administrasi menurut pemohon, jenis, dan statusnya.', 'mutasi': 'Catat mutasi siswa masuk dan keluar.', 'cetaksurat': 'Susun dan cetak surat resmi dengan kop sekolah.', 'cetakabsen': 'Cetak daftar hadir kelas per bulan untuk diisi manual.', 'rekapadmin': 'Rekap bulanan kegiatan administrasi tata usaha.'};
+    const DESK = {'dashboard': 'Ringkasan hari ini dan pintasan ke menu yang sering dipakai.', 'monitor': 'Ringkasan kehadiran, nilai, jurnal, dan kinerja guru sepanjang bulan.', 'catatan': 'Tulis catatan, apresiasi, atau arahan untuk guru.', 'catatansaya': 'Catatan, apresiasi, dan arahan dari pimpinan untuk Anda.', 'izin': 'Pengajuan izin dan sakit siswa beserta status persetujuannya.', 'kelas': 'Atur daftar kelas dan wali kelas.', 'siswa': 'Lihat dan kelola data siswa per kelas.', 'guru': 'Data guru dan tenaga kependidikan beserta akunnya.', 'akun': 'Buat akun, reset sandi, dan bagikan sandi awal pengguna.', 'jadwal': 'Jadwal pelajaran per hari dan per blok A/B.', 'presensi': 'Catat kehadiran siswa dan lihat rekap harian maupun bulanan.', 'nilai': 'Isi nilai sumatif atau catat ketercapaian tujuan pembelajaran (TP) siswa.', 'leger': 'Rekap nilai semua mata pelajaran dalam satu kelas.', 'rapor': 'Wali kelas menyiapkan, memfinalkan, dan mencetak rapor semester serta kenaikan kelas.', 'jurnal': 'Catat materi dan kegiatan pada setiap pertemuan mengajar.', 'bimbingan': 'Catatan bimbingan wali kelas untuk siswa.', 'bimbingansaya': 'Catatan bimbingan dari wali kelas dan guru BK untuk Anda.', 'pengaturan': 'Blok jadwal, kop surat, penandatangan, bobot nilai, dan kunci nilai.', 'dokumen': 'Simpan dan buka tautan dokumen resmi sekolah.', 'log': 'Riwayat tindakan pengguna di portal untuk keperluan pemeriksaan.', 'pkl': 'Data penempatan, jurnal, dan nilai PKL/Prakerin siswa.', 'tahun': 'Atur tahun ajaran, simpan riwayat kelas, dan luluskan siswa.', 'sandi': 'Gunakan sandi yang sulit ditebak dan jangan bagikan kepada siapa pun.', 'anak': 'Kehadiran, nilai, dan catatan bimbingan anak Anda.', 'notif': 'Pemberitahuan terbaru dari sekolah.', 'pelanggaran': 'Catat pelanggaran dan pantau poin tata tertib siswa.', 'pengurangan': 'Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.', 'konseling': 'Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.', 'perangkat': 'Pantau kelengkapan perangkat ajar guru dan unggah berkas yang diperlukan.', 'riwayat': 'Riwayat kehadiran Anda pada setiap mata pelajaran.', 'nilaisaya': 'Nilai Anda per mata pelajaran dan tujuan pembelajaran.', 'suratmasuk': 'Catat dan telusuri surat masuk beserta statusnya.', 'suratkeluar': 'Catat dan telusuri surat keluar.', 'disposisi': 'Teruskan surat masuk dengan instruksi dan batas waktu.', 'arsip': 'Arsip dokumen sekolah menurut kode, kategori, dan lokasi simpan.', 'layanan': 'Layanan administrasi menurut pemohon, jenis, dan statusnya.', 'mutasi': 'Catat mutasi siswa masuk dan keluar.', 'cetaksurat': 'Susun dan cetak surat resmi dengan kop sekolah.', 'cetakabsen': 'Cetak daftar hadir kelas per minggu (Senin–Jumat) untuk diisi manual.', 'rekapadmin': 'Rekap bulanan kegiatan administrasi tata usaha.'};
     const roleNama = { ADMIN: 'Administrator', GURU: 'Guru', STAF: 'Staf tata usaha', KEPSEK: 'Kepala sekolah', SISWA: 'Siswa', ORTU: 'Orang tua', BK: 'Guru BK' };
     const salam = () => { const j = parseInt(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Jakarta' }), 10); return j < 4 ? 'Selamat malam' : j < 11 ? 'Selamat pagi' : j < 15 ? 'Selamat siang' : j < 18 ? 'Selamat sore' : 'Selamat malam'; };
     const memuat = ref(false); let nGo = 0; // true selama perpindahan menu menarik data dari server
@@ -2542,7 +2543,7 @@ const app = createApp({
       if (k === 'arsip') await loadArsip();
       if (k === 'layanan') await loadLayanan();
       if (k === 'mutasi') { await Promise.all([loadMutasi(), api('siswaList').then(x=>siswa.value=x), api('kelasDetail').then(x=>kelasAll.value=x)]); }
-      if (k === 'cetakabsen') { [cfg.value, siswa.value, kelasAll.value] = await Promise.all([api('pengaturanGet'), api('siswaList'), api('kelasDetail')]); Object.assign(ca, { kelas: '', bulan: hari0.slice(0, 7), ket: '', extra: 0 }); }
+      if (k === 'cetakabsen') { [cfg.value, siswa.value, kelasAll.value] = await Promise.all([api('pengaturanGet'), api('siswaList'), api('kelasDetail')]); Object.assign(ca, { kelas: '', tgl: hari0, ket: '', extra: 0 }); }
       if (k === 'cetaksurat') { await api('pengaturanGet').then(x=>cfg.value=x); resetCetakSurat(); }
       if (k === 'rekapadmin') await loadRekapAdmin();
       if (k === 'kelas') { [kelasAll.value, guru.value] = await Promise.all([api('kelasDetail'), api('guruList')]); }
@@ -2809,7 +2810,7 @@ const app = createApp({
     };
     const loadSesi = () => run(fetchSesi);
     const loadDetail = () => run(async () => {
-      if (!pd.bulan) throw new Error('Pilih bulan terlebih dahulu');
+      if (!pd.bulan) throw new Error('Pilih tanggal terlebih dahulu');
       if (!pd.kelas || !pd.mapel) throw new Error('Pilih kelas dan mata pelajaran (wajib) terlebih dahulu');
       rk.value = await api('presensiRekap', { kelas: pd.kelas, mapel: pd.mapel, bulan: pd.bulan });
     });
@@ -3511,14 +3512,16 @@ const app = createApp({
     const printSurat=()=>{if(!cs.isi.trim())return err.value='Isi surat wajib diisi';Vue.nextTick(()=>window.print());};
 
     /* ====== Cetak absensi kelas (Staf/TU) ====== */
-    const ca = reactive({ kelas: '', bulan: hari0.slice(0, 7), ket: '', extra: 0 });
+    const ca = reactive({ kelas: '', tgl: hari0, ket: '', extra: 0 });
     const caSiswa = computed(() => siswa.value.filter(x => x.kelas === ca.kelas).slice().sort((a, b) => String(a.nama).localeCompare(String(b.nama))));
-    const caHari = computed(() => { const m = /^(\d{4})-(\d{2})$/.exec(ca.bulan || ''); if (!m) return []; const y = +m[1], mo = +m[2], n = new Date(y, mo, 0).getDate(); return Array.from({ length: n }, (_, i) => ({ d: i + 1, mg: new Date(y, mo - 1, i + 1).getDay() === 0 })); });
+    const BLN_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const HARI_ID = ['Senin','Selasa','Rabu','Kamis','Jumat'];
+    const caHari = computed(() => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ca.tgl || ''); if (!m) return []; const t = new Date(+m[1], +m[2] - 1, +m[3]); const sel = t.getDay(); const geser = sel === 0 ? 1 : 1 - sel; return HARI_ID.map((nm, i) => { const d = new Date(t.getFullYear(), t.getMonth(), t.getDate() + geser + i); return { d: i, nama: nm, tgl: d.getDate(), bln: d.getMonth(), thn: d.getFullYear() }; }); });
     const caWali = computed(() => { const k = kelasAll.value.find(x => x.kelas === ca.kelas); return k ? (k.waliNama || '') : ''; });
-    const caBulanLabel = computed(() => fmtBln(ca.bulan));
+    const caBulanLabel = computed(() => { const h = caHari.value; if (!h.length) return ''; const a = h[0], b = h[4]; return a.bln === b.bln ? `${a.tgl} – ${b.tgl} ${BLN_ID[b.bln]} ${b.thn}` : `${a.tgl} ${BLN_ID[a.bln]} – ${b.tgl} ${BLN_ID[b.bln]} ${b.thn}`; });
     const cetakAbsen = () => {
       if (!ca.kelas || !caSiswa.value.length) { err.value = 'Pilih kelas yang memiliki siswa terlebih dahulu'; toTop(); return; }
-      if (!caHari.value.length) { err.value = 'Pilih bulan terlebih dahulu'; toTop(); return; }
+      if (!caHari.value.length) { err.value = 'Pilih tanggal terlebih dahulu'; toTop(); return; }
       document.body.classList.add('cetak-absen');
       const cleanup = () => { document.body.classList.remove('cetak-absen'); window.removeEventListener('afterprint', cleanup); };
       window.addEventListener('afterprint', cleanup, { once: true });
