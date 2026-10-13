@@ -35,6 +35,11 @@
   .rapor-page table.calm-table-print th,.rapor-page table.calm-table-print td{padding:4pt 5pt!important;vertical-align:top!important;overflow-wrap:anywhere;word-break:normal}
   .rapor-page table.calm-table-print th{line-height:1.25;text-align:center}
   .rapor-page table.calm-table-print td{line-height:1.35}
+  /* Identitas peserta didik: rapatkan jarak vertikal khusus untuk tiga baris data. */
+  .rapor-page table.rapor-identitas{margin-top:2pt!important;margin-bottom:6pt!important}
+  .rapor-page table.rapor-identitas td{padding:2pt 5pt!important;line-height:1.15!important;vertical-align:middle!important}
+  .rapor-page table.rapor-identitas tr{height:auto!important}
+
   .rapor-page table.calm-table-print:first-of-type td:nth-child(3){padding-left:8pt!important}
   .rapor-page .rapor-ttd{break-inside:avoid;page-break-inside:avoid}
   /* Perapian PDF rapor: blok identitas kanan (Kelas/Fase/Semester) digeser ke kanan,
@@ -1974,7 +1979,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <kop :k="cfg.kop"></kop>
       <p class="text-center font-bold underline mt-2">{{rp.periode==='STS'?'LAPORAN KEMAJUAN HASIL BELAJAR':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}}</p>
       <p class="text-center text-sm mb-3">{{rp.periode==='STS'?'Sumatif Tengah Semester':'Sumatif Akhir Semester'}} {{rpMeta.sem}} &middot; Tahun Ajaran {{rpMeta.tahun}}</p>
-      <table class="text-sm mb-3 w-full calm-table-print"><tbody>
+      <table class="text-sm mb-2 w-full calm-table-print rapor-identitas"><tbody>
         <tr><td style="width:24%">Nama Peserta Didik</td><td style="width:34%">: <b>{{s.nama}}</b></td><td style="width:16%">Kelas</td><td>: {{rp.kelas}}</td></tr>
         <tr><td>NISN</td><td>: {{s.nisn||'-'}}</td><td>Fase</td><td>: {{rp.fase||'-'}}</td></tr>
         <tr><td>Kompetensi Keahlian</td><td>: {{rpInfo.kompetensi||'-'}}</td><td>Semester</td><td>: {{rpMeta.sem}}</td></tr></tbody></table>
