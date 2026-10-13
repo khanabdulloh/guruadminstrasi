@@ -957,6 +957,41 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
 /* Pratinjau layar mengikuti perataan angka pada PDF. */
 body.cetak-rapor .rapor-page table.rapor-mapel tr.rapor-rata-row > td.rapor-rata-value { text-align:center !important; }
 </style>
+
+<style id="calm-nav-modern-v94">
+/* v94: penyegaran visual navigasi saja; handler, hak akses, API, dan struktur data tetap. */
+:root{--calm-blue:#1688f8;--calm-blue-deep:#0759bd;--calm-blue-soft:#eaf5ff;--calm-ink:#102b4e;--calm-line:#d7eaff}
+@media screen{
+  header.md\:hidden.noprint{background:linear-gradient(115deg,#0878ed 0%,#16a5ff 100%)!important;box-shadow:0 4px 18px rgba(0,91,190,.18)!important}
+  aside[aria-label="Menu utama"]{background:linear-gradient(180deg,#0879ed 0%,#0868d2 52%,#0758b8 100%)!important;color:#f5fbff!important;border-right:1px solid rgba(255,255,255,.16);box-shadow:5px 0 24px rgba(7,89,189,.08);padding:16px 12px!important;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.35) transparent}
+  aside[aria-label="Menu utama"]>div.hidden.md\:block{padding:8px 10px 15px;margin-bottom:14px!important;border-bottom:1px solid rgba(255,255,255,.22)}
+  aside[aria-label="Menu utama"]>div.hidden.md\:block img{width:42px!important;height:42px!important;padding:4px;background:#fff;border-radius:13px;box-shadow:0 3px 12px rgba(0,35,90,.12)}
+  aside[aria-label="Menu utama"]>div.hidden.md\:block p{font-size:14px;letter-spacing:.035em}
+  aside[aria-label="Menu utama"]>div.hidden.md\:block span{background:rgba(255,255,255,.16)!important;color:#fff!important;border:1px solid rgba(255,255,255,.2)}
+  aside[aria-label="Menu utama"] section{margin-bottom:5px!important}
+  aside[aria-label="Menu utama"] section>button{min-height:48px;padding:7px 9px!important;border:1px solid transparent;border-radius:13px!important;gap:10px!important}
+  aside[aria-label="Menu utama"] section>button[aria-expanded="true"]{background:rgba(255,255,255,.17)!important;border-color:rgba(255,255,255,.26)!important;box-shadow:inset 3px 0 0 #bfe8ff,0 4px 12px rgba(0,47,112,.08);color:#fff!important}
+  aside[aria-label="Menu utama"] section>button[aria-expanded="false"]{color:#eaf5ff!important}
+  aside[aria-label="Menu utama"] section>button[aria-expanded="false"]:hover{background:rgba(255,255,255,.11)!important;border-color:rgba(255,255,255,.12)!important}
+  aside[aria-label="Menu utama"] section>button>span:first-child{width:32px!important;height:32px!important;border-radius:10px!important;background:rgba(255,255,255,.13)!important;border:1px solid rgba(255,255,255,.22)!important;color:#fff!important}
+  aside[aria-label="Menu utama"] section>button[aria-expanded="true"]>span:first-child{background:#fff!important;color:#0875df!important;border-color:#fff!important;box-shadow:0 2px 8px rgba(0,35,90,.12)}
+  aside[aria-label="Menu utama"] section>button>span:nth-child(2)>span:first-child{font-size:12px!important;font-weight:750;letter-spacing:.005em}
+  aside[aria-label="Menu utama"] section>button>span:nth-child(2)>span:last-child{color:#cce6ff!important;font-size:10px!important;letter-spacing:.015em}
+  aside[aria-label="Menu utama"] section>button>svg:last-child{color:#d8edff!important;width:15px;height:15px}
+  aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]{margin:5px 0 7px 15px!important;padding:3px 0 4px 10px!important;border-left:1px solid rgba(211,237,255,.55)!important}
+  aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button{min-height:37px;padding:8px 9px!important;border-radius:9px!important;gap:10px!important;color:#e3f2ff!important;font-size:12px!important;font-weight:550!important;white-space:normal!important}
+  aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button:hover{background:rgba(255,255,255,.12)!important;color:#fff!important}
+  aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button[aria-current="page"]{background:#fff!important;color:#0759bd!important;box-shadow:0 3px 10px rgba(0,37,95,.12)!important;font-weight:750!important}
+  aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button[aria-current="page"] svg{color:#0879ed!important;opacity:1!important}
+  aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button>span.absolute{background:#a6ddff!important}
+  aside[aria-label="Menu utama"]>button{border-radius:11px!important;padding:10px!important}
+  aside[aria-label="Menu utama"]>button:last-child{border-top:1px solid rgba(255,255,255,.18);margin-top:14px!important;padding-top:13px!important;color:#fff!important}
+  aside[aria-label="Menu utama"]>button:hover{background:rgba(255,255,255,.12)!important}
+}
+@media(max-width:767px){aside[aria-label="Menu utama"]{border-radius:0 0 18px 18px;box-shadow:0 12px 28px rgba(0,78,170,.2);padding:12px!important}aside[aria-label="Menu utama"] section>button{min-height:46px}}
+@media print{aside[aria-label="Menu utama"],header.md\:hidden.noprint{display:none!important}}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
