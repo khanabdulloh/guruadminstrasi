@@ -35,11 +35,6 @@
   .rapor-page table.calm-table-print th,.rapor-page table.calm-table-print td{padding:4pt 5pt!important;vertical-align:top!important;overflow-wrap:anywhere;word-break:normal}
   .rapor-page table.calm-table-print th{line-height:1.25;text-align:center}
   .rapor-page table.calm-table-print td{line-height:1.35}
-  /* Identitas peserta didik: rapatkan jarak vertikal khusus untuk tiga baris data. */
-  .rapor-page table.rapor-identitas{margin-top:2pt!important;margin-bottom:6pt!important}
-  .rapor-page table.rapor-identitas td{padding:2pt 5pt!important;line-height:1.15!important;vertical-align:middle!important}
-  .rapor-page table.rapor-identitas tr{height:auto!important}
-
   .rapor-page table.calm-table-print:first-of-type td:nth-child(3){padding-left:8pt!important}
   .rapor-page .rapor-ttd{break-inside:avoid;page-break-inside:avoid}
   /* Perapian PDF rapor: blok identitas kanan (Kelas/Fase/Semester) digeser ke kanan,
@@ -384,30 +379,93 @@ table{font-variant-numeric:tabular-nums}
 #app main#utama section h3{letter-spacing:-.005em}
 
 /* ===== E. Dasbor ===== */
-.dash{display:flex;flex-direction:column;gap:1rem}
+#app [data-role="ADMIN"]{--role:#0b3d91}
+#app [data-role="GURU"]{--role:#059669}
+#app [data-role="KEPSEK"]{--role:#7c3aed}
+#app [data-role="STAF"]{--role:#0284c7}
+#app [data-role="SISWA"]{--role:#d97706}
+#app [data-role="ORTU"]{--role:#2563eb}
+#app [data-role="BK"]{--role:#e11d48}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.dash{display:flex;flex-direction:column;gap:1.25rem}
 .dash>*{order:5;margin:0}
 .dash>.dash-hero{order:0}
 .dash>.dash-stats{order:1}
 .dash>.dash-quick{order:2}
-.dash>div[class*="bg-amber-50"],.dash>div[class*="bg-sky-50"],.dash>div[class*="bg-violet-50"],.dash>div[class*="bg-rose-50"]{order:3}
 .dash>.pwa-card{order:9}
 
-.dash .dash-hero{position:relative;overflow:hidden;isolation:isolate;min-height:8.5rem;padding:1.5rem 1.75rem;border:0;border-radius:var(--rad);box-shadow:none}
-.dash .dash-hero::after{content:"";position:absolute;z-index:-1;width:16rem;height:16rem;right:-4rem;top:-6rem;border-radius:50%;background:rgba(255,255,255,.07)}
-.dash .dash-hero>p:first-child{font-size:.75rem;font-weight:700;letter-spacing:.02em}
-.dash .dash-hero h2{margin:.3rem 0 .2rem;font-size:clamp(1.4rem,2.2vw,1.85rem);line-height:1.2;font-weight:700;letter-spacing:-.025em}
+/* Hero: kartu putih, aksen warna peran pada sisi kiri */
+.dash .dash-hero{position:relative;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:.75rem 1.5rem;min-height:0;padding:1.3rem 1.5rem 1.3rem 1.7rem;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:var(--rad);box-shadow:inset 4px 0 0 var(--role,var(--navy))}
+.dash-hero-main{min-width:0;flex:1 1 18rem}
+.dash-hero .dash-role{margin:0;font-size:.8rem;font-weight:600;color:var(--role,var(--navy))}
+.dash-hero h2{margin:.2rem 0 0;font-size:clamp(1.3rem,2.2vw,1.7rem);line-height:1.25;font-weight:700;letter-spacing:-.025em;color:var(--navy-d)}
+.dash-hero .dash-date{margin:.3rem 0 0;font-size:.85rem;color:var(--mut)}
+.dash-hero .dash-sub{margin:.65rem 0 0;max-width:62ch;font-size:.9rem;line-height:1.55;color:#33445f}
+.dash-sync{display:inline-flex;align-items:center;gap:.5rem;padding:.3rem .75rem;border-radius:999px;background:var(--navy-soft);color:var(--navy);font-size:.75rem;font-weight:600;white-space:nowrap}
+.spin-s{display:inline-block;width:.85rem;height:.85rem;border:2px solid #c3d1e8;border-top-color:var(--navy);border-radius:50%;animation:sp .7s linear infinite}
 
+/* Kartu angka: netral; merah hanya untuk hal yang perlu perhatian */
 .dash-stats{gap:.875rem}
 #app main#utama .card{display:flex;flex-direction:column;justify-content:space-between;gap:.35rem;min-height:5.75rem;padding:1rem 1.15rem;background:var(--card);border:1px solid var(--line);border-radius:var(--rad);box-shadow:none;color:var(--mut);font-size:.78rem;font-weight:500;line-height:1.35;contain:content}
 #app main#utama .card .n{order:1;margin:0;font-size:1.75rem;line-height:1.15;font-weight:700;letter-spacing:-.03em;color:var(--navy-d)}
-#app main#utama .card .n.text-blue-900{color:var(--navy-d)}
+#app main#utama .dash-stats .card .n[class*="text-"]{color:var(--navy-d)}
+#app main#utama .dash-stats .card .n.text-rose-600{color:#be123c}
 
-.dash-quick .btn-o{min-height:2.25rem;padding:.4rem .9rem;border-radius:999px;font-size:.8125rem;font-weight:600}
+/* Akses cepat: ikon + judul + penjelasan singkat */
+.dash-quick .dash-h{margin:0 0 .6rem;font-size:.85rem;font-weight:600;color:var(--mut)}
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.75rem}
+.quick-tile{display:flex;align-items:flex-start;gap:.8rem;padding:.85rem 1rem;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--rad);transition:border-color .12s,background-color .12s}
+.quick-tile:hover{border-color:#9fb4d3;background:#fbfdff}
+.quick-ic{flex:none;display:grid;place-items:center;width:2.25rem;height:2.25rem;border-radius:.6rem;background:var(--navy-soft);color:var(--navy)}
+.quick-ic svg{width:1.15rem;height:1.15rem}
+.quick-tx{min-width:0;display:flex;flex-direction:column;gap:.15rem}
+.quick-tx b{font-size:.875rem;font-weight:600;color:var(--navy-d)}
+.quick-tx small{font-size:.775rem;line-height:1.4;color:var(--mut);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* Pemberitahuan: bilah netral dengan aksen warna di kiri */
+.dash>div[class*="bg-amber-50"],.dash>div[class*="bg-sky-50"],.dash>div[class*="bg-violet-50"],.dash>div[class*="bg-rose-50"]{order:3;padding:.7rem 1rem;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--acc,#94a3b8);border-radius:var(--rad-s);color:var(--ink)}
+.dash>div[class*="bg-amber-50"]{--acc:#f59e0b}
+.dash>div[class*="bg-sky-50"]{--acc:#0ea5e9}
+.dash>div[class*="bg-violet-50"]{--acc:#8b5cf6}
+.dash>div[class*="bg-rose-50"]{--acc:#e11d48}
+
 .dash .pwa-card{padding:.75rem 1rem;border-color:var(--line);box-shadow:none}
 .dash .pwa-card>div:first-child{width:2.25rem;height:2.25rem}
 .dash .pwa-card h3{font-size:.875rem}
 .dash .pwa-card>span{display:none}
 @media(display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){.pwa-card{display:none!important}}
+
+/* Judul panel + penjelasan */
+.panel-head{margin-bottom:.75rem}
+.panel-head h3{margin:0}
+.panel-desc{margin:.15rem 0 0;font-size:.78rem;line-height:1.45;color:var(--mut)}
+
+/* Judul halaman + penjelasan (semua menu) */
+.page-head{margin-bottom:1rem}
+.page-head .h2{margin:0}
+.page-head.in-row{margin-top:0;margin-bottom:0;min-width:min(100%,14rem)}
+.desk{margin:.25rem 0 0;max-width:70ch;font-size:.85rem;line-height:1.5;color:var(--mut)}
+.desk-note{margin:.25rem 0 1rem;max-width:80ch;padding:.6rem .8rem;border-radius:var(--rad-s);background:var(--navy-soft);font-size:.78rem;line-height:1.55;color:#40516d}
+
+/* Penanda memuat: bilah tipis di atas + lencana di pojok kanan atas (muncul bila >0,4 dtk) */
+.loadbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:50;overflow:hidden;background:rgba(245,158,11,.18)}
+.loadbar i{display:block;height:100%;width:38%;background:var(--ring);border-radius:2px;animation:lb 1.1s ease-in-out infinite;will-change:transform}
+@keyframes lb{from{transform:translateX(-100%)}to{transform:translateX(270%)}}
+.load-wrap{position:sticky;top:3.75rem;z-index:30;height:0;pointer-events:none}
+@media(min-width:768px){.load-wrap{top:.75rem}}
+.load-chip{position:absolute;right:0;top:0;display:inline-flex;align-items:center;gap:.5rem;padding:.4rem .85rem;border-radius:999px;background:var(--navy-d);color:#fff;font-size:.78rem;font-weight:600;box-shadow:0 6px 16px -8px rgba(10,34,80,.6);opacity:0;animation:chipIn .2s ease .4s forwards}
+.load-chip .spin-s{border-color:rgba(255,255,255,.35);border-top-color:#fff}
+@keyframes chipIn{to{opacity:1}}
+@media(max-width:767px){.load-wrap{position:fixed;top:auto;bottom:calc(1rem + env(safe-area-inset-bottom,0px));left:0;right:0;height:auto;display:flex;justify-content:center}.load-chip{position:static}}
+
+/* Kerangka dasbor saat data belum tiba */
+.sk{display:block;background:#e7edf6;border-radius:.5rem;animation:skp 1.4s ease-in-out infinite}
+@keyframes skp{50%{opacity:.5}}
+.sk-lines{flex:1 1 14rem;display:flex;flex-direction:column;gap:.65rem}
+.sk-l1{height:.8rem;width:28%}.sk-l2{height:1.6rem;width:58%}.sk-l3{height:.8rem;width:44%}
+.sk-card{height:5.5rem;border-radius:var(--rad)}
+.sk-panel{height:10rem;border-radius:var(--rad)}
 
 /* ===== F. Kartu & panel ===== */
 #app main#utama section .bg-white.rounded-2xl{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);box-shadow:none}
@@ -498,7 +556,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
   #app main#utama{padding:1rem .85rem calc(2rem + env(safe-area-inset-bottom,0px))}
   html:not(.embedded) #app aside[aria-label="Menu utama"]{position:fixed;top:58px;left:0;right:0;z-index:35;max-height:calc(100vh - 58px);max-height:calc(100dvh - 58px);overflow-y:auto;border-bottom:1px solid rgba(255,255,255,.1);box-shadow:0 24px 40px -16px rgba(2,10,30,.5)}
   #app aside[aria-label="Menu utama"]>button{min-height:2.85rem}
-  .dash .dash-hero{padding:1.15rem 1.2rem 1.15rem 1.4rem}
+  .dash .dash-hero{padding:1.1rem 1.15rem 1.1rem 1.4rem}
   #app main#utama .card{min-height:5.25rem;padding:.85rem .95rem}
   #app main#utama .card .n{font-size:1.5rem}
   .inp,.fld,select,textarea,input:not([type=checkbox]):not([type=radio]){font-size:16px}
@@ -509,14 +567,15 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
   .modal-wrap{align-items:flex-end;padding-bottom:0}
 }
 }
-@media(prefers-reduced-motion:reduce){.modal-box{animation:none!important}.spin{animation:sp 1.6s linear infinite!important}}
+@media(prefers-reduced-motion:reduce){.modal-box{animation:none!important}.spin,.spin-s{animation:sp 1.6s linear infinite!important}.sk{animation:none}.loadbar i{animation-duration:2.4s}.load-chip{animation-duration:.01s}}
+@media print{.desk,.desk-note,.panel-desc,.load-wrap,.loadbar{display:none!important}}
 </style>
 
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
 
-<div v-if="busy" class="noprint fixed top-0 inset-x-0 h-1 bg-amber-400 animate-pulse z-50" role="progressbar" aria-label="Memuat"></div>
+<div v-if="busy" class="loadbar noprint" role="progressbar" aria-label="Memuat data" aria-busy="true"><i></i></div>
 <div v-if="raporCetakDialog" class="modal-wrap noprint fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm" role="presentation" @keydown.esc="batalCetakRapor">
   <section class="modal-box w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200/80" role="alertdialog" aria-modal="true" aria-labelledby="judul-konfirmasi-cetak" aria-describedby="isi-konfirmasi-cetak">
     <div class="px-6 pt-6 pb-5">
@@ -645,6 +704,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
   </aside>
 
   <main id="utama" class="calm-table-polish flex-1 min-w-0 p-4 pb-10 md:p-8 md:pb-12 max-w-7xl">
+    <div class="load-wrap noprint" aria-hidden="false"><div v-if="busy&&view!=='dashboard'" class="load-chip" role="status" aria-live="polite"><span class="spin-s" aria-hidden="true"></span>{{memuat?'Memuat data…':'Memproses…'}}</div></div>
     <div class="hidden md:flex items-center gap-2 mb-4 noprint"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c">{{badge[user.role].t}}</span><span class="text-sm text-slate-500">{{user.nama}}</span></div>
     <p v-if="err" role="alert" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-rose-50 border border-rose-200 shadow text-rose-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{err}}</span><button @click="err=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
     <p v-if="ok" role="status" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 shadow text-emerald-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{ok}}</span><button @click="ok=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
@@ -652,16 +712,27 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     <div v-if="antreSaya.length" class="noprint mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-2">
       <div class="flex flex-wrap items-center gap-2"><span class="mr-auto"><b>{{antreSaya.length}}</b> data menunggu dikirim ke server.</span><button @click="kirimAntre(false)" :disabled="busy" class="btn-o !py-1 text-xs">Kirim sekarang</button></div>
       <div v-for="x in antreSaya" :key="x.id" class="flex items-center gap-2 text-xs mt-1"><span class="flex-1">{{x.label}}<span v-if="x.galat" class="text-rose-600 font-bold"> - ditolak server: {{x.galat}}</span></span><button @click="buangAntre(x.id)" class="text-rose-600 font-bold">Buang</button></div></div>
-    <p v-if="view==='dashboard'&&!dash&&!err" class="text-sm text-slate-500 animate-pulse">Memuat dashboard...</p>
+    <section v-if="view==='dashboard'&&!dash&&!err" class="dash" aria-busy="true">
+      <p class="sr-only" role="status">Memuat dasbor, mohon tunggu.</p>
+      <div class="dash-hero" aria-hidden="true"><div class="sk-lines"><i class="sk sk-l1"></i><i class="sk sk-l2"></i><i class="sk sk-l3"></i></div><span class="dash-sync"><span class="spin-s"></span>Mengambil data dari server…</span></div>
+      <div class="dash-stats grid grid-cols-2 md:grid-cols-4 gap-4" aria-hidden="true"><i v-for="n in 4" :key="n" class="sk sk-card"></i></div>
+      <i class="sk sk-panel" aria-hidden="true"></i>
+    </section>
     <!-- Dashboard -->
     <section v-if="view==='dashboard' && dash" class="dash">
-      <div class="dash-hero rounded-2xl bg-gradient-to-r text-white p-6 mb-4" :class="heroCls[user.role]">
-        <p class="text-xs font-bold opacity-80">{{badge[user.role].t}}<span v-if="user.role==='SISWA'&&user.kelas">, Kelas {{user.kelas}}</span><span v-if="dash.tipe==='ORTU'&&dash.anak">, orang tua {{dash.anak.nama}} (Kelas {{dash.anak.kelas}})</span></p>
-        <h2 class="text-2xl font-extrabold">Halo, {{user.nama}}!</h2>
-        <p class="text-white/80 text-sm">{{tgl}}, pukul <span class="clk"></span> WIB</p>
-        <p class="text-white/90 text-sm mt-2">{{sub[user.role]}}</p>
+      <div class="dash-hero">
+        <div class="dash-hero-main">
+          <p class="dash-role">{{roleNama[user.role]}}<span v-if="user.role==='SISWA'&&user.kelas">, Kelas {{user.kelas}}</span><span v-if="dash.tipe==='ORTU'&&dash.anak">, orang tua {{dash.anak.nama}} (Kelas {{dash.anak.kelas}})</span></p>
+          <h2>{{salam()}}, {{user.nama}}</h2>
+          <p class="dash-date">{{tgl}}, pukul <span class="clk"></span> WIB</p>
+          <p class="dash-sub">{{sub[user.role]}}</p>
+        </div>
+        <span v-if="busy" class="dash-sync" role="status"><span class="spin-s" aria-hidden="true"></span>Memperbarui data…</span>
       </div>
-      <div class="dash-quick flex flex-wrap gap-2 mb-6"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="btn-o">{{m.t}}</button></div>
+      <div class="dash-quick" v-if="menu.some(x=>quick[user.role].includes(x.k))">
+        <h3 class="dash-h">Akses cepat</h3>
+        <div class="quick-grid"><button v-for="m in menu.filter(x=>quick[user.role].includes(x.k))" :key="m.k" @click="go(m.k)" class="quick-tile"><span class="quick-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" v-html="ICON[m.k]"></svg></span><span class="quick-tx"><b>{{m.t}}</b><small>{{DESK[m.k]}}</small></span></button></div>
+      </div>
       <div class="pwa-card noprint rounded-2xl bg-white border border-sky-200 shadow-sm p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
         <div class="h-11 w-11 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
           <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/><path d="M12 6v7m0 0-3-3m3 3 3-3"/></svg>
@@ -677,10 +748,10 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <div v-if="dash.perangkatKurang" class="rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto"><b>{{dash.perangkatKurang}}</b> perangkat ajar belum dikumpulkan.</span><button @click="go('perangkat')" class="btn-o !py-1 text-xs">Lengkapi</button></div>
       <div v-if="dash.catatanBaru" class="rounded-2xl bg-violet-50 border border-violet-200 text-violet-800 text-sm px-4 py-3 mb-4 flex items-center gap-2"><span class="mr-auto">Anda punya <b>{{dash.catatanBaru}}</b> catatan baru dari pimpinan.</span><button @click="go('catatansaya')" class="btn-o !py-1 text-xs">Baca</button></div>
       <div v-if="peng.length||canPost" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-amber-400">
-        <div class="flex items-center gap-2 mb-2"><h3 class="font-bold mr-auto">Pengumuman</h3><button v-if="canPost" @click="bukaPeng" class="btn-o !py-1 text-xs">Tulis pengumuman</button></div>
+        <div class="flex items-center gap-2 mb-2"><div class="mr-auto"><h3 class="font-bold">Pengumuman</h3><p class="panel-desc">Informasi resmi dari sekolah yang sedang tayang.</p></div><button v-if="canPost" @click="bukaPeng" class="btn-o !py-1 text-xs">Tulis pengumuman</button></div>
         <p v-if="!peng.length" class="text-sm text-slate-500">Belum ada pengumuman aktif.</p>
         <div v-for="p in peng" :key="p.id" class="py-2 border-t first:border-t-0 flex items-start gap-2"><div class="flex-1 min-w-0"><p class="font-bold text-sm">{{p.judul}}</p><p class="text-sm text-slate-600 whitespace-pre-line">{{p.isi}}</p><p class="text-xs text-slate-400 mt-1">{{fmtTgl(p.tanggal)}} &middot; {{p.olehNama}}<span v-if="p.sampai"> &middot; tayang s/d {{fmtTgl(p.sampai)}}</span></p></div><button v-if="canPost" @click="delPeng(p)" class="text-rose-600 text-xs font-bold">Hapus</button></div></div>
-      <div v-if="agenda.length||canPost" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-navy-700"><div class="flex items-center gap-2 mb-2"><h3 class="font-bold mr-auto">Agenda akademik</h3><button v-if="canPost" @click="bukaAg" class="btn-o !py-1 text-xs">Tambah agenda</button></div>
+      <div v-if="agenda.length||canPost" class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-navy-700"><div class="flex items-center gap-2 mb-2"><div class="mr-auto"><h3 class="font-bold">Agenda akademik</h3><p class="panel-desc">Kegiatan sekolah dalam 60 hari ke depan.</p></div><button v-if="canPost" @click="bukaAg" class="btn-o !py-1 text-xs">Tambah agenda</button></div>
         <p v-if="!agenda.length" class="text-sm text-slate-500">Tidak ada agenda dalam 60 hari ke depan.</p>
         <div v-for="a in agenda" :key="a.id" class="flex items-center gap-2 text-sm py-1.5 border-t first:border-t-0"><span class="w-32 shrink-0 text-slate-500">{{a.tanggal.slice(8)}}/{{a.tanggal.slice(5,7)}}<span v-if="a.sampai&&a.sampai!==a.tanggal"> - {{a.sampai.slice(8)}}/{{a.sampai.slice(5,7)}}</span></span><span class="flex-1"><b>{{a.judul}}</b> <span class="text-xs text-slate-400">{{a.jenis}}</span></span><button v-if="canPost" @click="delAg(a)" class="text-rose-600 text-xs font-bold">Hapus</button></div></div>
       <div v-if="dash.galat" role="alert" class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm px-4 py-3 mb-4">{{dash.galat}}</div>
@@ -724,12 +795,12 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <div v-for="j in dash.jadwalHariIni" :key="j.jam+j.mapel+j.kelas" class="flex justify-between text-sm py-2 border-t first:border-t-0"><span><b>{{j.jam}}</b> {{j.mapel}}</span><span class="text-slate-500 flex items-center gap-2 flex-wrap justify-end">{{dash.tipe==='SISWA'?j.guruNama:j.kelas}}<template v-if="dash.tipe==='GURU'"><span v-if="j.presensi" class="text-xs font-bold text-emerald-600">Presensi terisi</span><button v-else @click="presensiCepat(j)" class="btn-o !py-0.5 !px-2 text-xs">Isi presensi</button></template></span></div>
       </div>
       <div v-if="dash.tipe==='GURU'&&dash.waliRingkas.length" class="bg-white rounded-2xl shadow-sm p-4 mt-4">
-        <h3 class="font-bold mb-2">Kelas perwalian saya</h3>
+        <div class="panel-head"><h3 class="font-bold">Kelas perwalian saya</h3><p class="panel-desc">Kehadiran dan bimbingan di kelas yang Anda walikan.</p></div>
         <div v-for="w in dash.waliRingkas" :key="w.kelas" class="text-sm py-2 border-t first:border-t-0 flex flex-wrap gap-x-4 gap-y-1"><b class="w-24">{{w.kelas}}</b><span>{{w.siswa}} siswa</span><span>Hari ini: <b>{{w.persenHariIni==null?'-':w.persenHariIni+'%'}}</b></span><span>Bulan ini: <b>{{w.persenBulan==null?'-':w.persenBulan+'%'}}</b></span><span class="text-rose-600">Alpa {{w.alpaBulan}}</span><span class="text-slate-500">Bimbingan {{w.bimbinganBulan}}</span></div>
       </div>
       <div v-if="!['SISWA','STAF','ORTU','BK'].includes(dash.tipe)" class="grid lg:grid-cols-2 gap-4 mt-4">
         <div class="bg-white rounded-2xl shadow-sm p-4">
-          <h3 class="font-bold mb-2">Kehadiran 7 hari terakhir</h3>
+          <div class="panel-head"><h3 class="font-bold">Kehadiran 7 hari terakhir</h3><p class="panel-desc">Persentase siswa hadir di seluruh sekolah.</p></div>
           <svg viewBox="0 0 210 100" class="w-full h-40" role="img" aria-label="Persentase kehadiran sekolah selama 7 hari terakhir">
             <line x1="0" x2="210" y1="75" y2="75" stroke="#cbd5e1"/>
             <g v-for="(t,i) in dash.tren" :key="i">
@@ -744,7 +815,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
           <p class="text-xs text-slate-500">Tanda - berarti belum ada presensi pada tanggal itu.</p>
         </div>
         <div class="bg-white rounded-2xl shadow-sm p-4">
-          <h3 class="font-bold mb-3">Kehadiran hari ini per kelas</h3>
+          <div class="panel-head"><h3 class="font-bold">Kehadiran hari ini per kelas</h3><p class="panel-desc">Persentase siswa hadir pada tiap kelas.</p></div>
           <p v-if="!dash.perKelas.length" class="text-sm text-slate-500">Belum ada kelas.</p>
           <div v-for="k in dash.perKelas" :key="k.kelas" class="flex items-center gap-2 mb-2 text-sm">
             <span class="w-24 shrink-0 truncate">{{k.kelas}}</span>
@@ -753,7 +824,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
           </div>
         </div>
         <div class="bg-white rounded-2xl shadow-sm p-4 lg:col-span-2">
-          <h3 class="font-bold mb-2">Alpa terbanyak bulan ini</h3>
+          <div class="panel-head"><h3 class="font-bold">Alpa terbanyak bulan ini</h3><p class="panel-desc">Siswa dengan alpa terbanyak pada bulan berjalan.</p></div>
           <p v-if="!dash.topAlpa.length" class="text-sm text-slate-500">Tidak ada alpa bulan ini.</p>
           <div v-for="a in dash.topAlpa" :key="a.nama+a.kelas" class="flex justify-between text-sm py-1 border-t first:border-t-0"><span>{{a.nama}} <span class="text-slate-400">({{a.kelas}})</span></span><b class="text-rose-600">{{a.n}} hari</b></div>
         </div>
@@ -765,7 +836,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <div class="hidden print:block"><kop :k="cfg.kop"></kop>
         <p v-if="ptab==='rekap'" class="text-center font-bold underline mb-3">REKAPITULASI PRESENSI - {{pr.jenis==='Harian'?fmtTgl(pr.tanggal):fmtBln(pr.bulan)}}</p>
         <p v-if="ptab==='detail'" class="text-center font-bold underline mb-3">DETAIL PRESENSI HARIAN - {{pd.kelas}} - {{pd.mapel}} - {{fmtBln(pd.bulan)}}</p></div>
-      <h2 class="h2 noprint">Presensi Siswa</h2>
+      <div class="page-head noprint"><h2 class="h2">Presensi Siswa</h2><p class="desk">{{DESK.presensi}}</p></div>
       <div class="flex gap-1 overflow-x-auto mb-4 noprint border-b border-slate-200" role="tablist">
         <button v-for="t in ptabs" :key="t.k" role="tab" @click="setTab(t.k)" class="tab" :class="ptab===t.k?'tab-on':''">{{t.t}}</button>
       </div>
@@ -944,7 +1015,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Kehadiran saya -->
     <section v-if="view==='riwayat'">
-      <h2 class="h2">Kehadiran Saya</h2>
+      <div class="page-head"><h2 class="h2">Kehadiran Saya</h2><p class="desk">{{DESK.riwayat}}</p></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Tanggal</th><th>Mata pelajaran</th><th>Status</th><th>Keterangan</th></tr></thead>
         <tbody><tr v-for="(r,i) in riwayat" class="border-t"><td class="p-3">{{i+1}}</td><td>{{fmtTgl(r.tanggal)}}</td><td>{{r.mapel||'-'}}</td>
@@ -955,50 +1026,50 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- STAFF / TU: Administrasi -->
     <section v-if="view==='suratmasuk'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Surat Masuk</h2><input v-model.trim="tuSM.q" @keyup.enter="loadSuratMasuk" placeholder="Cari nomor, asal, perihal..." class="inp"><input type="month" v-model="tuSM.bulan" @change="loadSuratMasuk" class="inp"><button @click="openSuratMasuk()" class="btn-p">Tambah surat</button></div>
+      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Surat Masuk</h2><p class="desk">{{DESK.suratmasuk}}</p></div><input v-model.trim="tuSM.q" @keyup.enter="loadSuratMasuk" placeholder="Cari nomor, asal, perihal..." class="inp"><input type="month" v-model="tuSM.bulan" @change="loadSuratMasuk" class="inp"><button @click="openSuratMasuk()" class="btn-p">Tambah surat</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Nomor</th><th>Asal</th><th>Perihal</th><th>Sifat</th><th>Status</th><th>Aksi</th></tr></thead>
       <tbody><tr v-for="r in suratMasuk.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.nomor}}</td><td>{{r.asal}}</td><td class="max-w-xs">{{r.perihal}}</td><td>{{r.sifat}}</td><td><span class="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold">{{r.status}}</span></td><td class="pr-3 whitespace-nowrap"><button @click="editSuratMasuk(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delSuratMasuk(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!suratMasuk.rows.length"><td colspan="7" class="p-4 text-slate-500">Belum ada surat masuk.</td></tr></tbody></table></div>
       <div v-if="showSM" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuSMF.id?'Ubah':'Tambah'}} surat masuk</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuSMF.tanggal" class="inp w-full mt-1"></label><label class="lb">Nomor surat<input v-model.trim="tuSMF.nomor" class="inp w-full mt-1"></label></div><input v-model.trim="tuSMF.asal" placeholder="Asal surat" class="inp w-full mt-3"><input v-model.trim="tuSMF.perihal" placeholder="Perihal" class="inp w-full mt-3"><div class="grid sm:grid-cols-3 gap-3 mt-3"><select v-model="tuSMF.kategori" class="inp"><option value="">Kategori</option><option>Undangan</option><option>Pemberitahuan</option><option>Permohonan</option><option>Dinas</option><option>Lainnya</option></select><select v-model="tuSMF.sifat" class="inp"><option>Biasa</option><option>Penting</option><option>Rahasia</option></select><select v-model="tuSMF.status" class="inp"><option>Baru</option><option>Dibaca</option><option>Diproses</option><option>Selesai</option></select></div><input v-model.trim="tuSMF.fileUrl" placeholder="Tautan file (https://...) opsional" class="inp w-full mt-3"><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showSM=false" class="btn-o">Batal</button><button @click="saveSuratMasuk" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
     </section>
 
     <section v-if="view==='suratkeluar'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Surat Keluar</h2><input v-model.trim="tuSK.q" @keyup.enter="loadSuratKeluar" placeholder="Cari nomor, tujuan, perihal..." class="inp"><input type="month" v-model="tuSK.bulan" @change="loadSuratKeluar" class="inp"><button @click="openSuratKeluar()" class="btn-p">Tambah surat</button></div>
+      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Surat Keluar</h2><p class="desk">{{DESK.suratkeluar}}</p></div><input v-model.trim="tuSK.q" @keyup.enter="loadSuratKeluar" placeholder="Cari nomor, tujuan, perihal..." class="inp"><input type="month" v-model="tuSK.bulan" @change="loadSuratKeluar" class="inp"><button @click="openSuratKeluar()" class="btn-p">Tambah surat</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Nomor</th><th>Tujuan</th><th>Perihal</th><th>Status</th><th>Aksi</th></tr></thead><tbody><tr v-for="r in suratKeluar.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.nomor}}</td><td>{{r.tujuan}}</td><td>{{r.perihal}}</td><td>{{r.status}}</td><td class="pr-3 whitespace-nowrap"><button @click="editSuratKeluar(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delSuratKeluar(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!suratKeluar.rows.length"><td colspan="6" class="p-4 text-slate-500">Belum ada surat keluar.</td></tr></tbody></table></div>
       <div v-if="showSK" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuSKF.id?'Ubah':'Tambah'}} surat keluar</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuSKF.tanggal" class="inp w-full mt-1"></label><input v-model.trim="tuSKF.nomor" placeholder="Nomor surat" class="inp"></div><input v-model.trim="tuSKF.tujuan" placeholder="Tujuan surat" class="inp w-full mt-3"><input v-model.trim="tuSKF.perihal" placeholder="Perihal" class="inp w-full mt-3"><div class="grid sm:grid-cols-2 gap-3 mt-3"><select v-model="tuSKF.kategori" class="inp"><option value="">Kategori</option><option>Undangan</option><option>Keterangan</option><option>Pengantar</option><option>Dinas</option><option>Lainnya</option></select><select v-model="tuSKF.status" class="inp"><option>Draft</option><option>Diproses</option><option>Ditandatangani</option><option>Dikirim</option><option>Arsip</option></select></div><input v-model.trim="tuSKF.fileUrl" placeholder="Tautan file opsional" class="inp w-full mt-3"><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showSK=false" class="btn-o">Batal</button><button @click="saveSuratKeluar" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
     </section>
 
     <section v-if="view==='disposisi'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Disposisi</h2><input v-model.trim="tuDP.q" @keyup.enter="loadDisposisi" placeholder="Cari surat / tujuan..." class="inp"><input type="month" v-model="tuDP.bulan" @change="loadDisposisi" class="inp"><button @click="openDisposisi()" class="btn-p">Buat disposisi</button></div>
+      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Disposisi</h2><p class="desk">{{DESK.disposisi}}</p></div><input v-model.trim="tuDP.q" @keyup.enter="loadDisposisi" placeholder="Cari surat / tujuan..." class="inp"><input type="month" v-model="tuDP.bulan" @change="loadDisposisi" class="inp"><button @click="openDisposisi()" class="btn-p">Buat disposisi</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Nomor surat</th><th>Asal</th><th>Tujuan</th><th>Instruksi</th><th>Batas</th><th>Status</th><th>Aksi</th></tr></thead><tbody><tr v-for="r in disposisi.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.nomorSurat||'-'}}</td><td>{{r.asal||'-'}}</td><td>{{r.tujuan}}</td><td>{{r.instruksi}}</td><td>{{r.batasWaktu?fmtTgl(r.batasWaktu):'-'}}</td><td>{{r.status}}</td><td class="pr-3 whitespace-nowrap"><button @click="editDisposisi(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delDisposisi(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!disposisi.rows.length"><td colspan="8" class="p-4 text-slate-500">Belum ada disposisi.</td></tr></tbody></table></div>
       <div v-if="showDP" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuDPF.id?'Ubah':'Buat'}} disposisi</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuDPF.tanggal" class="inp w-full mt-1"></label><select v-model="tuDPF.suratId" @change="pilihSuratDisposisi" class="inp"><option value="">Surat terkait (opsional)</option><option v-for="r in suratMasuk.rows" :value="r.id">{{r.nomor}} — {{r.asal}}</option></select></div><div class="grid sm:grid-cols-2 gap-3 mt-3"><input v-model.trim="tuDPF.nomorSurat" placeholder="Nomor surat" class="inp"><input v-model.trim="tuDPF.asal" placeholder="Asal surat" class="inp"></div><input v-model.trim="tuDPF.tujuan" placeholder="Ditujukan kepada/unit" class="inp w-full mt-3"><textarea v-model.trim="tuDPF.instruksi" rows="3" placeholder="Instruksi disposisi" class="inp w-full mt-3"></textarea><div class="grid sm:grid-cols-2 gap-3 mt-3"><label class="lb">Batas waktu<input type="date" v-model="tuDPF.batasWaktu" class="inp w-full mt-1"></label><select v-model="tuDPF.status" class="inp"><option>Baru</option><option>Diproses</option><option>Selesai</option><option>Batal</option></select></div><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showDP=false" class="btn-o">Batal</button><button @click="saveDisposisi" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
     </section>
 
     <section v-if="view==='arsip'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Arsip Dokumen</h2><input v-model.trim="tuAR.q" @keyup.enter="loadArsip" placeholder="Cari kode, judul, kategori..." class="inp"><input type="month" v-model="tuAR.bulan" @change="loadArsip" class="inp"><button @click="openArsip()" class="btn-p">Tambah arsip</button></div>
+      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Arsip Dokumen</h2><p class="desk">{{DESK.arsip}}</p></div><input v-model.trim="tuAR.q" @keyup.enter="loadArsip" placeholder="Cari kode, judul, kategori..." class="inp"><input type="month" v-model="tuAR.bulan" @change="loadArsip" class="inp"><button @click="openArsip()" class="btn-p">Tambah arsip</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Kode</th><th>Judul</th><th>Kategori</th><th>Tahun</th><th>Lokasi</th><th>Aksi</th></tr></thead><tbody><tr v-for="r in arsip.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.kode||'-'}}</td><td>{{r.judul}}</td><td>{{r.kategori||'-'}}</td><td>{{r.tahun||'-'}}</td><td>{{r.lokasi||'-'}}</td><td class="pr-3 whitespace-nowrap"><a v-if="r.fileUrl" :href="r.fileUrl" target="_blank" rel="noopener noreferrer" class="text-blue-800 font-bold mr-3">Buka</a><button @click="editArsip(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delArsip(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!arsip.rows.length"><td colspan="7" class="p-4 text-slate-500">Belum ada arsip.</td></tr></tbody></table></div>
       <div v-if="showAR" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuARF.id?'Ubah':'Tambah'}} arsip</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuARF.tanggal" class="inp w-full mt-1"></label><input v-model.trim="tuARF.kode" placeholder="Kode arsip" class="inp"></div><input v-model.trim="tuARF.judul" placeholder="Judul dokumen" class="inp w-full mt-3"><div class="grid sm:grid-cols-3 gap-3 mt-3"><input v-model.trim="tuARF.kategori" placeholder="Kategori" class="inp"><input v-model.trim="tuARF.tahun" placeholder="Tahun" class="inp"><input v-model.trim="tuARF.lokasi" placeholder="Lokasi / rak" class="inp"></div><input v-model.trim="tuARF.fileUrl" placeholder="Tautan file opsional" class="inp w-full mt-3"><textarea v-model.trim="tuARF.keterangan" rows="3" placeholder="Keterangan" class="inp w-full mt-3"></textarea><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showAR=false" class="btn-o">Batal</button><button @click="saveArsip" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
     </section>
 
     <section v-if="view==='layanan'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Layanan Administrasi</h2><input v-model.trim="tuLA.q" @keyup.enter="loadLayanan" placeholder="Cari pemohon / jenis layanan..." class="inp"><input type="month" v-model="tuLA.bulan" @change="loadLayanan" class="inp"><button @click="openLayanan()" class="btn-p">Tambah layanan</button></div>
+      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Layanan Administrasi</h2><p class="desk">{{DESK.layanan}}</p></div><input v-model.trim="tuLA.q" @keyup.enter="loadLayanan" placeholder="Cari pemohon / jenis layanan..." class="inp"><input type="month" v-model="tuLA.bulan" @change="loadLayanan" class="inp"><button @click="openLayanan()" class="btn-p">Tambah layanan</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>No. layanan</th><th>Pemohon</th><th>Jenis</th><th>Keperluan</th><th>Status</th><th>Petugas</th><th>Aksi</th></tr></thead><tbody><tr v-for="r in layanan.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.noLayanan||'-'}}</td><td>{{r.pemohon}}</td><td>{{r.jenis}}</td><td>{{r.keperluan}}</td><td>{{r.status}}</td><td>{{r.petugasNama}}</td><td class="pr-3 whitespace-nowrap"><button @click="editLayanan(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delLayanan(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!layanan.rows.length"><td colspan="8" class="p-4 text-slate-500">Belum ada layanan administrasi.</td></tr></tbody></table></div>
       <div v-if="showLA" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuLAF.id?'Ubah':'Tambah'}} layanan</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuLAF.tanggal" class="inp w-full mt-1"></label><input v-model.trim="tuLAF.noLayanan" placeholder="No. layanan (opsional)" class="inp"></div><input v-model.trim="tuLAF.pemohon" placeholder="Nama pemohon" class="inp w-full mt-3"><div class="grid sm:grid-cols-2 gap-3 mt-3"><select v-model="tuLAF.jenis" class="inp"><option value="">Pilih jenis layanan</option><option>Surat keterangan</option><option>Legalisir</option><option>Administrasi siswa</option><option>Administrasi guru/PTK</option><option>Permohonan data</option><option>Lainnya</option></select><select v-model="tuLAF.status" class="inp"><option>Diajukan</option><option>Diproses</option><option>Selesai</option><option>Ditolak</option></select></div><textarea v-model.trim="tuLAF.keperluan" rows="3" placeholder="Keperluan" class="inp w-full mt-3"></textarea><textarea v-model.trim="tuLAF.keterangan" rows="2" placeholder="Keterangan petugas" class="inp w-full mt-3"></textarea><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showLA=false" class="btn-o">Batal</button><button @click="saveLayanan" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
     </section>
 
     <section v-if="view==='mutasi'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Mutasi Siswa</h2><input v-model.trim="tuMU.q" @keyup.enter="loadMutasi" placeholder="Cari siswa / kelas..." class="inp"><input type="month" v-model="tuMU.bulan" @change="loadMutasi" class="inp"><button @click="openMutasi()" class="btn-p">Catat mutasi</button></div>
+      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Mutasi Siswa</h2><p class="desk">{{DESK.mutasi}}</p></div><input v-model.trim="tuMU.q" @keyup.enter="loadMutasi" placeholder="Cari siswa / kelas..." class="inp"><input type="month" v-model="tuMU.bulan" @change="loadMutasi" class="inp"><button @click="openMutasi()" class="btn-p">Catat mutasi</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>NISN</th><th>Nama</th><th>Jenis</th><th>Asal</th><th>Tujuan</th><th>Status</th><th>Petugas</th><th>Aksi</th></tr></thead><tbody><tr v-for="r in mutasi.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{labelNisn(r.nis, r.nisn)}}</td><td>{{r.nama}}</td><td>{{r.jenis}}</td><td>{{r.kelasAsal}}</td><td>{{r.kelasTujuan}}</td><td>{{r.status}}</td><td>{{r.olehNama}}</td><td class="pr-3"><button @click="delMutasi(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!mutasi.rows.length"><td colspan="9" class="p-4 text-slate-500">Belum ada riwayat mutasi.</td></tr></tbody></table></div>
       <div v-if="showMU" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">Catat mutasi siswa</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuMUF.tanggal" class="inp w-full mt-1"></label><select v-model="tuMUF.nis" class="inp"><option value="">Pilih siswa</option><option v-for="s in siswa" :value="s.nis">{{labelNisn(s.nis, s.nisn)}} — {{s.nama}} ({{s.kelas}})</option></select></div><div class="grid sm:grid-cols-2 gap-3 mt-3"><select v-model="tuMUF.jenis" class="inp"><option>Naik Kelas</option><option>Pindah Masuk</option><option>Pindah Keluar</option><option>Lainnya</option></select><select v-model="tuMUF.kelasTujuan" class="inp"><option value="">Pilih kelas tujuan</option><option v-for="k in kelasAll" :value="k.kelas">{{k.kelas}}</option></select></div><textarea v-model.trim="tuMUF.alasan" rows="3" placeholder="Alasan / keterangan mutasi" class="inp w-full mt-3"></textarea><input v-model.trim="tuMUF.dokumenUrl" placeholder="Tautan dokumen pendukung opsional" class="inp w-full mt-3"><select v-model="tuMUF.status" class="inp w-full mt-3"><option>Diajukan</option><option>Diproses</option><option>Selesai</option><option>Batal</option></select><p class="text-xs text-slate-500 mt-2">Status Selesai akan memperbarui kelas siswa pada Data Siswa.</p><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showMU=false" class="btn-o">Batal</button><button @click="saveMutasi" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
     </section>
 
     <section v-if="view==='cetaksurat'">
-      <div class="noprint flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Cetak Surat</h2><select v-model="cs.jenis" class="inp"><option>Surat Keterangan Aktif</option><option>Surat Keterangan</option><option>Surat Pengantar</option><option>Surat Tugas</option><option>Undangan</option><option>Surat Izin</option></select><button @click="resetCetakSurat" class="btn-o">Kosongkan</button><button @click="printSurat" class="btn-p">Cetak</button></div>
+      <div class="noprint flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Cetak Surat</h2><p class="desk">{{DESK.cetaksurat}}</p></div><select v-model="cs.jenis" class="inp"><option>Surat Keterangan Aktif</option><option>Surat Keterangan</option><option>Surat Pengantar</option><option>Surat Tugas</option><option>Undangan</option><option>Surat Izin</option></select><button @click="resetCetakSurat" class="btn-o">Kosongkan</button><button @click="printSurat" class="btn-p">Cetak</button></div>
       <div class="noprint bg-white rounded-2xl shadow-sm p-5 grid lg:grid-cols-2 gap-3"><input v-model.trim="cs.nomor" placeholder="Nomor surat" class="inp"><input v-model.trim="cs.tanggal" type="date" class="inp"><input v-model.trim="cs.kepada" placeholder="Kepada / nama penerima" class="inp lg:col-span-2"><input v-model.trim="cs.perihal" placeholder="Perihal" class="inp lg:col-span-2"><textarea v-model.trim="cs.isi" rows="12" placeholder="Isi surat" class="inp lg:col-span-2"></textarea><div class="grid sm:grid-cols-2 gap-3 lg:col-span-2"><input v-model.trim="cs.namaTtd" placeholder="Nama penandatangan" class="inp"><input v-model.trim="cs.nipTtd" placeholder="NUPTK / identitas penandatangan" class="inp"></div></div>
       <div class="hidden print:block bg-white min-h-screen p-8"><kop :k="cfg.kop"></kop><div class="text-center mt-4"><h2 class="font-extrabold underline">{{cs.jenis.toUpperCase()}}</h2><p v-if="cs.nomor">Nomor: {{cs.nomor}}</p></div><p class="mt-8">{{cs.kepada?'Kepada Yth. '+cs.kepada:''}}</p><p v-if="cs.perihal" class="font-bold mt-3">Perihal: {{cs.perihal}}</p><p class="whitespace-pre-line leading-7 mt-5">{{cs.isi}}</p><div class="mt-12 ml-auto w-64 text-center"><p>{{cfg.ttd&&cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{fmtTgl(cs.tanggal)}}</p><p>{{cfg.ttd&&cfg.ttd.jabatan?cfg.ttd.jabatan:''}}</p><div class="h-20"></div><p class="font-bold underline">{{cs.namaTtd||cfg.ttd&&cfg.ttd.nama||'-'}}</p><p v-if="cs.nipTtd||cfg.ttd&&cfg.ttd.nip">NUPTK / Identitas: {{cs.nipTtd||cfg.ttd&&cfg.ttd.nip}}</p></div></div>
     </section>
 
     <section v-if="view==='rekapadmin'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">Rekap Administrasi</h2><input type="month" v-model="tuRK.bulan" @change="loadRekapAdmin" class="inp"><button @click="loadRekapAdmin" class="btn-o">Muat ulang</button><button @click="printPage" class="btn-o">Cetak</button></div>
+      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Rekap Administrasi</h2><p class="desk">{{DESK.rekapadmin}}</p></div><input type="month" v-model="tuRK.bulan" @change="loadRekapAdmin" class="inp"><button @click="loadRekapAdmin" class="btn-o">Muat ulang</button><button @click="printPage" class="btn-o">Cetak</button></div>
       <div v-if="rekapAdmin" class="grid grid-cols-2 md:grid-cols-4 gap-4"><div class="card"><b class="n">{{rekapAdmin.suratMasuk}}</b>Surat masuk</div><div class="card"><b class="n">{{rekapAdmin.suratKeluar}}</b>Surat keluar</div><div class="card"><b class="n">{{rekapAdmin.disposisi}}</b>Disposisi</div><div class="card"><b class="n">{{rekapAdmin.arsip}}</b>Arsip</div><div class="card"><b class="n">{{rekapAdmin.layanan}}</b>Layanan</div><div class="card"><b class="n">{{rekapAdmin.mutasi}}</b>Mutasi</div><div class="card"><b class="n">{{rekapAdmin.siswa}}</b>Total siswa</div><div class="card"><b class="n">{{rekapAdmin.guru}}</b>Guru/PTK</div></div>
       <div v-if="rekapAdmin" class="grid lg:grid-cols-2 gap-4 mt-4"><div class="bg-white rounded-2xl shadow-sm p-4"><h3 class="font-bold mb-3">Status surat masuk</h3><div v-for="(v,k) in rekapAdmin.suratMasukStatus" :key="k" class="flex justify-between border-t first:border-t-0 py-2 text-sm"><span>{{k}}</span><b>{{v}}</b></div></div><div class="bg-white rounded-2xl shadow-sm p-4"><h3 class="font-bold mb-3">Status surat keluar</h3><div v-for="(v,k) in rekapAdmin.suratKeluarStatus" :key="k" class="flex justify-between border-t first:border-t-0 py-2 text-sm"><span>{{k}}</span><b>{{v}}</b></div></div><div class="bg-white rounded-2xl shadow-sm p-4"><h3 class="font-bold mb-3">Status layanan</h3><div v-for="(v,k) in rekapAdmin.layananStatus" :key="k" class="flex justify-between border-t first:border-t-0 py-2 text-sm"><span>{{k}}</span><b>{{v}}</b></div></div><div class="bg-white rounded-2xl shadow-sm p-4"><h3 class="font-bold mb-3">Status mutasi</h3><div v-for="(v,k) in rekapAdmin.mutasiStatus" :key="k" class="flex justify-between border-t first:border-t-0 py-2 text-sm"><span>{{k}}</span><b>{{v}}</b></div></div></div>
       <p v-else class="text-sm text-slate-500">Memuat rekap...</p>
@@ -1006,7 +1077,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Siswa -->
     <section v-if="view==='siswa'">
-      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">{{canEdit?'Kelola Siswa':'Data Siswa'}}</h2>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><div class="page-head in-row"><h2 class="h2">{{canEdit?'Kelola Siswa':'Data Siswa'}}</h2><p class="desk">{{DESK.siswa}}</p></div>
         <div class="flex flex-wrap gap-2">
           <button v-if="canEdit" @click="templateSiswa" class="btn-o">Unduh template</button>
           <label v-if="canEdit" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickFile"></label>
@@ -1070,7 +1141,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Guru (Admin) -->
     <section v-if="view==='guru'">
-      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">{{canEdit?'Kelola Guru':'Data Guru'}}</h2>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><div class="page-head in-row"><h2 class="h2">{{canEdit?'Kelola Guru':'Data Guru'}}</h2><p class="desk">{{DESK.guru}}</p></div>
         <div class="flex flex-wrap gap-2">
           <button v-if="canEdit" @click="templateGuru" class="btn-o">Unduh template</button>
           <label v-if="canEdit" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickGuruFile"></label>
@@ -1140,7 +1211,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Kelas -->
     <section v-if="view==='kelas'">
-      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">Kelola Kelas</h2>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><div class="page-head in-row"><h2 class="h2">Kelola Kelas</h2><p class="desk">{{DESK.kelas}}</p></div>
         <button @click="editKelas(null)" class="btn-p inline-flex items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Tambah kelas</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Kelas</th><th>Wali kelas</th><th>Siswa</th><th>Aksi</th></tr></thead>
@@ -1162,7 +1233,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Jadwal -->
     <section v-if="view==='jadwal'">
-      <div class="flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Jadwal {{user.role==='SISWA'?'Pelajaran':'Mengajar'}}</h2>
+      <div class="flex flex-wrap items-center gap-3 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Jadwal {{user.role==='SISWA'?'Pelajaran':'Mengajar'}}</h2><p class="desk">{{DESK.jadwal}}</p></div>
         <select v-model="jhari" class="inp"><option value="">Semua hari</option><option v-for="h in hariList" :key="h">{{h}}</option></select>
         <select v-model="jblok" class="inp"><option value="">Semua blok</option><option value="A">Blok A</option><option value="B">Blok B</option></select>
         <input v-model.trim="jq" placeholder="Cari kelas / mapel / guru" class="inp">
@@ -1225,7 +1296,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Nilai (admin & guru) -->
     <section v-if="view==='nilai'">
-      <h2 class="h2">Input Nilai</h2>
+      <div class="page-head"><h2 class="h2">Input Nilai</h2><p class="desk">{{DESK.nilai}}</p></div>
       <p v-if="!pil.length" class="text-sm text-slate-500">Belum ada jadwal untuk dinilai. Admin perlu mengisi menu Jadwal dulu.</p>
       <template v-else>
         <div class="flex flex-wrap gap-2 mb-2"><button @click="nMode='sumatif';loadNilai()" :class="nMode==='sumatif'?'btn-p':'btn-o'">Nilai Sumatif</button><button @click="nMode='formatif';loadNilai()" :class="nMode==='formatif'?'btn-p':'btn-o'">Asesmen Formatif (ketercapaian TP)</button></div>
@@ -1260,7 +1331,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Nilai saya -->
     <section v-if="view==='nilaisaya'">
-      <h2 class="h2">Nilai Saya</h2>
+      <div class="page-head"><h2 class="h2">Nilai Saya</h2><p class="desk">{{DESK.nilaisaya}}</p></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Mata pelajaran</th><th>Tujuan pembelajaran</th><th>Jenis</th><th>Skor</th></tr></thead>
         <tbody><tr v-for="(r,i) in nilaiSaya" class="border-t"><td class="p-3">{{i+1}}</td><td>{{r.mapel}}</td><td>{{r.tp}}</td><td>{{jl(r.jenis)}}</td><td class="font-bold">{{r.skor}}</td></tr>
@@ -1270,7 +1341,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     <!-- Jurnal -->
     <section v-if="view==='jurnal'">
       <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">JURNAL MENGAJAR - {{bulan}}</p></div>
-      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><h2 class="h2 !mb-0 mr-auto">Jurnal Mengajar</h2>
+      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><div class="page-head in-row mr-auto"><h2 class="h2">Jurnal Mengajar</h2><p class="desk">{{DESK.jurnal}}</p></div>
         <input type="month" v-model="bulan" @change="loadJurnal" class="inp"><input v-model.trim="q" @keyup.enter="loadJurnal" placeholder="Cari, lalu Enter" class="inp">
         <button @click="printPage" class="btn-o">Cetak</button><button v-if="canWrite" @click="bukaJurnal" class="btn-p">Tambah jurnal</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
@@ -1292,7 +1363,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     <!-- Bimbingan wali (admin & guru) -->
     <section v-if="view==='bimbingan'">
       <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">BIMBINGAN WALI - {{bulan}}</p></div>
-      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><h2 class="h2 !mb-0 mr-auto">Bimbingan Wali</h2>
+      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><div class="page-head in-row mr-auto"><h2 class="h2">Bimbingan Wali</h2><p class="desk">{{DESK.bimbingan}}</p></div>
         <input type="month" v-model="bulan" @change="loadBimb" class="inp"><input v-model.trim="q" @keyup.enter="loadBimb" placeholder="Cari, lalu Enter" class="inp">
         <button @click="printPage" class="btn-o">Cetak</button><button v-if="(user.role==='ADMIN'||user.role==='GURU')&&bk.length" @click="openB" class="btn-p">Tambah catatan</button></div>
       <p v-if="user.role==='GURU'&&!bk.length" class="text-sm text-slate-500 mb-4">Anda belum ditetapkan sebagai wali kelas. Admin menetapkannya di menu Kelola Kelas.</p>
@@ -1315,7 +1386,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Catatan bimbingan (siswa) -->
     <section v-if="view==='bimbingansaya'">
-      <h2 class="h2">Catatan Bimbingan</h2>
+      <div class="page-head"><h2 class="h2">Catatan Bimbingan</h2><p class="desk">{{DESK.bimbingansaya}}</p></div>
       <div class="flex flex-wrap gap-2 mb-3"><button @click="bimbTab='wali'" :class="bimbTab==='wali'?'btn-p':'btn-o'">Bimbingan Wali Kelas</button><button @click="bimbTab='bk'" :class="bimbTab==='bk'?'btn-p':'btn-o'">Konseling Guru BK</button></div>
       <div v-if="bimbTab==='wali'" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Catatan</th><th>Solusi</th><th>Dicatat oleh</th></tr></thead>
@@ -1329,7 +1400,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Pengaturan sekolah (admin) -->
     <section v-if="view==='pengaturan'">
-      <h2 class="h2">Pengaturan Sekolah</h2>
+      <div class="page-head"><h2 class="h2">Pengaturan Sekolah</h2><p class="desk">{{DESK.pengaturan}}</p></div>
       <div class="grid lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-2xl shadow-sm p-5 lg:col-span-2">
           <h3 class="font-bold mb-1">Blok jadwal (A / B bergantian)</h3>
@@ -1392,7 +1463,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     <!-- Leger nilai -->
     <section v-if="view==='leger'">
       <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">LEGER NILAI - {{lkelas}}</p></div>
-      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><h2 class="h2 !mb-0 mr-auto">Leger Nilai</h2>
+      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><div class="page-head in-row mr-auto"><h2 class="h2">Leger Nilai</h2><p class="desk">{{DESK.leger}}</p></div>
         <select v-model="lkelas" @change="loadLeger" class="inp"><option value="">Pilih kelas</option><option v-for="k in lk">{{k}}</option></select>
         <button v-if="leger.mapel.length" @click="printPage" class="btn-o">Cetak</button><button v-if="leger.mapel.length" @click="exportLeger" class="btn-o">Ekspor Excel</button></div>
       <p v-if="!lk.length" class="text-sm text-slate-500">Belum ada kelas yang bisa Anda lihat. Guru perlu memiliki jadwal atau ditetapkan sebagai wali kelas.</p>
@@ -1409,7 +1480,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Log aktivitas -->
     <section v-if="view==='log'">
-      <div class="flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Log Aktivitas</h2><input v-model.trim="lq" placeholder="Cari pengguna / aksi / detail" class="inp"><button @click="go('log')" class="btn-o">Muat ulang</button></div>
+      <div class="flex flex-wrap items-center gap-3 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Log Aktivitas</h2><p class="desk">{{DESK.log}}</p></div><input v-model.trim="lq" placeholder="Cari pengguna / aksi / detail" class="inp"><button @click="go('log')" class="btn-o">Muat ulang</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Waktu</th><th>Pengguna</th><th>Aksi</th><th>Detail</th></tr></thead>
         <tbody><tr v-for="l in logTampil" :key="l.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{l.waktu}}</td><td>{{l.nama}} <span class="text-xs text-slate-400">({{l.username}})</span></td><td class="font-semibold whitespace-nowrap">{{aksiLbl(l.aksi)}}</td><td class="text-slate-600">{{l.detail}}</td></tr>
@@ -1418,8 +1489,8 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Rapor -->
     <section v-if="view==='rapor'">
-      <h2 class="h2">Rapor</h2>
-      <p class="text-xs text-slate-500 mb-3">Kurikulum Merdeka (Panduan Pembelajaran dan Asesmen revisi 2025): nilai akhir = Sumatif Lingkup Materi (Harian/Tugas/Praktik) + Sumatif Tengah Semester (UTS) + Sumatif Akhir Semester (UAS), dengan bobot &amp; KKTP dari Pengaturan Akademik.</p>
+      <div class="page-head"><h2 class="h2">Rapor</h2><p class="desk">{{DESK.rapor}}</p></div>
+      <p class="desk-note">Kurikulum Merdeka (Panduan Pembelajaran dan Asesmen revisi 2025): nilai akhir = Sumatif Lingkup Materi (Harian/Tugas/Praktik) + Sumatif Tengah Semester (UTS) + Sumatif Akhir Semester (UAS), dengan bobot &amp; KKTP dari Pengaturan Akademik.</p>
       <p v-if="!rpTabs.length" class="text-sm text-slate-500">Rapor hanya dapat dicetak oleh wali kelas. Admin menetapkan wali di Kelola Kelas.</p>
       <div v-else class="flex flex-wrap gap-2 mb-4"><button v-for="t in rpTabs" :key="t.k" @click="gantiTabR(t.k)" :class="rpTab===t.k?'btn-p':'btn-o'">{{t.t}}</button></div>
 
@@ -1578,7 +1649,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Dokumen digital -->
     <section v-if="view==='dokumen'">
-      <div class="flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Dokumen Digital</h2>
+      <div class="flex flex-wrap items-center gap-3 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Dokumen Digital</h2><p class="desk">{{DESK.dokumen}}</p></div>
         <input v-model.trim="q" @keyup.enter="loadDok" placeholder="Cari, lalu Enter" class="inp"><button @click="showD=true" class="btn-p">Simpan tautan</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Judul</th><th>Kategori</th><th>Ditambahkan</th><th>Aksi</th></tr></thead>
@@ -1597,7 +1668,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     <!-- Perangkat ajar -->
     <section v-if="view==='perangkat'">
       <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">KELENGKAPAN PERANGKAT AJAR - TAHUN AJARAN {{pa.tahun||'-'}}</p></div>
-      <div class="noprint flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Perangkat Ajar</h2>
+      <div class="noprint flex flex-wrap items-center gap-3 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Perangkat Ajar</h2><p class="desk">{{DESK.perangkat}}</p></div>
         <span class="text-xs text-slate-500">Tahun ajaran {{pa.tahun||'(belum diatur)'}}<template v-if="pa.tenggat"> &middot; tenggat {{fmtTgl(pa.tenggat)}}</template></span><button v-if="isPim" @click="printPage" class="btn-o">Cetak</button></div>
       <template v-if="!isPim">
         <div v-if="pa.kurang.length" class="rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 mb-4"><b>Belum dikumpulkan ({{pa.kurang.length}}):</b> <span v-for="(k,i) in pa.kurang" :key="i" class="inline-block bg-white border border-amber-200 rounded-full px-2 py-0.5 text-xs mr-1 mt-1">{{k.mapel}} &middot; {{k.jenis}}</span></div>
@@ -1632,7 +1703,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     <!-- Monitoring (Kepala Sekolah & Admin) -->
     <section v-if="view==='monitor'">
       <div class="hidden print:block"><kop :k="cfg.kop"></kop><p class="text-center font-bold underline mb-3">LAPORAN MONITORING KINERJA - {{fmtBln(mon?mon.bulan:monBulan)}}</p></div>
-      <div class="noprint flex flex-wrap items-center gap-3 mb-4"><h2 class="h2 !mb-0 mr-auto">Monitoring Kinerja</h2>
+      <div class="noprint flex flex-wrap items-center gap-3 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Monitoring Kinerja</h2><p class="desk">{{DESK.monitor}}</p></div>
         <input type="month" v-model="monBulan" @change="loadMon" class="inp"><button @click="printPage" :disabled="!mon" class="btn-o disabled:opacity-50">Cetak laporan</button></div>
       <template v-if="mon">
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
@@ -1674,7 +1745,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
 
     <section v-if="view==='izin'">
-      <h2 class="h2">{{user.role==='SISWA'?'Pengajuan Izin':'Izin Siswa'}}</h2>
+      <div class="page-head"><h2 class="h2">{{user.role==='SISWA'?'Pengajuan Izin':'Izin Siswa'}}</h2><p class="desk">{{DESK.izin}}</p></div>
       <div v-if="user.role==='SISWA'" class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3">
         <label class="lb">Tanggal<input type="date" v-model="iz.tanggal" :min="hari0" class="inp w-full mt-1"></label>
         <label class="lb">Jenis<select v-model="iz.jenis" class="inp w-full mt-1 normal-case"><option value="I">Izin</option><option value="S">Sakit</option></select></label>
@@ -1690,7 +1761,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Catatan pimpinan -> guru -->
     <section v-if="view==='catatan'">
-      <h2 class="h2">Catatan untuk Guru</h2>
+      <div class="page-head"><h2 class="h2">Catatan untuk Guru</h2><p class="desk">{{DESK.catatan}}</p></div>
       <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-[1fr_2fr] gap-3">
         <label class="lb">Guru penerima<select v-model="cg.guru" class="inp w-full mt-1 normal-case"><option value="">-- Pilih guru --</option><option v-for="g in guru" :key="g.username" :value="g.username">{{g.nama}}</option></select></label>
         <label class="lb">Catatan, apresiasi, atau arahan<textarea v-model.trim="cg.isi" maxlength="1000" rows="3" placeholder="Hanya dapat dibaca guru yang bersangkutan" class="inp w-full mt-1 normal-case"></textarea></label>
@@ -1704,7 +1775,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
         <tr v-if="!cgTampil.length"><td colspan="6" class="p-4 text-slate-500">Belum ada catatan.</td></tr></tbody></table></div>
     </section>
     <section v-if="view==='catatansaya'">
-      <h2 class="h2">Catatan Pimpinan</h2>
+      <div class="page-head"><h2 class="h2">Catatan Pimpinan</h2><p class="desk">{{DESK.catatansaya}}</p></div>
       <p v-if="!cglist.length" class="text-sm text-slate-500">Belum ada catatan untuk Anda.</p>
       <div v-for="c in cglist" :key="c.id" class="bg-white rounded-2xl shadow-sm p-4 mb-3 border-l-4" :class="c.dibaca?'border-slate-200':'border-violet-500'">
         <p class="text-sm whitespace-pre-line">{{c.isi}}</p>
@@ -1712,7 +1783,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Akun & Sandi (admin) -->
     <section v-if="view==='akun'">
-      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><h2 class="h2 !mb-0">Akun &amp; Sandi</h2>
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><div class="page-head in-row"><h2 class="h2">Akun &amp; Sandi</h2><p class="desk">{{DESK.akun}}</p></div>
         <div class="flex flex-wrap gap-2"><button v-if="akOrtu" @click="buatOrtu" :disabled="busy" class="btn-o">Buat akun orang tua ({{akOrtu}})</button><button v-if="akpilih.length" @click="bagikanAwal(akpilih)" :disabled="busy" class="btn-o">Bagikan sandi awal ({{akpilih.length}})</button><button v-if="akpilih.length" @click="konfirmReset(akpilih)" :disabled="busy" class="btn-p">Reset sandi {{akpilih.length}} akun</button></div></div>
       <div class="flex flex-wrap gap-2 mb-3">
         <select v-model="akrole" class="inp"><option value="">Semua peran</option><option value="SISWA">Siswa</option><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf</option><option value="BK">Guru BK</option><option value="ORTU">Orang tua</option></select>
@@ -1731,7 +1802,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Portal orang tua: data anak -->
     <section v-if="view==='anak'">
-      <h2 class="h2">Data Anak</h2>
+      <div class="page-head"><h2 class="h2">Data Anak</h2><p class="desk">{{DESK.anak}}</p></div>
       <p v-if="!anak" class="text-sm text-slate-500 animate-pulse">Memuat data...</p>
       <template v-else>
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 border-l-4 border-sky-500"><p class="font-bold">{{anak.anak.nama}}</p><p class="text-sm text-slate-500">NISN {{anak.anak.nisn||'-'}} &middot; Kelas {{anak.anak.kelas}}</p></div>
@@ -1770,7 +1841,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Pemberitahuan (siswa & orang tua) -->
     <section v-if="view==='notif'">
-      <h2 class="h2">Pemberitahuan</h2>
+      <div class="page-head"><h2 class="h2">Pemberitahuan</h2><p class="desk">{{DESK.notif}}</p></div>
       <p v-if="!nlist.length" class="text-sm text-slate-500">Belum ada pemberitahuan.</p>
       <div v-for="n in nlist" :key="n.id" class="bg-white rounded-2xl shadow-sm p-4 mb-3 border-l-4" :class="n.dibaca?'border-slate-200':'border-sky-500'">
         <p class="font-bold text-sm">{{n.judul}}<span v-if="!n.dibaca" class="ml-2 text-[10px] font-bold bg-rose-500 text-white rounded-full px-1.5">BARU</span></p>
@@ -1780,7 +1851,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     <!-- Konseling BK -->
     <section v-if="view==='konseling'">
       <div class="flex flex-wrap items-center gap-3 mb-4">
-        <div class="mr-auto"><h2 class="h2 !mb-0">Konseling BK</h2><p class="text-xs text-slate-500 mt-1">Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.</p></div>
+        <div class="mr-auto"><h2 class="h2 !mb-0">Konseling BK</h2><p class="desk">{{DESK.konseling}}</p></div>
         <select v-model="ksq.kelas" @change="loadKonseling" class="inp"><option value="">Semua kelas</option><option v-for="k in konseling.kelas" :key="k">{{k}}</option></select>
         <input type="month" v-model="ksq.bulan" @change="loadKonseling" class="inp">
         <input v-model.trim="ksq.q" @keyup.enter="loadKonseling" placeholder="Cari siswa / topik, lalu Enter" class="inp min-w-[12rem]">
@@ -1816,7 +1887,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 
     <!-- Pelanggaran & poin tata tertib (BK) -->
     <section v-if="view==='pelanggaran'">
-      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><h2 class="h2 !mb-0 mr-auto">Pelanggaran Siswa</h2>
+      <div class="flex flex-wrap items-center gap-3 mb-4 noprint"><div class="page-head in-row mr-auto"><h2 class="h2">Pelanggaran Siswa</h2><p class="desk">{{DESK.pelanggaran}}</p></div>
         <select v-model="plq.kelas" @change="loadPl" class="inp"><option value="">Semua kelas</option><option v-for="k in pel.kelas" :key="k">{{k}}</option></select>
         <input type="month" v-model="plq.bulan" @change="loadPl" class="inp"><input v-model.trim="plq.q" @keyup.enter="loadPl" placeholder="Cari, lalu Enter" class="inp">
         <button @click="openPanduanPel" class="btn-o">Panduan & FAQ</button><button @click="printPelanggaran" :disabled="!pel.rows.length" class="btn-o disabled:opacity-50">Cetak / PDF</button><button v-if="canPel" @click="openPl" class="btn-p">Tambah catatan</button></div>
@@ -1866,7 +1937,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Pengurangan Poin -->
     <section v-if="view==='pengurangan'">
-      <div class="flex flex-wrap items-center gap-3 mb-4"><div class="mr-auto"><h2 class="h2 !mb-0">Pengurangan Poin</h2><p class="text-sm text-slate-500 mt-1">Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.</p></div>
+      <div class="flex flex-wrap items-center gap-3 mb-4"><div class="mr-auto"><h2 class="h2 !mb-0">Pengurangan Poin</h2><p class="desk">{{DESK.pengurangan}}</p></div>
         <select v-model="plq.kelas" @change="loadPl" class="inp"><option value="">Semua kelas</option><option v-for="k in pel.kelas" :key="k">{{k}}</option></select><input v-model.trim="plq.q" @keyup.enter="loadPl" placeholder="Cari siswa / pelanggaran" class="inp">
       </div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm bk-audit-table bk-pengurangan-table"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Siswa</th><th>Kelas</th><th>Total pelanggaran</th><th>Sudah dikurangi</th><th>Total poin efektif</th><th class="noprint">Aksi</th></tr></thead>
@@ -1886,7 +1957,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- PKL / Prakerin -->
     <section v-if="view==='pkl'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><h2 class="h2 !mb-0 mr-auto">PKL / Prakerin</h2>
+      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">PKL / Prakerin</h2><p class="desk">{{DESK.pkl}}</p></div>
         <input v-if="user.role!=='SISWA'" v-model.trim="pq" placeholder="Cari siswa / industri..." class="inp">
         <button v-if="user.role!=='SISWA'" @click="exportPkl" :disabled="!pklTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
         <button v-if="canEdit" @click="editPkl(null)" class="btn-p">Tambah penempatan</button></div>
@@ -1924,7 +1995,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Tahun ajaran, riwayat kelas, alumni (admin) -->
     <section v-if="view==='tahun'">
-      <h2 class="h2">Tahun Ajaran, Riwayat Kelas &amp; Alumni</h2>
+      <div class="page-head"><h2 class="h2">Tahun Ajaran, Riwayat Kelas &amp; Alumni</h2><p class="desk">{{DESK.tahun}}</p></div>
       <div class="grid lg:grid-cols-2 gap-4 mb-4">
         <div class="bg-white rounded-2xl shadow-sm p-5"><h3 class="font-bold mb-3">Tahun ajaran aktif</h3>
           <div class="grid grid-cols-2 gap-2"><select v-model="ta.tahun" class="inp"><option value="">-- Tahun ajaran --</option><option v-for="t in opsiTahun(ta.tahun)" :key="t" :value="t">{{t}}</option></select><select v-model="ta.semester" class="inp"><option>Ganjil</option><option>Genap</option></select></div>
@@ -1948,7 +2019,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
     <!-- Ganti sandi -->
     <section v-if="view==='sandi'" class="max-w-sm">
-      <h2 class="h2">Ganti Sandi</h2>
+      <div class="page-head"><h2 class="h2">Ganti Sandi</h2><p class="desk">{{DESK.sandi}}</p></div>
       <p v-if="user.wajib" role="alert" class="mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3">Demi keamanan, ganti sandi awal Anda terlebih dahulu sebelum memakai portal.</p>
       <input v-model="pw.nis" disabled class="inp w-full mb-3 bg-slate-100">
       <input v-model="pw.lama" type="password" placeholder="Sandi lama" class="inp w-full mb-3">
@@ -1979,7 +2050,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <kop :k="cfg.kop"></kop>
       <p class="text-center font-bold underline mt-2">{{rp.periode==='STS'?'LAPORAN KEMAJUAN HASIL BELAJAR':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}}</p>
       <p class="text-center text-sm mb-3">{{rp.periode==='STS'?'Sumatif Tengah Semester':'Sumatif Akhir Semester'}} {{rpMeta.sem}} &middot; Tahun Ajaran {{rpMeta.tahun}}</p>
-      <table class="text-sm mb-2 w-full calm-table-print rapor-identitas"><tbody>
+      <table class="text-sm mb-3 w-full calm-table-print"><tbody>
         <tr><td style="width:24%">Nama Peserta Didik</td><td style="width:34%">: <b>{{s.nama}}</b></td><td style="width:16%">Kelas</td><td>: {{rp.kelas}}</td></tr>
         <tr><td>NISN</td><td>: {{s.nisn||'-'}}</td><td>Fase</td><td>: {{rp.fase||'-'}}</td></tr>
         <tr><td>Kompetensi Keahlian</td><td>: {{rpInfo.kompetensi||'-'}}</td><td>Semester</td><td>: {{rpMeta.sem}}</td></tr></tbody></table>
@@ -2104,6 +2175,10 @@ const app = createApp({
     const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600', ORTU: 'from-navy-900 to-sky-600', BK: 'from-navy-900 to-violet-600' };
     const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Kelola administrasi persuratan, layanan, arsip, dan data sekolah.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.', ORTU: 'Pantau kehadiran, nilai, dan catatan bimbingan anak Anda.', BK: 'Catat pelanggaran dan pantau poin tata tertib siswa.' };
     const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal', 'perangkat'], STAF: ['suratmasuk', 'suratkeluar', 'disposisi', 'layanan', 'rekapadmin'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya', 'notif'], ORTU: ['anak', 'notif'], BK: ['konseling', 'pelanggaran'] };
+    const DESK = {'dashboard': 'Ringkasan hari ini dan pintasan ke menu yang sering dipakai.', 'monitor': 'Ringkasan kehadiran, nilai, jurnal, dan kinerja guru sepanjang bulan.', 'catatan': 'Tulis catatan, apresiasi, atau arahan untuk guru.', 'catatansaya': 'Catatan, apresiasi, dan arahan dari pimpinan untuk Anda.', 'izin': 'Pengajuan izin dan sakit siswa beserta status persetujuannya.', 'kelas': 'Atur daftar kelas dan wali kelas.', 'siswa': 'Lihat dan kelola data siswa per kelas.', 'guru': 'Data guru dan tenaga kependidikan beserta akunnya.', 'akun': 'Buat akun, reset sandi, dan bagikan sandi awal pengguna.', 'jadwal': 'Jadwal pelajaran per hari dan per blok A/B.', 'presensi': 'Catat kehadiran siswa dan lihat rekap harian maupun bulanan.', 'nilai': 'Input nilai sumatif dan asesmen formatif per kelas dan mata pelajaran.', 'leger': 'Rekap nilai semua mata pelajaran dalam satu kelas.', 'rapor': 'Wali kelas menyiapkan, memfinalkan, dan mencetak rapor semester serta kenaikan kelas.', 'jurnal': 'Catat materi dan kegiatan pada setiap pertemuan mengajar.', 'bimbingan': 'Catatan bimbingan wali kelas untuk siswa.', 'bimbingansaya': 'Catatan bimbingan dari wali kelas dan guru BK untuk Anda.', 'pengaturan': 'Blok jadwal, kop surat, penandatangan, bobot nilai, dan kunci nilai.', 'dokumen': 'Simpan dan buka tautan dokumen resmi sekolah.', 'log': 'Riwayat tindakan pengguna di portal untuk keperluan pemeriksaan.', 'pkl': 'Data penempatan, jurnal, dan nilai PKL/Prakerin siswa.', 'tahun': 'Atur tahun ajaran, simpan riwayat kelas, dan luluskan siswa.', 'sandi': 'Gunakan sandi yang sulit ditebak dan jangan bagikan kepada siapa pun.', 'anak': 'Kehadiran, nilai, dan catatan bimbingan anak Anda.', 'notif': 'Pemberitahuan terbaru dari sekolah.', 'pelanggaran': 'Catat pelanggaran dan pantau poin tata tertib siswa.', 'pengurangan': 'Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.', 'konseling': 'Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.', 'perangkat': 'Pantau kelengkapan perangkat ajar guru dan unggah berkas yang diperlukan.', 'riwayat': 'Riwayat kehadiran Anda pada setiap mata pelajaran.', 'nilaisaya': 'Nilai Anda per mata pelajaran dan tujuan pembelajaran.', 'suratmasuk': 'Catat dan telusuri surat masuk beserta statusnya.', 'suratkeluar': 'Catat dan telusuri surat keluar.', 'disposisi': 'Teruskan surat masuk dengan instruksi dan batas waktu.', 'arsip': 'Arsip dokumen sekolah menurut kode, kategori, dan lokasi simpan.', 'layanan': 'Layanan administrasi menurut pemohon, jenis, dan statusnya.', 'mutasi': 'Catat mutasi siswa masuk dan keluar.', 'cetaksurat': 'Susun dan cetak surat resmi dengan kop sekolah.', 'rekapadmin': 'Rekap bulanan kegiatan administrasi tata usaha.'};
+    const roleNama = { ADMIN: 'Administrator', GURU: 'Guru', STAF: 'Staf tata usaha', KEPSEK: 'Kepala sekolah', SISWA: 'Siswa', ORTU: 'Orang tua', BK: 'Guru BK' };
+    const salam = () => { const j = parseInt(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Jakarta' }), 10); return j < 4 ? 'Selamat malam' : j < 11 ? 'Selamat pagi' : j < 15 ? 'Selamat siang' : j < 18 ? 'Selamat sore' : 'Selamat malam'; };
+    const memuat = ref(false); let nGo = 0; // true selama perpindahan menu menarik data dari server
     const clock = ref(''), tick = () => { if (document.hidden) return; const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' }); document.querySelectorAll('.clk').forEach(e => { if (e.textContent !== t) e.textContent = t; }); };
     tick(); setInterval(tick, 1000); // ubah DOM langsung: tidak memicu render ulang seluruh aplikasi tiap detik
     const mnav = ref(false);
@@ -2245,7 +2320,7 @@ const app = createApp({
     });
     function logout() { CC.clear(); token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
     let dashAt = 0;
-    const go = k => run(async () => {
+    const goDasar = k => run(async () => {
       if (user.value.wajib) k = 'sandi';
       if (!MENU[user.value.role].includes(k)) k = 'dashboard'; // peran tidak boleh membuka menu di luar daftarnya
       view.value = k; dash.value = null; q.value = ''; toTop();
@@ -3253,6 +3328,7 @@ const app = createApp({
     });
 
     new MutationObserver(ms => { for (const m of ms) for (const nd of m.addedNodes) { if (nd.nodeType === 1 && nd.classList && nd.classList.contains('modal-wrap')) { const el = nd.querySelector('input:not([disabled]):not([type=checkbox]),select,textarea'); if (el) setTimeout(() => el.focus(), 30); } } }).observe(document.getElementById('app'), { childList: true, subtree: true });
+    const go = k => { nGo++; memuat.value = true; return goDasar(k).finally(() => { if (--nGo <= 0) { nGo = 0; memuat.value = false; } }); };
     if (user.value) go('dashboard');
     // Bantu halaman tertanam menyesuaikan tinggi melalui pesan antar-frame
     // Tinggi dihitung dari isi aplikasi (bukan tinggi jendela) agar tidak terpotong; modal tinggi ikut diperhitungkan
@@ -3274,7 +3350,7 @@ const app = createApp({
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai, nMode, frows, kt, saveFormatif, saveKktp, setSemuaF, jl, cekTahunR, opsiTahun,
       antreSaya, kirimAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
-      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu };
+      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu, DESK, roleNama, salam, memuat };
   }
 });
 app.component('kop', { props: ['k'], template: `<div class="flex items-center gap-3 border-b-4 border-double border-slate-800 pb-2 mb-3">
