@@ -531,11 +531,18 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 .overflow-x-auto,.overflow-auto{scrollbar-width:thin}
 
 /* ===== I. Dialog & pesan ===== */
-.modal-wrap{background:rgba(10,25,55,.5);padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom))}
-.modal-box{border:0;border-radius:1.1rem;box-shadow:0 20px 48px -16px rgba(15,23,42,.45);max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain;animation:modalIn .16s ease-out both}
-@keyframes modalIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.modal-box>h3:first-child{font-size:1.1rem;font-weight:700;letter-spacing:-.015em;color:var(--navy-d);padding-bottom:.8rem;margin-bottom:1.1rem;border-bottom:1px solid var(--line)}
-.modal-box .flex.justify-end.gap-2.mt-4{margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--line)}
+.modal-wrap{background:rgba(10,25,55,.5);padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom));-webkit-backdrop-filter:none;backdrop-filter:none;animation:fadeIn .15s ease-out both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{border:1px solid var(--line);border-radius:1rem;box-shadow:0 24px 56px -20px rgba(15,23,42,.5),0 2px 6px rgba(15,23,42,.06);max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;animation:modalIn .18s ease-out both}
+.modal-box.p-5,.modal-box.p-6{padding:1.5rem}
+@keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+/* Judul dialog: pita penuh, tetap terlihat saat isi digulir */
+.modal-box>h3:first-child{position:sticky;top:-1.5rem;z-index:2;margin:-1.5rem -1.5rem 1.25rem;padding:1.1rem 1.5rem;background:#fbfcfe;border-bottom:1px solid var(--line);border-radius:1rem 1rem 0 0;font-size:1.05rem;line-height:1.35;font-weight:700;letter-spacing:-.015em;color:var(--navy-d)}
+/* Tombol aksi: pita bawah, tetap terlihat pada formulir panjang */
+.modal-box .flex.justify-end.gap-2{position:sticky;bottom:-1.5rem;z-index:2;margin:1.5rem -1.5rem -1.5rem;padding:1rem 1.5rem;background:#fbfcfe;border-top:1px solid var(--line);border-radius:0 0 1rem 1rem}
+.modal-box .flex.justify-end.gap-2>.btn-p,.modal-box .flex.justify-end.gap-2>.btn-o{min-width:5.5rem}
+/* Pesan galat di dalam dialog */
+.modal-box p.text-rose-600{padding:.5rem .75rem;border:1px solid #fecdd3;border-radius:var(--rad-s);background:#fff1f2;color:#be123c;font-size:.82rem;line-height:1.45}
 #app main#utama>p[role="alert"],#app main#utama>p[role="status"]{border-radius:var(--rad-s);font-weight:500;box-shadow:0 8px 20px -10px rgba(15,35,65,.35)}
 
 /* ===== J. Halaman masuk ===== */
@@ -565,9 +572,11 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
   .tab{flex:0 0 auto}
   .modal-box{border-radius:1.1rem 1.1rem 0 0;margin:auto 0 0}
   .modal-wrap{align-items:flex-end;padding-bottom:0}
+  .modal-box .flex.justify-end.gap-2{padding-bottom:max(1rem,env(safe-area-inset-bottom))}
+  .modal-box .flex.justify-end.gap-2>button{flex:1}
 }
 }
-@media(prefers-reduced-motion:reduce){.modal-box{animation:none!important}.spin,.spin-s{animation:sp 1.6s linear infinite!important}.sk{animation:none}.loadbar i{animation-duration:2.4s}.load-chip{animation-duration:.01s}}
+@media(prefers-reduced-motion:reduce){.modal-box,.modal-wrap{animation:none!important}.spin,.spin-s{animation:sp 1.6s linear infinite!important}.sk{animation:none}.loadbar i{animation-duration:2.4s}.load-chip{animation-duration:.01s}}
 @media print{.desk,.desk-note,.panel-desc,.load-wrap,.loadbar{display:none!important}}
 </style>
 
