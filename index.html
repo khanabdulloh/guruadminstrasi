@@ -563,6 +563,44 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 .cfm-primary:hover{background:var(--navy)}
 @media(max-width:767px){.cfm-wrap{align-items:flex-end;padding:0}.modal-box.cfm{max-width:none;margin:0;border-radius:1.25rem 1.25rem 0 0;padding-bottom:max(1.25rem,env(safe-area-inset-bottom))}.cfm-actions{flex-direction:column-reverse;align-items:stretch}.cfm-actions button{width:100%}}
 
+
+/* ===== Input nilai ===== */
+.nl-card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:1.1rem 1.25rem;margin-bottom:1rem}
+.nl-head{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem;margin-bottom:1rem}
+.nl-hint{margin:0;font-size:.78rem;line-height:1.45;color:var(--mut)}
+.nl-form{display:grid;grid-template-columns:1fr;gap:.9rem}
+@media(min-width:768px){.nl-form{grid-template-columns:1fr 1fr}.nl-form-3{grid-template-columns:1fr 1.2fr 1fr}}
+.nl-n{display:inline-grid;place-items:center;width:1.15rem;height:1.15rem;margin-right:.4rem;border-radius:50%;background:var(--navy-soft);color:var(--navy);font-size:.68rem;font-weight:700}
+.seg{display:inline-flex;gap:.125rem;padding:.2rem;border-radius:.7rem;background:#e9eef5}
+.seg button{padding:.4rem .9rem;border-radius:.5rem;font-size:.82rem;font-weight:600;color:#52627a;transition:background-color .12s,color .12s}
+.seg button:hover{color:var(--navy)}
+.seg .seg-on{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(15,35,65,.1)}
+.seg-s{padding:.15rem}.seg-s button{padding:.3rem .85rem;min-width:4.5rem}
+.seg-s .seg-ok{background:#059669;color:#fff;box-shadow:none}.seg-s .seg-no{background:#e11d48;color:#fff;box-shadow:none}
+.nl-lock{margin:0 0 1rem;padding:.6rem .85rem;border:1px solid #fde68a;border-left:3px solid #f59e0b;border-radius:var(--rad-s);background:#fffbeb;font-size:.82rem;color:#92400e}
+.nl-empty{margin:0;padding:2rem 1rem;border:1px dashed var(--line-2);border-radius:var(--rad);text-align:center;font-size:.88rem;color:var(--mut)}
+.nl-kktp{margin-bottom:1rem;border:1px solid var(--line);border-radius:var(--rad);background:var(--card);padding:.2rem 1.25rem}
+.nl-kktp summary{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.7rem 0;cursor:pointer;list-style:none;font-size:.85rem;font-weight:600;color:var(--navy-d)}
+.nl-kktp summary::-webkit-details-marker{display:none}
+.nl-kktp summary b{padding:.1rem .6rem;border-radius:999px;background:var(--navy-soft);color:var(--navy)}
+.nl-kktp-body{display:grid;grid-template-columns:1fr;gap:.75rem;align-items:end;padding-bottom:.6rem}
+@media(min-width:768px){.nl-kktp-body{grid-template-columns:12rem 1fr auto}}
+.nl-kktp .nl-hint{padding-bottom:.9rem}
+.nl-stat{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem .9rem;margin-bottom:.6rem}
+.nl-chip{display:inline-flex;gap:.3rem;padding:.25rem .75rem;border-radius:999px;background:var(--navy-soft);color:var(--navy);font-size:.78rem;font-weight:500}
+.nl-low{color:#be123c;font-weight:600}
+.nl-tools{display:flex;gap:.25rem}
+.nl-link{padding:.25rem .6rem;border-radius:.5rem;font-size:.78rem;font-weight:600;color:var(--navy)}
+.nl-link:hover{background:var(--navy-soft)}
+.nl-table{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);overflow-x:auto}
+.nl-table th{padding:.6rem .85rem;text-align:left;font-size:.75rem;font-weight:600;color:var(--mut);background:#f7f9fc;border-bottom:1px solid var(--line)}
+.nl-table td{padding:.4rem .85rem;border-top:1px solid #edf1f6}
+.nl-table tbody tr:first-child td{border-top:0}
+.nl-skor{width:6rem;padding:.4rem .6rem;border:1px solid var(--line-2);border-radius:.55rem;background:#fff;font-size:.95rem;font-weight:600;text-align:center;font-variant-numeric:tabular-nums}
+.nl-skor:focus{outline:0;border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,61,145,.14)}
+.nl-skor-low{color:#be123c;border-color:#fda4af;background:#fff1f2}
+.nl-bar{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-top:.75rem;padding:.7rem 1rem;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:var(--rad);box-shadow:0 -8px 20px -14px rgba(10,34,80,.35)}
+
 /* ===== J. Halaman masuk ===== */
 .login-wrap .login-bg h1{font-size:3rem;font-weight:700;letter-spacing:-.035em}
 .login-wrap .login-bg .grid>div{background:none;border:0;border-top:1px solid rgba(255,255,255,.2);border-radius:0;padding:.75rem 0 0}
@@ -1328,37 +1366,57 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
     </section>
 
     <!-- Nilai (admin & guru) -->
-    <section v-if="view==='nilai'">
+    <section v-if="view==='nilai'" class="nl">
       <div class="page-head"><h2 class="h2">Input Nilai</h2><p class="desk">{{DESK.nilai}}</p></div>
-      <p v-if="!pil.length" class="text-sm text-slate-500">Belum ada jadwal untuk dinilai. Admin perlu mengisi menu Jadwal dulu.</p>
+      <p v-if="!pil.length" class="desk-note">Belum ada jadwal untuk dinilai. Minta admin mengisi menu Jadwal terlebih dahulu.</p>
       <template v-else>
-        <div class="flex flex-wrap gap-2 mb-2"><button @click="nMode='sumatif';loadNilai()" :class="nMode==='sumatif'?'btn-p':'btn-o'">Nilai Sumatif</button><button @click="nMode='formatif';loadNilai()" :class="nMode==='formatif'?'btn-p':'btn-o'">Asesmen Formatif (ketercapaian TP)</button></div>
-        <p class="text-xs text-slate-500 mb-3"><template v-if="nMode==='sumatif'">Nilai sumatif (angka 0-100) masuk perhitungan nilai rapor sesuai bobot. Satu TP dapat dinilai dengan beberapa bentuk sumatif lingkup materi (SLM) serta STS/SAS.</template><template v-else>Asesmen formatif tidak berupa angka rapor: catat apakah siswa <b>sudah/belum mencapai KKTP</b> pada TP ini. Status dipakai sebagai dasar menentukan kesiapan sumatif, remedial, dan deskripsi rapor bila TP belum punya nilai sumatif.</template></p>
-        <div class="flex flex-wrap gap-3 mb-4">
-          <select v-model="pilIdx" @change="loadNilai" class="inp"><option value="">Kelas - Mapel</option><option v-for="(p,i) in pil" :value="i">{{p.kelas}} - {{p.mapel}}</option></select>
-          <input v-model.trim="nm.tp" @change="loadNilai" placeholder="Tujuan pembelajaran" class="inp flex-1 min-w-[200px]">
-          <select v-if="nMode==='sumatif'" v-model="nm.jenis" @change="loadNilai" class="inp"><option v-for="j in JENIS" :key="j" :value="j">{{jl(j)}}</option></select>
+        <div class="nl-card">
+          <div class="nl-head">
+            <div role="tablist" class="seg" aria-label="Jenis penilaian">
+              <button type="button" role="tab" :aria-selected="nMode==='sumatif'" :class="nMode==='sumatif'?'seg-on':''" @click="nMode='sumatif';loadNilai()">Nilai sumatif</button>
+              <button type="button" role="tab" :aria-selected="nMode==='formatif'" :class="nMode==='formatif'?'seg-on':''" @click="nMode='formatif';loadNilai()">Ketercapaian TP</button>
+            </div>
+            <p class="nl-hint"><template v-if="nMode==='sumatif'">Angka 0&ndash;100 yang dihitung ke nilai rapor.</template><template v-else>Catat siswa yang sudah atau belum mencapai tujuan. Tidak masuk nilai rapor.</template></p>
+          </div>
+          <div class="nl-form" :class="nMode==='sumatif'?'nl-form-3':''">
+            <label class="lb"><span class="nl-n">1</span>Kelas &amp; mapel
+              <select v-model="pilIdx" @change="loadNilai" class="inp w-full mt-1 normal-case"><option value="">Pilih kelas dan mapel</option><option v-for="(p,i) in pil" :value="i">{{p.kelas}} &middot; {{p.mapel}}</option></select></label>
+            <label class="lb"><span class="nl-n">2</span>Tujuan pembelajaran (TP)
+              <input v-model.trim="nm.tp" @change="loadNilai" placeholder="Ketik TP, lalu tekan Enter" class="inp w-full mt-1 normal-case"></label>
+            <label v-if="nMode==='sumatif'" class="lb"><span class="nl-n">3</span>Bentuk penilaian
+              <select v-model="nm.jenis" @change="loadNilai" class="inp w-full mt-1 normal-case"><option v-for="j in JENIS" :key="j" :value="j">{{jl(j)}}</option></select></label>
+          </div>
         </div>
-      </template>
-      <p v-if="pairKunci" role="alert" class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">Nilai kelas ini <b>dikunci</b> oleh admin{{user.role==='ADMIN'?' (sebagai admin Anda tetap bisa mengubah; tercatat di log)':'. Hubungi admin bila perlu perubahan'}}.</p>
-      <p v-if="pil.length&&!nrows.length&&!frows.length" class="text-xs text-slate-500 mb-3">Pilih kelas - mapel, isi tujuan pembelajaran, lalu tekan Tab/Enter agar daftar siswa muncul.<template v-if="nMode==='sumatif'"> Setelah itu, Enter pada kolom skor berpindah ke siswa berikutnya.</template></p>
-      <div v-if="kt.loaded" class="bg-white rounded-2xl shadow-sm p-4 mb-4"><h3 class="font-bold text-sm mb-2">KKTP untuk TP ini</h3>
-        <div class="grid sm:grid-cols-4 gap-3 items-end">
-          <label class="lb">Batas ketercapaian (0-100)<input type="number" min="0" max="100" v-model="kt.kktp" :placeholder="'bawaan mapel: '+kt.def" class="inp w-full mt-1"></label>
-          <label class="lb sm:col-span-2">Kriteria ketercapaian (opsional)<input v-model.trim="kt.kriteria" maxlength="300" placeholder="mis. mampu menyusun laporan dengan sistematika lengkap dan bahasa baku" class="inp w-full mt-1 normal-case"></label>
-          <button @click="saveKktp" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="btn-o">Simpan KKTP</button></div>
-        <p class="text-xs text-slate-500 mt-2">Kosongkan angka untuk memakai KKTP mapel ({{kt.def}}). KKTP TP dipakai pada deskripsi capaian rapor dan analisis TP; berlaku untuk semua kelas yang memakai TP yang sama pada mapel ini.</p></div>
-      <div v-if="nMode==='sumatif'&&nrows.length" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th class="p-3">NISN</th><th>Nama</th><th>Skor (0-100)</th></tr></thead>
-        <tbody><tr v-for="r in nrows" :key="r.nis" class="border-t"><td class="p-3">{{labelNisn(r.nis, r.nisn)}}</td><td>{{r.nama}}</td><td><input type="number" inputmode="decimal" min="0" max="100" v-model="r.skor" @keydown.enter.prevent="nextSkor($event)" data-skor class="w-24 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
-      <button v-if="nMode==='sumatif'&&nrows.length" @click="saveNilai" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="mt-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan nilai</button>
-      <template v-if="nMode==='formatif'&&frows.length">
-        <div class="flex flex-wrap gap-2 mb-2"><button @click="setSemuaF('Sudah')" class="btn-o !min-h-[2rem] text-xs">Tandai semua sudah mencapai</button><button @click="setSemuaF('')" class="btn-o !min-h-[2rem] text-xs">Kosongkan semua</button>
-          <span class="text-xs text-slate-500 self-center">{{frows.filter(r=>r.status==='Sudah').length}} sudah &middot; {{frows.filter(r=>r.status==='Belum').length}} belum &middot; {{frows.filter(r=>!r.status).length}} belum dicatat</span></div>
-        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-          <thead class="bg-slate-50 text-left"><tr><th class="p-3">NISN</th><th>Nama</th><th>Ketercapaian TP</th></tr></thead>
-          <tbody><tr v-for="r in frows" :key="r.nis" class="border-t"><td class="p-3">{{labelNisn(r.nis, r.nisn)}}</td><td>{{r.nama}}</td><td><select v-model="r.status" class="inp normal-case" :class="r.status==='Belum'?'text-rose-600':r.status==='Sudah'?'text-emerald-700':''"><option value="">Belum dicatat</option><option value="Sudah">Sudah mencapai KKTP</option><option value="Belum">Belum mencapai KKTP</option></select></td></tr></tbody></table></div>
-        <button @click="saveFormatif" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="mt-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan ketercapaian</button>
+        <p v-if="pairKunci" role="alert" class="nl-lock">Nilai kelas ini <b>dikunci</b> admin.<template v-if="user.role==='ADMIN'"> Sebagai admin Anda tetap bisa mengubah (tercatat di log).</template><template v-else> Hubungi admin bila perlu perubahan.</template></p>
+        <p v-if="!nrows.length&&!frows.length" class="nl-empty">Pilih kelas &amp; mapel dan isi TP, lalu tekan <b>Enter</b>. Daftar siswa akan muncul di sini.</p>
+        <details v-if="kt.loaded" class="nl-kktp">
+          <summary><span>Batas ketercapaian (KKTP)</span><b>{{kt.kktp===''||kt.kktp==null?kt.def:kt.kktp}}</b></summary>
+          <div class="nl-kktp-body">
+            <label class="lb">Batas nilai (0&ndash;100)<input type="number" min="0" max="100" v-model="kt.kktp" :placeholder="'Bawaan mapel: '+kt.def" class="inp w-full mt-1"></label>
+            <label class="lb">Kriteria (opsional)<input v-model.trim="kt.kriteria" maxlength="300" placeholder="mis. mampu menyusun laporan dengan sistematika lengkap" class="inp w-full mt-1 normal-case"></label>
+            <button @click="saveKktp" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="btn-o">Simpan KKTP</button>
+          </div>
+          <p class="nl-hint">Kosongkan angka untuk memakai KKTP mapel ({{kt.def}}). Berlaku untuk semua kelas pada TP dan mapel yang sama.</p>
+        </details>
+
+        <template v-if="nMode==='sumatif'&&nrows.length">
+          <div class="nl-stat"><span class="nl-chip"><b>{{nrows.filter(r=>r.skor!==''&&r.skor!=null).length}}</b> dari {{nrows.length}} terisi</span><span class="nl-hint">Enter = siswa berikutnya &middot; <span class="nl-low">merah</span> = di bawah KKTP</span></div>
+          <div class="nl-table"><table class="w-full text-sm">
+            <thead><tr><th class="w-10">No</th><th>Nama</th><th class="hidden sm:table-cell">NISN</th><th class="w-32">Skor</th></tr></thead>
+            <tbody><tr v-for="(r,i) in nrows" :key="r.nis"><td class="text-slate-400">{{i+1}}</td><td class="font-medium">{{r.nama}}</td><td class="hidden sm:table-cell text-slate-500">{{labelNisn(r.nis, r.nisn)}}</td>
+              <td><input type="number" inputmode="decimal" min="0" max="100" placeholder="0&ndash;100" v-model="r.skor" @keydown.enter.prevent="nextSkor($event)" @focus="$event.target.select()" data-skor class="nl-skor" :class="r.skor!==''&&r.skor!=null&&Number(r.skor)<(kt.kktp===''||kt.kktp==null?kt.def:Number(kt.kktp))?'nl-skor-low':''" :aria-label="'Skor '+r.nama"></td></tr></tbody></table></div>
+          <div class="nl-bar noprint"><span class="nl-hint">{{nrows.filter(r=>r.skor===''||r.skor==null).length}} siswa belum diisi</span><button @click="saveNilai" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="btn-p">Simpan nilai</button></div>
+        </template>
+
+        <template v-if="nMode==='formatif'&&frows.length">
+          <div class="nl-stat"><span class="nl-chip"><b>{{frows.filter(r=>r.status==='Sudah').length}}</b> sudah &middot; <b>{{frows.filter(r=>r.status==='Belum').length}}</b> belum &middot; {{frows.filter(r=>!r.status).length}} belum dicatat</span>
+            <span class="nl-tools"><button @click="setSemuaF('Sudah')" class="nl-link">Semua sudah</button><button @click="setSemuaF('')" class="nl-link">Kosongkan</button></span></div>
+          <div class="nl-table"><table class="w-full text-sm">
+            <thead><tr><th class="w-10">No</th><th>Nama</th><th class="hidden sm:table-cell">NISN</th><th class="w-64">Mencapai KKTP?</th></tr></thead>
+            <tbody><tr v-for="(r,i) in frows" :key="r.nis"><td class="text-slate-400">{{i+1}}</td><td class="font-medium">{{r.nama}}</td><td class="hidden sm:table-cell text-slate-500">{{labelNisn(r.nis, r.nisn)}}</td>
+              <td><div class="seg seg-s" role="group" :aria-label="'Ketercapaian '+r.nama"><button type="button" :aria-pressed="r.status==='Sudah'" :class="r.status==='Sudah'?'seg-ok':''" @click="r.status=r.status==='Sudah'?'':'Sudah'">Sudah</button><button type="button" :aria-pressed="r.status==='Belum'" :class="r.status==='Belum'?'seg-no':''" @click="r.status=r.status==='Belum'?'':'Belum'">Belum</button></div></td></tr></tbody></table></div>
+          <div class="nl-bar noprint"><span class="nl-hint">Klik lagi untuk mengosongkan pilihan.</span><button @click="saveFormatif" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="btn-p">Simpan ketercapaian</button></div>
+        </template>
       </template>
     </section>
 
@@ -2205,7 +2263,7 @@ const app = createApp({
     const heroCls = { KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600', ORTU: 'from-navy-900 to-sky-600', BK: 'from-navy-900 to-violet-600' };
     const sub = { KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Kelola administrasi persuratan, layanan, arsip, dan data sekolah.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.', ORTU: 'Pantau kehadiran, nilai, dan catatan bimbingan anak Anda.', BK: 'Catat pelanggaran dan pantau poin tata tertib siswa.' };
     const quick = { KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal', 'perangkat'], STAF: ['suratmasuk', 'suratkeluar', 'disposisi', 'layanan', 'rekapadmin'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya', 'notif'], ORTU: ['anak', 'notif'], BK: ['konseling', 'pelanggaran'] };
-    const DESK = {'dashboard': 'Ringkasan hari ini dan pintasan ke menu yang sering dipakai.', 'monitor': 'Ringkasan kehadiran, nilai, jurnal, dan kinerja guru sepanjang bulan.', 'catatan': 'Tulis catatan, apresiasi, atau arahan untuk guru.', 'catatansaya': 'Catatan, apresiasi, dan arahan dari pimpinan untuk Anda.', 'izin': 'Pengajuan izin dan sakit siswa beserta status persetujuannya.', 'kelas': 'Atur daftar kelas dan wali kelas.', 'siswa': 'Lihat dan kelola data siswa per kelas.', 'guru': 'Data guru dan tenaga kependidikan beserta akunnya.', 'akun': 'Buat akun, reset sandi, dan bagikan sandi awal pengguna.', 'jadwal': 'Jadwal pelajaran per hari dan per blok A/B.', 'presensi': 'Catat kehadiran siswa dan lihat rekap harian maupun bulanan.', 'nilai': 'Input nilai sumatif dan asesmen formatif per kelas dan mata pelajaran.', 'leger': 'Rekap nilai semua mata pelajaran dalam satu kelas.', 'rapor': 'Wali kelas menyiapkan, memfinalkan, dan mencetak rapor semester serta kenaikan kelas.', 'jurnal': 'Catat materi dan kegiatan pada setiap pertemuan mengajar.', 'bimbingan': 'Catatan bimbingan wali kelas untuk siswa.', 'bimbingansaya': 'Catatan bimbingan dari wali kelas dan guru BK untuk Anda.', 'pengaturan': 'Blok jadwal, kop surat, penandatangan, bobot nilai, dan kunci nilai.', 'dokumen': 'Simpan dan buka tautan dokumen resmi sekolah.', 'log': 'Riwayat tindakan pengguna di portal untuk keperluan pemeriksaan.', 'pkl': 'Data penempatan, jurnal, dan nilai PKL/Prakerin siswa.', 'tahun': 'Atur tahun ajaran, simpan riwayat kelas, dan luluskan siswa.', 'sandi': 'Gunakan sandi yang sulit ditebak dan jangan bagikan kepada siapa pun.', 'anak': 'Kehadiran, nilai, dan catatan bimbingan anak Anda.', 'notif': 'Pemberitahuan terbaru dari sekolah.', 'pelanggaran': 'Catat pelanggaran dan pantau poin tata tertib siswa.', 'pengurangan': 'Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.', 'konseling': 'Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.', 'perangkat': 'Pantau kelengkapan perangkat ajar guru dan unggah berkas yang diperlukan.', 'riwayat': 'Riwayat kehadiran Anda pada setiap mata pelajaran.', 'nilaisaya': 'Nilai Anda per mata pelajaran dan tujuan pembelajaran.', 'suratmasuk': 'Catat dan telusuri surat masuk beserta statusnya.', 'suratkeluar': 'Catat dan telusuri surat keluar.', 'disposisi': 'Teruskan surat masuk dengan instruksi dan batas waktu.', 'arsip': 'Arsip dokumen sekolah menurut kode, kategori, dan lokasi simpan.', 'layanan': 'Layanan administrasi menurut pemohon, jenis, dan statusnya.', 'mutasi': 'Catat mutasi siswa masuk dan keluar.', 'cetaksurat': 'Susun dan cetak surat resmi dengan kop sekolah.', 'rekapadmin': 'Rekap bulanan kegiatan administrasi tata usaha.'};
+    const DESK = {'dashboard': 'Ringkasan hari ini dan pintasan ke menu yang sering dipakai.', 'monitor': 'Ringkasan kehadiran, nilai, jurnal, dan kinerja guru sepanjang bulan.', 'catatan': 'Tulis catatan, apresiasi, atau arahan untuk guru.', 'catatansaya': 'Catatan, apresiasi, dan arahan dari pimpinan untuk Anda.', 'izin': 'Pengajuan izin dan sakit siswa beserta status persetujuannya.', 'kelas': 'Atur daftar kelas dan wali kelas.', 'siswa': 'Lihat dan kelola data siswa per kelas.', 'guru': 'Data guru dan tenaga kependidikan beserta akunnya.', 'akun': 'Buat akun, reset sandi, dan bagikan sandi awal pengguna.', 'jadwal': 'Jadwal pelajaran per hari dan per blok A/B.', 'presensi': 'Catat kehadiran siswa dan lihat rekap harian maupun bulanan.', 'nilai': 'Isi nilai sumatif atau catat ketercapaian tujuan pembelajaran (TP) siswa.', 'leger': 'Rekap nilai semua mata pelajaran dalam satu kelas.', 'rapor': 'Wali kelas menyiapkan, memfinalkan, dan mencetak rapor semester serta kenaikan kelas.', 'jurnal': 'Catat materi dan kegiatan pada setiap pertemuan mengajar.', 'bimbingan': 'Catatan bimbingan wali kelas untuk siswa.', 'bimbingansaya': 'Catatan bimbingan dari wali kelas dan guru BK untuk Anda.', 'pengaturan': 'Blok jadwal, kop surat, penandatangan, bobot nilai, dan kunci nilai.', 'dokumen': 'Simpan dan buka tautan dokumen resmi sekolah.', 'log': 'Riwayat tindakan pengguna di portal untuk keperluan pemeriksaan.', 'pkl': 'Data penempatan, jurnal, dan nilai PKL/Prakerin siswa.', 'tahun': 'Atur tahun ajaran, simpan riwayat kelas, dan luluskan siswa.', 'sandi': 'Gunakan sandi yang sulit ditebak dan jangan bagikan kepada siapa pun.', 'anak': 'Kehadiran, nilai, dan catatan bimbingan anak Anda.', 'notif': 'Pemberitahuan terbaru dari sekolah.', 'pelanggaran': 'Catat pelanggaran dan pantau poin tata tertib siswa.', 'pengurangan': 'Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.', 'konseling': 'Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.', 'perangkat': 'Pantau kelengkapan perangkat ajar guru dan unggah berkas yang diperlukan.', 'riwayat': 'Riwayat kehadiran Anda pada setiap mata pelajaran.', 'nilaisaya': 'Nilai Anda per mata pelajaran dan tujuan pembelajaran.', 'suratmasuk': 'Catat dan telusuri surat masuk beserta statusnya.', 'suratkeluar': 'Catat dan telusuri surat keluar.', 'disposisi': 'Teruskan surat masuk dengan instruksi dan batas waktu.', 'arsip': 'Arsip dokumen sekolah menurut kode, kategori, dan lokasi simpan.', 'layanan': 'Layanan administrasi menurut pemohon, jenis, dan statusnya.', 'mutasi': 'Catat mutasi siswa masuk dan keluar.', 'cetaksurat': 'Susun dan cetak surat resmi dengan kop sekolah.', 'rekapadmin': 'Rekap bulanan kegiatan administrasi tata usaha.'};
     const roleNama = { ADMIN: 'Administrator', GURU: 'Guru', STAF: 'Staf tata usaha', KEPSEK: 'Kepala sekolah', SISWA: 'Siswa', ORTU: 'Orang tua', BK: 'Guru BK' };
     const salam = () => { const j = parseInt(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Jakarta' }), 10); return j < 4 ? 'Selamat malam' : j < 11 ? 'Selamat pagi' : j < 15 ? 'Selamat siang' : j < 18 ? 'Selamat sore' : 'Selamat malam'; };
     const memuat = ref(false); let nGo = 0; // true selama perpindahan menu menarik data dari server
