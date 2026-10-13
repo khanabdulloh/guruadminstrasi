@@ -100,12 +100,12 @@
   body.cetak-pelanggaran tbody tr:nth-child(even){background:#f8fafc!important}
   body.cetak-pelanggaran .pel-print-notes{margin-top:8pt!important;padding-top:5pt;border-top:1px solid #b9c4d2;font-size:7.5pt;color:#39465a}
   body.cetak-pelanggaran .pel-print-notes p{margin:0 0 3pt!important}
-  body.cetak-pelanggaran .pel-print-signature{width:210pt;margin:14pt 36pt 0 auto;text-align:center;font-size:9pt;line-height:1.4;break-inside:avoid;page-break-inside:avoid}
-  body.cetak-pelanggaran .pel-print-signature-date{text-align:right;white-space:nowrap;margin-bottom:2pt}
-  body.cetak-pelanggaran .pel-print-signature-role{text-align:center;margin-top:2pt}
-  body.cetak-pelanggaran .pel-print-signature-role{margin-top:2pt}
-  body.cetak-pelanggaran .pel-print-signature-space{height:44pt}
-  body.cetak-pelanggaran .pel-print-signature-name{display:inline-block;min-width:145pt;padding-top:2pt;border-top:0!important;font-weight:800;text-decoration:none!important}
+  /* Blok tanda tangan Guru BK: satu garis tengah, rapat, dan stabil saat cetak. */
+  body.cetak-pelanggaran .pel-print-signature{box-sizing:border-box;width:230pt;max-width:100%;margin:12pt 24pt 0 auto;text-align:center;font-size:9pt;line-height:1.35;break-inside:avoid;page-break-inside:avoid}
+  body.cetak-pelanggaran .pel-print-signature-date{text-align:center;white-space:normal;margin:0 0 3pt}
+  body.cetak-pelanggaran .pel-print-signature-role{text-align:center;margin:0}
+  body.cetak-pelanggaran .pel-print-signature-space{height:30pt}
+  body.cetak-pelanggaran .pel-print-signature-name{display:block;width:max-content;max-width:100%;box-sizing:border-box;margin:0 auto;padding-top:3pt;border-top:1px dotted #334155!important;font-weight:700;text-decoration:none!important}
   body.cetak-pelanggaran button{display:none!important}
 }
 button:disabled{cursor:not-allowed}
