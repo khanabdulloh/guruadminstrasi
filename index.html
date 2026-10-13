@@ -751,6 +751,89 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button,input,select,textarea,.quick-tile{transition:none}}
 </style>
 
+
+<style id="calm-rapor-print-pro-v72">
+/* SMK CALM — penyempurnaan khusus lembar rapor. Tidak mengubah data maupun logika penilaian. */
+@page rapor { size: A4 portrait; margin: 10mm 11mm 11mm; }
+@media screen {
+  .rapor-wrap { display:none; }
+}
+@media print {
+  body.cetak-rapor { background:#fff!important; color:#111827!important; font-family:Arial,Helvetica,sans-serif!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body.cetak-rapor main { width:100%!important; max-width:none!important; margin:0!important; padding:0!important; }
+  body.cetak-rapor main>*:not(.rapor-wrap) { display:none!important; }
+  body.cetak-rapor .rapor-wrap { display:block!important; width:100%!important; margin:0!important; padding:0!important; page:rapor; }
+  body.cetak-rapor .rapor-page { position:relative; box-sizing:border-box; width:100%!important; margin:0!important; padding:0!important; color:#111827!important; background:#fff!important; font-size:8.6pt!important; line-height:1.28!important; break-after:page; page-break-after:always; overflow:visible!important; }
+  body.cetak-rapor .rapor-page:last-child { break-after:auto!important; page-break-after:auto!important; }
+  body.cetak-rapor .rapor-page * { box-sizing:border-box; }
+  body.cetak-rapor .rapor-page .rapor-wm { top:34%; font-size:88pt; color:rgba(15,23,42,.055)!important; z-index:0; }
+  body.cetak-rapor .rapor-page>p:first-of-type { margin:0 0 4pt!important; }
+  body.cetak-rapor .rapor-page p { margin-top:3pt!important; margin-bottom:4pt!important; overflow-wrap:anywhere; }
+  /* Kop: logo seimbang, teks tengah, garis institusi rapi. */
+  body.cetak-rapor .rapor-page kop,
+  body.cetak-rapor .rapor-page .flex.items-center.gap-3.border-b-4 { display:flex!important; align-items:center!important; gap:9pt!important; width:100%!important; margin:0 0 7pt!important; padding:0 0 6pt!important; border-bottom:2.25pt double #1e3a5f!important; }
+  body.cetak-rapor .rapor-page .flex.items-center.gap-3.border-b-4>div:first-child,
+  body.cetak-rapor .rapor-page .flex.items-center.gap-3.border-b-4>div:last-child { flex:0 0 42pt!important; width:42pt!important; min-width:42pt!important; max-width:42pt!important; }
+  body.cetak-rapor .rapor-page .flex.items-center.gap-3.border-b-4 img { width:38pt!important; height:38pt!important; max-width:38pt!important; max-height:38pt!important; object-fit:contain!important; }
+  body.cetak-rapor .rapor-page .flex.items-center.gap-3.border-b-4>div:nth-child(2) { flex:1 1 auto!important; min-width:0!important; text-align:center!important; }
+  body.cetak-rapor .rapor-page .flex.items-center.gap-3.border-b-4>div:nth-child(2)>div { line-height:1.12!important; }
+  body.cetak-rapor .rapor-page .underline { text-decoration-thickness:.7pt!important; text-underline-offset:2pt; }
+  body.cetak-rapor .rapor-page .rapor-id { table-layout:fixed!important; margin:5pt 0 7pt!important; }
+  body.cetak-rapor .rapor-page .rapor-id td { border:0!important; padding:2.5pt 3pt!important; vertical-align:top!important; font-size:8.5pt!important; line-height:1.25!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(1) { width:21%!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(2) { width:2%!important; text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(3) { width:32%!important; padding-left:3pt!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(4) { width:17%!important; padding-left:8pt!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(5) { width:2%!important; text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-id td:nth-child(6) { width:26%!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print { width:100%!important; max-width:100%!important; margin:0 0 6pt!important; border-collapse:collapse!important; table-layout:fixed!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print th,
+  body.cetak-rapor .rapor-page table.calm-table-print td { border:.55pt solid #64748b!important; padding:3pt 3.5pt!important; vertical-align:middle!important; overflow-wrap:anywhere!important; word-break:normal!important; hyphens:auto; }
+  body.cetak-rapor .rapor-page table.calm-table-print th { background:#e9eef5!important; color:#172b4d!important; font-size:7.6pt!important; line-height:1.15!important; font-weight:700!important; text-align:center!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print td { font-size:8pt!important; line-height:1.22!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sts th:nth-child(1) { width:4%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sts th:nth-child(2) { width:25%!important; text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sts th:nth-child(3) { width:7%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sts th:nth-child(4) { width:15%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sts th:nth-child(5) { width:14%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sts th:nth-child(6) { width:13%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sts th:nth-child(7) { width:22%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sas th:nth-child(1) { width:4%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sas th:nth-child(2) { width:28%!important; text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sas th:nth-child(3) { width:8%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sas th:nth-child(4) { width:10%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sas th:nth-child(5) { width:8%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel-sas th:nth-child(6) { width:42%!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel tbody tr.font-bold td { background:#f0f3f8!important; color:#1e293b!important; font-weight:700!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(2) { text-align:left!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(4),
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(5),
+  body.cetak-rapor .rapor-page .rapor-mapel td:nth-child(6) { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-mapel td:last-child { text-align:justify!important; }
+  body.cetak-rapor .rapor-page .rapor-pkl th:nth-child(1) { width:45%!important; }
+  body.cetak-rapor .rapor-page .rapor-pkl th:nth-child(2) { width:40%!important; }
+  body.cetak-rapor .rapor-page .rapor-pkl th:nth-child(3) { width:15%!important; }
+  body.cetak-rapor .rapor-page .rapor-ekskul th:nth-child(1) { width:7%!important; }
+  body.cetak-rapor .rapor-page .rapor-ekskul th:nth-child(2) { width:38%!important; }
+  body.cetak-rapor .rapor-page .rapor-ekskul th:nth-child(3) { width:55%!important; }
+  body.cetak-rapor .rapor-page .rapor-kokurikuler th:nth-child(1) { width:24%!important; }
+  body.cetak-rapor .rapor-page .rapor-kokurikuler th:nth-child(2) { width:76%!important; }
+  body.cetak-rapor .rapor-page .rapor-hadir th { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-hadir td { text-align:center!important; }
+  body.cetak-rapor .rapor-page .rapor-catatan { border:.65pt solid #64748b!important; background:#fafbfd!important; padding:6pt 7pt!important; min-height:34pt!important; }
+  body.cetak-rapor .rapor-page .rapor-ttd { margin-top:8pt!important; font-size:8.3pt!important; break-inside:avoid!important; page-break-inside:avoid!important; }
+  body.cetak-rapor .rapor-page .rapor-ttd .flex.justify-between { display:flex!important; justify-content:space-between!important; gap:12pt!important; }
+  body.cetak-rapor .rapor-page .rapor-ttd .w-56 { width:44%!important; }
+  body.cetak-rapor .rapor-page .rapor-ttd .h-16 { height:38pt!important; }
+  body.cetak-rapor .rapor-page .rapor-ttd .mt-3 { margin-top:5pt!important; }
+  body.cetak-rapor .rapor-page .border-2 { border:1pt solid #334155!important; }
+  body.cetak-rapor .rapor-page tr { break-inside:avoid!important; page-break-inside:avoid!important; }
+  body.cetak-rapor .rapor-page thead { display:table-header-group; }
+  body.cetak-rapor .rapor-page .bg-slate-100,
+  body.cetak-rapor .rapor-page .bg-slate-50 { background:#e9eef5!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
@@ -2359,7 +2442,7 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
       <p class="text-center text-sm mb-3">{{rp.periode==='STS'?'Sumatif Tengah Semester':'Sumatif Akhir Semester'}} {{rpMeta.sem}} &middot; Tahun Ajaran {{rpMeta.tahun}}</p>
       <table class="text-sm mb-3 w-full calm-table-print rapor-id"><tbody><tr><td>Nama Peserta Didik</td><td>:</td><td><b>{{s.nama}}</b></td><td>Kelas</td><td>:</td><td>{{rp.kelas}}</td></tr><tr><td>NISN</td><td>:</td><td>{{s.nisn||'-'}}</td><td>Fase</td><td>:</td><td>{{rp.fase||'-'}}</td></tr><tr><td>Kompetensi Keahlian</td><td>:</td><td>{{rpInfo.kompetensi||'-'}}</td><td>Semester</td><td>:</td><td>{{rpMeta.sem}}</td></tr></tbody></table>
       <p class="font-bold text-sm mb-1">A. Nilai Mata Pelajaran</p>
-      <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100">
+      <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-mapel" :class="rp.periode==='STS'?'rapor-mapel-sts':'rapor-mapel-sas'"><thead><tr class="bg-slate-100">
         <th class="border p-1" style="width:5%">No</th><th class="border p-1 text-left">Mata Pelajaran</th><th class="border p-1" style="width:7%">KKTP</th>
         <template v-if="rp.periode==='STS'"><th class="border p-1" style="width:12%">Rata-rata Sumatif Lingkup Materi</th><th class="border p-1" style="width:11%">Sumatif Tengah Semester</th><th class="border p-1" style="width:10%">Nilai Sementara</th><th class="border p-1" style="width:14%">Keterangan</th></template>
         <template v-else><th class="border p-1" style="width:9%">Nilai Akhir</th><th class="border p-1" style="width:7%">Predikat</th><th class="border p-1" style="width:44%">Capaian Kompetensi</th></template></tr></thead>
@@ -2371,19 +2454,19 @@ main section[v-if="view='rapor'"] .bg-white.rounded-2xl{box-shadow:0 4px 18px rg
         <tbody><tr class="font-bold"><td class="border p-1" colspan="3">Rata-rata</td><td class="border p-1 text-center" :colspan="rp.periode==='STS'?3:1">{{s.rata==null?'-':s.rata}}</td><td class="border p-1" :colspan="rp.periode==='STS'?1:2"></td></tr></tbody></table>
       <template v-if="rp.periode==='SAS'">
         <template v-if="s.pkl"><p class="font-bold text-sm mb-1">B. Praktik Kerja Lapangan (PKL)</p>
-          <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1 text-left">Mitra DU/DI</th><th class="border p-1">Waktu Pelaksanaan</th><th class="border p-1" style="width:10%">Nilai</th></tr></thead><tbody>
+          <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-pkl"><thead><tr class="bg-slate-100"><th class="border p-1 text-left">Mitra DU/DI</th><th class="border p-1">Waktu Pelaksanaan</th><th class="border p-1" style="width:10%">Nilai</th></tr></thead><tbody>
             <tr><td class="border p-1">{{s.pkl.industri||'-'}}</td><td class="border p-1 text-center">{{tglPendekR(s.pkl.mulai)}} s.d. {{tglPendekR(s.pkl.selesai)}}</td><td class="border p-1 text-center font-bold">{{s.pkl.nilai==null?'-':s.pkl.nilai}}</td></tr></tbody></table></template>
         <p class="font-bold text-sm mb-1">{{s.pkl?'C':'B'}}. Ekstrakurikuler</p>
-        <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1" style="width:5%">No</th><th class="border p-1 text-left" style="width:40%">Kegiatan</th><th class="border p-1 text-left">Keterangan</th></tr></thead><tbody>
+        <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-ekskul"><thead><tr class="bg-slate-100"><th class="border p-1" style="width:5%">No</th><th class="border p-1 text-left" style="width:40%">Kegiatan</th><th class="border p-1 text-left">Keterangan</th></tr></thead><tbody>
           <tr v-for="(e,i) in barisR(rpF[s.nis].ekskul)" :key="i"><td class="border p-1 text-center">{{i+1}}</td><td class="border p-1">{{e.a}}</td><td class="border p-1">{{e.b}}</td></tr>
           <tr v-if="!barisR(rpF[s.nis].ekskul).length"><td class="border p-1 text-center">-</td><td class="border p-1">-</td><td class="border p-1">-</td></tr></tbody></table>
         <p class="font-bold text-sm mb-1">{{s.pkl?'D':'C'}}. Kokurikuler</p>
-        <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1 text-left" style="width:24%">Aspek</th><th class="border p-1 text-left">Kegiatan dan dimensi Profil Lulusan</th></tr></thead><tbody>
+        <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-kokurikuler"><thead><tr class="bg-slate-100"><th class="border p-1 text-left" style="width:24%">Aspek</th><th class="border p-1 text-left">Kegiatan dan dimensi Profil Lulusan</th></tr></thead><tbody>
           <tr><td class="border p-1 font-semibold">Kokurikuler</td><td class="border p-1" style="white-space:pre-wrap;overflow-wrap:anywhere">{{rpF[s.nis].kokurikuler||'-'}}</td></tr>
         </tbody></table>
       </template>
-      <table class="text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100"><th class="border p-1 px-3" colspan="4">Ketidakhadiran</th></tr></thead><tbody><tr><td class="border p-1 px-3">Sakit: {{s.hadir.S}} hari</td><td class="border p-1 px-3">Izin: {{s.hadir.I}} hari</td><td class="border p-1 px-3">Tanpa keterangan: {{s.hadir.A}} hari</td><td class="border p-1 px-3">Kehadiran: {{s.pct==null?'-':s.pct+'%'}}</td></tr></tbody></table>
-      <div class="border p-2 text-sm mb-3" style="min-height:3rem"><b>Catatan Wali Kelas:</b> {{rpF[s.nis].catatan||'-'}}</div>
+      <table class="text-sm border-collapse mb-3 calm-table-print rapor-hadir"><thead><tr class="bg-slate-100"><th class="border p-1 px-3" colspan="4">Ketidakhadiran</th></tr></thead><tbody><tr><td class="border p-1 px-3">Sakit: {{s.hadir.S}} hari</td><td class="border p-1 px-3">Izin: {{s.hadir.I}} hari</td><td class="border p-1 px-3">Tanpa keterangan: {{s.hadir.A}} hari</td><td class="border p-1 px-3">Kehadiran: {{s.pct==null?'-':s.pct+'%'}}</td></tr></tbody></table>
+      <div class="border p-2 text-sm mb-3 rapor-catatan" style="min-height:3rem"><b>Catatan Wali Kelas:</b> {{rpF[s.nis].catatan||'-'}}</div>
       <div v-if="rp.periode==='SAS'&&rpMeta.sem==='Genap'&&rpF[s.nis].keputusan" class="border-2 p-2 text-sm mb-3" style="break-inside:avoid"><b>Keputusan:</b> Berdasarkan hasil yang dicapai pada Semester Ganjil dan Genap Tahun Ajaran {{rpMeta.tahun}}, peserta didik dinyatakan:
         <div class="text-center font-bold mt-1">{{rpF[s.nis].keputusan==='Naik'?'NAIK KE KELAS '+(rpF[s.nis].kelasTujuan||'.........'):rpF[s.nis].keputusan==='Tidak Naik'?'TINGGAL DI KELAS '+rp.kelas:rpF[s.nis].keputusan.toUpperCase()}}</div></div>
       <div class="rapor-ttd text-sm mt-4" style="break-inside:avoid">
