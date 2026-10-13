@@ -596,6 +596,23 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 }
 @media(prefers-reduced-motion:reduce){.modal-box,.modal-wrap{animation:none!important}.spin,.spin-s{animation:sp 1.6s linear infinite!important}.sk{animation:none}.loadbar i{animation-duration:2.4s}.load-chip{animation-duration:.01s}}
 @media print{.desk,.desk-note,.panel-desc,.load-wrap,.loadbar{display:none!important}}
+@media print{
+  /* Blok identitas rapor: rapat, dua pasang kolom, label redup dan nilai tegas */
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type{width:100%!important;margin:0 0 9pt!important;border-top:.5pt solid #b8c2d0!important;border-bottom:.5pt solid #b8c2d0!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td{border:0!important;padding:2pt 0!important;vertical-align:baseline!important;font-size:9.5pt!important;line-height:1.35!important;color:#111827!important;white-space:normal}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr:first-child td{padding-top:5pt!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type tr:last-child td{padding-bottom:5pt!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(1),body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(4){color:#5b6b82!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(2),body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(5){color:#5b6b82!important;text-align:center!important;padding-left:0!important;padding-right:0!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(1){width:21%!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(2){width:3%!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(3){width:33%!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(4){width:12%!important;padding-left:14pt!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(5){width:3%!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(6){width:28%!important}
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type td:nth-child(3) b{font-weight:700}
+}
+
 </style>
 
 </head>
@@ -2066,10 +2083,7 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
       <kop :k="cfg.kop"></kop>
       <p class="text-center font-bold underline mt-2">{{rp.periode==='STS'?'LAPORAN KEMAJUAN HASIL BELAJAR':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}}</p>
       <p class="text-center text-sm mb-3">{{rp.periode==='STS'?'Sumatif Tengah Semester':'Sumatif Akhir Semester'}} {{rpMeta.sem}} &middot; Tahun Ajaran {{rpMeta.tahun}}</p>
-      <table class="text-sm mb-3 w-full calm-table-print"><tbody>
-        <tr><td style="width:24%">Nama Peserta Didik</td><td style="width:34%">: <b>{{s.nama}}</b></td><td style="width:16%">Kelas</td><td>: {{rp.kelas}}</td></tr>
-        <tr><td>NISN</td><td>: {{s.nisn||'-'}}</td><td>Fase</td><td>: {{rp.fase||'-'}}</td></tr>
-        <tr><td>Kompetensi Keahlian</td><td>: {{rpInfo.kompetensi||'-'}}</td><td>Semester</td><td>: {{rpMeta.sem}}</td></tr></tbody></table>
+      <table class="text-sm mb-3 w-full calm-table-print rapor-id"><tbody><tr><td>Nama Peserta Didik</td><td>:</td><td><b>{{s.nama}}</b></td><td>Kelas</td><td>:</td><td>{{rp.kelas}}</td></tr><tr><td>NISN</td><td>:</td><td>{{s.nisn||'-'}}</td><td>Fase</td><td>:</td><td>{{rp.fase||'-'}}</td></tr><tr><td>Kompetensi Keahlian</td><td>:</td><td>{{rpInfo.kompetensi||'-'}}</td><td>Semester</td><td>:</td><td>{{rpMeta.sem}}</td></tr></tbody></table>
       <p class="font-bold text-sm mb-1">A. Nilai Mata Pelajaran</p>
       <table class="w-full text-sm border-collapse mb-3 calm-table-print"><thead><tr class="bg-slate-100">
         <th class="border p-1" style="width:5%">No</th><th class="border p-1 text-left">Mata Pelajaran</th><th class="border p-1" style="width:7%">KKTP</th>
