@@ -601,6 +601,20 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 .nl-skor-low{color:#be123c;border-color:#fda4af;background:#fff1f2}
 .nl-bar{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-top:.75rem;padding:.7rem 1rem;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:var(--rad);box-shadow:0 -8px 20px -14px rgba(10,34,80,.35)}
 
+
+.nl-jenis{margin-top:.6rem}
+.nl-guide{margin-bottom:1rem;border:1px solid var(--line);border-radius:var(--rad);background:var(--card);padding:0 1.25rem}
+.nl-guide summary{padding:.7rem 0;cursor:pointer;list-style:none;font-size:.85rem;font-weight:600;color:var(--navy-d)}
+.nl-guide summary::-webkit-details-marker{display:none}
+.nl-guide summary::after{content:"Buka";float:right;font-size:.75rem;font-weight:600;color:var(--navy)}
+.nl-guide[open] summary::after{content:"Tutup"}
+.nl-guide dl{margin:0;padding:.25rem 0 1rem;display:grid;gap:.6rem}
+.nl-guide dl>div{display:grid;grid-template-columns:5.5rem 1fr;gap:.75rem;align-items:baseline}
+.nl-guide dt{justify-self:start;padding:.05rem .55rem;border-radius:999px;background:var(--navy-soft);color:var(--navy);font-size:.75rem;font-weight:700}
+.nl-guide dd{margin:0;font-size:.82rem;line-height:1.5;color:#40516d}
+.nl-guide dd b{font-weight:600;color:var(--navy-d)}
+@media(max-width:639px){.nl-guide dl>div{grid-template-columns:1fr;gap:.2rem}}
+
 /* ===== J. Halaman masuk ===== */
 .login-wrap .login-bg h1{font-size:3rem;font-weight:700;letter-spacing:-.035em}
 .login-wrap .login-bg .grid>div{background:none;border:0;border-top:1px solid rgba(255,255,255,.2);border-radius:0;padding:.75rem 0 0}
@@ -1386,7 +1400,21 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
             <label v-if="nMode==='sumatif'" class="lb"><span class="nl-n">3</span>Bentuk penilaian
               <select v-model="nm.jenis" @change="loadNilai" class="inp w-full mt-1 normal-case"><option v-for="j in JENIS" :key="j" :value="j">{{jl(j)}}</option></select></label>
           </div>
+          <p v-if="nMode==='sumatif'" class="nl-hint nl-jenis">{{ {Harian:'Tes atau kuis di akhir satu lingkup materi.',Tugas:'Tugas atau proyek di akhir satu lingkup materi.',Praktik:'Praktik atau unjuk kerja di akhir satu lingkup materi.',UTS:'Penilaian tengah semester. Satu nilai per siswa.',UAS:'Penilaian akhir semester. Satu nilai per siswa.'}[nm.jenis] }}</p>
         </div>
+        <details class="nl-guide">
+          <summary>Panduan penilaian: apa arti TP, SLM, STS, SAS, dan KKTP?</summary>
+          <dl>
+            <div><dt>TP</dt><dd><b>Tujuan Pembelajaran.</b> Kemampuan yang harus dicapai siswa pada satu materi. Contoh: &ldquo;Siswa mampu mengonfigurasi jaringan LAN&rdquo;.</dd></div>
+            <div><dt>Sumatif</dt><dd>Penilaian di akhir materi atau semester. Hasilnya berupa angka 0&ndash;100 dan masuk nilai rapor.</dd></div>
+            <div><dt>Formatif</dt><dd>Penilaian selama proses belajar untuk memantau kemajuan siswa. Hanya dicatat &ldquo;sudah&rdquo; atau &ldquo;belum&rdquo; mencapai tujuan, tidak masuk nilai rapor.</dd></div>
+            <div><dt>SLM</dt><dd><b>Sumatif Lingkup Materi.</b> Penilaian di akhir satu lingkup materi (gabungan beberapa TP). Bentuknya bisa Tes/Harian, Tugas/Proyek, atau Praktik/Unjuk kerja.</dd></div>
+            <div><dt>STS</dt><dd><b>Sumatif Tengah Semester</b> (dulu UTS). Satu nilai per siswa untuk tiap mapel.</dd></div>
+            <div><dt>SAS</dt><dd><b>Sumatif Akhir Semester</b> (dulu UAS). Satu nilai per siswa untuk tiap mapel.</dd></div>
+            <div><dt>KKTP</dt><dd><b>Kriteria Ketercapaian Tujuan Pembelajaran.</b> Batas nilai untuk dinyatakan &ldquo;sudah mencapai&rdquo; tujuan. Siswa di bawah batas ini perlu remedial. Skor di bawah KKTP tampil merah.</dd></div>
+            <div><dt>Nilai akhir</dt><dd>Gabungan SLM, STS, dan SAS menurut bobot yang diatur admin di menu Pengaturan.</dd></div>
+          </dl>
+        </details>
         <p v-if="pairKunci" role="alert" class="nl-lock">Nilai kelas ini <b>dikunci</b> admin.<template v-if="user.role==='ADMIN'"> Sebagai admin Anda tetap bisa mengubah (tercatat di log).</template><template v-else> Hubungi admin bila perlu perubahan.</template></p>
         <p v-if="!nrows.length&&!frows.length" class="nl-empty">Pilih kelas &amp; mapel dan isi TP, lalu tekan <b>Enter</b>. Daftar siswa akan muncul di sini.</p>
         <details v-if="kt.loaded" class="nl-kktp">
