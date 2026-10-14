@@ -1247,6 +1247,22 @@ body.cetak-rapor .rapor-page table.rapor-mapel tr.rapor-rata-row > td.rapor-rata
 }
 </style>
 
+
+<style id="calm-dialog-v1">
+/* Dialog konfirmasi/isian internal: pengganti dialog bawaan browser (yang memuat nama domain hosting). */
+@media screen{
+.dlg-wrap{z-index:300;background:rgba(10,25,55,.46)}
+.dlg-wrap .cfm-msg{margin:.6rem 0 0;font-size:.875rem;line-height:1.55;color:var(--mut,#5b6b82);white-space:pre-line}
+.dlg-wrap .cfm-field{margin-top:1.1rem}
+.dlg-wrap .cfm-field label{display:block;margin-bottom:.35rem;font-size:.78rem;font-weight:600;color:#475569}
+.dlg-wrap .cfm-input{width:100%;min-height:2.6rem;padding:.55rem .75rem;border:1px solid #d3dcea;border-radius:.7rem;background:#fff;font-size:.9rem;color:#18263f}
+.dlg-wrap textarea.cfm-input{min-height:5.5rem;resize:vertical}
+.dlg-wrap .cfm-input:focus{outline:0;border-color:#0b3d91;box-shadow:0 0 0 3px rgba(11,61,145,.14)}
+.cfm-primary.cfm-danger{background:#be123c}
+.cfm-primary.cfm-danger:hover{background:#9f1239}
+.cfm-primary:disabled{opacity:.45;cursor:not-allowed}
+}
+</style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
@@ -1263,6 +1279,22 @@ body.cetak-rapor .rapor-page table.rapor-mapel tr.rapor-rata-row > td.rapor-rata
     <div class="cfm-actions">
       <button type="button" @click="batalCetakRapor" class="cfm-ghost">Batal</button>
       <button type="button" @click="lanjutCetakRapor" class="cfm-primary">Lanjut cetak</button>
+    </div>
+  </section>
+</div>
+<div v-if="dlg" class="modal-wrap cfm-wrap dlg-wrap noprint fixed inset-0" role="presentation" @click.self="dlgBatal">
+  <section class="modal-box cfm" role="alertdialog" aria-modal="true" aria-labelledby="dlg-judul" aria-describedby="dlg-isi">
+    <p class="cfm-eyebrow">{{dlg.eyebrow}}</p>
+    <h3 id="dlg-judul" class="cfm-title">{{dlg.judul}}</h3>
+    <p v-if="dlg.detail" id="dlg-isi" class="cfm-msg">{{dlg.detail}}</p>
+    <div v-if="dlg.field" class="cfm-field">
+      <label for="dlg-input">{{dlg.label}}</label>
+      <textarea v-if="dlg.multiline" id="dlg-input" v-model="dlgInput" :readonly="dlg.bacaSaja" :placeholder="dlg.placeholder" class="cfm-input" @focus="dlg.bacaSaja&&$event.target.select()"></textarea>
+      <input v-else id="dlg-input" v-model="dlgInput" :placeholder="dlg.placeholder" autocomplete="off" class="cfm-input" @keydown.enter.prevent="dlgOk">
+    </div>
+    <div class="cfm-actions">
+      <button v-if="!dlg.tanpaBatal" type="button" @click="dlgBatal" class="cfm-ghost">Batal</button>
+      <button id="dlg-ok" type="button" @click="dlgOk" :disabled="!dlgCocok" class="cfm-primary" :class="dlg.bahaya?'cfm-danger':''">{{dlg.tombol}}</button>
     </div>
   </section>
 </div>
@@ -3065,9 +3097,9 @@ const app = createApp({
     const fetchPa = async () => { pa.value = await api('perangkatList'); paAtur.wajib = pa.value.wajib.join(', '); paAtur.tenggat = pa.value.tenggat; };
     const pickFilePa = e => { const f = e.target.files[0]; paf.file = null; if (!f) return; if (f.size > 4 * 1024 * 1024) { err.value = 'Ukuran berkas maksimal 4 MB'; e.target.value = ''; return; } err.value = ''; const r = new FileReader(); r.onload = () => { paf.file = { nama: f.name, mime: f.type, data: String(r.result).split(',')[1] }; }; r.readAsDataURL(f); };
     const savePa = () => run(async () => { if (!paf.file && !paf.url) throw new Error('Pilih berkas atau isi tautan'); await api('perangkatSave', { mapel: paf.mapel, jenis: paf.jenis, judul: paf.judul, url: paf.url, file: paf.file }); Object.assign(paf, { judul: '', url: '', file: null }); const i = document.getElementById('pa-file'); if (i) i.value = ''; await fetchPa(); ok.value = 'Perangkat ajar tersimpan'; });
-    const delPa = r => confirm('Hapus ' + r.jenis + ' - ' + r.mapel + '?') && run(async () => { await api('perangkatDelete', { id: r.id }); await fetchPa(); });
+    const delPa = r => cfmRun('Hapus ' + r.jenis + ' - ' + r.mapel + '?', async () => { await api('perangkatDelete', { id: r.id }); await fetchPa(); });
     const aturPa = () => run(async () => { await api('perangkatAtur', { wajib: paAtur.wajib.split(','), tenggat: paAtur.tenggat }); await fetchPa(); ok.value = 'Pengaturan perangkat disimpan'; });
-    const ingatPa = () => confirm('Kirim pengingat ke guru yang perangkatnya belum lengkap?') && run(async () => { const d = await api('perangkatIngatkan'); ok.value = d.dikirim + ' pengingat terkirim' + (d.sudah ? ' (' + d.sudah + ' guru sudah dikirimi hari ini)' : ''); });
+    const ingatPa = () => cfmRun('Kirim pengingat ke guru yang perangkatnya belum lengkap?', async () => { const d = await api('perangkatIngatkan'); ok.value = d.dikirim + ' pengingat terkirim' + (d.sudah ? ' (' + d.sudah + ' guru sudah dikirimi hari ini)' : ''); });
     /* ====== Antrean simpan offline (presensi & nilai): tersimpan di HP bila sinyal putus, dikirim otomatis saat tersambung. Aman diulang: simpan = menimpa satu sesi/isian. ====== */
     const QK = 'calm_antrean';
     const qBaca = () => { try { const l = JSON.parse(localStorage.getItem(QK) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } };
@@ -3160,6 +3192,25 @@ const app = createApp({
       nb = Math.max(0, nb - 1); busy.value = nb > 0;
       if (err.value) toTop(); else if (ok.value) { const m = ok.value; toTop(); setTimeout(() => { if (ok.value === m) ok.value = ''; }, 7000); }
     }
+
+    /* ====== Dialog internal (pengganti confirm/prompt bawaan browser) ====== */
+    const dlg = ref(null), dlgInput = ref('');
+    const dlgCocok = computed(() => !!dlg.value && (!dlg.value.cocok || dlgInput.value.trim() === dlg.value.cocok));
+    const dlgBuka = o => new Promise(res => { if (dlg.value) dlg.value.selesai(o.field ? null : false); dlgInput.value = o.nilai || ''; dlg.value = { eyebrow: 'Konfirmasi', tombol: 'Lanjutkan', ...o, selesai: res }; Vue.nextTick(() => setTimeout(() => { const el = document.getElementById(o.field ? 'dlg-input' : 'dlg-ok'); if (el) { el.focus(); if (o.field && o.bacaSaja && el.select) el.select(); } }, 30)); });
+    const dlgTutup = v => { const d = dlg.value; if (!d) return; dlg.value = null; d.selesai(v); };
+    const dlgOk = () => { const d = dlg.value; if (!d || !dlgCocok.value) return; dlgTutup(d.field ? dlgInput.value.trim() : true); };
+    const dlgBatal = () => { const d = dlg.value; if (d) dlgTutup(d.field && !d.tanpaBatal ? null : (d.field ? dlgInput.value : false)); };
+    const KATA_AKSI = [['Hapus', 'Hapus', true], ['Luluskan', 'Luluskan', true], ['Atur ulang', 'Atur ulang', true], ['Finalkan', 'Finalkan', false], ['Simpan', 'Simpan', false], ['Kirim', 'Kirim', false]];
+    const konfirm = (pesan, o = {}) => {
+      const t = String(pesan), bagi = t.indexOf('\n\n'); let judul = t, detail = '';
+      if (bagi > 0) { judul = t.slice(0, bagi); detail = t.slice(bagi + 2).replace(/\n\n/g, '\n'); }
+      else { const k = t.search(/\?\s/); if (k > 0) { judul = t.slice(0, k + 1); detail = t.slice(k + 2); } }
+      const a = KATA_AKSI.find(x => judul.startsWith(x[0]));
+      return dlgBuka({ judul, detail, tombol: a ? a[1] : 'Lanjutkan', bahaya: a ? a[2] : false, ...o });
+    };
+    const tanya = o => dlgBuka({ eyebrow: 'Isian', ...o, field: true });
+    const cfmRun = (pesan, fn) => konfirm(pesan).then(y => y && run(fn));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && dlg.value) { e.stopPropagation(); dlgBatal(); } if (e.key === 'Enter' && dlg.value && !dlg.value.field && document.activeElement && document.activeElement.id !== 'dlg-ok') { e.preventDefault(); dlgOk(); } }, true);
     const login = () => run(async () => {
       const d = await api('login', { username: f.username, password: f.password, expectedRole: loginRole.value });
       token.value = d.token; user.value = d.user; f.password = '';
@@ -3341,7 +3392,7 @@ const app = createApp({
       await api('siswaSave', { edit: sf.edit, s: { nis: sf.edit ? sf.nis : nisn, nisn, nama: sf.nama, gender: sf.gender, kelas: sf.kelas, kontak: sf.kontak } });
       showS.value = false; siswa.value = await api('siswaList'); await refresh(); ok.value = 'Data siswa tersimpan';
     });
-    const delSiswa = s => confirm('Hapus ' + s.nama + '? Akun login siswa ikut terhapus.') && run(async () => { await api('siswaDelete', { nis: s.nis }); siswa.value = await api('siswaList'); await refresh(); });
+    const delSiswa = s => cfmRun('Hapus ' + s.nama + '? Akun login siswa ikut terhapus.', async () => { await api('siswaDelete', { nis: s.nis }); siswa.value = await api('siswaList'); await refresh(); });
     const editKelas = k => { err.value = ok.value = ''; Object.assign(kf, { edit: !!k, kelas: k ? k.kelas : '', wali: k ? k.wali : '' }); showK.value = true; };
     const saveKelas = () => run(async () => {
       if (!kf.kelas) throw new Error('Nama kelas wajib diisi');
@@ -3349,8 +3400,8 @@ const app = createApp({
       await api('kelasSave', { kelas: kf.kelas, wali: kf.wali });
       showK.value = false; await refresh(); ok.value = 'Kelas tersimpan';
     });
-    const delKelas = k => confirm('Hapus kelas ' + k.kelas + '? Jadwal kelas ini ikut terhapus.') && run(async () => { await api('kelasDelete', { kelas: k.kelas }); await refresh(); });
-    const delJadwal = j => confirm('Hapus jadwal ' + j.mapel + ' ' + j.kelas + '?') && run(async () => { await api('jadwalDelete', { id: j.id }); jadwal.value = await api('jadwalList'); });
+    const delKelas = k => cfmRun('Hapus kelas ' + k.kelas + '? Jadwal kelas ini ikut terhapus.', async () => { await api('kelasDelete', { kelas: k.kelas }); await refresh(); });
+    const delJadwal = j => cfmRun('Hapus jadwal ' + j.mapel + ' ' + j.kelas + '?', async () => { await api('jadwalDelete', { id: j.id }); jadwal.value = await api('jadwalList'); });
     const nextSkor = e => { const a = [...document.querySelectorAll('input[data-skor]')], i = a.indexOf(e.target); (a[i + 1] || e.target).focus(); };
     let nReq = 0, nKey = null, fKey = null; // nKey/fKey = kelas/mapel/TP(/jenis) yang BENAR-BENAR dimuat; simpan selalu memakai kunci ini, bukan isian form yang bisa sudah berubah
     const nMode = ref('sumatif'), frows = ref([]), kt = reactive({ kktp: '', kriteria: '', def: 75, loaded: false });
@@ -3399,17 +3450,17 @@ const app = createApp({
       else { const p = pil.value[jr.pi]; if (!p) throw new Error('Pilih kelas dan mapel'); await api('jurnalSave', { tanggal: jr.tanggal, ...p, materi: jr.materi, catatan: jr.catatan }); }
       showJ.value = false; jr.id = ''; jr.materi = jr.catatan = ''; await fetchJ(); ok.value = 'Jurnal tersimpan';
     });
-    const delJurnal = j => confirm('Hapus jurnal ini?') && run(async () => { await api('jurnalDelete', { id: j.id }); await fetchJ(); });
+    const delJurnal = j => cfmRun('Hapus jurnal ini?', async () => { await api('jurnalDelete', { id: j.id }); await fetchJ(); });
     const openB = () => { Object.assign(bf, { tanggal: hari0, kelas: '', nis: '', catatan: '', solusi: '' }); bsiswa.value = []; showB.value = true; };
     const pickKelasB = () => run(async () => { bf.nis = ''; bsiswa.value = bf.kelas ? await api('bimbinganSiswa', { kelas: bf.kelas }) : []; });
     const saveBimb = () => run(async () => { await api('bimbinganSave', { ...bf }); showB.value = false; await fetchB(); ok.value = 'Catatan tersimpan'; });
-    const delBimb = b => confirm('Hapus catatan ' + b.nama + '?') && run(async () => { await api('bimbinganDelete', { id: b.id }); await fetchB(); });
+    const delBimb = b => cfmRun('Hapus catatan ' + b.nama + '?', async () => { await api('bimbinganDelete', { id: b.id }); await fetchB(); });
 
     const addBaris = () => cfg.value.kop.baris.length < 8 && cfg.value.kop.baris.push({ t: '', s: 12, b: false });
     const savePengaturan = () => run(async () => { await api('pengaturanSave', { kop: cfg.value.kop, ttd: cfg.value.ttd }); ok.value = 'Pengaturan tersimpan'; });
     const backup = () => run(async () => { backupUrl.value = (await api('backup')).url; });
     const resetSem = () => run(async () => {
-      if (!confirm('Hapus SELURUH data presensi, nilai, jurnal, dan bimbingan? Tidak bisa dibatalkan.')) return;
+      if (!(await konfirm('Hapus SELURUH data presensi, nilai, jurnal, dan bimbingan? Tidak bisa dibatalkan.'))) return;
       await api('resetSemester', { konfirmasi: resetTxt.value, label: resetLabel.value }); resetTxt.value = resetLabel.value = ''; ok.value = 'Data semester diarsipkan ke Drive dan direset';
     });
 
@@ -3418,7 +3469,7 @@ const app = createApp({
     let lgReq = 0;
     const loadLeger = () => run(async () => { const rid = ++lgReq, k = lkelas.value; if (!k) { leger.value = { mapel: [], siswa: [] }; return; } const d = await api('legerGet', { kelas: k }); if (rid === lgReq) leger.value = d; });
     const saveDok = () => run(async () => { await api('dokumenSave', { ...df }); showD.value = false; df.judul = df.url = df.kategori = ''; await fetchD(); ok.value = 'Dokumen tersimpan'; });
-    const delDok = d => confirm('Hapus tautan ' + d.judul + '?') && run(async () => { await api('dokumenDelete', { id: d.id }); await fetchD(); });
+    const delDok = d => cfmRun('Hapus tautan ' + d.judul + '?', async () => { await api('dokumenDelete', { id: d.id }); await fetchD(); });
 
 
     /* ====== v3: izin & utilitas umum ====== */
@@ -3476,7 +3527,7 @@ const app = createApp({
       if (t === 'rekap') run(fetchSesi); if (t === 'grafik') run(fetchGrafik); if (t === 'riwayat') run(fetchRiwayat);
     };
     const editSesi = s => { ptab.value = 'input'; Object.assign(pi, { tanggal: s.tanggal, kelas: s.kelas, mapel: s.mapel }); loadPresensi(); toTop(); };
-    const delSesi = s => confirm('Hapus presensi ' + s.kelas + ' - ' + (s.mapel || 'tanpa mapel') + ' pada ' + fmtTgl(s.tanggal) + '? Tidak bisa dibatalkan.') && run(async () => {
+    const delSesi = s => cfmRun('Hapus presensi ' + s.kelas + ' - ' + (s.mapel || 'tanpa mapel') + ' pada ' + fmtTgl(s.tanggal) + '? Tidak bisa dibatalkan.', async () => {
       await api('presensiHapus', { kelas: s.kelas, mapel: s.mapel, tanggal: s.tanggal }); await fetchRiwayat(); ok.value = 'Presensi dihapus';
     });
     const donut = computed(() => {
@@ -3657,7 +3708,7 @@ const app = createApp({
     const showKred = (judul, list) => Object.assign(kred, { show: true, judul, list, copied: false });
     const copyKred = async () => {
       const teks = kred.list.map(c => c.nama + '\nUsername: ' + c.username + '\nSandi: ' + c.sandi).join('\n\n');
-      try { await navigator.clipboard.writeText(teks); kred.copied = true; } catch (e) { window.prompt('Salin teks berikut:', teks); }
+      try { await navigator.clipboard.writeText(teks); kred.copied = true; } catch (e) { await tanya({ judul: 'Salin kredensial', detail: 'Salin teks berikut secara manual.', nilai: teks, multiline: true, bacaSaja: true, tombol: 'Selesai', tanpaBatal: true }); }
     };
     const editGuru = g => { err.value = ok.value = ''; Object.assign(gf, { edit: !!g, username: g ? g.username : '', nama: g ? g.nama : '', role: g ? g.role : 'GURU', sandi: '', wali: g ? [...g.wali] : [] }); showG.value = true; };
     const saveGuru = () => run(async () => {
@@ -3669,7 +3720,7 @@ const app = createApp({
       if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi, role: gf.role }]);
       ok.value = gf.edit ? 'Data guru diperbarui' : 'Akun guru dibuat';
     });
-    const delGuru = g => confirm('Hapus akun ' + g.nama + '? Status wali kelasnya ikut dilepas.') && run(async () => { await api('guruDelete', { username: g.username }); await refreshGuru(); ok.value = 'Akun dihapus'; });
+    const delGuru = g => cfmRun('Hapus akun ' + g.nama + '? Status wali kelasnya ikut dilepas.', async () => { await api('guruDelete', { username: g.username }); await refreshGuru(); ok.value = 'Akun dihapus'; });
     const exportGuru = () => run(async () => {
       const aoa = [['No', 'Username', 'Nama', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, ROLE_LBL[g.role] || 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
       await saveXlsx('Data_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Guru', aoa, [5, 20, 32, 16, 20, 30, 12]]]); ok.value = guruTampil.value.length + ' akun diekspor';
@@ -3761,7 +3812,7 @@ const app = createApp({
     const fetchAg = async () => { try { agenda.value = await api('agendaList'); } catch (e) { agenda.value = []; } };
     const bukaAg = () => { err.value = ''; Object.assign(af, { judul: '', jenis: 'Ujian', tanggal: '', sampai: '' }); showAg.value = true; };
     const saveAg = () => run(async () => { await api('agendaSave', { ...af }); showAg.value = false; await fetchAg(); ok.value = 'Agenda ditambahkan'; });
-    const delAg = a => confirm('Hapus agenda "' + a.judul + '"?') && run(async () => { await api('agendaDelete', { id: a.id }); await fetchAg(); });
+    const delAg = a => cfmRun('Hapus agenda "' + a.judul + '"?', async () => { await api('agendaDelete', { id: a.id }); await fetchAg(); });
     const JENIS = ['Harian', 'Tugas', 'Praktik', 'UTS', 'UAS'], ak = ref(null), resetLabel = ref('');
     const saveAk = () => run(async () => {
       const t = JENIS.reduce((a, j) => a + (Number(ak.value.bobot[j]) || 0), 0); if (t <= 0) throw new Error('Total bobot harus lebih dari 0');
@@ -3812,8 +3863,8 @@ const app = createApp({
       fKey = null;
       ok.value = 'Penilaian dimuat untuk diedit. Periksa nilainya lalu tekan Simpan Nilai.';
     });
-    const hapusRiwayatPenilaian = r => {
-      if (!confirm('Hapus penilaian ' + r.mapel + ' — ' + r.tp + ' (' + jl(r.jenis) + ')?\n\nNilai siswa pada penilaian ini akan dihapus jika belum diganti setelah riwayat dicatat.')) return;
+    const hapusRiwayatPenilaian = async r => {
+      if (!(await konfirm('Hapus penilaian ' + r.mapel + ' — ' + r.tp + ' (' + jl(r.jenis) + ')?\n\nNilai siswa pada penilaian ini akan dihapus jika belum diganti setelah riwayat dicatat.'))) return;
       run(async () => {
         const d = await api('riwayatPenilaianHapus', { id: r.id });
         await loadRiwayatPenilaian();
@@ -3906,9 +3957,9 @@ const app = createApp({
     const finalkanRapor = paksa => run(async () => {
       if (!rp.value || !rpPeran.value) return;
       const d0 = rp.value, sas = d0.periode === 'SAS', nm = d0.kelas + ' - ' + (sas ? 'SAS' : 'STS') + ' ' + d0.semester + ' ' + d0.tahun;
-      if (!confirm('Finalkan rapor ' + nm + '?\n\nData rapor yang sedang diisi disimpan lebih dulu, lalu nilai semua siswa disimpan permanen sebagai salinan'
+      if (!(await konfirm('Finalkan rapor ' + nm + '?\n\nData rapor yang sedang diisi disimpan lebih dulu, lalu nilai semua siswa disimpan permanen sebagai salinan'
         + (sas ? '. Catatan, ekstrakurikuler, kokurikuler, dan keputusan wali tidak dapat diubah lagi kecuali rapor dibuka kembali oleh admin' : '') + '.'
-        + (paksa === true ? '\n\nPENGECUALIAN: kekurangan nilai akan difinalkan apa adanya.' : ''))) return;
+        + (paksa === true ? '\n\nPENGECUALIAN: kekurangan nilai akan difinalkan apa adanya.' : '')))) return;
       await kirimRapor();
       const d = await api('raporFinalisasi', { kelas: d0.kelas, periode: d0.periode, tahun: d0.tahun, semester: d0.semester, paksa: paksa === true });
       await muatRapor();
@@ -3916,7 +3967,7 @@ const app = createApp({
     });
     const bukaFinalRapor = () => run(async () => {
       if (!rp.value || !user.value || user.value.role !== 'ADMIN') return;
-      const d0 = rp.value, t = prompt('Membuka rapor menghapus salinan nilai final dan mengembalikannya menjadi DRAF (dihitung ulang dari nilai yang ada saat ini). Bila nilai semester ini sudah di-reset, nilai rapor ini TIDAK dapat dipulihkan.\n\nKetik BUKA untuk melanjutkan:');
+      const d0 = rp.value, t = await tanya({ judul: 'Buka kembali rapor?', detail: 'Salinan nilai final dihapus dan rapor kembali menjadi DRAF (dihitung ulang dari nilai saat ini). Bila nilai semester ini sudah di-reset, nilai rapor ini tidak dapat dipulihkan.', label: 'Ketik BUKA untuk melanjutkan', placeholder: 'BUKA', cocok: 'BUKA', tombol: 'Buka kembali', bahaya: true });
       if (t !== 'BUKA') return;
       const d = await api('raporBukaFinal', { kelas: d0.kelas, periode: d0.periode, tahun: d0.tahun, semester: d0.semester, konfirmasi: t });
       await muatRapor();
@@ -3932,7 +3983,7 @@ const app = createApp({
     const simpanSumberRapor = row => run(async () => {
       const p = pil.value[rkpIdx.value];
       if (!p || !row) return;
-      if (!confirm('Simpan koreksi '+row.jenis+' untuk '+row.nama+'? Nilai akhir rapor akan dihitung ulang otomatis.')) return;
+      if (!(await konfirm('Simpan koreksi '+row.jenis+' untuk '+row.nama+'? Nilai akhir rapor akan dihitung ulang otomatis.'))) return;
       await api('raporKoreksiSumberSimpan', { kelas:p.kelas, mapel:p.mapel, nis:row.nis, tp:row.tp, jenis:row.jenis,
         skor:row.skor, tahun:rpMeta.tahun, semester:rpMeta.sem });
       await loadSumberRapor();
@@ -3959,7 +4010,7 @@ const app = createApp({
     const cgTampil = computed(() => cglist.value.filter(c => !cgf.value || c.guru === cgf.value));
     const fetchCg = async () => cglist.value = await api('catatanGuruList');
     const saveCatatan = () => run(async () => { await api('catatanGuruSave', { guru: cg.guru, isi: cg.isi }); cg.isi = ''; await fetchCg(); ok.value = 'Catatan terkirim ke guru'; });
-    const delCatatan = c => confirm('Hapus catatan untuk ' + c.guruNama + '?') && run(async () => { await api('catatanGuruDelete', { id: c.id }); await fetchCg(); });
+    const delCatatan = c => cfmRun('Hapus catatan untuk ' + c.guruNama + '?', async () => { await api('catatanGuruDelete', { id: c.id }); await fetchCg(); });
 
     /* ====== v3.3: pengumuman, kartu login, edit jurnal ====== */
     const peng = ref([]), showPg = ref(false), pf = reactive({ judul: '', isi: '', sampai: '' }), kartu = ref(null);
@@ -3967,7 +4018,7 @@ const app = createApp({
     const fetchPeng = async () => { try { peng.value = await api('pengumumanList'); } catch (e) { peng.value = []; } }; // dashboard tetap tampil bila server belum diperbarui
     const bukaPeng = () => { err.value = ''; Object.assign(pf, { judul: '', isi: '', sampai: '' }); showPg.value = true; };
     const savePeng = () => run(async () => { await api('pengumumanSave', { ...pf }); showPg.value = false; await fetchPeng(); ok.value = 'Pengumuman dipublikasikan'; });
-    const delPeng = p => confirm('Hapus pengumuman "' + p.judul + '"?') && run(async () => { await api('pengumumanDelete', { id: p.id }); await fetchPeng(); });
+    const delPeng = p => cfmRun('Hapus pengumuman "' + p.judul + '"?', async () => { await api('pengumumanDelete', { id: p.id }); await fetchPeng(); });
     const cetakKartu = () => run(async () => {
       if (!skelas.value) throw new Error('Pilih kelas terlebih dahulu');
       const d = await api('kartuLogin', { kelas: skelas.value }); if (!d.siswa.length) throw new Error('Tidak ada siswa di kelas ini');
@@ -4011,7 +4062,7 @@ const app = createApp({
       if (h.length) { h.forEach(c => { const a = akMap.value.get(c.username); if (a) a.awal = true; }); akpilih.value = []; showKred(judul, withKontak(h)); }
       if (gagal) throw new Error(gagal + (h.length ? ' (' + h.length + ' akun sudah diproses dan ditampilkan)' : ''));
     };
-    const konfirmReset = names => confirm('Atur ulang sandi ' + names.length + ' akun? Sandi lama tidak berlaku dan sesi login mereka dihentikan.') && run(async () => {
+    const konfirmReset = names => cfmRun('Atur ulang sandi ' + names.length + ' akun? Sandi lama tidak berlaku dan sesi login mereka dihentikan.', async () => {
       const r = await kirimAkun('akunReset', names); await hasilAkun(r.h.length === 1 ? 'Sandi baru ' + r.h[0].nama : 'Sandi baru ' + r.h.length + ' akun', r); });
     const resetSatu = a => konfirmReset([a.username]);
     const bagikanAwal = names => run(async () => {
@@ -4053,14 +4104,14 @@ const app = createApp({
       if (!pf2.guru) throw new Error('Pilih guru pembimbing');
       await api('pklSave', { edit: !!pf2.id, p: { ...pf2 } }); showPk.value = false; await fetchPkl(); ok.value = 'Penempatan PKL tersimpan';
     });
-    const delPkl = p => confirm('Hapus penempatan PKL ' + p.nama + '? Seluruh jurnal PKL siswa ini ikut terhapus.') && run(async () => { await api('pklDelete', { id: p.id }); await fetchPkl(); ok.value = 'Penempatan dihapus'; });
+    const delPkl = p => cfmRun('Hapus penempatan PKL ' + p.nama + '? Seluruh jurnal PKL siswa ini ikut terhapus.', async () => { await api('pklDelete', { id: p.id }); await fetchPkl(); ok.value = 'Penempatan dihapus'; });
     const bukaJurPkl = p => { err.value = ok.value = ''; jp.value = p; jlist.value = []; Object.assign(nl, { nilai: p.nilai == null ? '' : p.nilai, catatan: p.catatanNilai || '' }); Object.assign(jf2, { id: '', tanggal: hari0 < p.selesai ? hari0 : p.selesai, kegiatan: '' }); run(fetchJur); };
     const ubahJurPkl = j => Object.assign(jf2, { id: j.id, tanggal: j.tanggal, kegiatan: j.kegiatan });
     const saveJurPkl = () => run(async () => {
       await api('pklJurnalSave', { id: jf2.id, tanggal: jf2.tanggal, kegiatan: jf2.kegiatan }); jf2.id = jf2.kegiatan = '';
       await Promise.all([fetchJur(), fetchPkl()]); ok.value = 'Jurnal PKL tersimpan';
     });
-    const putusJur = (j, st) => { let k = ''; if (st !== 'Disetujui') { k = prompt('Komentar perbaikan untuk siswa:'); if (k === null) return; } return run(async () => { await api('pklJurnalPutus', { id: j.id, status: st, komentar: k }); await Promise.all([fetchJur(), fetchPkl()]); ok.value = 'Jurnal ' + st.toLowerCase(); }); };
+    const putusJur = async (j, st) => { let k = ''; if (st !== 'Disetujui') { k = await tanya({ judul: 'Perlu perbaikan', detail: 'Tulis komentar agar siswa tahu bagian yang harus diperbaiki.', label: 'Komentar untuk siswa', placeholder: 'mis. Kegiatan belum rinci', tombol: 'Kirim', multiline: true }); if (k === null) return; } return run(async () => { await api('pklJurnalPutus', { id: j.id, status: st, komentar: k }); await Promise.all([fetchJur(), fetchPkl()]); ok.value = 'Jurnal ' + st.toLowerCase(); }); };
     const saveNilaiPkl = () => run(async () => { await api('pklNilai', { id: jp.value.id, nilai: nl.nilai, catatan: nl.catatan }); await fetchPkl(); ok.value = 'Nilai PKL tersimpan'; });
     const exportPkl = () => run(async () => {
       const aoa = [['No', 'NISN', 'Nama', 'Kelas', 'Industri', 'Alamat', 'Mulai', 'Selesai', 'Guru Pembimbing', 'Pembimbing Industri', 'Jurnal', 'Nilai']].concat(pklTampil.value.map((p, i) => [i + 1, labelNisn(p.nis, p.nisn), p.nama, p.kelas, p.industri, p.alamat, p.mulai, p.selesai, p.guruNama, p.pembimbingIndustri, p.jurnal, p.nilai == null ? '' : p.nilai]));
@@ -4071,7 +4122,7 @@ const app = createApp({
     const saveTa = () => run(async () => { if (!/^\d{4}\/\d{4}$/.test(ta.tahun)) throw new Error('Format tahun ajaran: 2026/2027'); await api('tahunSimpan', { tahun: ta.tahun, semester: ta.semester }); cfg.value.tahun = { tahun: ta.tahun, semester: ta.semester }; ok.value = 'Tahun ajaran tersimpan'; });
     const loadRw = () => run(async () => { rw.value = await api('riwayatList', { label: rwSel.value, q: rwq.value }); });
     const arsipRw = () => run(async () => { const d = await api('riwayatArsip', { label: rwLabel.value }); rw.value = await api('riwayatList', {}); ok.value = d.tersimpan + ' siswa tersimpan pada riwayat "' + rwLabel.value + '"'; });
-    const lulusKelas = () => confirm('Luluskan seluruh siswa kelas ' + ll.kelas + '? Akun login mereka akan dihapus. Tidak bisa dibatalkan.') && run(async () => {
+    const lulusKelas = () => cfmRun('Luluskan seluruh siswa kelas ' + ll.kelas + '? Akun login mereka akan dihapus. Tidak bisa dibatalkan.', async () => {
       const d = await api('luluskanKelas', { kelas: ll.kelas, tahun: ll.tahun, konfirmasi: ll.txt });
       Object.assign(ll, { kelas: '', txt: '' }); [alumni.value, kelasAll.value] = await Promise.all([api('alumniList'), api('kelasDetail')]); ok.value = d.diluluskan + ' siswa dipindahkan ke alumni';
     });
@@ -4129,7 +4180,7 @@ const app = createApp({
       await api('pelanggaranSave', { tanggal: plf.tanggal, kelas: plf.kelas, nis: plf.nis, butir: plf.butir, poin: p, catatan: plf.catatan, tindakan: plf.tindakan });
       showPl.value = false; await fetchPl(); ok.value = 'Catatan pelanggaran tersimpan';
     });
-    const delPl = r => confirm('Hapus catatan pelanggaran ' + r.nama + '?') && run(async () => { await api('pelanggaranDelete', { id: r.id }); await fetchPl(); });
+    const delPl = r => cfmRun('Hapus catatan pelanggaran ' + r.nama + '?', async () => { await api('pelanggaranDelete', { id: r.id }); await fetchPl(); });
     const openKurangi = r => run(async () => { err.value = ok.value = ''; Object.assign(kpf, { tanggal: hari0, kelas: String(r.kelas), nis: String(r.nis), nama: String(r.nama), jumlah: '', alasan: '', periodePantau: '', buktiPerubahan: '' }); const d = await api('penguranganPoinList', { nis: r.nis, kelas: r.kelas }); kurangiInfo.value = d; kurangiRows.value = d.rows || []; showKurangi.value = true; });
     const saveKurangi = () => run(async () => { if (!kpf.kelas || !kpf.nis) throw new Error('Siswa belum dipilih'); const n = Number(kpf.jumlah); if (!(n >= 1 && n <= 100) || Math.floor(n) !== n) throw new Error('Pengurangan harus bilangan bulat 1-100'); if (!kpf.alasan.trim()) throw new Error('Alasan pengurangan wajib diisi'); if (!kpf.periodePantau.trim()) throw new Error('Periode pemantauan wajib diisi'); if (!kpf.buktiPerubahan.trim()) throw new Error('Bukti perubahan wajib diisi'); await api('penguranganPoinSave', { tanggal:kpf.tanggal, kelas:kpf.kelas, nis:kpf.nis, jumlah:n, alasan:kpf.alasan, periodePantau:kpf.periodePantau, buktiPerubahan:kpf.buktiPerubahan }); const d = await api('penguranganPoinList', { nis:kpf.nis, kelas:kpf.kelas }); kurangiInfo.value = d; kurangiRows.value = d.rows || []; await fetchPl(); ok.value = 'Pengurangan poin tercatat'; });
     const pelRingkasan = computed(() => { const seen = new Set(), t = pel.value.total || {}; let berat = 0, warning = 0; pel.value.rows.forEach(r => { const nis = String(r.nis); if (seen.has(nis)) return; seen.add(nis); const n = Number(t[nis] || 0); if (n >= pel.value.ambang) warning++; else if (n >= 26) berat++; }); return { catatan: pel.value.rows.length, siswa: seen.size, berat, warning }; });
@@ -4158,7 +4209,7 @@ const app = createApp({
       await api(kfBK.id ? 'konselingBKEdit' : 'konselingBKSave', kfBK.id ? { id: kfBK.id, ...payload } : payload);
       showKonseling.value = false; await fetchKonseling(); ok.value = kfBK.id ? 'Catatan konseling diperbarui' : 'Catatan konseling tersimpan';
     });
-    const delKonseling = r => confirm('Hapus catatan konseling ' + r.nama + '?') && run(async () => { await api('konselingBKDelete', { id: r.id }); await fetchKonseling(); });
+    const delKonseling = r => cfmRun('Hapus catatan konseling ' + r.nama + '?', async () => { await api('konselingBKDelete', { id: r.id }); await fetchKonseling(); });
     const statusKonselingCls = st => st === 'Selesai' ? 'bg-emerald-100 text-emerald-700' : st === 'Monitoring' ? 'bg-violet-100 text-violet-700' : st === 'Berjalan' ? 'bg-sky-100 text-sky-700' : 'bg-amber-100 text-amber-800';
     /* ====== STAFF / TU ====== */
     const suratMasuk=ref({rows:[]}), suratKeluar=ref({rows:[]}), disposisi=ref({rows:[]}), arsip=ref({rows:[]}), layanan=ref({rows:[]}), mutasi=ref({rows:[]}), rekapAdmin=ref(null);
@@ -4183,27 +4234,27 @@ const app = createApp({
     const openSuratMasuk=()=>{err.value='';resetTuF(tuSMF,{id:'',tanggal:hari0,nomor:'',asal:'',perihal:'',kategori:'',sifat:'Biasa',status:'Baru',fileUrl:''});showSM.value=true;};
     const editSuratMasuk=r=>{resetTuF(tuSMF,r);showSM.value=true;};
     const saveSuratMasuk=()=>run(async()=>{const id=tuSMF.id;await api(id?'suratMasukEdit':'suratMasukSave',{...tuSMF});showSM.value=false;await loadSuratMasuk();ok.value=id?'Surat masuk diperbarui':'Surat masuk tersimpan';});
-    const delSuratMasuk=r=>confirm('Hapus surat masuk '+r.nomor+'?')&&run(async()=>{await api('suratMasukDelete',{id:r.id});await loadSuratMasuk();});
+    const delSuratMasuk=r=>cfmRun('Hapus surat masuk '+r.nomor+'?', async()=>{await api('suratMasukDelete',{id:r.id});await loadSuratMasuk();});
     const openSuratKeluar=()=>{err.value='';resetTuF(tuSKF,{id:'',tanggal:hari0,nomor:'',tujuan:'',perihal:'',kategori:'',status:'Draft',fileUrl:''});showSK.value=true;};
     const editSuratKeluar=r=>{resetTuF(tuSKF,r);showSK.value=true;};
     const saveSuratKeluar=()=>run(async()=>{const id=tuSKF.id;await api(id?'suratKeluarEdit':'suratKeluarSave',{...tuSKF});showSK.value=false;await loadSuratKeluar();ok.value=id?'Surat keluar diperbarui':'Surat keluar tersimpan';});
-    const delSuratKeluar=r=>confirm('Hapus surat keluar '+r.nomor+'?')&&run(async()=>{await api('suratKeluarDelete',{id:r.id});await loadSuratKeluar();});
+    const delSuratKeluar=r=>cfmRun('Hapus surat keluar '+r.nomor+'?', async()=>{await api('suratKeluarDelete',{id:r.id});await loadSuratKeluar();});
     const openDisposisi=()=>{err.value='';resetTuF(tuDPF,{id:'',tanggal:hari0,suratId:'',nomorSurat:'',asal:'',tujuan:'',instruksi:'',batasWaktu:'',status:'Baru'});showDP.value=true;if(!suratMasuk.value.rows.length)loadSuratMasuk();};
     const pilihSuratDisposisi=()=>{const r=suratMasuk.value.rows.find(x=>x.id===tuDPF.suratId);if(r)Object.assign(tuDPF,{nomorSurat:r.nomor,asal:r.asal});};
     const editDisposisi=r=>{resetTuF(tuDPF,r);showDP.value=true;};
     const saveDisposisi=()=>run(async()=>{const id=tuDPF.id;await api(id?'disposisiEdit':'disposisiSave',{...tuDPF});showDP.value=false;await loadDisposisi();ok.value=id?'Disposisi diperbarui':'Disposisi tersimpan';});
-    const delDisposisi=r=>confirm('Hapus disposisi ini?')&&run(async()=>{await api('disposisiDelete',{id:r.id});await loadDisposisi();});
+    const delDisposisi=r=>cfmRun('Hapus disposisi ini?', async()=>{await api('disposisiDelete',{id:r.id});await loadDisposisi();});
     const openArsip=()=>{err.value='';resetTuF(tuARF,{id:'',tanggal:hari0,kode:'',judul:'',kategori:'',tahun:'',lokasi:'',fileUrl:'',keterangan:''});showAR.value=true;};
     const editArsip=r=>{resetTuF(tuARF,r);showAR.value=true;};
     const saveArsip=()=>run(async()=>{const id=tuARF.id;await api(id?'arsipDokumenEdit':'arsipDokumenSave',{...tuARF});showAR.value=false;await loadArsip();ok.value=id?'Arsip diperbarui':'Arsip tersimpan';});
-    const delArsip=r=>confirm('Hapus arsip '+r.judul+'?')&&run(async()=>{await api('arsipDokumenDelete',{id:r.id});await loadArsip();});
+    const delArsip=r=>cfmRun('Hapus arsip '+r.judul+'?', async()=>{await api('arsipDokumenDelete',{id:r.id});await loadArsip();});
     const openLayanan=()=>{err.value='';resetTuF(tuLAF,{id:'',tanggal:hari0,noLayanan:'',pemohon:'',jenis:'',keperluan:'',status:'Diajukan',keterangan:''});showLA.value=true;};
     const editLayanan=r=>{resetTuF(tuLAF,r);showLA.value=true;};
     const saveLayanan=()=>run(async()=>{const id=tuLAF.id;await api(id?'layananAdminEdit':'layananAdminSave',{...tuLAF});showLA.value=false;await loadLayanan();ok.value=id?'Layanan diperbarui':'Layanan tersimpan';});
-    const delLayanan=r=>confirm('Hapus layanan ini?')&&run(async()=>{await api('layananAdminDelete',{id:r.id});await loadLayanan();});
+    const delLayanan=r=>cfmRun('Hapus layanan ini?', async()=>{await api('layananAdminDelete',{id:r.id});await loadLayanan();});
     const openMutasi=()=>{err.value='';resetTuF(tuMUF,{id:'',tanggal:hari0,nis:'',jenis:'Naik Kelas',kelasTujuan:'',alasan:'',dokumenUrl:'',status:'Diajukan'});showMU.value=true;if(!siswa.value.length)run(async()=>{[siswa.value,kelasAll.value]=await Promise.all([api('siswaList'),api('kelasDetail')]);});};
     const saveMutasi=()=>run(async()=>{await api('mutasiSiswaSave',{...tuMUF});showMU.value=false;await Promise.all([loadMutasi(),api('siswaList').then(x=>siswa.value=x)]);ok.value='Mutasi siswa tersimpan';});
-    const delMutasi=r=>confirm('Hapus riwayat mutasi ini?')&&run(async()=>{await api('mutasiSiswaDelete',{id:r.id});await loadMutasi();});
+    const delMutasi=r=>cfmRun('Hapus riwayat mutasi ini?', async()=>{await api('mutasiSiswaDelete',{id:r.id});await loadMutasi();});
     const resetCetakSurat=()=>Object.assign(cs,{jenis:'Surat Keterangan Aktif',nomor:'',tanggal:hari0,kepada:'',perihal:'',isi:'',namaTtd:'',nipTtd:''});
     const printSurat=()=>{if(!cs.isi.trim())return err.value='Isi surat wajib diisi';Vue.nextTick(()=>window.print());};
 
@@ -4272,7 +4323,7 @@ const app = createApp({
       }
     }
 
-    return { raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
