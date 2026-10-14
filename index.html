@@ -1292,12 +1292,24 @@ input[type=checkbox],input[type=radio]{accent-color:var(--p-blue);width:1rem;hei
 #calm-app table:not([class*="rapor"]) tbody tr:nth-child(even){background:transparent!important}
 #calm-app [class*="rounded-full"]{font-weight:600}
 #calm-app h1{font-size:1.5rem;font-weight:800;letter-spacing:-.025em}
-.dlg-wrap{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:rgba(15,23,42,.42)}
+.dlg-wrap{background:rgba(15,23,42,.5)}
 .cfm{border-radius:20px;box-shadow:0 30px 80px -20px rgba(15,23,42,.45)}
 *{scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
 ::selection{background:#bfd4ff}
 @media(max-width:767px){.card{border-radius:14px!important}.btn-p,.btn-o{min-height:2.5rem}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@keyframes p-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes p-fade{from{opacity:0}to{opacity:1}}
+@keyframes p-pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{overscroll-behavior-y:none;text-rendering:optimizeSpeed}
+#calm-app main>*{animation:p-in .22s cubic-bezier(.22,.8,.3,1) both}
+.dlg-wrap,.modal-wrap{animation:p-fade .16s ease-out both}
+.dlg-wrap .cfm,.modal-wrap .modal-box{animation:p-pop .2s cubic-bezier(.22,.8,.3,1) both}
+button,a,.inp,summary,[role=button]{touch-action:manipulation}
+.card,.btn-p,.btn-o{backface-visibility:hidden}
+#calm-app table tbody tr{contain:layout style}
+@media(max-width:767px){.card{box-shadow:0 1px 2px rgba(15,23,42,.06)!important}button.card:hover,a.card:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 }
 </style>
 </head>
