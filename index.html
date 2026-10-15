@@ -4307,5 +4307,15 @@ app.component('ttd', { props: ['t'], data: () => ({ tgl: new Date().toLocaleDate
   <div class="font-bold underline">{{t.nama||'.....................'}}</div><div v-if="t.nip">NUPTK. {{t.nip}}</div></div>` });
 app.mount('#app');
 </script>
+
+<style id="visual-audit-v107">
+/* v107: indikator fokus keyboard yang konsisten; tidak mengubah perilaku komponen. */
+@media screen {
+  #app :is(button, a, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
+    outline: 2px solid #204397;
+    outline-offset: 2px;
+  }
+}
+</style>
 </body>
 </html>
