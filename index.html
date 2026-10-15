@@ -4317,5 +4317,34 @@ app.mount('#app');
   }
 }
 </style>
+
+<style id="calm-sidebar-visual-audit-v108">
+/* v108: hilangkan garis vertikal dekoratif yang terlepas dari item navigasi aktif. */
+@media screen {
+  #app aside[aria-label="Menu utama"] { border-left: 0 !important; outline: 0; }
+  #app aside[aria-label="Menu utama"]::before,
+  #app aside[aria-label="Menu utama"]::after,
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"]::before,
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"]::after {
+    content: none !important; display: none !important;
+  }
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"] {
+    border: 0 !important; outline: 0;
+    background: #f1f5ff !important; color: #12377f !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 8px rgba(3, 20, 55, .08) !important;
+    font-weight: 650 !important;
+    min-height: 48px;
+    transition: background-color .18s ease, box-shadow .18s ease;
+  }
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"] svg {
+    color: #244ca7 !important;
+  }
+  #app aside[aria-label="Menu utama"] > button:not([aria-current="page"]):hover {
+    border-radius: 12px !important; background: rgba(255,255,255,.075) !important;
+  }
+}
+</style>
+
 </body>
 </html>
