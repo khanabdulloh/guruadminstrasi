@@ -2234,7 +2234,7 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
           <div class="grid sm:grid-cols-2 gap-3"><label class="lb">Maksimal mapel belum mencapai KKTP agar tetap naik<input type="number" min="0" max="20" v-model.number="rcf.maksBelum" class="inp w-full mt-1"></label>
             <label class="lb">Minimal kehadiran (%)<input type="number" min="0" max="100" v-model.number="rcf.minHadir" class="inp w-full mt-1"></label></div>
           <p class="text-xs text-slate-500 mt-2">Bobot nilai dan KKTP per mapel diatur di menu Pengaturan (Akademik). Kop surat &amp; Kepala Sekolah diatur di Pengaturan (Kop &amp; Tanda Tangan).</p></div>
-        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto mb-4"><h3 class="font-bold p-4 pb-1">Kelompok &amp; urutan mata pelajaran pada rapor</h3><p class="text-xs text-slate-500 px-4 pb-2">Mapel tanpa pengaturan masuk kelompok Umum. Pilih "Mata Pelajaran Pilihan" untuk mapel pilihan; kelompok ini opsional dan hanya tampil pada rapor jika ada mapel yang ditempatkan di dalamnya. Urutan: angka kecil tampil lebih dulu dalam kelompoknya.</p>
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto mb-4"><h3 class="font-bold p-4 pb-1">Kelompok &amp; urutan mata pelajaran pada rapor</h3><p class="text-xs text-slate-500 px-4 pb-2">Mapel tanpa pengaturan masuk kelompok Umum. Pilih "Pilihan" untuk mapel pilihan; kelompok ini opsional dan hanya tampil pada rapor jika ada mapel yang ditempatkan di dalamnya. Urutan: angka kecil tampil lebih dulu dalam kelompoknya.</p>
           <div class="mx-4 mb-4 grid gap-3 md:grid-cols-3 text-xs leading-relaxed">
             <div class="rounded-lg border border-slate-200 bg-slate-50 p-3"><b class="block text-slate-800 mb-1">Keterangan Kelas X</b><span class="text-slate-600">Tempatkan mata pelajaran sesuai struktur kurikulum dan penawaran pilihan yang berlaku untuk Kelas X. Jangan masukkan mapel yang tidak ditawarkan pada tingkat ini.</span></div>
             <div class="rounded-lg border border-slate-200 bg-slate-50 p-3"><b class="block text-slate-800 mb-1">Keterangan Kelas XI</b><span class="text-slate-600">Periksa kembali daftar mapel pilihan sesuai struktur kurikulum dan konsentrasi/program keahlian Kelas XI. Daftarnya dapat berbeda dari Kelas X.</span></div>
@@ -2242,7 +2242,7 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
           </div>
           <div class="mx-4 mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs leading-relaxed text-blue-950"><b class="block mb-1">Panduan guru pengampu mata pelajaran pilihan</b>Guru yang sama dapat mengampu lebih dari satu mata pelajaran pilihan hanya jika sesuai kompetensi/keahlian dan penugasan resmi sekolah. Pengaturan kelompok ini mengelompokkan tampilan mapel pada rapor; pengaturan ini tidak menetapkan guru pengampu dan tidak otomatis menentukan mapel mana yang boleh diajar oleh guru yang sama. Daftar nama mapel pilihan per kelas perlu mengikuti struktur kurikulum serta pembagian tugas guru sekolah.</div>
           <table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama/kode asli</th><th style="min-width:260px">Nama mata pelajaran pada rapor</th><th>Kelompok</th><th>Urutan</th></tr></thead><tbody>
-            <tr v-for="m in rcf.mapel" :key="m" class="border-t"><td class="p-3 font-medium">{{m}}</td><td class="p-2"><input type="text" maxlength="100" :value="rcf.nama[m]||m" @input="rcf.nama[m]=$event.target.value" class="inp w-full normal-case" :aria-label="'Nama rapor untuk '+m" placeholder="Nama lengkap mata pelajaran"></td><td class="p-2"><select v-model="rcf.kel[m].g" class="inp normal-case"><option v-for="g in rcf.grup" :key="g">{{g}}</option></select></td><td class="p-2"><input type="number" min="0" max="999" v-model="rcf.kel[m].o" class="w-20 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
+            <tr v-for="m in rcf.mapel" :key="m" class="border-t"><td class="p-3 font-medium">{{m}}</td><td class="p-2"><input type="text" maxlength="100" :value="rcf.nama[m]||m" @input="rcf.nama[m]=$event.target.value" class="inp w-full normal-case" :aria-label="'Nama rapor untuk '+m" placeholder="Nama lengkap mata pelajaran"></td><td class="p-2"><select v-model="rcf.kel[m].g" class="inp normal-case"><option v-for="g in rcf.grup" :key="g" :value="g">{{g==='Mata Pelajaran Pilihan'?'Pilihan':g}}</option></select></td><td class="p-2"><input type="number" min="0" max="999" v-model="rcf.kel[m].o" class="w-20 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
         <button @click="simpanRc" :disabled="busy" class="btn-p">Simpan pengaturan rapor</button>
       </template>
     </section>
@@ -2973,6 +2973,14 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   }
 }
 </style>
+<style id="dialog-width-fix-v107">
+/* v107: aturan "#app .modal-box{max-width:min(100%,...)}" (v105/v106) menimpa lebar dialog konfirmasi
+   (.modal-box.cfm = 22.5rem) sehingga dialog melebar selebar layar. Kembalikan lebar ringkas di desktop;
+   di ponsel (<768px) tetap bottom-sheet seperti semula. */
+@media screen and (min-width:768px){
+  #app .modal-box.cfm{max-width:25rem;width:100%}
+}
+</style>
 </head>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
@@ -2991,6 +2999,8 @@ const LOGO = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiD-8YPF
     icons: [{ src: u(192), sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: u(512), sizes: '512x512', type: 'image/png', purpose: 'any' }] })], { type: 'application/manifest+json' }));
 } catch (e) { /* ikon bawaan tetap dipakai */ } })();
 
+const ssSet = (k, v) => { try { sessionStorage.setItem(k, v); } catch (e) { /* penyimpanan sesi diblokir (mis. iframe sandbox) */ } };
+const ssClear = () => { try { sessionStorage.clear(); } catch (e) { /* */ } };
 const app = createApp({
   setup() {
     const token = ref((() => { try { return sessionStorage.getItem('tk') || ''; } catch (e) { return ''; } })());
@@ -3203,10 +3213,10 @@ const app = createApp({
     const login = () => run(async () => {
       const d = await api('login', { username: f.username, password: f.password, expectedRole: loginRole.value });
       token.value = d.token; user.value = d.user; f.password = '';
-      sessionStorage.setItem('tk', d.token); sessionStorage.setItem('us', JSON.stringify(d.user));
+      ssSet('tk', d.token); ssSet('us', JSON.stringify(d.user));
       go('dashboard');
     });
-    function logout() { CC.clear(); token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
+    function logout() { CC.clear(); token.value = ''; user.value = null; ssClear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
     let dashAt = 0;
     const goDasar = k => run(async () => {
       if (user.value.wajib) k = 'sandi';
@@ -3281,7 +3291,7 @@ const app = createApp({
       if (pw.baru !== pw.konf) throw new Error('Konfirmasi sandi tidak cocok');
       if (pw.baru === pw.lama) throw new Error('Sandi baru harus berbeda dari sandi lama');
       await api('gantiPassword', { lama: pw.lama, baru: pw.baru }); pw.lama = pw.baru = pw.konf = '';
-      if (user.value.wajib) { user.value.wajib = false; sessionStorage.setItem('us', JSON.stringify(user.value)); await go('dashboard'); ok.value = 'Sandi diperbarui. Selamat datang di portal!'; } else ok.value = 'Sandi diperbarui';
+      if (user.value.wajib) { user.value.wajib = false; ssSet('us', JSON.stringify(user.value)); await go('dashboard'); ok.value = 'Sandi diperbarui. Selamat datang di portal!'; } else ok.value = 'Sandi diperbarui';
     });
     const refresh = async () => { kelasList.value = []; kelasAll.value = await api('kelasDetail'); };
     const skelas = ref(''), sq = ref('');
@@ -4305,46 +4315,15 @@ app.component('kop', { props: ['k'], template: `<div class="flex items-center ga
 app.component('ttd', { props: ['t'], data: () => ({ tgl: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) }),
   template: `<div class="text-sm w-64 ml-auto mt-8 text-center"><div>{{t.kota}}, {{tgl}}</div><div>{{t.jabatan}}</div><div class="h-16"></div>
   <div class="font-bold underline">{{t.nama||'.....................'}}</div><div v-if="t.nip">NUPTK. {{t.nip}}</div></div>` });
+app.component('icon', { props: { name: String, size: { type: [Number, String], default: 16 }, color: { type: String, default: 'currentColor' } },
+  computed: { p() { return ({
+    'pencil': '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    'save': '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
+    'refresh-cw': '<path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>',
+    'trash-2': '<path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+    'history': '<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><path d="M12 7v5l3 2"/>' })[this.name] || ''; } },
+  template: `<svg :width="size" :height="size" viewBox="0 0 24 24" fill="none" :stroke="color" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:-0.15em;flex:none" v-html="p"></svg>` });
 app.mount('#app');
 </script>
-
-<style id="visual-audit-v107">
-/* v107: indikator fokus keyboard yang konsisten; tidak mengubah perilaku komponen. */
-@media screen {
-  #app :is(button, a, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
-    outline: 2px solid #204397;
-    outline-offset: 2px;
-  }
-}
-</style>
-
-<style id="calm-sidebar-visual-audit-v108">
-/* v108: hilangkan garis vertikal dekoratif yang terlepas dari item navigasi aktif. */
-@media screen {
-  #app aside[aria-label="Menu utama"] { border-left: 0 !important; outline: 0; }
-  #app aside[aria-label="Menu utama"]::before,
-  #app aside[aria-label="Menu utama"]::after,
-  #app aside[aria-label="Menu utama"] > button[aria-current="page"]::before,
-  #app aside[aria-label="Menu utama"] > button[aria-current="page"]::after {
-    content: none !important; display: none !important;
-  }
-  #app aside[aria-label="Menu utama"] > button[aria-current="page"] {
-    border: 0 !important; outline: 0;
-    background: #f1f5ff !important; color: #12377f !important;
-    border-radius: 14px !important;
-    box-shadow: 0 2px 8px rgba(3, 20, 55, .08) !important;
-    font-weight: 650 !important;
-    min-height: 48px;
-    transition: background-color .18s ease, box-shadow .18s ease;
-  }
-  #app aside[aria-label="Menu utama"] > button[aria-current="page"] svg {
-    color: #244ca7 !important;
-  }
-  #app aside[aria-label="Menu utama"] > button:not([aria-current="page"]):hover {
-    border-radius: 12px !important; background: rgba(255,255,255,.075) !important;
-  }
-}
-</style>
-
 </body>
 </html>
