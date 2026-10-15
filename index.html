@@ -2690,54 +2690,33 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   </main>
 </div>
 </div>
-    <style id="calm-nav-compact-v102">
-/* v102: perkecil ikon navigasi + rapatkan jarak agar sidebar ramping seperti sebelumnya.
-   Blok ini berada paling akhir, jadi menang atas semua aturan nav lama (v94/v96/v97) yang masih ada. */
-@media screen{
-  /* Ikon grup: 26×26, ikon di dalam 14×14 */
-  #app aside[aria-label="Menu utama"] section>button>span:first-child{
-    width:26px!important;height:26px!important;
-    min-width:26px!important;max-width:26px!important;min-height:26px!important;max-height:26px!important;
-    border-radius:7px!important;padding:0!important;
-  }
-  #app aside[aria-label="Menu utama"] section>button>span:first-child svg{
-    width:14px!important;height:14px!important;stroke-width:1.75!important;
-  }
-  /* Baris grup: lebih pendek */
-  #app aside[aria-label="Menu utama"] section>button{
-    min-height:36px!important;padding:5px 8px!important;gap:9px!important;
-    border-radius:9px!important;margin-bottom:1px!important;
-  }
-  #app aside[aria-label="Menu utama"] section>button>span:nth-child(2)>span:first-child{
-    font-size:12px!important;line-height:1.25!important;
-  }
-  #app aside[aria-label="Menu utama"] section>button>span:nth-child(2)>span:last-child{
-    font-size:9.5px!important;line-height:1.2!important;margin-top:1px!important;
-  }
-  #app aside[aria-label="Menu utama"] section>button>svg:last-child{
-    width:13px!important;height:13px!important;
-  }
-  /* Submenu: rapat dan kecil */
-  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]{
-    margin:3px 0 4px 13px!important;padding:2px 0 3px 7px!important;
-  }
-  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button{
-    min-height:32px!important;padding:5px 8px!important;gap:8px!important;
-    font-size:11.5px!important;border-radius:7px!important;
-  }
-  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button svg{
-    width:13px!important;height:13px!important;stroke-width:1.7!important;
-  }
-  /* Header logo di atas sidebar: kecilkan agar proporsional */
-  #app aside[aria-label="Menu utama"]>div.hidden.md\:block img{
-    width:34px!important;height:34px!important;padding:3px!important;
-  }
-  #app aside[aria-label="Menu utama"]>div.hidden.md\:block p{font-size:13px!important}
-  #app aside[aria-label="Menu utama"]>div.hidden.md\:block span{
-    font-size:9.5px!important;padding:.15rem .5rem!important;
-  }
-  /* Rapatkan jarak antar grup */
-  #app aside[aria-label="Menu utama"] section{margin-bottom:2px!important}
+<style id="calm-print-nohdr-v103">
+/* v103 — hilangkan header/footer otomatis browser (URL, tanggal, judul halaman)
+   saat mencetak. Akar masalah: setiap @page dengan margin > 0 membuat browser
+   menambahkan header/footer cetak. Solusi: set margin @page = 0 lalu pindahkan
+   ruang tersebut ke padding container sehingga hasil cetak identik tanpa tambahan
+   dari browser. Berlaku untuk semua mode: rapor, tabel, pelanggaran, absen, kartu. */
+
+@page           { size: A4 landscape; margin: 0; }
+@page rapor     { size: A4 portrait;  margin: 0; }
+@page pelanggaran { size: A4 landscape; margin: 0; }
+@page absen     { size: A4 portrait;  margin: 0; }
+
+@media print {
+  /* Rapor: ruang 10/11/11 mm dipindah dari @page rapor ke tiap .rapor-page */
+  body.cetak-rapor .rapor-page      { padding: 10mm 11mm 11mm !important; }
+
+  /* Pelanggaran: ruang 10/11/12 mm */
+  body.cetak-pelanggaran main       { padding: 10mm 11mm 12mm !important; }
+
+  /* Absensi kelas: ruang 12 mm */
+  body.cetak-absen .absen-section   { padding: 12mm !important; }
+
+  /* Cetak tabel umum (leger, rekap, jurnal, bimbingan, monitor) */
+  body.cetak-tabel main             { padding: 12mm !important; }
+
+  /* Cetak kartu login */
+  body.cetak-kartu main             { padding: 12mm !important; }
 }
 </style>
 </head>
@@ -3049,7 +3028,8 @@ const app = createApp({
     const refresh = async () => { kelasList.value = []; kelasAll.value = await api('kelasDetail'); };
     const skelas = ref(''), sq = ref('');
     const siswaTampil = computed(() => { const t = sq.value.toLowerCase(); return siswa.value.filter(s => (!skelas.value || s.kelas === skelas.value) && (!t || (s.nisn + ' ' + s.nama).toLowerCase().includes(t))); });
-    const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis); const s = siswa.value.find(x => String(x.nis) === key); return String(langsung || (s && s.nisn) || key || '-'); };
+    const nisnMap = computed(() => { const m = new Map(); for (const s of siswa.value) m.set(String(s.nis), String(s.nisn || '')); return m; });
+const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis); const nisn = nisnMap.value.get(key); return String(langsung || nisn || key || '-'); };
     const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', XL_GAGAL = 'Pustaka Excel gagal dimuat. Periksa koneksi internet lalu coba lagi.';
     let xlLoad = null;
     const XL = () => {
