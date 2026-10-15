@@ -3013,15 +3013,15 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
             <template v-if="rp.periode==='STS'"><td class="border p-1 text-center">{{nv(s,m.nama,'slm')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'sts')}}</td><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{s.nilai[m.nama]?(s.nilai[m.nama].akhir>=m.kkm?'Tuntas':'Belum tuntas'):'-'}}</td></template>
             <template v-else><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'pred')}}</td><td class="border p-1 text-xs" style="text-align:justify">{{s.nilai[m.nama]&&s.nilai[m.nama].desk||'-'}}</td></template></tr></tbody>
         <tbody><tr class="font-bold rapor-rata-row"><td class="border p-1 text-center" colspan="3">Rata-rata</td><template v-if="rp.periode==='STS'"><td class="border p-1"></td><td class="border p-1"></td><td class="border p-1 text-center rapor-rata-value">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td></template><template v-else><td class="border p-1 text-center rapor-rata-value">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td><td class="border p-1"></td></template></tr></tbody></table>
-      <template v-if="rp.periode==='SAS'">
-        <template v-if="s.pkl"><p class="font-bold text-sm mb-1">B. Praktik Kerja Lapangan (PKL)</p>
+      <template>
+        <template v-if="rp.periode==='SAS' && s.pkl"><p class="font-bold text-sm mb-1">B. Praktik Kerja Lapangan (PKL)</p>
           <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-pkl"><thead><tr class="bg-slate-100"><th class="border p-1 text-left">Mitra DU/DI</th><th class="border p-1">Waktu Pelaksanaan</th><th class="border p-1" style="width:10%">Nilai</th></tr></thead><tbody>
             <tr><td class="border p-1">{{s.pkl.industri||'-'}}</td><td class="border p-1 text-center">{{tglPendekR(s.pkl.mulai)}} s.d. {{tglPendekR(s.pkl.selesai)}}</td><td class="border p-1 text-center font-bold">{{s.pkl.nilai==null?'-':s.pkl.nilai}}</td></tr></tbody></table></template>
-        <p class="font-bold text-sm mb-1">{{s.pkl?'C':'B'}}. Ekstrakurikuler</p>
+        <p class="font-bold text-sm mb-1">{{s.pkl && rp.periode==='SAS'?'C':'B'}}. Ekstrakurikuler</p>
         <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-ekskul"><thead><tr class="bg-slate-100"><th class="border p-1" style="width:5%">No</th><th class="border p-1 text-left" style="width:40%">Kegiatan</th><th class="border p-1 text-left">Keterangan</th></tr></thead><tbody>
           <tr v-for="(e,i) in barisR(rpF[s.nis].ekskul)" :key="i"><td class="border p-1 text-center">{{i+1}}</td><td class="border p-1">{{e.a}}</td><td class="border p-1">{{e.b}}</td></tr>
           <tr v-if="!barisR(rpF[s.nis].ekskul).length"><td class="border p-1 text-center">-</td><td class="border p-1">-</td><td class="border p-1">-</td></tr></tbody></table>
-        <p class="font-bold text-sm mb-1">{{s.pkl?'D':'C'}}. Kokurikuler</p>
+        <p class="font-bold text-sm mb-1">{{s.pkl && rp.periode==='SAS'?'D':'C'}}. Kokurikuler</p>
         <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-kokurikuler"><thead><tr class="bg-slate-100"><th class="border p-1 text-left" style="width:24%">Aspek</th><th class="border p-1 text-left">Kegiatan dan dimensi Profil Lulusan</th></tr></thead><tbody>
           <tr><td class="border p-1 font-semibold">Kokurikuler</td><td class="border p-1" style="white-space:pre-wrap;overflow-wrap:anywhere">{{rpF[s.nis].kokurikuler||'-'}}</td></tr>
         </tbody></table>
