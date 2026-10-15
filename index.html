@@ -2799,6 +2799,180 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   body.cetak-kartu main             { padding: 12mm !important; }
 }
 </style>
+<style id="visual-refinement-v104">
+/* Visual refinement v104 — CSS-only, scoped, screen-only.
+   Tidak mengubah struktur DOM, handler, API, autentikasi, atau aturan cetak. */
+@media screen {
+  #app {
+    color: #24344d;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Fokus keyboard yang konsisten dan terlihat jelas. */
+  #app :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid #d99b20;
+    outline-offset: 2px;
+  }
+
+  /* Formulir: konsisten tanpa mengubah ukuran/jenis kontrol secara agresif. */
+  #app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  #app select,
+  #app textarea {
+    border-color: #d7e0ed;
+    color: #172b4d;
+  }
+  #app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+  #app select:focus,
+  #app textarea:focus {
+    border-color: #7b98c7;
+    box-shadow: 0 0 0 3px rgba(32, 67, 151, .11);
+  }
+  #app :is(input, select, textarea)::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+  }
+  #app :is(button, input, select, textarea):disabled {
+    cursor: not-allowed;
+    opacity: .62;
+  }
+
+  /* Interaksi tabel lebih mudah diikuti; tidak memengaruhi tabel cetak. */
+  #app table:not(.calm-table-print) tbody tr {
+    transition: background-color .12s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    #app table:not(.calm-table-print) tbody tr:hover {
+      background-color: rgba(226, 235, 248, .34);
+    }
+    #app aside[aria-label="Menu utama"] a:hover,
+    #app aside[aria-label="Menu utama"] button:hover {
+      transition: background-color .12s ease, color .12s ease;
+    }
+  }
+
+  /* Batas konten aman untuk halaman dan komponen yang lebar. */
+  #app main,
+  #app main > *,
+  #app .page-head,
+  #app .page-head > * {
+    min-width: 0;
+  }
+  #app .overflow-x-auto {
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #c5d0e0 transparent;
+  }
+  #app .overflow-x-auto::-webkit-scrollbar { height: 7px; width: 7px; }
+  #app .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #c5d0e0;
+    border-radius: 999px;
+  }
+  #app .overflow-x-auto::-webkit-scrollbar-track { background: transparent; }
+
+  /* Modal/dialog: beri ruang di layar sempit tanpa mengubah perilaku buka/tutup. */
+  #app .modal-wrap,
+  #app .dlg-wrap {
+    padding: clamp(10px, 2.5vw, 24px);
+  }
+  #app .modal-box {
+    max-width: min(100%, 100vw - 20px);
+  }
+}
+
+@media screen and (max-width: 640px) {
+  #app .modal-box {
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #app .page-head {
+    gap: 8px;
+  }
+  #app .page-head :is(button, a) {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app *,
+  #app *::before,
+  #app *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+<style id="visual-refinement-v105">
+/* Visual refinement v105 — tambahan CSS konservatif; tidak menyentuh JavaScript atau aturan cetak. */
+@media screen {
+  /* Hierarki teks halaman lebih konsisten, tanpa mengubah ukuran layout secara agresif. */
+  #app .page-head .h2 {
+    letter-spacing: -.022em;
+    text-wrap: balance;
+  }
+  #app .panel-head h3 {
+    letter-spacing: -.012em;
+    line-height: 1.35;
+  }
+  #app .desk,
+  #app .panel-desc {
+    text-wrap: pretty;
+  }
+
+  /* Transisi tombol ringan; tidak mengubah event, dimensi, atau perilaku klik. */
+  #app .btn-p,
+  #app .btn-o {
+    transition: background-color .14s ease, border-color .14s ease, box-shadow .14s ease;
+  }
+  #app .btn-p:hover:not(:disabled) {
+    box-shadow: 0 2px 8px rgba(11, 61, 145, .12);
+  }
+  #app .btn-o:hover:not(:disabled) {
+    border-color: #b8c7dc;
+  }
+
+  /* Umpan balik visual halus untuk pintasan yang memang interaktif. */
+  #app .quick-tile:hover {
+    border-color: #b8c7dc;
+  }
+
+  /* Warna kontrol native mengikuti palet portal dan tetap dapat diakses keyboard. */
+  #app input[type="checkbox"],
+  #app input[type="radio"] {
+    accent-color: #204397;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  /* Kartu pintasan tidak memaksa kolom lebih lebar daripada layar. */
+  #app .quick-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app .btn-p,
+  #app .btn-o {
+    transition: none !important;
+  }
+}
+</style>
+
+
+<style id="visual-refinement-v106">
+/* v106: penyempurnaan area gulir responsif; hanya tampilan layar. */
+@media screen {
+  /* Pembungkus tabel/daftar lebar tetap berada di dalam kolom induknya. */
+  #app .overflow-x-auto {
+    min-width: 0;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+</style>
 </head>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
@@ -4133,5 +4307,44 @@ app.component('ttd', { props: ['t'], data: () => ({ tgl: new Date().toLocaleDate
   <div class="font-bold underline">{{t.nama||'.....................'}}</div><div v-if="t.nip">NUPTK. {{t.nip}}</div></div>` });
 app.mount('#app');
 </script>
+
+<style id="visual-audit-v107">
+/* v107: indikator fokus keyboard yang konsisten; tidak mengubah perilaku komponen. */
+@media screen {
+  #app :is(button, a, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
+    outline: 2px solid #204397;
+    outline-offset: 2px;
+  }
+}
+</style>
+
+<style id="calm-sidebar-visual-audit-v108">
+/* v108: hilangkan garis vertikal dekoratif yang terlepas dari item navigasi aktif. */
+@media screen {
+  #app aside[aria-label="Menu utama"] { border-left: 0 !important; outline: 0; }
+  #app aside[aria-label="Menu utama"]::before,
+  #app aside[aria-label="Menu utama"]::after,
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"]::before,
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"]::after {
+    content: none !important; display: none !important;
+  }
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"] {
+    border: 0 !important; outline: 0;
+    background: #f1f5ff !important; color: #12377f !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 8px rgba(3, 20, 55, .08) !important;
+    font-weight: 650 !important;
+    min-height: 48px;
+    transition: background-color .18s ease, box-shadow .18s ease;
+  }
+  #app aside[aria-label="Menu utama"] > button[aria-current="page"] svg {
+    color: #244ca7 !important;
+  }
+  #app aside[aria-label="Menu utama"] > button:not([aria-current="page"]):hover {
+    border-radius: 12px !important; background: rgba(255,255,255,.075) !important;
+  }
+}
+</style>
+
 </body>
 </html>
