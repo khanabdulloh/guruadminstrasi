@@ -2799,180 +2799,6 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   body.cetak-kartu main             { padding: 12mm !important; }
 }
 </style>
-<style id="visual-refinement-v104">
-/* Visual refinement v104 — CSS-only, scoped, screen-only.
-   Tidak mengubah struktur DOM, handler, API, autentikasi, atau aturan cetak. */
-@media screen {
-  #app {
-    color: #24344d;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Fokus keyboard yang konsisten dan terlihat jelas. */
-  #app :is(a, button, input, select, textarea, [tabindex]):focus-visible {
-    outline: 2px solid #d99b20;
-    outline-offset: 2px;
-  }
-
-  /* Formulir: konsisten tanpa mengubah ukuran/jenis kontrol secara agresif. */
-  #app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-  #app select,
-  #app textarea {
-    border-color: #d7e0ed;
-    color: #172b4d;
-  }
-  #app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
-  #app select:focus,
-  #app textarea:focus {
-    border-color: #7b98c7;
-    box-shadow: 0 0 0 3px rgba(32, 67, 151, .11);
-  }
-  #app :is(input, select, textarea)::placeholder {
-    color: #94a3b8;
-    opacity: 1;
-  }
-  #app :is(button, input, select, textarea):disabled {
-    cursor: not-allowed;
-    opacity: .62;
-  }
-
-  /* Interaksi tabel lebih mudah diikuti; tidak memengaruhi tabel cetak. */
-  #app table:not(.calm-table-print) tbody tr {
-    transition: background-color .12s ease;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    #app table:not(.calm-table-print) tbody tr:hover {
-      background-color: rgba(226, 235, 248, .34);
-    }
-    #app aside[aria-label="Menu utama"] a:hover,
-    #app aside[aria-label="Menu utama"] button:hover {
-      transition: background-color .12s ease, color .12s ease;
-    }
-  }
-
-  /* Batas konten aman untuk halaman dan komponen yang lebar. */
-  #app main,
-  #app main > *,
-  #app .page-head,
-  #app .page-head > * {
-    min-width: 0;
-  }
-  #app .overflow-x-auto {
-    overscroll-behavior-x: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #c5d0e0 transparent;
-  }
-  #app .overflow-x-auto::-webkit-scrollbar { height: 7px; width: 7px; }
-  #app .overflow-x-auto::-webkit-scrollbar-thumb {
-    background: #c5d0e0;
-    border-radius: 999px;
-  }
-  #app .overflow-x-auto::-webkit-scrollbar-track { background: transparent; }
-
-  /* Modal/dialog: beri ruang di layar sempit tanpa mengubah perilaku buka/tutup. */
-  #app .modal-wrap,
-  #app .dlg-wrap {
-    padding: clamp(10px, 2.5vw, 24px);
-  }
-  #app .modal-box {
-    max-width: min(100%, 100vw - 20px);
-  }
-}
-
-@media screen and (max-width: 640px) {
-  #app .modal-box {
-    width: 100%;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  #app .page-head {
-    gap: 8px;
-  }
-  #app .page-head :is(button, a) {
-    max-width: 100%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #app *,
-  #app *::before,
-  #app *::after {
-    scroll-behavior: auto !important;
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
-  }
-}
-</style>
-<style id="visual-refinement-v105">
-/* Visual refinement v105 — tambahan CSS konservatif; tidak menyentuh JavaScript atau aturan cetak. */
-@media screen {
-  /* Hierarki teks halaman lebih konsisten, tanpa mengubah ukuran layout secara agresif. */
-  #app .page-head .h2 {
-    letter-spacing: -.022em;
-    text-wrap: balance;
-  }
-  #app .panel-head h3 {
-    letter-spacing: -.012em;
-    line-height: 1.35;
-  }
-  #app .desk,
-  #app .panel-desc {
-    text-wrap: pretty;
-  }
-
-  /* Transisi tombol ringan; tidak mengubah event, dimensi, atau perilaku klik. */
-  #app .btn-p,
-  #app .btn-o {
-    transition: background-color .14s ease, border-color .14s ease, box-shadow .14s ease;
-  }
-  #app .btn-p:hover:not(:disabled) {
-    box-shadow: 0 2px 8px rgba(11, 61, 145, .12);
-  }
-  #app .btn-o:hover:not(:disabled) {
-    border-color: #b8c7dc;
-  }
-
-  /* Umpan balik visual halus untuk pintasan yang memang interaktif. */
-  #app .quick-tile:hover {
-    border-color: #b8c7dc;
-  }
-
-  /* Warna kontrol native mengikuti palet portal dan tetap dapat diakses keyboard. */
-  #app input[type="checkbox"],
-  #app input[type="radio"] {
-    accent-color: #204397;
-  }
-}
-
-@media screen and (max-width: 640px) {
-  /* Kartu pintasan tidak memaksa kolom lebih lebar daripada layar. */
-  #app .quick-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #app .btn-p,
-  #app .btn-o {
-    transition: none !important;
-  }
-}
-</style>
-
-
-<style id="visual-refinement-v106">
-/* v106: penyempurnaan area gulir responsif; hanya tampilan layar. */
-@media screen {
-  /* Pembungkus tabel/daftar lebar tetap berada di dalam kolom induknya. */
-  #app .overflow-x-auto {
-    min-width: 0;
-    max-width: 100%;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-</style>
 </head>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
@@ -2991,8 +2817,6 @@ const LOGO = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiD-8YPF
     icons: [{ src: u(192), sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: u(512), sizes: '512x512', type: 'image/png', purpose: 'any' }] })], { type: 'application/manifest+json' }));
 } catch (e) { /* ikon bawaan tetap dipakai */ } })();
 
-const ssSet = (k, v) => { try { sessionStorage.setItem(k, v); } catch (e) { /* penyimpanan sesi diblokir (mis. iframe sandbox) */ } };
-const ssClear = () => { try { sessionStorage.clear(); } catch (e) { /* */ } };
 const app = createApp({
   setup() {
     const token = ref((() => { try { return sessionStorage.getItem('tk') || ''; } catch (e) { return ''; } })());
@@ -3205,10 +3029,10 @@ const app = createApp({
     const login = () => run(async () => {
       const d = await api('login', { username: f.username, password: f.password, expectedRole: loginRole.value });
       token.value = d.token; user.value = d.user; f.password = '';
-      ssSet('tk', d.token); ssSet('us', JSON.stringify(d.user));
+      sessionStorage.setItem('tk', d.token); sessionStorage.setItem('us', JSON.stringify(d.user));
       go('dashboard');
     });
-    function logout() { CC.clear(); token.value = ''; user.value = null; ssClear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
+    function logout() { CC.clear(); token.value = ''; user.value = null; sessionStorage.clear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
     let dashAt = 0;
     const goDasar = k => run(async () => {
       if (user.value.wajib) k = 'sandi';
@@ -3283,7 +3107,7 @@ const app = createApp({
       if (pw.baru !== pw.konf) throw new Error('Konfirmasi sandi tidak cocok');
       if (pw.baru === pw.lama) throw new Error('Sandi baru harus berbeda dari sandi lama');
       await api('gantiPassword', { lama: pw.lama, baru: pw.baru }); pw.lama = pw.baru = pw.konf = '';
-      if (user.value.wajib) { user.value.wajib = false; ssSet('us', JSON.stringify(user.value)); await go('dashboard'); ok.value = 'Sandi diperbarui. Selamat datang di portal!'; } else ok.value = 'Sandi diperbarui';
+      if (user.value.wajib) { user.value.wajib = false; sessionStorage.setItem('us', JSON.stringify(user.value)); await go('dashboard'); ok.value = 'Sandi diperbarui. Selamat datang di portal!'; } else ok.value = 'Sandi diperbarui';
     });
     const refresh = async () => { kelasList.value = []; kelasAll.value = await api('kelasDetail'); };
     const skelas = ref(''), sq = ref('');
@@ -4307,14 +4131,6 @@ app.component('kop', { props: ['k'], template: `<div class="flex items-center ga
 app.component('ttd', { props: ['t'], data: () => ({ tgl: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) }),
   template: `<div class="text-sm w-64 ml-auto mt-8 text-center"><div>{{t.kota}}, {{tgl}}</div><div>{{t.jabatan}}</div><div class="h-16"></div>
   <div class="font-bold underline">{{t.nama||'.....................'}}</div><div v-if="t.nip">NUPTK. {{t.nip}}</div></div>` });
-app.component('icon', { props: { name: String, size: { type: [Number, String], default: 16 }, color: { type: String, default: 'currentColor' } },
-  computed: { p() { return ({
-    'pencil': '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
-    'save': '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
-    'refresh-cw': '<path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>',
-    'trash-2': '<path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
-    'history': '<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/><path d="M12 7v5l3 2"/>' })[this.name] || ''; } },
-  template: `<svg :width="size" :height="size" viewBox="0 0 24 24" fill="none" :stroke="color" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:-0.15em;flex:none" v-html="p"></svg>` });
 app.mount('#app');
 </script>
 </body>
