@@ -2690,6 +2690,56 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   </main>
 </div>
 </div>
+    <style id="calm-nav-compact-v102">
+/* v102: perkecil ikon navigasi + rapatkan jarak agar sidebar ramping seperti sebelumnya.
+   Blok ini berada paling akhir, jadi menang atas semua aturan nav lama (v94/v96/v97) yang masih ada. */
+@media screen{
+  /* Ikon grup: 26×26, ikon di dalam 14×14 */
+  #app aside[aria-label="Menu utama"] section>button>span:first-child{
+    width:26px!important;height:26px!important;
+    min-width:26px!important;max-width:26px!important;min-height:26px!important;max-height:26px!important;
+    border-radius:7px!important;padding:0!important;
+  }
+  #app aside[aria-label="Menu utama"] section>button>span:first-child svg{
+    width:14px!important;height:14px!important;stroke-width:1.75!important;
+  }
+  /* Baris grup: lebih pendek */
+  #app aside[aria-label="Menu utama"] section>button{
+    min-height:36px!important;padding:5px 8px!important;gap:9px!important;
+    border-radius:9px!important;margin-bottom:1px!important;
+  }
+  #app aside[aria-label="Menu utama"] section>button>span:nth-child(2)>span:first-child{
+    font-size:12px!important;line-height:1.25!important;
+  }
+  #app aside[aria-label="Menu utama"] section>button>span:nth-child(2)>span:last-child{
+    font-size:9.5px!important;line-height:1.2!important;margin-top:1px!important;
+  }
+  #app aside[aria-label="Menu utama"] section>button>svg:last-child{
+    width:13px!important;height:13px!important;
+  }
+  /* Submenu: rapat dan kecil */
+  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]{
+    margin:3px 0 4px 13px!important;padding:2px 0 3px 7px!important;
+  }
+  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button{
+    min-height:32px!important;padding:5px 8px!important;gap:8px!important;
+    font-size:11.5px!important;border-radius:7px!important;
+  }
+  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button svg{
+    width:13px!important;height:13px!important;stroke-width:1.7!important;
+  }
+  /* Header logo di atas sidebar: kecilkan agar proporsional */
+  #app aside[aria-label="Menu utama"]>div.hidden.md\:block img{
+    width:34px!important;height:34px!important;padding:3px!important;
+  }
+  #app aside[aria-label="Menu utama"]>div.hidden.md\:block p{font-size:13px!important}
+  #app aside[aria-label="Menu utama"]>div.hidden.md\:block span{
+    font-size:9.5px!important;padding:.15rem .5rem!important;
+  }
+  /* Rapatkan jarak antar grup */
+  #app aside[aria-label="Menu utama"] section{margin-bottom:2px!important}
+}
+</style>
 </head>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
