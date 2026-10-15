@@ -1312,6 +1312,47 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 }
 </style>
+
+<style id="calm-rapor-identitas-simetris-v75">
+/* v75: identitas peserta didik dan blok Kelas/Fase/Semester konsisten pada cetak rapor. */
+@media print {
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id {
+    width:100%!important;
+    max-width:100%!important;
+    table-layout:fixed!important;
+    border-collapse:collapse!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id tr {
+    display:grid!important;
+    grid-template-columns: 20% 2% 38% 13% 2% 25%!important;
+    width:100%!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td {
+    display:block!important;
+    min-width:0!important;
+    width:auto!important;
+    box-sizing:border-box!important;
+    padding:3pt 3pt!important;
+    vertical-align:middle!important;
+    overflow-wrap:anywhere!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(2),
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(5) {
+    text-align:center!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(3) {
+    padding-left:5pt!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(4) {
+    padding-left:5pt!important;
+  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(6) {
+    padding-left:5pt!important;
+  }
+}
+</style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
@@ -2593,6 +2634,12 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
             <label class="lb">Minimal kehadiran (%)<input type="number" min="0" max="100" v-model.number="rcf.minHadir" class="inp w-full mt-1"></label></div>
           <p class="text-xs text-slate-500 mt-2">Bobot nilai dan KKTP per mapel diatur di menu Pengaturan (Akademik). Kop surat &amp; Kepala Sekolah diatur di Pengaturan (Kop &amp; Tanda Tangan).</p></div>
         <div class="bg-white rounded-2xl shadow-sm overflow-x-auto mb-4"><h3 class="font-bold p-4 pb-1">Kelompok &amp; urutan mata pelajaran pada rapor</h3><p class="text-xs text-slate-500 px-4 pb-2">Mapel tanpa pengaturan masuk kelompok Umum. Pilih “Mata Pelajaran Pilihan” untuk mapel pilihan; kelompok ini opsional dan hanya tampil pada rapor jika ada mapel yang ditempatkan di dalamnya. Urutan: angka kecil tampil lebih dulu dalam kelompoknya.</p>
+          <div class="mx-4 mb-4 grid gap-3 md:grid-cols-3 text-xs leading-relaxed">
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-3"><b class="block text-slate-800 mb-1">Keterangan Kelas X</b><span class="text-slate-600">Tempatkan mata pelajaran sesuai struktur kurikulum dan penawaran pilihan yang berlaku untuk Kelas X. Jangan masukkan mapel yang tidak ditawarkan pada tingkat ini.</span></div>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-3"><b class="block text-slate-800 mb-1">Keterangan Kelas XI</b><span class="text-slate-600">Periksa kembali daftar mapel pilihan sesuai struktur kurikulum dan konsentrasi/program keahlian Kelas XI. Daftarnya dapat berbeda dari Kelas X.</span></div>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-3"><b class="block text-slate-800 mb-1">Keterangan Kelas XII</b><span class="text-slate-600">Gunakan mapel pilihan yang benar-benar tercantum pada struktur kurikulum dan penawaran Kelas XII. Pastikan penamaan rapor konsisten dengan dokumen akademik sekolah.</span></div>
+          </div>
+          <div class="mx-4 mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs leading-relaxed text-blue-950"><b class="block mb-1">Panduan guru pengampu mata pelajaran pilihan</b>Guru yang sama dapat mengampu lebih dari satu mata pelajaran pilihan hanya jika sesuai kompetensi/keahlian dan penugasan resmi sekolah. Pengaturan kelompok ini mengelompokkan tampilan mapel pada rapor; pengaturan ini tidak menetapkan guru pengampu dan tidak otomatis menentukan mapel mana yang boleh diajar oleh guru yang sama. Daftar nama mapel pilihan per kelas perlu mengikuti struktur kurikulum serta pembagian tugas guru sekolah.</div>
           <table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama/kode asli</th><th style="min-width:260px">Nama mata pelajaran pada rapor</th><th>Kelompok</th><th>Urutan</th></tr></thead><tbody>
             <tr v-for="m in rcf.mapel" :key="m" class="border-t"><td class="p-3 font-medium">{{m}}</td><td class="p-2"><input type="text" maxlength="100" :value="rcf.nama[m]||m" @input="rcf.nama[m]=$event.target.value" class="inp w-full normal-case" :aria-label="'Nama rapor untuk '+m" placeholder="Nama lengkap mata pelajaran"></td><td class="p-2"><select v-model="rcf.kel[m].g" class="inp normal-case"><option v-for="g in rcf.grup" :key="g">{{g}}</option></select></td><td class="p-2"><input type="number" min="0" max="999" v-model="rcf.kel[m].o" class="w-20 border-b border-slate-300 py-1 focus:outline-none focus:border-blue-700"></td></tr></tbody></table></div>
         <button @click="simpanRc" :disabled="busy" class="btn-p">Simpan pengaturan rapor</button>
