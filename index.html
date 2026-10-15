@@ -2690,6 +2690,86 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   </main>
 </div>
 </div>
+    <style id="calm-nav-compact-v103">
+/* v103: menggantikan v102. v102 mengecilkan ikon ke 26px sementara teks tetap 12px
+   sehingga proporsinya janggal dan menu tampak besar/kasar. v103 menyeimbangkan:
+   ikon sedikit lebih lega, teks sedikit lebih kecil, jarak dirapikan.
+   Blok ini harus berada PALING AKHIR di antara semua style nav agar menang cascade. */
+@media screen{
+  /* ---------- Header sidebar (logo + nama + badge) ---------- */
+  #app aside[aria-label="Menu utama"]>div.hidden.md\:block img{
+    width:36px!important;height:36px!important;padding:3px!important;border-radius:9px!important;
+  }
+  #app aside[aria-label="Menu utama"]>div.hidden.md\:block p{
+    font-size:13.5px!important;letter-spacing:-.01em!important;
+  }
+  #app aside[aria-label="Menu utama"]>div.hidden.md\:block span{
+    font-size:10px!important;padding:.18rem .55rem!important;letter-spacing:.02em!important;
+  }
+
+  /* ---------- Baris grup (judul kategori) ---------- */
+  #app aside[aria-label="Menu utama"] section>button{
+    min-height:38px!important;
+    padding:6px 10px!important;
+    gap:10px!important;
+    border-radius:9px!important;
+    margin-bottom:2px!important;
+  }
+
+  /* Kontainer ikon grup: 28x28, ikon SVG di dalam 15x15 */
+  #app aside[aria-label="Menu utama"] section>button>span:first-child{
+    width:28px!important;height:28px!important;
+    min-width:28px!important;max-width:28px!important;
+    min-height:28px!important;max-height:28px!important;
+    border-radius:8px!important;padding:0!important;
+  }
+  #app aside[aria-label="Menu utama"] section>button>span:first-child svg{
+    width:15px!important;height:15px!important;stroke-width:1.8!important;
+  }
+
+  /* Teks grup: judul + subjudul ("N menu") */
+  #app aside[aria-label="Menu utama"] section>button>span:nth-child(2)>span:first-child{
+    font-size:12.5px!important;line-height:1.25!important;letter-spacing:-.005em!important;
+  }
+  #app aside[aria-label="Menu utama"] section>button>span:nth-child(2)>span:last-child{
+    font-size:10px!important;line-height:1.2!important;margin-top:1px!important;opacity:.75!important;
+  }
+
+  /* Chevron (panah buka/tutup) */
+  #app aside[aria-label="Menu utama"] section>button>svg:last-child{
+    width:14px!important;height:14px!important;
+  }
+
+  /* ---------- Submenu (item di dalam grup) ---------- */
+  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]{
+    margin:3px 0 5px 14px!important;
+    padding:2px 0 4px 8px!important;
+    border-left-width:2px!important;
+  }
+  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button{
+    min-height:34px!important;
+    padding:6px 9px!important;
+    gap:9px!important;
+    font-size:12px!important;
+    font-weight:500!important;
+    border-radius:7px!important;
+    line-height:1.35!important;
+  }
+  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button svg{
+    width:14px!important;height:14px!important;stroke-width:1.75!important;
+  }
+  /* Badge kecil (notif belum dibaca) */
+  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button>span.absolute,
+  #app aside[aria-label="Menu utama"] section>div[id^="calm-menu-"]>button>span[class*="bg-rose"]{
+    font-size:10px!important;line-height:1!important;
+    padding:2px 6px!important;min-width:18px!important;text-align:center!important;
+  }
+
+  /* ---------- Jarak antar grup ---------- */
+  #app aside[aria-label="Menu utama"] section{margin-bottom:4px!important}
+  #app aside[aria-label="Menu utama"] section:last-of-type{margin-bottom:8px!important}
+}
+</style>
 <style id="calm-print-nohdr-v103">
 /* v103 — hilangkan header/footer otomatis browser (URL, tanggal, judul halaman)
    saat mencetak. Akar masalah: setiap @page dengan margin > 0 membuat browser
