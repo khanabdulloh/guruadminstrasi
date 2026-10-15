@@ -1313,8 +1313,8 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
 }
 </style>
 
-<style id="calm-rapor-identitas-simetris-v75">
-/* v75: identitas peserta didik dan blok Kelas/Fase/Semester konsisten pada cetak rapor. */
+<style id="calm-rapor-identitas-simetris-v76">
+/* v76: gunakan perilaku tabel asli saat cetak; jangan ubah baris tabel menjadi CSS grid. */
 @media print {
   body.cetak-rapor .rapor-page table.calm-table-print.rapor-id {
     width:100%!important;
@@ -1323,34 +1323,30 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
     border-collapse:collapse!important;
   }
   body.cetak-rapor .rapor-page table.calm-table-print.rapor-id tr {
-    display:grid!important;
-    grid-template-columns: 20% 2% 38% 13% 2% 25%!important;
-    width:100%!important;
+    display:table-row!important;
+    width:auto!important;
   }
   body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td {
-    display:block!important;
+    display:table-cell!important;
     min-width:0!important;
-    width:auto!important;
     box-sizing:border-box!important;
-    padding:3pt 3pt!important;
+    padding:3pt 4pt!important;
     vertical-align:middle!important;
-    overflow-wrap:anywhere!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    white-space:normal!important;
   }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(1) { width:19%!important; }
   body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(2),
   body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(5) {
+    width:2%!important;
     text-align:center!important;
     padding-left:0!important;
     padding-right:0!important;
   }
-  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(3) {
-    padding-left:5pt!important;
-  }
-  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(4) {
-    padding-left:5pt!important;
-  }
-  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(6) {
-    padding-left:5pt!important;
-  }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(3) { width:39%!important; padding-left:5pt!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(4) { width:10%!important; padding-left:5pt!important; white-space:nowrap!important; }
+  body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(6) { width:28%!important; padding-left:5pt!important; white-space:nowrap!important; }
 }
 </style>
 </head>
