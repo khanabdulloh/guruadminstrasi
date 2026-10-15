@@ -1349,6 +1349,73 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   body.cetak-rapor .rapor-page table.calm-table-print.rapor-id td:nth-child(6) { width:28%!important; padding-left:5pt!important; white-space:nowrap!important; }
 }
 </style>
+
+<style id="calm-rapor-identitas-final-audit">
+/* Aturan final identitas rapor: mengalahkan aturan cetak lama yang saling bertumpuk. */
+@media print {
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id,
+  html body.cetak-rapor .rapor-page table.rapor-id {
+    display: table !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody {
+    display: table-row-group !important;
+    width: 100% !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr {
+    display: table-row !important;
+    width: 100% !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td {
+    display: table-cell !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    padding: 3pt 4pt !important;
+    vertical-align: middle !important;
+    font-size: 9.5pt !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    hyphens: none !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td:nth-child(1) {
+    width: 20% !important;
+    text-align: left !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td:nth-child(2),
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td:nth-child(5) {
+    width: 2.5% !important;
+    text-align: center !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td:nth-child(3) {
+    width: 37.5% !important;
+    text-align: left !important;
+    padding-left: 5pt !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td:nth-child(4) {
+    width: 12% !important;
+    text-align: left !important;
+    padding-left: 8pt !important;
+    white-space: nowrap !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td:nth-child(6) {
+    width: 25.5% !important;
+    text-align: left !important;
+    padding-left: 5pt !important;
+    white-space: nowrap !important;
+  }
+}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="app" v-cloak>
