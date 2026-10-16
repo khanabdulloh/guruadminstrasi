@@ -3997,7 +3997,18 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       rp.value = d; rpSatu.value = ''; rpCek.value = null;
       // Info guru pengampu per mapel (hanya tampilan; gagal = diabaikan, tidak memengaruhi rapor)
       rpGuruMap.value = {};
-      if (d) { try { const jl = await api('jadwalList'), m = {}; (jl || []).forEach(j => { if (String(j.kelas) !== String(k)) return; const key = String(j.mapel || '').trim().toLowerCase(); if (!key || !j.guruNama) return; (m[key] = m[key] || []); if (!m[key].includes(j.guruNama)) m[key].push(j.guruNama); }); if (rid === rpReq) rpGuruMap.value = m; } catch (e) { /* nama guru opsional */ } }
+      if (d) { try { const jl = await api('jadwalList'), m = {}, nk = x => String(x == null ? '' : x).toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, ''); (jl || []).forEach(j => { if (nk(j.kelas) !== nk(k)) return; const key = nrmMapel(j.mapel), gn = String(j.guruNama || j.guru || '').trim(); if (!key || !gn) return; (m[key] = m[key] || []); if (!m[key].includes(gn)) m[key].push(gn); }); if (rid === rpReq) rpGuruMap.value = m; } catch (e) { /* nama guru opsional */ } }
+    };
+    const nrmMapel = x => String(x == null ? '' : x).toLowerCase().replace(/&/g, ' dan ').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+    const cariGuruMapel = (nama, label) => {
+      const M = rpGuruMap.value, keys = Object.keys(M);
+      for (const c of [nama, label]) { const k = nrmMapel(c); if (k && M[k]) return M[k]; }
+      for (const c of [nama, label]) {
+        const k = nrmMapel(c); if (!k) continue;
+        const t = new Set(k.split(' ')), hit = keys.filter(z => { if (z.length < 3 || k.length < 3) return false; if (z.includes(k) || k.includes(z)) return true; const zt = z.split(' '); return zt.every(w => t.has(w)) || [...t].every(w => zt.includes(w)); });
+        if (hit.length === 1) return M[hit[0]];
+      }
+      return [];
     };
     const rpGuruMap = ref({});
     const rpGuruStat = computed(() => {
@@ -4011,7 +4022,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       const hitung = (m, f) => d.siswa.reduce((a, s) => { const x = s.nilai && s.nilai[m]; return a + (x && x[f] != null && x[f] !== '' && x[f] !== '-' ? 1 : 0); }, 0);
       const grup = new Map();
       [...nm.keys()].forEach(m => {
-        const gs = rpGuruMap.value[String(m).trim().toLowerCase()] || [], nama = gs.length ? gs.join(' / ') : '', key = nama || ('?' + m);
+        const gs = cariGuruMapel(m, nm.get(m)), nama = gs.length ? gs.join(' / ') : '', key = nama || ('?' + m);
         if (!grup.has(key)) grup.set(key, { nama: nama || 'Guru belum terdata', dikenal: !!nama, mapel: [] });
         grup.get(key).mapel.push({ label: nm.get(m), sts: hitung(m, 'sts'), sas: hitung(m, 'sas') });
       });
