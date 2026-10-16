@@ -2077,8 +2077,8 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
         </div>
         <p v-if="rpGuruStat.tdk&&rpGuruDiag" class="rg-note">{{rpGuruStat.tdk}} mapel belum ditemukan gurunya. <template v-if="rpGuruDiag.err">Jadwal gagal dimuat: {{rpGuruDiag.err}}.</template><template v-else>Jadwal yang terbaca oleh akun ini: {{rpGuruDiag.total}} baris, {{rpGuruDiag.kelas}} baris untuk kelas {{rp.kelas}}. Jika jumlahnya jauh lebih sedikit dari jadwal sebenarnya, akun ini hanya diberi akses ke jadwalnya sendiri oleh server.</template></p>
         <div class="rg-list">
-          <div v-for="g in rpGuruStat.list" :key="g.nama+g.mapel.length" class="rg-line" :title="g.mapel.map(m=>m.label+' — STS '+(rpGuruStat.tersedia.sts?m.sts+'/'+rpGuruStat.n:'–')+', SAS '+(rpGuruStat.tersedia.sas?m.sas+'/'+rpGuruStat.n:'–')).join('\n')">
-            <span class="rg-nm"><b>{{g.dikenal?g.nama:g.mapel[0].label}}</b><small>{{g.dikenal?g.mapel.map(m=>m.label).join(', '):'guru tidak terbaca dari jadwal'}}</small></span>
+          <div v-for="(g,gi) in rpGuruStat.list" :key="g.nama+g.mapel.length" class="rg-line" :title="g.mapel.map(m=>m.label+' — STS '+(rpGuruStat.tersedia.sts?m.sts+'/'+rpGuruStat.n:'–')+', SAS '+(rpGuruStat.tersedia.sas?m.sas+'/'+rpGuruStat.n:'–')).join('\n')">
+            <span class="rg-nm"><b>{{gi+1}}. {{g.dikenal?g.nama:g.mapel[0].label}}</b><small>{{g.dikenal?g.mapel.map(m=>m.label).join(', '):'guru tidak terbaca dari jadwal'}}</small></span>
             <span class="rg-bar"><i class="rg-sts" :class="g.stsFull?'full':''" :style="{width:(rpGuruStat.tersedia.sts?g.stsPct:0)+'%'}"></i></span>
             <em>{{!rpGuruStat.tersedia.sts?'–':g.stsFull?'✓':g.stsPct+'%'}}</em>
             <span class="rg-bar"><i class="rg-sas" :class="g.sasFull?'full':''" :style="{width:(rpGuruStat.tersedia.sas?g.sasPct:0)+'%'}"></i></span>
