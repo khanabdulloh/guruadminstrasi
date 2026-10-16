@@ -2069,20 +2069,17 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
         <label class="lb">Tahun ajaran<select v-model="rpMeta.tahun" @change="loadRapor" class="inp w-full mt-1 normal-case"><option v-for="t in opsiTahun(rpMeta.tahun)" :key="t" :value="t">{{t}}</option></select></label>
       </div>
 
-      <div v-if="rpGuruStat&&(rpTab==='data'||rpTab==='validasi')" class="rg noprint" role="region" aria-label="Status pengiriman nilai oleh guru pengajar">
+      <div v-if="rpGuruStat&&(rpTab==='data'||rpTab==='validasi')" class="rg noprint" role="region" :aria-label="'Status pengiriman nilai '+rpGuruStat.pLabel+' oleh guru pengajar'">
         <div class="rg-head">
-          <b>Nilai masuk dari guru pengajar</b>
-          <span class="rg-leg"><i class="rg-sts"></i>STS <u v-if="rpGuruStat.tersedia.sts">{{rpGuruStat.stsFull}}/{{rpGuruStat.total}} lengkap</u><u v-else>belum tersedia</u></span>
-          <span class="rg-leg"><i class="rg-sas"></i>SAS <u v-if="rpGuruStat.tersedia.sas">{{rpGuruStat.sasFull}}/{{rpGuruStat.total}} lengkap</u><u v-else>belum tersedia</u></span>
+          <b>Nilai {{rpGuruStat.pLabel}} masuk dari guru pengajar</b>
+          <span class="rg-leg"><i :class="rpGuruStat.p==='sts'?'rg-sts':'rg-sas'"></i>{{rpGuruStat.pLabel}} <u v-if="rpGuruStat.ok">{{rpGuruStat.pFull}}/{{rpGuruStat.total}} lengkap</u><u v-else>belum tersedia</u></span>
         </div>
         <p v-if="rpGuruStat.tdk&&rpGuruDiag" class="rg-note">{{rpGuruStat.tdk}} mapel belum ditemukan gurunya. <template v-if="rpGuruDiag.err">Jadwal gagal dimuat: {{rpGuruDiag.err}}.</template><template v-else>Jadwal yang terbaca oleh akun ini: {{rpGuruDiag.total}} baris, {{rpGuruDiag.kelas}} baris untuk kelas {{rp.kelas}}. Jika jumlahnya jauh lebih sedikit dari jadwal sebenarnya, akun ini hanya diberi akses ke jadwalnya sendiri oleh server.</template></p>
         <div class="rg-list">
-          <div v-for="(g,gi) in rpGuruStat.list" :key="g.nama+g.mapel.length" class="rg-line" :title="g.mapel.map(m=>m.label+' — STS '+(rpGuruStat.tersedia.sts?m.sts+'/'+rpGuruStat.n:'–')+', SAS '+(rpGuruStat.tersedia.sas?m.sas+'/'+rpGuruStat.n:'–')).join('\n')">
+          <div v-for="(g,gi) in rpGuruStat.list" :key="g.key" class="rg-line" :title="g.mapel.map(m=>m.label+' — '+rpGuruStat.pLabel+' '+(rpGuruStat.ok?m.v+'/'+rpGuruStat.n:'–')).join('\n')">
             <span class="rg-nm"><b>{{gi+1}}. {{g.dikenal?g.nama:g.mapel[0].label}}</b><small>{{g.dikenal?g.mapel.map(m=>m.label).join(', '):'guru tidak terbaca dari jadwal'}}</small></span>
-            <span class="rg-bar"><i class="rg-sts" :class="g.stsFull?'full':''" :style="{width:(rpGuruStat.tersedia.sts?g.stsPct:0)+'%'}"></i></span>
-            <em>{{!rpGuruStat.tersedia.sts?'–':g.stsFull?'✓':g.stsPct+'%'}}</em>
-            <span class="rg-bar"><i class="rg-sas" :class="g.sasFull?'full':''" :style="{width:(rpGuruStat.tersedia.sas?g.sasPct:0)+'%'}"></i></span>
-            <em>{{!rpGuruStat.tersedia.sas?'–':g.sasFull?'✓':g.sasPct+'%'}}</em>
+            <span class="rg-bar"><i :class="[rpGuruStat.p==='sts'?'rg-sts':'rg-sas',g.full?'full':'']" :style="{width:(rpGuruStat.ok?g.pct:0)+'%'}"></i></span>
+            <em>{{!rpGuruStat.ok?'–':g.full?'✓':g.pct+'%'}}</em>
           </div>
         </div>
       </div>
@@ -3033,7 +3030,7 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
 .rg-leg i.rg-sas,.rg-bar i.rg-sas{background:#059669}
 .rg-list{display:grid;gap:.2rem}
 .rg-note{margin:0 0 .5rem;padding:.35rem .6rem;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;font-size:.72rem;color:#92400e}
-.rg-line{display:grid;grid-template-columns:minmax(7rem,12rem) 1fr 2.4rem 1fr 2.4rem;align-items:center;gap:.5rem;padding:.12rem 0}
+.rg-line{display:grid;grid-template-columns:minmax(7rem,14rem) 1fr 2.8rem;align-items:center;gap:.5rem;padding:.12rem 0}
 .rg-nm{min-width:0;line-height:1.15}
 .rg-nm b{display:block;font-size:.76rem;font-weight:600;color:#172b4d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rg-nm small{display:block;font-size:.65rem;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -3041,7 +3038,7 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
 .rg-bar i{display:block;height:100%;border-radius:99px;transition:width .4s ease}
 .rg-bar i.full{filter:brightness(.92)}
 .rg-line em{font-style:normal;font-size:.7rem;font-weight:700;color:#475569;text-align:right}
-@media(max-width:640px){.rg-line{grid-template-columns:1fr 1fr 2.2rem 1fr 2.2rem;gap:.3rem}}
+@media(max-width:640px){.rg-line{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 2.4rem;gap:.4rem}}
 }
 @media print{.rg{display:none!important}}
 </style>
@@ -4022,20 +4019,21 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       if (!nm.size) return null;
       const ada = f => d.siswa.some(s => s.nilai && Object.keys(s.nilai).some(k => s.nilai[k] && Object.prototype.hasOwnProperty.call(s.nilai[k], f)));
       const tersedia = { sts: ada('sts'), sas: ada('sas') };
+      const p = (d.periode ? d.periode === 'STS' : rpMeta.periode === 'STS') ? 'sts' : 'sas'; // hanya jenis rapor yang sedang dibuka
       const hitung = (m, f) => d.siswa.reduce((a, s) => { const x = s.nilai && s.nilai[m]; return a + (x && x[f] != null && x[f] !== '' && x[f] !== '-' ? 1 : 0); }, 0);
       const grup = new Map();
       [...nm.keys()].forEach(m => {
         const gs = cariGuruMapel(m, nm.get(m)), nama = gs.length ? gs.join(' / ') : '', key = nama || ('?' + m);
-        if (!grup.has(key)) grup.set(key, { nama: nama || 'Guru tidak terbaca', dikenal: !!nama, mapel: [] });
-        grup.get(key).mapel.push({ label: nm.get(m), sts: hitung(m, 'sts'), sas: hitung(m, 'sas') });
+        if (!grup.has(key)) grup.set(key, { key, nama: nama || 'Guru tidak terbaca', dikenal: !!nama, mapel: [] });
+        grup.get(key).mapel.push({ label: nm.get(m), sts: hitung(m, 'sts'), sas: hitung(m, 'sas'), v: hitung(m, p) });
       });
       const list = [...grup.values()].map(g => {
-        const tot = g.mapel.length * n, h1 = g.mapel.reduce((a, m) => a + m.sts, 0), h2 = g.mapel.reduce((a, m) => a + m.sas, 0);
-        return Object.assign(g, { n, tot, stsHas: h1, sasHas: h2, stsPct: Math.round(h1 / tot * 100), sasPct: Math.round(h2 / tot * 100), stsFull: tersedia.sts && h1 === tot, sasFull: tersedia.sas && h2 === tot });
-      }).sort((a, b) => ((a.stsFull ? 1 : 0) + (a.sasFull ? 1 : 0)) - ((b.stsFull ? 1 : 0) + (b.sasFull ? 1 : 0)) || a.nama.localeCompare(b.nama));
-      const total = list.length, stsFull = list.filter(g => g.stsFull).length, sasFull = list.filter(g => g.sasFull).length;
+        const tot = g.mapel.length * n, h1 = g.mapel.reduce((a, m) => a + m.sts, 0), h2 = g.mapel.reduce((a, m) => a + m.sas, 0), hp = g.mapel.reduce((a, m) => a + m.v, 0);
+        return Object.assign(g, { n, tot, stsHas: h1, sasHas: h2, stsPct: Math.round(h1 / tot * 100), sasPct: Math.round(h2 / tot * 100), stsFull: tersedia.sts && h1 === tot, sasFull: tersedia.sas && h2 === tot, pct: Math.round(hp / tot * 100), full: tersedia[p] && hp === tot });
+      }).sort((a, b) => (a.full ? 1 : 0) - (b.full ? 1 : 0) || a.nama.localeCompare(b.nama));
+      const total = list.length, stsFull = list.filter(g => g.stsFull).length, sasFull = list.filter(g => g.sasFull).length, pFull = list.filter(g => g.full).length;
       const tdk = list.filter(g => !g.dikenal).reduce((a, g) => a + g.mapel.length, 0);
-      return { tdk, list, total, stsFull, sasFull, n, tersedia, stsPct: total ? Math.round(stsFull / total * 100) : 0, sasPct: total ? Math.round(sasFull / total * 100) : 0 };
+      return { tdk, list, total, stsFull, sasFull, n, tersedia, p, pLabel: p.toUpperCase(), ok: tersedia[p], pFull, stsPct: total ? Math.round(stsFull / total * 100) : 0, sasPct: total ? Math.round(sasFull / total * 100) : 0 };
     });
     const loadRapor = () => run(muatRapor);
     const gantiTabR = k => { rpTab.value = k; err.value = ok.value = ''; if (k === 'riwayat') loadRiwayatPenilaian(); if (k === 'rekap' && !rkp.value && rkpIdx.value !== '') loadRekap(); if (k === 'atur' && !rcf.value) loadRc(); if ((k === 'data' || k === 'naik' || k === 'validasi') && rpKelas.value) loadRapor(); };
