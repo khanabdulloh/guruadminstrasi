@@ -3989,7 +3989,9 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     let rpReq = 0;
     const muatRapor = async () => {
       const rid = ++rpReq, k = rpKelas.value; if (k) cekTahunR();
+      const jlP = k ? api('jadwalList').then(v => ({ v }), e => ({ e })) : null; // paralel dgn raporData; gagal tidak memengaruhi rapor
       const d = k ? await api('raporData', { kelas: k, periode: rpTab.value === 'naik' ? 'SAS' : rpMeta.periode, tahun: rpMeta.tahun, semester: rpMeta.sem }) : null;
+      const jr = jlP ? await jlP : null;         // umumnya sudah selesai; rapor & peta guru dipasang bersamaan (tanpa kedipan)
       if (rid !== rpReq) return;
       Object.keys(rpF).forEach(x => delete rpF[x]);
       if (d) { d.siswa.forEach(s => { rpF[s.nis] = { ekskul: s.ekskul, kokurikuler: s.kokurikuler, catatan: s.catatan, keputusan: s.keputusan, kelasTujuan: s.kelasTujuan }; }); Object.assign(rpInfo, { kompetensi: d.info.kompetensi || '', nipWali: d.info.nipWali || '', tanggal: d.info.tanggal || '' }); }
@@ -3997,7 +3999,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       // Info guru pengampu per mapel (hanya tampilan; gagal = diabaikan, tidak memengaruhi rapor)
       rpGuruMap.value = {}; rpGuruDiag.value = null;
       if (d && Array.isArray(d.guruMapel)) { const m = {}; d.guruMapel.forEach(x => { const key = nrmMapel(x.mapel), gn = String(x.guruNama || '').trim(); if (!key || !gn) return; (m[key] = m[key] || []); if (!m[key].includes(gn)) m[key].push(gn); }); rpGuruMap.value = m; rpGuruDiag.value = { total: d.guruMapel.length, kelas: d.guruMapel.length, err: '' }; }
-      else if (d) { try { const jl = await api('jadwalList'), m = {}, tot = Array.isArray(jl) ? jl.length : -1, kls = {}, nk = x => String(x == null ? '' : x).toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, ''); (jl || []).forEach(j => { if (nk(j.kelas) !== nk(k)) return; kls.n = (kls.n || 0) + 1; const key = nrmMapel(j.mapel), gn = String(j.guruNama || j.guru || '').trim(); if (!key || !gn) return; (m[key] = m[key] || []); if (!m[key].includes(gn)) m[key].push(gn); }); if (rid === rpReq) { rpGuruMap.value = m; rpGuruDiag.value = { total: tot, kelas: kls.n || 0, err: '' }; } } catch (e) { if (rid === rpReq) rpGuruDiag.value = { total: -1, kelas: 0, err: String((e && e.message) || e || 'gagal memuat jadwal') }; } }
+      else if (d) { try { if (!jr || jr.e) throw (jr && jr.e) || new Error('gagal memuat jadwal'); const jl = jr.v, m = {}, tot = Array.isArray(jl) ? jl.length : -1, kls = {}, nk = x => String(x == null ? '' : x).toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, ''); (jl || []).forEach(j => { if (nk(j.kelas) !== nk(k)) return; kls.n = (kls.n || 0) + 1; const key = nrmMapel(j.mapel), gn = String(j.guruNama || j.guru || '').trim(); if (!key || !gn) return; (m[key] = m[key] || []); if (!m[key].includes(gn)) m[key].push(gn); }); if (rid === rpReq) { rpGuruMap.value = m; rpGuruDiag.value = { total: tot, kelas: kls.n || 0, err: '' }; } } catch (e) { if (rid === rpReq) rpGuruDiag.value = { total: -1, kelas: 0, err: String((e && e.message) || e || 'gagal memuat jadwal') }; } }
     };
     const nrmMapel = x => String(x == null ? '' : x).toLowerCase().replace(/&/g, ' dan ').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
     const cariGuruMapel = (nama, label) => {
@@ -4020,12 +4022,13 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       const ada = f => d.siswa.some(s => s.nilai && Object.keys(s.nilai).some(k => s.nilai[k] && Object.prototype.hasOwnProperty.call(s.nilai[k], f)));
       const tersedia = { sts: ada('sts'), sas: ada('sas') };
       const p = (d.periode ? d.periode === 'STS' : rpMeta.periode === 'STS') ? 'sts' : 'sas'; // hanya jenis rapor yang sedang dibuka
-      const hitung = (m, f) => d.siswa.reduce((a, s) => { const x = s.nilai && s.nilai[m]; return a + (x && x[f] != null && x[f] !== '' && x[f] !== '-' ? 1 : 0); }, 0);
+      const isi = v => v != null && v !== '' && v !== '-';
+      const cnt = m => { let a = 0, b = 0; for (const s of d.siswa) { const x = s.nilai && s.nilai[m]; if (!x) continue; if (isi(x.sts)) a++; if (isi(x.sas)) b++; } return { sts: a, sas: b }; };
       const grup = new Map();
       [...nm.keys()].forEach(m => {
         const gs = cariGuruMapel(m, nm.get(m)), nama = gs.length ? gs.join(' / ') : '', key = nama || ('?' + m);
         if (!grup.has(key)) grup.set(key, { key, nama: nama || 'Guru tidak terbaca', dikenal: !!nama, mapel: [] });
-        grup.get(key).mapel.push({ label: nm.get(m), sts: hitung(m, 'sts'), sas: hitung(m, 'sas'), v: hitung(m, p) });
+        const c = cnt(m); grup.get(key).mapel.push({ label: nm.get(m), sts: c.sts, sas: c.sas, v: c[p] });
       });
       const list = [...grup.values()].map(g => {
         const tot = g.mapel.length * n, h1 = g.mapel.reduce((a, m) => a + m.sts, 0), h2 = g.mapel.reduce((a, m) => a + m.sas, 0), hp = g.mapel.reduce((a, m) => a + m.v, 0);
