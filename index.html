@@ -2071,28 +2071,18 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
 
       <div v-if="rpGuruStat&&(rpTab==='data'||rpTab==='validasi')" class="rg noprint" role="region" aria-label="Status pengiriman nilai oleh guru pengajar">
         <div class="rg-head">
-          <div class="rg-title"><h3>Status nilai dari guru pengajar</h3><p>Guru yang sudah mengirim nilai <b>STS</b> dan <b>SAS</b> secara lengkap untuk seluruh {{rpGuruStat.n}} siswa kelas {{rp.kelas}}.</p></div>
-          <div class="rg-rings">
-            <div class="rg-ring" :title="'STS: '+rpGuruStat.stsFull+' dari '+rpGuruStat.total+' guru lengkap'">
-              <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rg-trk" cx="18" cy="18" r="15.9155"/><circle class="rg-arc rg-sts" cx="18" cy="18" r="15.9155" :stroke-dasharray="rpGuruStat.tersedia.sts?rpGuruStat.stsPct+' '+(100-rpGuruStat.stsPct):'0 100'" transform="rotate(-90 18 18)"/></svg>
-              <b>{{rpGuruStat.tersedia.sts?rpGuruStat.stsFull+'/'+rpGuruStat.total:'–'}}</b><span>STS lengkap</span></div>
-            <div class="rg-ring" :title="'SAS: '+rpGuruStat.sasFull+' dari '+rpGuruStat.total+' guru lengkap'">
-              <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rg-trk" cx="18" cy="18" r="15.9155"/><circle class="rg-arc rg-sas" cx="18" cy="18" r="15.9155" :stroke-dasharray="rpGuruStat.tersedia.sas?rpGuruStat.sasPct+' '+(100-rpGuruStat.sasPct):'0 100'" transform="rotate(-90 18 18)"/></svg>
-              <b>{{rpGuruStat.tersedia.sas?rpGuruStat.sasFull+'/'+rpGuruStat.total:'–'}}</b><span>SAS lengkap</span></div>
-          </div>
+          <b>Nilai masuk dari guru pengajar</b>
+          <span class="rg-leg"><i class="rg-sts"></i>STS <u v-if="rpGuruStat.tersedia.sts">{{rpGuruStat.stsFull}}/{{rpGuruStat.total}} lengkap</u><u v-else>belum tersedia</u></span>
+          <span class="rg-leg"><i class="rg-sas"></i>SAS <u v-if="rpGuruStat.tersedia.sas">{{rpGuruStat.sasFull}}/{{rpGuruStat.total}} lengkap</u><u v-else>belum tersedia</u></span>
         </div>
-        <p v-if="!rpGuruStat.tersedia.sts||!rpGuruStat.tersedia.sas" class="rg-note">Data {{!rpGuruStat.tersedia.sas?'SAS':'STS'}} belum tersedia pada jenis rapor yang dipilih. Ganti "Jenis rapor" ke {{!rpGuruStat.tersedia.sas?'Akhir Semester (SAS)':'Tengah Semester (STS)'}} untuk melihatnya.</p>
-        <div class="rg-grid">
-          <article v-for="g in rpGuruStat.list" :key="g.nama+g.mapel.length" class="rg-card" :class="(g.stsFull&&g.sasFull)?'rg-done':''">
-            <header><span class="rg-av" aria-hidden="true">{{(g.dikenal?g.nama:g.mapel[0].label).trim().charAt(0).toUpperCase()}}</span>
-              <div class="rg-who"><b>{{g.dikenal?g.nama:g.mapel[0].label}}</b><small>{{g.dikenal?g.mapel.map(m=>m.label).join(', '):'Guru belum terdata di jadwal'}}</small></div></header>
-            <div class="rg-row"><span class="rg-lbl">STS</span><div class="rg-bar"><i class="rg-sts" :style="{width:(rpGuruStat.tersedia.sts?g.stsPct:0)+'%'}"></i></div>
-              <span class="rg-chip" :class="g.stsFull?'ok':rpGuruStat.tersedia.sts?'wait':'na'">{{!rpGuruStat.tersedia.sts?'–':g.stsFull?'Lengkap':g.stsPct+'%'}}</span></div>
-            <div class="rg-row"><span class="rg-lbl">SAS</span><div class="rg-bar"><i class="rg-sas" :style="{width:(rpGuruStat.tersedia.sas?g.sasPct:0)+'%'}"></i></div>
-              <span class="rg-chip" :class="g.sasFull?'ok':rpGuruStat.tersedia.sas?'wait':'na'">{{!rpGuruStat.tersedia.sas?'–':g.sasFull?'Lengkap':g.sasPct+'%'}}</span></div>
-            <details v-if="g.mapel.length>1||(rpGuruStat.tersedia.sts&&g.stsPct<100)||(rpGuruStat.tersedia.sas&&g.sasPct<100)" class="rg-det"><summary>Rincian per mapel</summary>
-              <ul><li v-for="m in g.mapel" :key="m.label"><span>{{m.label}}</span><span>STS {{rpGuruStat.tersedia.sts?m.sts+'/'+rpGuruStat.n:'–'}} · SAS {{rpGuruStat.tersedia.sas?m.sas+'/'+rpGuruStat.n:'–'}}</span></li></ul></details>
-          </article>
+        <div class="rg-list">
+          <div v-for="g in rpGuruStat.list" :key="g.nama+g.mapel.length" class="rg-line" :title="g.mapel.map(m=>m.label+' — STS '+(rpGuruStat.tersedia.sts?m.sts+'/'+rpGuruStat.n:'–')+', SAS '+(rpGuruStat.tersedia.sas?m.sas+'/'+rpGuruStat.n:'–')).join('\n')">
+            <span class="rg-nm"><b>{{g.dikenal?g.nama:g.mapel[0].label}}</b><small>{{g.dikenal?g.mapel.map(m=>m.label).join(', '):'guru belum terdata'}}</small></span>
+            <span class="rg-bar"><i class="rg-sts" :class="g.stsFull?'full':''" :style="{width:(rpGuruStat.tersedia.sts?g.stsPct:0)+'%'}"></i></span>
+            <em>{{!rpGuruStat.tersedia.sts?'–':g.stsFull?'✓':g.stsPct+'%'}}</em>
+            <span class="rg-bar"><i class="rg-sas" :class="g.sasFull?'full':''" :style="{width:(rpGuruStat.tersedia.sas?g.sasPct:0)+'%'}"></i></span>
+            <em>{{!rpGuruStat.tersedia.sas?'–':g.sasFull?'✓':g.sasPct+'%'}}</em>
+          </div>
         </div>
       </div>
 
@@ -3032,44 +3022,24 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
 </style>
 <style id="rapor-guru-status-v1">
 @media screen{
-.rg{margin:0 0 1rem;padding:1.1rem 1.25rem;background:#fff;border:1px solid #e0e7f1;border-radius:16px}
-.rg-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
-.rg-title{flex:1 1 16rem;min-width:0}
-.rg-title h3{margin:0;font-size:1rem;font-weight:700;color:#132c69;letter-spacing:-.01em}
-.rg-title p{margin:.25rem 0 0;font-size:.82rem;line-height:1.55;color:#64748b}
-.rg-rings{display:flex;gap:1.25rem}
-.rg-ring{position:relative;width:5.25rem;text-align:center}
-.rg-ring svg{width:5.25rem;height:5.25rem;display:block}
-.rg-trk{fill:none;stroke:#e8edf5;stroke-width:3.4}
-.rg-arc{fill:none;stroke-width:3.4;stroke-linecap:round;transition:stroke-dasharray .4s ease}
-circle.rg-sts{stroke:#204397}circle.rg-sas{stroke:#059669}
-.rg-ring b{position:absolute;left:0;right:0;top:1.7rem;font-size:1.05rem;font-weight:800;color:#132c69;line-height:1}
-.rg-ring span{display:block;margin-top:.15rem;font-size:.7rem;font-weight:600;color:#64748b}
-.rg-note{margin:.8rem 0 0;padding:.5rem .75rem;border-radius:10px;background:#fffbeb;border:1px solid #fde68a;font-size:.78rem;color:#92400e}
-.rg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(17rem,1fr));gap:.75rem;margin-top:1rem}
-.rg-card{padding:.85rem .95rem;border:1px solid #e6ebf3;border-radius:13px;background:#fbfcfe}
-.rg-card.rg-done{background:#f3fbf7;border-color:#cdeedd}
-.rg-card header{display:flex;align-items:center;gap:.65rem;margin-bottom:.7rem}
-.rg-av{flex:none;display:grid;place-items:center;width:2.1rem;height:2.1rem;border-radius:50%;background:#e9eef9;color:#204397;font-size:.85rem;font-weight:800}
-.rg-done .rg-av{background:#d7f3e5;color:#047857}
-.rg-who{min-width:0}
-.rg-who b{display:block;font-size:.85rem;font-weight:700;color:#172b4d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rg-who small{display:block;font-size:.72rem;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rg-row{display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:.5rem;margin-top:.35rem}
-.rg-lbl{font-size:.7rem;font-weight:700;color:#52627a}
-.rg-bar{height:.5rem;border-radius:99px;background:#e8edf5;overflow:hidden}
+.rg{margin:0 0 .9rem;padding:.7rem .9rem;background:#fff;border:1px solid #e0e7f1;border-radius:12px}
+.rg-head{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem 1rem;margin-bottom:.45rem;font-size:.78rem;color:#475569}
+.rg-head>b{font-size:.85rem;color:#132c69;margin-right:auto}
+.rg-leg{display:inline-flex;align-items:center;gap:.3rem;font-weight:600}
+.rg-leg u{text-decoration:none;font-weight:500;color:#64748b}
+.rg-leg i{width:.6rem;height:.6rem;border-radius:3px;display:inline-block}
+.rg-leg i.rg-sts,.rg-bar i.rg-sts{background:#204397}
+.rg-leg i.rg-sas,.rg-bar i.rg-sas{background:#059669}
+.rg-list{display:grid;gap:.2rem}
+.rg-line{display:grid;grid-template-columns:minmax(7rem,12rem) 1fr 2.4rem 1fr 2.4rem;align-items:center;gap:.5rem;padding:.12rem 0}
+.rg-nm{min-width:0;line-height:1.15}
+.rg-nm b{display:block;font-size:.76rem;font-weight:600;color:#172b4d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rg-nm small{display:block;font-size:.65rem;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rg-bar{height:.55rem;border-radius:99px;background:#e8edf5;overflow:hidden}
 .rg-bar i{display:block;height:100%;border-radius:99px;transition:width .4s ease}
-.rg-bar i.rg-sts{background:#204397}.rg-bar i.rg-sas{background:#059669}
-.rg-chip{justify-self:end;padding:.1rem .5rem;border-radius:99px;font-size:.68rem;font-weight:700;white-space:nowrap}
-.rg-chip.ok{background:#d1fae5;color:#047857}.rg-chip.wait{background:#fef3c7;color:#92400e}.rg-chip.na{background:#f1f5f9;color:#94a3b8}
-.rg-det{margin-top:.6rem;font-size:.74rem;color:#475569}
-.rg-det summary{cursor:pointer;font-weight:600;color:#204397;list-style:none}
-.rg-det summary::-webkit-details-marker{display:none}
-.rg-det ul{margin:.4rem 0 0;padding:0;list-style:none}
-.rg-det li{display:flex;justify-content:space-between;gap:.5rem;padding:.2rem 0;border-top:1px dashed #e6ebf3}
-.rg-det li span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rg-det li span:last-child{flex:none;color:#64748b}
-@media(max-width:640px){.rg{padding:1rem}.rg-rings{width:100%;justify-content:space-around}.rg-grid{grid-template-columns:1fr}}
+.rg-bar i.full{filter:brightness(.92)}
+.rg-line em{font-style:normal;font-size:.7rem;font-weight:700;color:#475569;text-align:right}
+@media(max-width:640px){.rg-line{grid-template-columns:1fr 1fr 2.2rem 1fr 2.2rem;gap:.3rem}}
 }
 @media print{.rg{display:none!important}}
 </style>
