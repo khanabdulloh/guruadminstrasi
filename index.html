@@ -2075,9 +2075,10 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
           <span class="rg-leg"><i class="rg-sts"></i>STS <u v-if="rpGuruStat.tersedia.sts">{{rpGuruStat.stsFull}}/{{rpGuruStat.total}} lengkap</u><u v-else>belum tersedia</u></span>
           <span class="rg-leg"><i class="rg-sas"></i>SAS <u v-if="rpGuruStat.tersedia.sas">{{rpGuruStat.sasFull}}/{{rpGuruStat.total}} lengkap</u><u v-else>belum tersedia</u></span>
         </div>
+        <p v-if="rpGuruStat.tdk&&rpGuruDiag" class="rg-note">{{rpGuruStat.tdk}} mapel belum ditemukan gurunya. <template v-if="rpGuruDiag.err">Jadwal gagal dimuat: {{rpGuruDiag.err}}.</template><template v-else>Jadwal yang terbaca oleh akun ini: {{rpGuruDiag.total}} baris, {{rpGuruDiag.kelas}} baris untuk kelas {{rp.kelas}}. Jika jumlahnya jauh lebih sedikit dari jadwal sebenarnya, akun ini hanya diberi akses ke jadwalnya sendiri oleh server.</template></p>
         <div class="rg-list">
           <div v-for="g in rpGuruStat.list" :key="g.nama+g.mapel.length" class="rg-line" :title="g.mapel.map(m=>m.label+' — STS '+(rpGuruStat.tersedia.sts?m.sts+'/'+rpGuruStat.n:'–')+', SAS '+(rpGuruStat.tersedia.sas?m.sas+'/'+rpGuruStat.n:'–')).join('\n')">
-            <span class="rg-nm"><b>{{g.dikenal?g.nama:g.mapel[0].label}}</b><small>{{g.dikenal?g.mapel.map(m=>m.label).join(', '):'guru belum terdata'}}</small></span>
+            <span class="rg-nm"><b>{{g.dikenal?g.nama:g.mapel[0].label}}</b><small>{{g.dikenal?g.mapel.map(m=>m.label).join(', '):'guru tidak terbaca dari jadwal'}}</small></span>
             <span class="rg-bar"><i class="rg-sts" :class="g.stsFull?'full':''" :style="{width:(rpGuruStat.tersedia.sts?g.stsPct:0)+'%'}"></i></span>
             <em>{{!rpGuruStat.tersedia.sts?'–':g.stsFull?'✓':g.stsPct+'%'}}</em>
             <span class="rg-bar"><i class="rg-sas" :class="g.sasFull?'full':''" :style="{width:(rpGuruStat.tersedia.sas?g.sasPct:0)+'%'}"></i></span>
@@ -3031,6 +3032,7 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
 .rg-leg i.rg-sts,.rg-bar i.rg-sts{background:#204397}
 .rg-leg i.rg-sas,.rg-bar i.rg-sas{background:#059669}
 .rg-list{display:grid;gap:.2rem}
+.rg-note{margin:0 0 .5rem;padding:.35rem .6rem;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;font-size:.72rem;color:#92400e}
 .rg-line{display:grid;grid-template-columns:minmax(7rem,12rem) 1fr 2.4rem 1fr 2.4rem;align-items:center;gap:.5rem;padding:.12rem 0}
 .rg-nm{min-width:0;line-height:1.15}
 .rg-nm b{display:block;font-size:.76rem;font-weight:600;color:#172b4d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -3996,8 +3998,9 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       if (d) { d.siswa.forEach(s => { rpF[s.nis] = { ekskul: s.ekskul, kokurikuler: s.kokurikuler, catatan: s.catatan, keputusan: s.keputusan, kelasTujuan: s.kelasTujuan }; }); Object.assign(rpInfo, { kompetensi: d.info.kompetensi || '', nipWali: d.info.nipWali || '', tanggal: d.info.tanggal || '' }); }
       rp.value = d; rpSatu.value = ''; rpCek.value = null;
       // Info guru pengampu per mapel (hanya tampilan; gagal = diabaikan, tidak memengaruhi rapor)
-      rpGuruMap.value = {};
-      if (d) { try { const jl = await api('jadwalList'), m = {}, nk = x => String(x == null ? '' : x).toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, ''); (jl || []).forEach(j => { if (nk(j.kelas) !== nk(k)) return; const key = nrmMapel(j.mapel), gn = String(j.guruNama || j.guru || '').trim(); if (!key || !gn) return; (m[key] = m[key] || []); if (!m[key].includes(gn)) m[key].push(gn); }); if (rid === rpReq) rpGuruMap.value = m; } catch (e) { /* nama guru opsional */ } }
+      rpGuruMap.value = {}; rpGuruDiag.value = null;
+      if (d && Array.isArray(d.guruMapel)) { const m = {}; d.guruMapel.forEach(x => { const key = nrmMapel(x.mapel), gn = String(x.guruNama || '').trim(); if (!key || !gn) return; (m[key] = m[key] || []); if (!m[key].includes(gn)) m[key].push(gn); }); rpGuruMap.value = m; rpGuruDiag.value = { total: d.guruMapel.length, kelas: d.guruMapel.length, err: '' }; }
+      else if (d) { try { const jl = await api('jadwalList'), m = {}, tot = Array.isArray(jl) ? jl.length : -1, kls = {}, nk = x => String(x == null ? '' : x).toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, ''); (jl || []).forEach(j => { if (nk(j.kelas) !== nk(k)) return; kls.n = (kls.n || 0) + 1; const key = nrmMapel(j.mapel), gn = String(j.guruNama || j.guru || '').trim(); if (!key || !gn) return; (m[key] = m[key] || []); if (!m[key].includes(gn)) m[key].push(gn); }); if (rid === rpReq) { rpGuruMap.value = m; rpGuruDiag.value = { total: tot, kelas: kls.n || 0, err: '' }; } } catch (e) { if (rid === rpReq) rpGuruDiag.value = { total: -1, kelas: 0, err: String((e && e.message) || e || 'gagal memuat jadwal') }; } }
     };
     const nrmMapel = x => String(x == null ? '' : x).toLowerCase().replace(/&/g, ' dan ').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
     const cariGuruMapel = (nama, label) => {
@@ -4010,7 +4013,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       }
       return [];
     };
-    const rpGuruMap = ref({});
+    const rpGuruMap = ref({}), rpGuruDiag = ref(null);
     const rpGuruStat = computed(() => {
       const d = rp.value; if (!d || !d.siswa || !d.siswa.length || !Array.isArray(d.mapel)) return null;
       const n = d.siswa.length, nm = new Map();
@@ -4023,7 +4026,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       const grup = new Map();
       [...nm.keys()].forEach(m => {
         const gs = cariGuruMapel(m, nm.get(m)), nama = gs.length ? gs.join(' / ') : '', key = nama || ('?' + m);
-        if (!grup.has(key)) grup.set(key, { nama: nama || 'Guru belum terdata', dikenal: !!nama, mapel: [] });
+        if (!grup.has(key)) grup.set(key, { nama: nama || 'Guru tidak terbaca', dikenal: !!nama, mapel: [] });
         grup.get(key).mapel.push({ label: nm.get(m), sts: hitung(m, 'sts'), sas: hitung(m, 'sas') });
       });
       const list = [...grup.values()].map(g => {
@@ -4031,7 +4034,8 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         return Object.assign(g, { n, tot, stsHas: h1, sasHas: h2, stsPct: Math.round(h1 / tot * 100), sasPct: Math.round(h2 / tot * 100), stsFull: tersedia.sts && h1 === tot, sasFull: tersedia.sas && h2 === tot });
       }).sort((a, b) => ((a.stsFull ? 1 : 0) + (a.sasFull ? 1 : 0)) - ((b.stsFull ? 1 : 0) + (b.sasFull ? 1 : 0)) || a.nama.localeCompare(b.nama));
       const total = list.length, stsFull = list.filter(g => g.stsFull).length, sasFull = list.filter(g => g.sasFull).length;
-      return { list, total, stsFull, sasFull, n, tersedia, stsPct: total ? Math.round(stsFull / total * 100) : 0, sasPct: total ? Math.round(sasFull / total * 100) : 0 };
+      const tdk = list.filter(g => !g.dikenal).reduce((a, g) => a + g.mapel.length, 0);
+      return { tdk, list, total, stsFull, sasFull, n, tersedia, stsPct: total ? Math.round(stsFull / total * 100) : 0, sasPct: total ? Math.round(sasFull / total * 100) : 0 };
     });
     const loadRapor = () => run(muatRapor);
     const gantiTabR = k => { rpTab.value = k; err.value = ok.value = ''; if (k === 'riwayat') loadRiwayatPenilaian(); if (k === 'rekap' && !rkp.value && rkpIdx.value !== '') loadRekap(); if (k === 'atur' && !rcf.value) loadRc(); if ((k === 'data' || k === 'naik' || k === 'validasi') && rpKelas.value) loadRapor(); };
@@ -4430,7 +4434,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         setInterval(kirimTinggiEmbed, 1000);
       }
     }
-    return { katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
