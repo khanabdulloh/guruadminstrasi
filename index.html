@@ -3110,6 +3110,60 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
   #app .modal-box.max-w-3xl{max-width:min(48rem,calc(100vw - 2rem))}
 }
 </style>
+<style id="rapor-print-a4-v109">
+/* v109 — Cetak rapor A4 portrait: margin atas/bawah konsisten di SETIAP halaman.
+   Akar masalah: @page margin:0 (v103, agar header/footer browser tidak muncul) memindahkan margin ke
+   padding .rapor-page, padahal padding hanya berlaku di awal & akhir elemen, bukan tiap halaman
+   -> halaman lanjutan menempel/terpotong di tepi kertas.
+   Solusi: box-decoration-break:clone membuat padding (10/11/11 mm) diulang di tiap halaman cetak.
+   Murni CSS: tidak menyentuh data, template Vue, maupun mode cetak lain (tabel/absen/pelanggaran). */
+@page rapor { size: A4 portrait; margin: 0; }
+@media print {
+  html body.cetak-rapor .rapor-page {
+    padding: 10mm 11mm 11mm !important; margin: 0 !important; width: 100% !important;
+    box-sizing: border-box !important; overflow: visible !important;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  }
+  /* Watermark DRAF: SATU elemen fixed untuk seluruh dokumen (berulang di setiap halaman, ringan
+     untuk kelas besar). Watermark per-siswa yang lama disembunyikan; hanya muncul bila status Draf. */
+  body.cetak-rapor .rapor-wrap .rapor-wm { display: none !important; }
+  body.cetak-rapor .rapor-wrap:has(.rapor-wm)::before {
+    content: "DRAF"; position: fixed; top: 36%; left: 0; right: 0; z-index: 0; pointer-events: none;
+    text-align: center; font-size: 88pt; font-weight: 800; color: rgba(15,23,42,.055);
+    transform: rotate(-30deg); -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* Judul bagian (A., B., C.) tidak ditinggal sendirian di dasar halaman */
+  body.cetak-rapor .rapor-page p.font-bold.text-sm { break-after: avoid; page-break-after: avoid; }
+  body.cetak-rapor .rapor-page tr.font-bold:not(.rapor-rata-row) { break-after: avoid; page-break-after: avoid; }
+  /* Blok kecil tidak dipecah antar halaman */
+  body.cetak-rapor .rapor-page table.rapor-ekskul,
+  body.cetak-rapor .rapor-page table.rapor-kokurikuler,
+  body.cetak-rapor .rapor-page table.rapor-pkl,
+  body.cetak-rapor .rapor-page table.rapor-hadir,
+  body.cetak-rapor .rapor-page .rapor-catatan,
+  body.cetak-rapor .rapor-page .rapor-catatan-bk,
+  body.cetak-rapor .rapor-page .border-2 { break-inside: avoid; page-break-inside: avoid; }
+  body.cetak-rapor .rapor-page .rapor-catatan-bk { padding: 6pt 7pt !important; font-size: 8.6pt; line-height: 1.3; min-height: 0 !important; }
+  body.cetak-rapor .rapor-page .rapor-catatan { min-height: 0 !important; }
+
+  /* Identitas siswa: hapus garis atas & bawah; blok kanan (Kelas/Fase/Semester) digeser ke kanan ±5 mm */
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id,
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type { border: 0 !important; border-top: 0 !important; border-bottom: 0 !important; }
+  html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td { border: 0 !important; }
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type > tbody > tr > td:nth-child(1) { width: 19% !important; }
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type > tbody > tr > td:nth-child(2),
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type > tbody > tr > td:nth-child(5) { width: 2.5% !important; }
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type > tbody > tr > td:nth-child(3) { width: 51% !important; }
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type > tbody > tr > td:nth-child(4) { width: 12% !important; padding-left: 10pt !important; }
+  html body.cetak-rapor .rapor-page table.calm-table-print.rapor-id:first-of-type > tbody > tr > td:nth-child(6) { width: 13% !important; }
+
+  /* Tanda tangan: lebih ringkas & tetap satu blok */
+  body.cetak-rapor .rapor-page .rapor-ttd { margin-top: 6pt !important; font-size: 8.3pt !important; line-height: 1.25; break-inside: avoid !important; page-break-inside: avoid !important; }
+  body.cetak-rapor .rapor-page .rapor-ttd .h-16 { height: 32pt !important; }
+}
+</style>
+
 </head>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
