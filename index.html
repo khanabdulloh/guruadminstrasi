@@ -1747,8 +1747,12 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
     <!-- Nilai (admin & guru) -->
     <section v-if="view==='nilai'" class="nl">
       <div class="page-head"><h2 class="h2">Input Nilai</h2><p class="desk">{{DESK.nilai}}</p></div>
-      <p v-if="!pil.length" class="desk-note">Belum ada jadwal untuk dinilai. Minta admin mengisi menu Jadwal terlebih dahulu.</p>
-      <template v-else>
+      <div class="flex flex-wrap gap-2 mb-4 noprint" role="tablist" aria-label="Input nilai dan riwayat">
+        <button type="button" role="tab" :aria-selected="nilaiSubTab==='input'" :class="nilaiSubTab==='input'?'btn-p':'btn-o'" @click="nilaiSubTab='input'">Input Nilai</button>
+        <button type="button" role="tab" :aria-selected="nilaiSubTab==='riwayat'" :class="nilaiSubTab==='riwayat'?'btn-p':'btn-o'" @click="bukaRiwayatNilai">Riwayat Penilaian</button>
+      </div>
+      <p v-if="nilaiSubTab==='input'&&!pil.length" class="desk-note">Belum ada jadwal untuk dinilai. Minta admin mengisi menu Jadwal terlebih dahulu.</p>
+      <template v-if="nilaiSubTab==='input'&&pil.length">
         <div class="nl-card">
           <div class="nl-head">
             <div role="tablist" class="seg" aria-label="Jenis penilaian">
@@ -1808,6 +1812,83 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
               <td><div class="seg seg-s" role="group" :aria-label="'Ketercapaian '+r.nama"><button type="button" :aria-pressed="r.status==='Sudah'" :class="r.status==='Sudah'?'seg-ok':''" @click="r.status=r.status==='Sudah'?'':'Sudah'">Sudah</button><button type="button" :aria-pressed="r.status==='Belum'" :class="r.status==='Belum'?'seg-no':''" @click="r.status=r.status==='Belum'?'':'Belum'">Belum</button></div></td></tr></tbody></table></div>
           <div class="nl-bar noprint"><span class="nl-hint">Klik lagi untuk mengosongkan pilihan.</span><button @click="saveFormatif" :disabled="busy||(pairKunci&&user.role!=='ADMIN')" class="btn-p">Simpan ketercapaian</button></div>
         </template>
+      </template>
+      <template v-if="nilaiSubTab==='riwayat'">
+        <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
+          <label class="lb">Kelas
+            <select v-model="rpKelas" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case">
+              <option value="">Semua kelas</option><option v-for="k in nilaiRiwayatKelas" :key="k" :value="k">{{k}}</option>
+            </select>
+          </label>
+          <label class="lb">Semester
+            <select v-model="rpMeta.sem" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select>
+          </label>
+          <label class="lb">Tahun ajaran
+            <select v-model="rpMeta.tahun" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case"><option v-for="t in opsiTahun(rpMeta.tahun)" :key="t" :value="t">{{t}}</option></select>
+          </label>
+          <button class="btn-o" @click="loadRiwayatPenilaian" :disabled="busy">Muat ulang riwayat</button>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div><h3 class="font-bold text-slate-800 text-lg">Riwayat penilaian semester</h3>
+              <p class="text-sm text-slate-500 mt-1">Daftar penilaian sumatif yang disimpan setelah fitur riwayat diaktifkan. Penilaian lama yang tidak memiliki tanggal tidak ditampilkan agar semester tidak ditebak.</p></div>
+          </div>
+          <div class="grid sm:grid-cols-3 gap-2 mt-4">
+            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Periode dipilih</div><div class="font-semibold">{{rpMeta.sem}} · {{rpMeta.tahun}}</div></div>
+            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Penilaian tersimpan</div><div class="font-semibold">{{riwayatPenilaian.length}} aktivitas</div></div>
+            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Aksi tersedia</div><div class="font-semibold">Edit nilai · Hapus penilaian</div></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50 text-left"><tr><th class="p-3">Waktu simpan</th><th>Kelas / Mapel</th><th>Tujuan pembelajaran</th><th>Jenis</th><th class="text-center">Siswa bernilai</th><th>Disimpan oleh</th><th class="text-center">Status</th><th class="text-center noprint">Aksi</th></tr></thead>
+            <tbody>
+              <tr v-for="r in riwayatPenilaian" :key="r.id" class="border-t align-top">
+                <td class="p-3 whitespace-nowrap">{{r.waktu}}</td>
+                <td class="p-2 min-w-[10rem]"><div class="font-semibold">{{r.kelas}}</div><div class="text-slate-500">{{r.mapel}}</div></td>
+                <td class="p-2 min-w-[12rem]">{{r.tp}}</td>
+                <td class="p-2 whitespace-nowrap">{{jl(r.jenis)}}</td>
+                <td class="p-2 text-center font-semibold">{{r.jumlah}}</td>
+                <td class="p-2">{{r.olehNama||'-'}}</td>
+                <td class="p-2 text-center"><span v-if="r.aktif" class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700">Aktif</span><span v-else class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-amber-50 text-amber-700">Riwayat lama</span></td>
+                <td class="p-2 noprint"><div class="flex justify-center gap-1">
+                  <button class="btn-o !min-h-[2rem] !px-2 text-xs" :disabled="!r.aktif" @click="editRiwayatPenilaian(r)" title="Buka nilai untuk diedit"><icon name="pencil" size="13"/> Edit</button>
+                  <button class="btn-o !min-h-[2rem] !px-2 text-xs !text-rose-700" :disabled="!r.aktif" @click="hapusRiwayatPenilaian(r)" title="Hapus penilaian"><icon name="trash-2" size="13"/> Hapus</button>
+                </div></td>
+              </tr>
+              <tr v-if="!riwayatPenilaian.length"><td colspan="8" class="p-8 text-center"><div class="mx-auto mb-2 rounded-full bg-slate-100 w-10 h-10 flex items-center justify-center"><icon name="history" size="18" color="#64748b"/></div><div class="font-semibold text-slate-700">Belum ada riwayat pada periode ini</div><p class="text-slate-500 text-sm mt-1">Simpan nilai sumatif melalui menu Input Nilai. Riwayat akan tercatat otomatis dengan waktu dan semester penyimpanan.</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-slate-500 mt-3">Tombol Edit membuka penilaian yang sama di menu Input Nilai. Tombol Hapus menghapus nilai aktif hanya jika data belum berubah sejak riwayat dicatat. Jejak perubahan di bawah merupakan arsip mulai tanggal fitur audit dipasang; bukan rekonstruksi nilai lama.</p>
+        <div class="bg-white rounded-2xl shadow-sm p-4 mt-4">
+          <div class="flex flex-wrap items-start justify-between gap-2 mb-3"><div><h3 class="font-bold text-slate-800">Jejak perubahan nilai</h3><p class="text-sm text-slate-500">Catatan nilai sebelum dan sesudah simpan atau sebelum penghapusan, difilter menurut semester aktif.</p></div><span class="text-xs rounded-full bg-slate-100 px-3 py-1 text-slate-600">{{riwayatNilaiAudit.length}} perubahan</span></div>
+          <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Waktu</th><th class="p-3">Siswa</th><th class="p-3">Penilaian</th><th class="p-3 text-center">Nilai sebelumnya</th><th class="p-3 text-center">Nilai sesudah</th><th class="p-3">Aksi / pengguna</th></tr></thead><tbody>
+            <tr v-for="a in riwayatNilaiAudit" :key="a.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{a.waktu}}</td><td class="p-3"><div class="font-semibold">{{a.nama||'-'}}</div><div class="text-xs text-slate-500">{{a.nis}}</div></td><td class="p-3 min-w-[12rem]"><div class="font-semibold">{{a.kelas}} · {{a.mapel}}</div><div class="text-slate-500">{{a.tp}} · {{jl(a.jenis)}}</div></td><td class="p-3 text-center">{{a.skorSebelum==null?'—':a.skorSebelum}}</td><td class="p-3 text-center font-semibold">{{a.skorSesudah==null?'—':a.skorSesudah}}</td><td class="p-3"><div class="font-semibold">{{a.aksi==='HAPUS'?'Hapus':'Simpan'}}</div><div class="text-xs text-slate-500">{{a.olehNama||'-'}}</div></td></tr>
+            <tr v-if="!riwayatNilaiAudit.length"><td colspan="6" class="p-6 text-center text-slate-500">Belum ada jejak perubahan pada periode ini. Catatan mulai dibuat setelah pembaruan backend dipasang.</td></tr>
+          </tbody></table></div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-4 mt-4">
+          <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
+            <div><h3 class="font-bold text-slate-800">Arsip nilai sebelum perubahan</h3>
+              <p class="text-sm text-slate-500">Salinan skor yang digantikan atau dihapus. Periode hanya ditampilkan bila cocok dengan fingerprint riwayat; data lama yang belum dapat diverifikasi diberi label "Tidak diketahui".</p></div>
+            <span class="text-xs rounded-full bg-slate-100 px-3 py-1 text-slate-600">{{nilaiArsip.length}} snapshot</span>
+          </div>
+          <div class="overflow-x-auto"><table class="w-full text-sm">
+            <thead class="bg-slate-50 text-left"><tr><th class="p-3">Waktu arsip</th><th class="p-3">Periode</th><th class="p-3">Siswa</th><th class="p-3">Penilaian</th><th class="p-3 text-center">Skor arsip</th><th class="p-3">Aksi sumber / pengguna</th></tr></thead>
+            <tbody>
+              <tr v-for="a in nilaiArsip" :key="a.snapshotId" class="border-t align-top">
+                <td class="p-3 whitespace-nowrap">{{a.waktuArsip}}</td>
+                <td class="p-3"><div>{{a.tahun||'Periode tidak diketahui'}}</div><div class="text-xs text-slate-500">{{a.semester||'—'}} · {{a.statusPeriode}}</div></td>
+                <td class="p-3"><div class="font-semibold">{{a.nama||'-'}}</div><div class="text-xs text-slate-500">{{a.nis}}</div></td>
+                <td class="p-3 min-w-[12rem]"><div class="font-semibold">{{a.kelas}} · {{a.mapel}}</div><div class="text-slate-500">{{a.tp}} · {{jl(a.jenis)}}</div></td>
+                <td class="p-3 text-center font-semibold">{{a.skor}}</td>
+                <td class="p-3"><div>{{a.aksiSumber}}</div><div class="text-xs text-slate-500">{{a.olehNama||'-'}}</div></td>
+              </tr>
+              <tr v-if="!nilaiArsip.length"><td colspan="6" class="p-6 text-center text-slate-500">Belum ada snapshot nilai yang digantikan atau dihapus.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </template>
     </section>
 
@@ -1976,11 +2057,11 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
       <p v-if="!rpTabs.length" class="text-sm text-slate-500">Rapor hanya dapat dicetak oleh wali kelas. Admin menetapkan wali di Kelola Kelas.</p>
       <div v-else class="flex flex-wrap gap-2 mb-4"><button v-for="t in rpTabs" :key="t.k" @click="gantiTabR(t.k)" :class="rpTab===t.k?'btn-p':'btn-o'">{{t.t}}</button></div>
 
-      <div v-if="(rpTab==='data'||rpTab==='naik'||rpTab==='validasi'||rpTab==='riwayat')&&rpPil.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
-        <label class="lb">Kelas<select v-model="rpKelas" @change="rpTab==='riwayat'?loadRiwayatPenilaian():loadRapor()" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Kelas --</option><option v-for="k in rpPil" :key="k">{{k}}</option></select></label>
+      <div v-if="(rpTab==='data'||rpTab==='naik'||rpTab==='validasi')&&rpPil.length" class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
+        <label class="lb">Kelas<select v-model="rpKelas" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Kelas --</option><option v-for="k in rpPil" :key="k">{{k}}</option></select></label>
         <label v-if="rpTab==='data'||rpTab==='validasi'" class="lb">Jenis rapor<select v-model="rpMeta.periode" @change="loadRapor" class="inp w-full mt-1 normal-case"><option value="SAS">Akhir Semester (SAS)</option><option value="STS">Tengah Semester (STS)</option></select></label>
-        <label class="lb">Semester<select v-model="rpMeta.sem" @change="rpTab==='riwayat'?loadRiwayatPenilaian():loadRapor()" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select></label>
-        <label class="lb">Tahun ajaran<select v-model="rpMeta.tahun" @change="rpTab==='riwayat'?loadRiwayatPenilaian():loadRapor()" class="inp w-full mt-1 normal-case"><option v-for="t in opsiTahun(rpMeta.tahun)" :key="t" :value="t">{{t}}</option></select></label>
+        <label class="lb">Semester<select v-model="rpMeta.sem" @change="loadRapor" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select></label>
+        <label class="lb">Tahun ajaran<select v-model="rpMeta.tahun" @change="loadRapor" class="inp w-full mt-1 normal-case"><option v-for="t in opsiTahun(rpMeta.tahun)" :key="t" :value="t">{{t}}</option></select></label>
       </div>
 
       <template v-if="rpTab==='bk'&&user&&user.role==='BK'">
@@ -2063,70 +2144,6 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
         <p class="text-xs text-slate-500 mt-2">Kehadiran dihitung per hari (status terburuk dari semua sesi hari itu). Capaian kompetensi pada rapor disusun otomatis dari ketercapaian tiap Tujuan Pembelajaran (TP): rata-rata skor sumatif TP dibandingkan KKTP TP tersebut, atau status asesmen formatif bila TP belum punya nilai sumatif. Nilai rapor dibulatkan ke bilangan bulat.</p>
       </template>
 
-      <template v-if="rpTab==='riwayat'">
-        <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div><h3 class="font-bold text-slate-800 text-lg">Riwayat penilaian semester</h3>
-              <p class="text-sm text-slate-500 mt-1">Daftar penilaian sumatif yang disimpan setelah fitur riwayat diaktifkan. Penilaian lama yang tidak memiliki tanggal tidak ditampilkan agar semester tidak ditebak.</p></div>
-            <button class="btn-o" @click="loadRiwayatPenilaian" :disabled="busy"><span class="inline-flex items-center gap-2"><icon name="refresh-cw" size="14"/> Muat ulang</span></button>
-          </div>
-          <div class="grid sm:grid-cols-3 gap-2 mt-4">
-            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Periode dipilih</div><div class="font-semibold">{{rpMeta.sem}} · {{rpMeta.tahun}}</div></div>
-            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Penilaian tersimpan</div><div class="font-semibold">{{riwayatPenilaian.length}} aktivitas</div></div>
-            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Aksi tersedia</div><div class="font-semibold">Edit nilai · Hapus penilaian</div></div>
-          </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 text-left"><tr><th class="p-3">Waktu simpan</th><th>Kelas / Mapel</th><th>Tujuan pembelajaran</th><th>Jenis</th><th class="text-center">Siswa bernilai</th><th>Disimpan oleh</th><th class="text-center">Status</th><th class="text-center noprint">Aksi</th></tr></thead>
-            <tbody>
-              <tr v-for="r in riwayatPenilaian" :key="r.id" class="border-t align-top">
-                <td class="p-3 whitespace-nowrap">{{r.waktu}}</td>
-                <td class="p-2 min-w-[10rem]"><div class="font-semibold">{{r.kelas}}</div><div class="text-slate-500">{{r.mapel}}</div></td>
-                <td class="p-2 min-w-[12rem]">{{r.tp}}</td>
-                <td class="p-2 whitespace-nowrap">{{jl(r.jenis)}}</td>
-                <td class="p-2 text-center font-semibold">{{r.jumlah}}</td>
-                <td class="p-2">{{r.olehNama||'-'}}</td>
-                <td class="p-2 text-center"><span v-if="r.aktif" class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700">Aktif</span><span v-else class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-amber-50 text-amber-700">Riwayat lama</span></td>
-                <td class="p-2 noprint"><div class="flex justify-center gap-1">
-                  <button class="btn-o !min-h-[2rem] !px-2 text-xs" :disabled="!r.aktif" @click="editRiwayatPenilaian(r)" title="Buka nilai untuk diedit"><icon name="pencil" size="13"/> Edit</button>
-                  <button class="btn-o !min-h-[2rem] !px-2 text-xs !text-rose-700" :disabled="!r.aktif" @click="hapusRiwayatPenilaian(r)" title="Hapus penilaian"><icon name="trash-2" size="13"/> Hapus</button>
-                </div></td>
-              </tr>
-              <tr v-if="!riwayatPenilaian.length"><td colspan="8" class="p-8 text-center"><div class="mx-auto mb-2 rounded-full bg-slate-100 w-10 h-10 flex items-center justify-center"><icon name="history" size="18" color="#64748b"/></div><div class="font-semibold text-slate-700">Belum ada riwayat pada periode ini</div><p class="text-slate-500 text-sm mt-1">Simpan nilai sumatif melalui menu Input Nilai. Riwayat akan tercatat otomatis dengan waktu dan semester penyimpanan.</p></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="text-xs text-slate-500 mt-3">Tombol Edit membuka penilaian yang sama di menu Input Nilai. Tombol Hapus menghapus nilai aktif hanya jika data belum berubah sejak riwayat dicatat. Jejak perubahan di bawah merupakan arsip mulai tanggal fitur audit dipasang; bukan rekonstruksi nilai lama.</p>
-        <div class="bg-white rounded-2xl shadow-sm p-4 mt-4">
-          <div class="flex flex-wrap items-start justify-between gap-2 mb-3"><div><h3 class="font-bold text-slate-800">Jejak perubahan nilai</h3><p class="text-sm text-slate-500">Catatan nilai sebelum dan sesudah simpan atau sebelum penghapusan, difilter menurut semester aktif.</p></div><span class="text-xs rounded-full bg-slate-100 px-3 py-1 text-slate-600">{{riwayatNilaiAudit.length}} perubahan</span></div>
-          <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Waktu</th><th class="p-3">Siswa</th><th class="p-3">Penilaian</th><th class="p-3 text-center">Nilai sebelumnya</th><th class="p-3 text-center">Nilai sesudah</th><th class="p-3">Aksi / pengguna</th></tr></thead><tbody>
-            <tr v-for="a in riwayatNilaiAudit" :key="a.id" class="border-t align-top"><td class="p-3 whitespace-nowrap">{{a.waktu}}</td><td class="p-3"><div class="font-semibold">{{a.nama||'-'}}</div><div class="text-xs text-slate-500">{{a.nis}}</div></td><td class="p-3 min-w-[12rem]"><div class="font-semibold">{{a.kelas}} · {{a.mapel}}</div><div class="text-slate-500">{{a.tp}} · {{jl(a.jenis)}}</div></td><td class="p-3 text-center">{{a.skorSebelum==null?'—':a.skorSebelum}}</td><td class="p-3 text-center font-semibold">{{a.skorSesudah==null?'—':a.skorSesudah}}</td><td class="p-3"><div class="font-semibold">{{a.aksi==='HAPUS'?'Hapus':'Simpan'}}</div><div class="text-xs text-slate-500">{{a.olehNama||'-'}}</div></td></tr>
-            <tr v-if="!riwayatNilaiAudit.length"><td colspan="6" class="p-6 text-center text-slate-500">Belum ada jejak perubahan pada periode ini. Catatan mulai dibuat setelah pembaruan backend dipasang.</td></tr>
-          </tbody></table></div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4 mt-4">
-          <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
-            <div><h3 class="font-bold text-slate-800">Arsip nilai sebelum perubahan</h3>
-              <p class="text-sm text-slate-500">Salinan skor yang digantikan atau dihapus. Periode hanya ditampilkan bila cocok dengan fingerprint riwayat; data lama yang belum dapat diverifikasi diberi label "Tidak diketahui".</p></div>
-            <span class="text-xs rounded-full bg-slate-100 px-3 py-1 text-slate-600">{{nilaiArsip.length}} snapshot</span>
-          </div>
-          <div class="overflow-x-auto"><table class="w-full text-sm">
-            <thead class="bg-slate-50 text-left"><tr><th class="p-3">Waktu arsip</th><th class="p-3">Periode</th><th class="p-3">Siswa</th><th class="p-3">Penilaian</th><th class="p-3 text-center">Skor arsip</th><th class="p-3">Aksi sumber / pengguna</th></tr></thead>
-            <tbody>
-              <tr v-for="a in nilaiArsip" :key="a.snapshotId" class="border-t align-top">
-                <td class="p-3 whitespace-nowrap">{{a.waktuArsip}}</td>
-                <td class="p-3"><div>{{a.tahun||'Periode tidak diketahui'}}</div><div class="text-xs text-slate-500">{{a.semester||'—'}} · {{a.statusPeriode}}</div></td>
-                <td class="p-3"><div class="font-semibold">{{a.nama||'-'}}</div><div class="text-xs text-slate-500">{{a.nis}}</div></td>
-                <td class="p-3 min-w-[12rem]"><div class="font-semibold">{{a.kelas}} · {{a.mapel}}</div><div class="text-slate-500">{{a.tp}} · {{jl(a.jenis)}}</div></td>
-                <td class="p-3 text-center font-semibold">{{a.skor}}</td>
-                <td class="p-3"><div>{{a.aksiSumber}}</div><div class="text-xs text-slate-500">{{a.olehNama||'-'}}</div></td>
-              </tr>
-              <tr v-if="!nilaiArsip.length"><td colspan="6" class="p-6 text-center text-slate-500">Belum ada snapshot nilai yang digantikan atau dihapus.</td></tr>
-            </tbody>
-          </table></div>
-        </div>
-      </template>
 
       <template v-if="rpTab==='validasi'">
         <p v-if="!rp" class="text-sm text-slate-500">Pilih kelas untuk memeriksa kesiapan rapor.</p>
@@ -3799,7 +3816,10 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const siapCetak = ref(false); // v82: render .rapor-wrap hanya saat cetak; hemat DOM untuk kelas besar
     const rkpSumber = ref([]), rkpSumberNis = ref(''), rkpSumberBusy = ref(false);
     const bkRapor = ref({ kelas: [], siswa: [] }), bkKelas = ref(''), bkRaporBusy = ref(false);
+    const nilaiSubTab = ref('input');
     const riwayatPenilaian = ref([]), riwayatNilaiAudit = ref([]), nilaiArsip = ref([]);
+    const nilaiRiwayatKelas = computed(() => Array.from(new Set(pil.value.map(p => String(p.kelas || '').trim()).filter(Boolean))).sort((a,b) => a.localeCompare(b, 'id')));
+    const bukaRiwayatNilai = () => { nilaiSubTab.value = 'riwayat'; rpKelas.value = ''; loadRiwayatPenilaian(); };
     const loadRiwayatPenilaian = () => run(async () => {
       const filter = { kelas: rpKelas.value, tahun: rpMeta.tahun, semester: rpMeta.sem };
       const [daftar, audit, arsip] = await Promise.all([
@@ -3843,7 +3863,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const rpPeran = computed(() => !!user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU')), rpFinal = computed(() => !!rp.value && rp.value.status === 'Final'), rpCek = ref(null);
     const bolehEditR = computed(() => rpPeran.value && !(rpFinal.value && rp.value.periode === 'SAS'));
     const rpBisaPaksa = computed(() => !!user.value && user.value.role === 'ADMIN' && !!rpCek.value && rpCek.value.status !== 'Final' && rpCek.value.blok.length > 0 && rpCek.value.blok.every(x => x.jenis === 'nilaiKosong' || x.jenis === 'mapelKosong'));
-    const rpTabs = computed(() => { const t = [], r = user.value && user.value.role; if (r === 'BK') return [{ k: 'bk', t: 'Penilaian BK' }]; if (rpPil.value.length) { t.push({ k: 'data', t: 'Data & Cetak Rapor' }); t.push({ k: 'validasi', t: 'Validasi & Finalisasi' }); t.push({ k: 'naik', t: 'Kenaikan Kelas' }); } if (r === 'ADMIN' || r === 'GURU') { t.push({ k: 'riwayat', t: 'Riwayat Penilaian' }); t.push({ k: 'rekap', t: 'Rekap Nilai Mapel' }); } if (r === 'ADMIN') t.push({ k: 'atur', t: 'Pengaturan Rapor' }); return t; });
+    const rpTabs = computed(() => { const t = [], r = user.value && user.value.role; if (r === 'BK') return [{ k: 'bk', t: 'Penilaian BK' }]; if (rpPil.value.length) { t.push({ k: 'data', t: 'Data & Cetak Rapor' }); t.push({ k: 'validasi', t: 'Validasi & Finalisasi' }); t.push({ k: 'naik', t: 'Kenaikan Kelas' }); } if (r === 'ADMIN' || r === 'GURU') { t.push({ k: 'rekap', t: 'Rekap Nilai Mapel' }); } if (r === 'ADMIN') t.push({ k: 'atur', t: 'Pengaturan Rapor' }); return t; });
     const tglPanjangR = s => /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     const tglPendekR = s => /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : (s || '-');
     const tglRapor = computed(() => tglPanjangR(rpInfo.tanggal) || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }));
@@ -4294,7 +4314,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         setInterval(kirimTinggiEmbed, 1000);
       }
     }
-    return { katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
