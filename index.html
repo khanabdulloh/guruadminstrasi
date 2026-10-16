@@ -1816,15 +1816,15 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
       <template v-if="nilaiSubTab==='riwayat'">
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-4 gap-3 items-end">
           <label class="lb">Kelas
-            <select v-model="rpKelas" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case">
+            <select v-model="nilaiRiwayatKelasDipilih" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case">
               <option value="">Semua kelas</option><option v-for="k in nilaiRiwayatKelas" :key="k" :value="k">{{k}}</option>
             </select>
           </label>
           <label class="lb">Semester
-            <select v-model="rpMeta.sem" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select>
+            <select v-model="nilaiRiwayatSem" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case"><option>Ganjil</option><option>Genap</option></select>
           </label>
           <label class="lb">Tahun ajaran
-            <select v-model="rpMeta.tahun" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case"><option v-for="t in opsiTahun(rpMeta.tahun)" :key="t" :value="t">{{t}}</option></select>
+            <select v-model="nilaiRiwayatTahun" @change="loadRiwayatPenilaian" class="inp w-full mt-1 normal-case"><option v-for="t in opsiTahun(nilaiRiwayatTahun)" :key="t" :value="t">{{t}}</option></select>
           </label>
           <button class="btn-o" @click="loadRiwayatPenilaian" :disabled="busy">Muat ulang riwayat</button>
         </div>
@@ -1834,7 +1834,7 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
               <p class="text-sm text-slate-500 mt-1">Daftar penilaian sumatif yang disimpan setelah fitur riwayat diaktifkan. Penilaian lama yang tidak memiliki tanggal tidak ditampilkan agar semester tidak ditebak.</p></div>
           </div>
           <div class="grid sm:grid-cols-3 gap-2 mt-4">
-            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Periode dipilih</div><div class="font-semibold">{{rpMeta.sem}} · {{rpMeta.tahun}}</div></div>
+            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Periode dipilih</div><div class="font-semibold">{{nilaiRiwayatSem}} · {{nilaiRiwayatTahun}}</div></div>
             <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Penilaian tersimpan</div><div class="font-semibold">{{riwayatPenilaian.length}} aktivitas</div></div>
             <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-500">Aksi tersedia</div><div class="font-semibold">Edit nilai · Hapus penilaian</div></div>
           </div>
@@ -3270,7 +3270,7 @@ const app = createApp({
       if (k === 'guru') { gq.value = grole.value = ''; await refreshGuru(); }
       if (k === 'akun') { akq.value = akrole.value = akkelas.value = ''; akpilih.value = []; await fetchAkun(); }
       if (k === 'monitor') { const r = await Promise.all([fetchMon(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; }
-      if (k === 'nilai') { pil.value = await api('pilihanNilai'); nrows.value = []; frows.value = []; kt.loaded = false; nMode.value = 'sumatif'; pilIdx.value = ''; }
+      if (k === 'nilai') { nilaiSubTab.value = 'input'; pil.value = await api('pilihanNilai'); nrows.value = []; frows.value = []; kt.loaded = false; nMode.value = 'sumatif'; pilIdx.value = ''; }
       if (k === 'jurnal') { const r = await Promise.all([canWrite.value ? api('pilihanNilai') : null, api('pengaturanGet'), fetchJ()]); if (r[0]) pil.value = r[0]; cfg.value = r[1]; }
       if (k === 'bimbingan') { const r = await Promise.all([['ADMIN','GURU'].includes(user.value.role) ? api('bimbinganKelas') : null, ['ADMIN','GURU','KEPSEK'].includes(user.value.role) ? api('pengaturanGet').catch(() => null) : null, fetchB()]); bk.value = r[0] || []; if (r[1]) cfg.value = r[1]; }
       if (k === 'pengaturan') { const r = await Promise.all([api('pengaturanGet'), api('backupStatus').catch(() => null), api('akademikGet').catch(() => null), api('kunciGet').catch(() => null), api('ukuranData').catch(() => null), api('blokInfo').catch(() => null)]); ukd.value = r[4]; cfg.value = r[0]; { const bi = r[5]; if (bi) { blokInfo.value = bi; Object.assign(bf2, { acuan: bi.acuan, blok: bi.blokAcuan, minggu: bi.minggu }); } } backupUrl.value = ''; bk2.value = r[1]; ak.value = r[2]; kunci.value = r[3]; }
@@ -3817,11 +3817,11 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const rkpSumber = ref([]), rkpSumberNis = ref(''), rkpSumberBusy = ref(false);
     const bkRapor = ref({ kelas: [], siswa: [] }), bkKelas = ref(''), bkRaporBusy = ref(false);
     const nilaiSubTab = ref('input');
+    const nilaiRiwayatKelasDipilih = ref(''), nilaiRiwayatSem = ref('Ganjil'), nilaiRiwayatTahun = ref('');
     const riwayatPenilaian = ref([]), riwayatNilaiAudit = ref([]), nilaiArsip = ref([]);
     const nilaiRiwayatKelas = computed(() => Array.from(new Set(pil.value.map(p => String(p.kelas || '').trim()).filter(Boolean))).sort((a,b) => a.localeCompare(b, 'id')));
-    const bukaRiwayatNilai = () => { nilaiSubTab.value = 'riwayat'; rpKelas.value = ''; loadRiwayatPenilaian(); };
-    const loadRiwayatPenilaian = () => run(async () => {
-      const filter = { kelas: rpKelas.value, tahun: rpMeta.tahun, semester: rpMeta.sem };
+    const muatDataRiwayatPenilaian = async () => {
+      const filter = { kelas: nilaiRiwayatKelasDipilih.value, tahun: nilaiRiwayatTahun.value, semester: nilaiRiwayatSem.value };
       const [daftar, audit, arsip] = await Promise.all([
         api('riwayatPenilaianList', filter),
         api('riwayatNilaiAuditList', { ...filter, limit: 200 }),
@@ -3830,9 +3830,22 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       riwayatPenilaian.value = daftar;
       riwayatNilaiAudit.value = audit;
       nilaiArsip.value = arsip;
-    });
+    };
+    const bukaRiwayatNilai = () => {
+      nilaiSubTab.value = 'riwayat';
+      run(async () => {
+        if (!nilaiRiwayatTahun.value) {
+          const c = await api('pengaturanGet').catch(() => null);
+          nilaiRiwayatTahun.value = (c && c.tahun && c.tahun.tahun) || rpMeta.tahun || opsiTahun()[2];
+          nilaiRiwayatSem.value = (c && c.tahun && c.tahun.semester) || rpMeta.sem || 'Ganjil';
+        }
+        await muatDataRiwayatPenilaian();
+      });
+    };
+    const loadRiwayatPenilaian = () => run(muatDataRiwayatPenilaian);
     const editRiwayatPenilaian = r => run(async () => {
       await go('nilai');
+      nilaiSubTab.value = 'input';
       const i = pil.value.findIndex(p => String(p.kelas) === String(r.kelas) && String(p.mapel) === String(r.mapel));
       if (i < 0) throw new Error('Jadwal kelas/mapel tidak tersedia untuk akun ini.');
       pilIdx.value = String(i);
@@ -4314,7 +4327,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         setInterval(kirimTinggiEmbed, 1000);
       }
     }
-    return { katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, barisR, loadRapor, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
