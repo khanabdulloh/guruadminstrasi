@@ -3332,6 +3332,64 @@ body.cetak-rapor .rapor-page table.rapor-mapel-sas tbody tr.rapor-rata-row > td.
 }
 @media (prefers-reduced-motion:reduce){#app aside[aria-label="Menu utama"] *{transition:none!important}}
 </style>
+<style id="calm-content-polish-v115">
+/* v115: area konten (kanan) lebih rapi dan konsisten. Hanya tampilan di layar; tidak mengubah data, fungsi, maupun cetak. */
+@media screen{
+  /* Kartu putih seragam di semua halaman */
+  #app main#utama .bg-white.rounded-2xl.shadow-sm{border:1px solid var(--line);border-radius:14px;box-shadow:none}
+  #app main#utama .dash>div.bg-white.rounded-2xl{padding:1.1rem 1.3rem}
+  #app main#utama .dash .grid>div.bg-white.rounded-2xl{padding:1.1rem 1.3rem}
+  #app main#utama h3.font-bold{font-size:.95rem;line-height:1.35;letter-spacing:-.005em;color:var(--navy-d)}
+  #app main#utama .panel-head{margin-bottom:.6rem}
+  #app main#utama .panel-desc{font-size:.78rem;color:var(--mut)}
+  /* Garis aksen kiri yang halus (menggantikan border-l-4 yang tebal) */
+  #app main#utama .dash>div.bg-white.border-l-4{border-left-width:3px}
+  #app main#utama .dash>div.bg-white.border-amber-400{border-left-color:#f59e0b}
+  #app main#utama .dash>div.bg-white.border-navy-700{border-left-color:#0b3d91}
+  #app main#utama .dash>div.bg-white.border-sky-500{border-left-color:#0ea5e9}
+  /* Label seksi */
+  #app main#utama .dash-quick .dash-h{font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#52647c;margin-bottom:.7rem}
+  /* Baris daftar di dalam panel */
+  #app main#utama .dash div.border-t{border-color:#eef2f8}
+  #app main#utama .dash div.flex.justify-between.border-t{align-items:center;gap:.75rem;padding:.7rem 0!important;font-size:.88rem}
+  #app main#utama .dash div.flex.justify-between.border-t>span:first-child{color:var(--ink)}
+  #app main#utama .dash div.flex.justify-between.border-t>span:first-child b{display:inline-block;min-width:3rem;color:var(--navy);font-variant-numeric:tabular-nums}
+  #app main#utama .dash span.text-emerald-600.font-bold.text-xs{padding:.2rem .65rem;border-radius:999px;background:#ecfdf3;color:#067647}
+  #app main#utama .dash div.flex-wrap.gap-x-4.border-t{align-items:center;gap:.5rem .6rem!important;padding:.8rem 0!important}
+  #app main#utama .dash div.flex-wrap.gap-x-4.border-t>b{width:auto!important;margin-right:.35rem;font-size:.95rem;color:var(--navy-d)}
+  #app main#utama .dash div.flex-wrap.gap-x-4.border-t>span{padding:.2rem .65rem;border-radius:999px;background:#f3f6fb;color:#33445f;font-size:.78rem;line-height:1.4}
+  #app main#utama .dash div.flex-wrap.gap-x-4.border-t>span.text-rose-600{background:#fff1f2;color:#be123c}
+  #app main#utama .dash div.flex.items-center.text-sm.border-t:has(>span.w-32){padding:.65rem 0!important;gap:.9rem!important}
+  #app main#utama .dash div.flex.items-center.text-sm.border-t>span.w-32{width:7.6rem!important;color:var(--navy);font-weight:600;font-variant-numeric:tabular-nums}
+  #app main#utama .dash div.flex.items-center.text-sm.border-t>span.flex-1 .text-xs{display:inline-block;margin-left:.45rem;padding:.1rem .55rem;border-radius:999px;background:var(--navy-soft);color:var(--navy);font-weight:600;vertical-align:1px}
+  #app main#utama .dash div.py-2.border-t.flex.items-start{padding:.75rem 0!important}
+  #app main#utama .dash div.py-2.border-t.flex.items-start p.font-bold{font-size:.92rem;color:var(--navy-d)}
+}
+@media screen and (min-width:1180px){
+  /* Susunan dua kolom pada layar lebar */
+  #app main#utama .dash{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:1.1rem 1.25rem;align-items:start}
+  #app main#utama .dash>*{grid-column:span 12;min-width:0}
+  #app main#utama .dash>div[class*="bg-sky-50"],#app main#utama .dash>div[class*="bg-amber-50"],#app main#utama .dash>div[class*="bg-violet-50"],#app main#utama .dash>div[class*="bg-rose-50"]{grid-column:span 6}
+  /* Pasangan panel bersebelahan: kiri dan kanan ditempatkan eksplisit agar tidak terpecah oleh banner ganjil */
+  #app main#utama .dash>div.bg-white.border-l-4:has(+div.bg-white.border-l-4),
+  #app main#utama .dash>div.bg-white.mt-4:has(+div.bg-white.mt-4){grid-column:1/span 6;align-self:stretch}
+  #app main#utama .dash>div.bg-white.border-l-4+div.bg-white.border-l-4,
+  #app main#utama .dash>div.bg-white.mt-4+div.bg-white.mt-4{grid-column:7/span 6;align-self:stretch}
+  #app main#utama .dash>div.dash-stats{margin:0}
+}
+@media screen{
+  #app main#utama .dash .btn-o,#app main#utama .dash .btn-p{white-space:nowrap}
+}
+@media screen and (max-width:767px){
+  #app header.sticky.md\:hidden .nav-brand b{white-space:nowrap}
+  #app header.sticky.md\:hidden>span.ml-auto{white-space:nowrap;font-size:9px!important;padding:.2rem .55rem!important;letter-spacing:.01em}
+}
+@media screen and (max-width:640px){
+  #app main#utama .dash div.flex.justify-between.border-t{flex-direction:column;align-items:flex-start;gap:.35rem}
+  #app main#utama .dash div.flex.justify-between.border-t>span:last-child{justify-content:flex-start!important}
+  #app main#utama .dash div.flex.items-center.text-sm.border-t>span.w-32{width:6.2rem!important}
+}
+</style>
 <style id="calm-bobot-kktp-v110">
 /* Bobot nilai & KKTP: kartu minimalis, responsif lewat container query */
 .bk-card{container-type:inline-size;padding:1.5rem;border:1px solid #e6ecf5;box-shadow:0 1px 2px rgba(15,35,70,.04)}
