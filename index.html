@@ -2709,9 +2709,9 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <tbody v-for="g in rpGrup" :key="g.g">
           <tr class="font-bold"><td class="border p-1 bg-slate-50" :colspan="rp.periode==='STS'?7:6">Kelompok Mata Pelajaran {{g.g.replace(/^Mata Pelajaran /,'')}}</td></tr>
           <tr v-for="m in g.items" :key="m.nama"><td class="border p-1 text-center">{{m.no}}</td><td class="border p-1">{{m.label||m.nama}}</td><td class="border p-1 text-center">{{m.kkm}}</td>
-            <template v-if="rp.periode==='STS'"><td class="border p-1 text-center">{{nv(s,m.nama,'slm')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'sts')}}</td><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{s.nilai[m.nama]?(s.nilai[m.nama].akhir>=m.kkm?'Tuntas':'Belum tuntas'):'-'}}</td></template>
+            <template v-if="rp.periode==='STS'"><td class="border p-1 text-center">{{nv(s,m.nama,'slm')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'sts')}}</td><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center rapor-ket">{{s.nilai[m.nama]?(s.nilai[m.nama].akhir>=m.kkm?'Tuntas':'Belum tuntas'):'-'}}</td></template>
             <template v-else><td class="border p-1 text-center font-bold">{{nv(s,m.nama,'akhir')}}</td><td class="border p-1 text-center">{{nv(s,m.nama,'pred')}}</td><td class="border p-1 text-xs" style="text-align:justify">{{s.nilai[m.nama]&&s.nilai[m.nama].desk||'-'}}</td></template></tr></tbody>
-        <tbody><tr class="font-bold rapor-rata-row"><td class="border p-1 text-center" :colspan="rp.periode==='STS'?2:3">Rata-rata</td><template v-if="rp.periode==='STS'"><td class="border p-1 text-center rapor-rata-value">{{rataKkm()}}</td><td class="border p-1 text-center rapor-rata-value">{{rataKolom(s,'slm')}}</td><td class="border p-1 text-center rapor-rata-value">{{rataKolom(s,'sts')}}</td><td class="border p-1 text-center rapor-rata-value">{{s.rata==null?'-':s.rata}}</td><td class="border p-1 text-center rapor-rata-value">{{ketRata(s)}}</td></template><template v-else><td class="border p-1 text-center rapor-rata-value">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td><td class="border p-1"></td></template></tr></tbody></table>
+        <tbody><tr class="font-bold rapor-rata-row"><td class="border p-1 text-center" :colspan="rp.periode==='STS'?2:3">Rata-rata</td><template v-if="rp.periode==='STS'"><td class="border p-1 text-center rapor-rata-value">{{rataKkm()}}</td><td class="border p-1 text-center rapor-rata-value">{{rataKolom(s,'slm')}}</td><td class="border p-1 text-center rapor-rata-value">{{rataKolom(s,'sts')}}</td><td class="border p-1 text-center rapor-rata-value">{{s.rata==null?'-':s.rata}}</td><td class="border p-1 text-center rapor-rata-value rapor-ket">{{ketRata(s)}}</td></template><template v-else><td class="border p-1 text-center rapor-rata-value">{{s.rata==null?'-':s.rata}}</td><td class="border p-1"></td><td class="border p-1"></td></template></tr></tbody></table>
       <template v-if="rp.periode==='SAS' && s.pkl"><p class="font-bold text-sm mb-1">B. Praktik Kerja Lapangan (PKL)</p>
           <table class="w-full text-sm border-collapse mb-3 calm-table-print rapor-pkl"><thead><tr class="bg-slate-100"><th class="border p-1 text-left">Mitra DU/DI</th><th class="border p-1">Waktu Pelaksanaan</th><th class="border p-1" style="width:10%">Nilai</th></tr></thead><tbody>
             <tr><td class="border p-1">{{s.pkl.industri||'-'}}</td><td class="border p-1 text-center">{{tglPendekR(s.pkl.mulai)}} s.d. {{tglPendekR(s.pkl.selesai)}}</td><td class="border p-1 text-center font-bold">{{s.pkl.nilai==null?'-':s.pkl.nilai}}</td></tr></tbody></table></template>
@@ -3164,6 +3164,11 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 }
 </style>
 
+<style>
+body.cetak-rapor .rapor-page table.rapor-mapel-sts tbody tr > td.rapor-ket,
+body.cetak-rapor .rapor-page table.rapor-mapel-sts tbody tr > td.rapor-ket:last-child { text-align:center!important; text-align-last:center!important; vertical-align:middle!important; }
+.rapor-mapel-sts td.rapor-ket { text-align:center; }
+</style>
 </head>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
