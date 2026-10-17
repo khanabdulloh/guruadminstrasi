@@ -3432,6 +3432,56 @@ body.cetak-rapor .rapor-page table.rapor-mapel-sas tbody tr.rapor-rata-row > td.
 .bk-foot{display:flex;justify-content:flex-end;margin-top:1.35rem;padding-top:1.1rem;border-top:1px solid #edf1f7}
 @media(max-width:480px){.bk-card{padding:1.1rem}.bk-foot .btn-p{width:100%}}
 </style>
+
+<style id="calm-teacher-ux-polish">
+/* Penyempurnaan area kerja kanan: tidak mengubah data, API, atau alur simpan. */
+#utama{width:100%;max-width:none;min-width:0;padding-top:clamp(1rem,2vw,2rem)}
+#utama .page-head{margin-bottom:1.15rem}
+#utama .page-head .h2{font-size:clamp(1.35rem,2vw,1.75rem);line-height:1.25;margin-bottom:.35rem}
+#utama .desk,#utama .panel-desc{line-height:1.65}
+#utama button:not(.nav-toggle){min-height:40px}
+#utama .btn-p,#utama .btn-o{padding:.65rem 1rem;line-height:1.35;border-radius:.75rem}
+#utama input:not([type=checkbox]):not([type=radio]),#utama select,#utama textarea{min-height:42px}
+#utama label.lb{display:block;line-height:1.55}
+#utama .inp{padding:.65rem .8rem;border-radius:.7rem}
+#utama :is(input,select,textarea,button,a,summary):focus-visible{outline:3px solid rgba(37,99,235,.5);outline-offset:2px}
+#utama .nl .nl-head .seg{gap:.35rem;flex-wrap:wrap}
+#utama .nl .seg button{min-height:44px;padding:.65rem .9rem;white-space:normal}
+#utama .nl .nl-form{gap:1.1rem}
+#utama .nl .nl-form label.lb{padding:0;min-width:0}
+#utama .nl .nl-form select,#utama .nl .nl-form input{font-size:1rem}
+#utama .nl .nl-stat{gap:.65rem}
+#utama .nl .nl-chip{align-items:center;min-height:36px;font-size:.86rem}
+#utama .nl .nl-table{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#utama .nl .nl-table table{min-width:520px}
+#utama .nl .nl-table th{font-size:.8rem}
+#utama .nl .nl-table td{line-height:1.45}
+#utama .nl .nl-skor{width:5.5rem;min-height:46px;font-size:1.05rem;font-weight:750;border-width:1.5px}
+#utama .nl .nl-bar{position:sticky;bottom:max(.5rem,env(safe-area-inset-bottom));z-index:8;gap:.8rem;box-shadow:0 5px 22px rgba(15,35,70,.12);backdrop-filter:blur(8px)}
+#utama .nl .nl-bar .btn-p{min-width:150px;min-height:48px;font-size:.95rem}
+#utama .nl .nl-guide summary,#utama .nl .nl-kktp summary{min-height:48px;display:flex;align-items:center;gap:.75rem;line-height:1.5}
+#utama .nl .nl-guide summary::after{margin-left:auto;flex-shrink:0}
+#utama .nl .nl-empty{color:#52627b}
+#utama .nl .nl-lock{line-height:1.6}
+#utama .overflow-x-auto{max-width:100%;-webkit-overflow-scrolling:touch}
+@media(max-width:767px){
+ #utama{padding-left:clamp(12px,3.5vw,18px);padding-right:clamp(12px,3.5vw,18px);padding-bottom:calc(2rem + env(safe-area-inset-bottom))}
+ #utama .nl .nl-card{padding:1rem}
+ #utama .nl .nl-head .seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+ #utama .nl .nl-head .seg button{width:100%;font-size:.88rem}
+ #utama .nl .nl-bar{flex-wrap:wrap;align-items:stretch}
+ #utama .nl .nl-bar .nl-hint{flex:1 1 100%}
+ #utama .nl .nl-bar .btn-p{width:100%;min-width:0}
+ #utama .nl .nl-table td,#utama .nl .nl-table th{padding:.7rem .65rem}
+ #utama .nl .nl-skor{width:5rem}
+}
+@media(min-width:768px){
+ #utama .nl .nl-form{align-items:start}
+ #utama .nl .nl-bar .nl-hint{font-size:.86rem}
+}
+@media(prefers-reduced-motion:reduce){#utama *{scroll-behavior:auto!important;transition:none!important}}
+</style>
+
 </head>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
