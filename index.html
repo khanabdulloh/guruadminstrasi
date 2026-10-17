@@ -2182,29 +2182,31 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <label class="lb">Tanggal rapor<input type="date" v-model="rpInfo.tanggal" :disabled="!bolehEditR" class="inp w-full mt-1"></label>
         </div>
         <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan data rapor</button><button @click="cetakRapor('')" :disabled="!rp.siswa.length" class="btn-o">Cetak semua rapor</button><button @click="cetakCover('')" :disabled="!rp.siswa.length" class="btn-o">Cetak cover rapor</button><label class="inline-flex items-center gap-1.5 text-xs text-slate-600"><input type="checkbox" v-model="coverIdentitas"> sertakan halaman identitas sekolah</label></div>
-        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-          <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>NISN</th><th>Rata-rata</th><th>&lt; KKTP</th><th>S/I/A</th><th>Ekstrakurikuler <span class="font-normal text-slate-400">(pilih dari daftar atau isi manual)</span></th><th>Kokurikuler <span class="font-normal text-slate-400">(pilih dimensi/tema atau isi manual)</span></th><th>Catatan wali kelas</th><th class="noprint text-center whitespace-nowrap">Aksi</th></tr></thead>
-          <tbody><tr v-for="(s,i) in rp.siswa" :key="s.nis" class="border-t align-top">
-            <td class="p-3">{{i+1}}</td><td class="min-w-[9rem]">{{s.nama}}</td>
-            <td class="p-2 font-mono text-sm">{{s.nisn||'-'}}</td>
-            <td class="font-bold">{{s.rata==null?'-':s.rata}}</td><td :class="s.belum?'text-rose-600 font-bold':''">{{s.belum}}</td><td class="whitespace-nowrap">{{s.hadir.S}}/{{s.hadir.I}}/{{s.hadir.A}}</td>
-            <td class="pr-2 min-w-[13rem]">
-              <select :disabled="!bolehEditR" class="w-full border border-slate-200 rounded p-1 text-xs mb-1 bg-white" aria-label="Pilih kegiatan ekstrakurikuler" @change="if($event.target.value && $event.target.value!=='__manual__'){rpF[s.nis].ekskul=((rpF[s.nis].ekskul||'').trim() ? rpF[s.nis].ekskul.trim()+'\n' : '')+$event.target.value+' - Baik';$event.target.value=''}else{$event.target.value=''}">
+        <div class="rc-list">
+          <article v-for="(s,i) in rp.siswa" :key="s.nis" class="rc-card">
+            <header class="rc-head">
+              <span class="rc-no">{{i+1}}</span>
+              <div class="rc-id"><b>{{s.nama}}</b><small>NISN {{s.nisn||'-'}}</small></div>
+              <div class="rc-stats">
+                <span><small>Rata-rata</small><b>{{s.rata==null?'-':s.rata}}</b></span>
+                <span :class="s.belum?'is-bad':''"><small>&lt; KKTP</small><b>{{s.belum}}</b></span>
+                <span><small>S / I / A</small><b>{{s.hadir.S}}/{{s.hadir.I}}/{{s.hadir.A}}</b></span>
+              </div>
+              <div class="rc-act noprint"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button> <button @click="cetakCover(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cover</button></div>
+            </header>
+            <div class="rc-body">
+              <div class="rc-f"><span class="rc-l">Ekstrakurikuler</span><select :disabled="!bolehEditR" class="rc-sel" aria-label="Pilih kegiatan ekstrakurikuler" @change="if($event.target.value && $event.target.value!=='__manual__'){rpF[s.nis].ekskul=((rpF[s.nis].ekskul||'').trim() ? rpF[s.nis].ekskul.trim()+'\n' : '')+$event.target.value+' - Baik';$event.target.value=''}else{$event.target.value=''}">
                 <option value="">＋ Pilih ekstrakurikuler…</option><option>OSIS</option><option>Pramuka</option><option>MPK</option><option>PMR</option><option>TCM</option><option>Teater</option><option>Voli</option><option>Basket</option><option>Paskibra</option><option>Padus</option><option>Komtik</option><option>Rohis</option><option value="__manual__">Lainnya (isi manual)</option>
-              </select>
-              <textarea v-model="rpF[s.nis].ekskul" rows="2" maxlength="300" :disabled="!bolehEditR" placeholder="Satu kegiatan per baris: Pramuka - Baik" class="w-full border border-slate-200 rounded p-1 text-xs"></textarea>
-            </td>
-            <td class="pr-2 min-w-[14rem]">
-              <select :disabled="!bolehEditR" class="w-full border border-slate-200 rounded p-1 text-xs mb-1 bg-white" aria-label="Pilih dimensi kokurikuler" @change="if($event.target.value && $event.target.value!=='__manual__'){rpF[s.nis].kokurikuler=((rpF[s.nis].kokurikuler||'').trim() ? rpF[s.nis].kokurikuler.trim()+'\n' : '')+$event.target.value;$event.target.value=''}else{$event.target.value=''}">
+              </select><textarea v-model="rpF[s.nis].ekskul" rows="2" maxlength="300" :disabled="!bolehEditR" placeholder="Satu kegiatan per baris: Pramuka - Baik" class="rc-ta"></textarea></div>
+              <div class="rc-f"><span class="rc-l">Kokurikuler</span><select :disabled="!bolehEditR" class="rc-sel" aria-label="Pilih dimensi kokurikuler" @change="if($event.target.value && $event.target.value!=='__manual__'){rpF[s.nis].kokurikuler=((rpF[s.nis].kokurikuler||'').trim() ? rpF[s.nis].kokurikuler.trim()+'\n' : '')+$event.target.value;$event.target.value=''}else{$event.target.value=''}">
                 <option value="">＋ Pilih dimensi/kegiatan…</option>
                 <optgroup label="Dimensi Profil Lulusan"><option>Keimanan dan ketakwaan terhadap Tuhan YME</option><option>Kewargaan</option><option>Penalaran kritis</option><option>Kreativitas</option><option>Kolaborasi</option><option>Kemandirian</option><option>Kesehatan</option><option>Komunikasi</option></optgroup>
                 <optgroup label="Contoh tema/kegiatan"><option>Gaya hidup berkelanjutan</option><option>Kearifan lokal</option><option>Bangunlah jiwa dan raganya</option><option>Suara demokrasi</option><option>Rekayasa dan teknologi</option><option>Kewirausahaan</option><option>Kebekerjaan dan budaya industri</option><option value="__manual__">Lainnya (isi manual)</option></optgroup>
-              </select>
-              <textarea v-model="rpF[s.nis].kokurikuler" rows="2" maxlength="400" placeholder="Isi tema/kegiatan dan dimensi; dapat diedit manual" :disabled="!bolehEditR" class="w-full border border-slate-200 rounded p-1 text-xs"></textarea>
-            </td>
-            <td class="pr-2"><textarea v-model="rpF[s.nis].catatan" rows="2" maxlength="300" :disabled="!bolehEditR" class="w-full min-w-[12rem] border border-slate-200 rounded p-1 text-xs"></textarea></td>
-            <td class="pr-3 noprint text-center whitespace-nowrap"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button> <button @click="cetakCover(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cover</button></td></tr>
-          <tr v-if="!rp.siswa.length"><td colspan="10" class="p-4 text-slate-500">Belum ada siswa di kelas ini.</td></tr></tbody></table></div>
+              </select><textarea v-model="rpF[s.nis].kokurikuler" rows="2" maxlength="400" placeholder="Isi tema/kegiatan dan dimensi; dapat diedit manual" :disabled="!bolehEditR" class="rc-ta"></textarea></div>
+              <div class="rc-f"><span class="rc-l">Catatan wali kelas</span><textarea v-model="rpF[s.nis].catatan" rows="2" maxlength="300" :disabled="!bolehEditR" class="rc-ta"></textarea></div>
+            </div>
+          </article>
+          <p v-if="!rp.siswa.length" class="rc-empty">Belum ada siswa di kelas ini.</p></div>
         <p class="text-xs text-slate-500 mt-2">Kehadiran dihitung per hari (status terburuk dari semua sesi hari itu). Capaian kompetensi pada rapor disusun otomatis dari ketercapaian tiap Tujuan Pembelajaran (TP): rata-rata skor sumatif TP dibandingkan KKTP TP tersebut, atau status asesmen formatif bila TP belum punya nilai sumatif. Nilai rapor dibulatkan ke bilangan bulat.</p>
       </template>
 
@@ -3249,6 +3251,33 @@ body.cetak-rapor .rapor-page table.rapor-mapel-sts tbody tr > td.rapor-ket:last-
   body.cetak-cover .cv-itbl td:nth-child(1){width:34%}
   body.cetak-cover .cv-itbl td:nth-child(2){width:3%;text-align:center}
 }
+</style>
+<style id="calm-rapor-cards-v111">
+/* Tab Data rapor: kartu per siswa, tanpa geser horizontal */
+.rc-list{display:flex;flex-direction:column;gap:.75rem;container-type:inline-size;min-width:0}
+.rc-card{background:#fff;border:1px solid #e6ecf5;border-radius:14px;box-shadow:0 1px 2px rgba(15,35,70,.04);padding:.9rem 1rem 1rem;min-width:0}
+.rc-head{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;padding-bottom:.8rem;border-bottom:1px solid #edf1f7}
+.rc-no{display:inline-grid;place-items:center;flex:none;width:1.9rem;height:1.9rem;border-radius:8px;background:#eaf1fb;color:#1d3f86;font-size:.78rem;font-weight:700;font-variant-numeric:tabular-nums}
+.rc-id{flex:1 1 11rem;min-width:0}
+.rc-id b{display:block;font-size:.92rem;font-weight:600;color:#0f2a5c;overflow-wrap:anywhere}
+.rc-id small{display:block;margin-top:.1rem;font-size:.72rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#94a3b8}
+.rc-stats{display:flex;gap:1.1rem}
+.rc-stats span{display:flex;flex-direction:column;align-items:center;min-width:3.2rem}
+.rc-stats small{font-size:.64rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;white-space:nowrap}
+.rc-stats b{font-size:.95rem;font-weight:700;color:#1e293b;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rc-stats .is-bad b{color:#c0262d}
+.rc-act{display:flex;gap:.4rem;margin-left:auto}
+.rc-body{display:grid;grid-template-columns:minmax(0,1fr);gap:.8rem;margin-top:.85rem}
+@container (min-width:720px){.rc-body{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.rc-f{display:flex;flex-direction:column;gap:.35rem;min-width:0}
+.rc-l{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#52647c}
+.rc-sel,.rc-ta{width:100%;max-width:100%;box-sizing:border-box;border:1px solid #d5dde9;border-radius:9px;background:#fff;color:#1e293b;font-size:.82rem;line-height:1.45;padding:.4rem .6rem}
+.rc-sel{min-height:2.1rem}
+.rc-ta{flex:1;min-height:4.2rem;resize:vertical;overflow-wrap:anywhere}
+.rc-sel:focus,.rc-ta:focus{outline:0;border-color:#5b84c9;box-shadow:0 0 0 3px rgba(91,132,201,.18)}
+.rc-sel:disabled,.rc-ta:disabled{background:#f6f8fc;color:#64748b}
+.rc-empty{margin:0;padding:1.2rem;text-align:center;font-size:.85rem;color:#94a3b8}
+@media(max-width:480px){.rc-stats{width:100%;justify-content:space-between}.rc-act{width:100%;margin-left:0}.rc-act .btn-o{flex:1}}
 </style>
 <style id="calm-bobot-kktp-v110">
 /* Bobot nilai & KKTP: kartu minimalis, responsif lewat container query */
