@@ -1670,7 +1670,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <h3 class="font-extrabold text-blue-900 mb-4">{{gf.edit?'Ubah guru':'Tambah guru'}}</h3>
         <label class="lb">Username</label><input v-model.trim="gf.username" :disabled="gf.edit" placeholder="mis. budi.santoso" autocapitalize="none" class="inp w-full mt-1 mb-3 disabled:bg-slate-100">
         <label class="lb">Nama lengkap</label><input v-model.trim="gf.nama" maxlength="100" placeholder="Nama beserta gelar" class="inp w-full mt-1 mb-3">
-        <label class="lb">Peran</label><select v-model="gf.role" @change="gf.role!=='GURU'&&(gf.wali=[])" class="inp w-full mt-1 mb-3"><option value="GURU">Guru</option><option value="WAKUR">WKS Kurikulum (monitor jadwal)</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf / Tata Usaha (hanya lihat &amp; unduh)</option><option value="BK">Guru BK (catatan pelanggaran)</option></select>
+        <label class="lb">Peran</label><select v-model="gf.role" @change="(gf.role!=='GURU'&&gf.role!=='WAKUR')&&(gf.wali=[])" class="inp w-full mt-1 mb-3"><option value="GURU">Guru</option><option value="WAKUR">WKS Kurikulum (monitor jadwal)</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf / Tata Usaha (hanya lihat &amp; unduh)</option><option value="BK">Guru BK (catatan pelanggaran)</option></select>
         <template v-if="!gf.edit"><label class="lb">Sandi awal <span class="font-normal normal-case text-slate-400">(kosongkan = dibuat acak)</span></label><input v-model="gf.sandi" placeholder="min. 6 karakter" class="inp w-full mt-1 mb-3"></template>
         <template v-if="gf.role==='GURU'"><label class="lb">Wali kelas <span class="font-normal normal-case text-slate-400">(opsional, boleh lebih dari satu)</span></label>
           <div class="mt-1 mb-3 max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-2">
@@ -1734,16 +1734,16 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 
     <!-- Jadwal -->
     <section v-if="view==='jadwal'">
-      <div class="flex flex-wrap items-center gap-3 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">{{user.role==='WAKUR'?'Monitoring Jadwal Seluruh Guru':user.role==='SISWA'?'Jadwal Pelajaran':'Jadwal Mengajar'}}</h2><p class="desk">{{user.role==='WAKUR'?'Pantau pembagian jam mengajar, guru, kelas, mata pelajaran, serta blok A/B. Akun ini hanya memiliki akses lihat dan ekspor.':DESK.jadwal}}</p></div>
+      <div class="flex flex-wrap items-center gap-3 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">{{(user.role==='WAKUR' || (user.role==='GURU' && (user.tugasTambahan || '').split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR'))) ? 'Monitoring Jadwal Seluruh Guru' : user.role==='SISWA'?'Jadwal Pelajaran':'Jadwal Mengajar'}}</h2><p class="desk">{{(user.role==='WAKUR' || (user.role==='GURU' && (user.tugasTambahan || '').split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR'))) ? 'Pantau pembagian jam mengajar, guru, kelas, mata pelajaran, serta blok A/B. Perubahan jadwal mengikuti hak Guru yang sudah dimiliki.' : DESK.jadwal}}</p></div>
         <select v-model="jhari" class="inp"><option value="">Semua hari</option><option v-for="h in hariList" :key="h">{{h}}</option></select>
         <select v-model="jblok" class="inp"><option value="">Semua blok</option><option value="A">Blok A</option><option value="B">Blok B</option></select>
-        <select v-if="user.role==='WAKUR'" v-model="jGuruFilter" class="inp" aria-label="Filter guru"><option value="">Semua guru</option><option v-for="g in guru" :key="g.username" :value="g.username">{{g.nama}}</option></select>
+        <select v-if="user.role==='WAKUR' || (user.role==='GURU' && (user.tugasTambahan || '').split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR'))" v-model="jGuruFilter" class="inp" aria-label="Filter guru"><option value="">Semua guru</option><option v-for="g in guru" :key="g.username" :value="g.username">{{g.nama}}</option></select>
         <input v-model.trim="jq" placeholder="Cari kelas / mapel / guru" class="inp">
         <button v-if="canJadwal" @click="templateJadwal" class="btn-o">Unduh template</button>
         <label v-if="canJadwal" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickJadwalFile"></label>
         <button @click="exportJadwal" :disabled="!jadwalTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
         <button v-if="canJadwal" @click="openJadwal" class="btn-p inline-flex items-center gap-2"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Tambah jadwal</button></div>
-      <div v-if="user.role==='WAKUR'" class="rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-900 text-sm px-4 py-3 mb-4"><b>Mode pemantauan:</b> data jadwal ditampilkan untuk pemeriksaan kurikulum. Perubahan jadwal tetap dilakukan oleh Admin sesuai kewenangan sekolah.</div>
+      <div v-if="user.role==='WAKUR' || (user.role==='GURU' && (user.tugasTambahan || '').split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR'))" class="rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-900 text-sm px-4 py-3 mb-4"><b>Mode pemantauan:</b> data jadwal ditampilkan untuk pemeriksaan kurikulum. Perubahan jadwal tetap dilakukan oleh Admin sesuai kewenangan sekolah.</div>
       <div v-if="blokInfo" class="rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-sm px-4 py-3 mb-4 flex items-center gap-2 flex-wrap"><span>Minggu ini: <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="BLOK_CLS[blokInfo.aktif]">Blok {{blokInfo.aktif}}</span></span><span>&middot; Minggu depan (mulai {{fmtTgl(blokInfo.seninDepan)}}): <span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="BLOK_CLS[blokInfo.depan]">Blok {{blokInfo.depan}}</span></span></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Hari</th><th>Jam</th><th>Blok</th><th>Kelas</th><th>Mata pelajaran</th><th>Guru</th><th v-if="canJadwal">Aksi</th></tr></thead>
@@ -2452,7 +2452,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       </template>
     </section>
 
-    <section v-if="view==='nilaiMonitor' && user.role==='WAKUR'">
+    <section v-if="view==='nilaiMonitor' && (user.role==='WAKUR' || (user.tugasTambahan || '').split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR'))">
       <div class="page-head mb-4"><h2 class="h2">Monitoring Nilai STS dan SAS</h2><p class="desk">Pemantauan seluruh kelas berdasarkan penugasan jadwal. Halaman ini hanya membaca data dan tidak menyediakan aksi edit atau simpan.</p></div>
       <div v-if="wakurNilai" class="text-sm bg-cyan-50 border border-cyan-200 text-cyan-950 rounded-xl p-3 mb-4">
         <b>Periode aktif:</b> {{wakurNilai.tahun}} · Semester {{wakurNilai.semester}}.
@@ -3612,7 +3612,9 @@ const app = createApp({
     ICON.perangkat = ICON.dokumen; ICON.notif = '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>'; ICON.pelanggaran = '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/>'; ICON.pengurangan = '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'; ICON.konseling = '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="M8 12h8M12 8v8"/>'; ICON.anak = ICON.siswa;
     ICON.akun = '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14 9l2 2"/>'; ICON.suratmasuk = ICON.dokumen; ICON.suratkeluar = ICON.dokumen; ICON.disposisi = ICON.bimbingan; ICON.arsip = ICON.dokumen; ICON.layanan = ICON.dokumen; ICON.mutasi = ICON.siswa; ICON.cetaksurat = ICON.dokumen; ICON.cetakabsen = ICON.presensi; ICON.rekapadmin = ICON.leger;
     const MS = { dashboard: 'Dashboard TU', siswa: 'Data Siswa', guru: 'Data Guru/PTK', suratmasuk: 'Surat Masuk', suratkeluar: 'Surat Keluar', disposisi: 'Disposisi', arsip: 'Arsip Dokumen', layanan: 'Layanan Administrasi', mutasi: 'Mutasi Siswa', cetaksurat: 'Cetak Surat', cetakabsen: 'Cetak Absensi', rekapadmin: 'Rekap Administrasi' };
-    const menu = computed(() => user.value ? MENU[user.value.role].filter(k => !user.value.wajib || k === 'sandi').map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || (user.value.role === 'BK' && k === 'rapor' ? 'Penilaian Rapor BK' : M[k]) })) : []);
+    const hasWakurTask = u => !!u && (String(u.role || '').toUpperCase() === 'WAKUR' || (String(u.role || '').toUpperCase() === 'GURU' && String(u.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR')));
+    const menuKeys = u => [...new Set([...(MENU[u && u.role] || []), ...(hasWakurTask(u) ? ['nilaiMonitor'] : [])])];
+    const menu = computed(() => user.value ? menuKeys(user.value).filter(k => !user.value.wajib || k === 'sandi').map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || (user.value.role === 'BK' && k === 'rapor' ? 'Penilaian Rapor BK' : M[k]) })) : []);
     const GROUP_ICON = {
       'Ringkasan': '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="4" rx="1.5"/><rect x="14" y="10" width="7" height="11" rx="1.5"/><rect x="3" y="13" width="7" height="8" rx="1.5"/>',
       'Akademik': '<path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 11.5V16c3.3 2.5 6.7 2.5 10 0v-4.5M21 9v6"/>',
@@ -3793,7 +3795,7 @@ const app = createApp({
     let dashAt = 0;
     const goDasar = k => run(async () => {
       if (user.value.wajib) k = 'sandi';
-      if (!MENU[user.value.role].includes(k)) k = 'dashboard';
+      if (!menuKeys(user.value).includes(k)) k = 'dashboard';
       view.value = k; dash.value = null; q.value = ''; toTop();
       if (k === 'dashboard') {
         const ck = 'dc_' + user.value.username + '_' + user.value.role, pakai = d => { dash.value = d; dashAt = Date.now(); Vue.nextTick(tick); belumBaca.value = d.catatanBaru || 0; notifN.value = d.notifBaru || 0; if (Array.isArray(d.peng)) peng.value = d.peng; if (Array.isArray(d.agenda)) agenda.value = d.agenda; };
@@ -3822,7 +3824,7 @@ const app = createApp({
       if (k === 'cetaksurat') { await api('pengaturanGet').then(x=>cfg.value=x); resetCetakSurat(); }
       if (k === 'rekapadmin') await loadRekapAdmin();
       if (k === 'kelas') { [kelasAll.value, guru.value] = await Promise.all([api('kelasDetail'), api('guruList')]); }
-      if (k === 'jadwal') { const r = await Promise.all([api('jadwalList'), canJadwal.value || user.value.role === 'WAKUR' ? api('kelasSemua') : null, ['ADMIN', 'WAKUR'].includes(user.value.role) ? api('guruList') : null, api('blokInfo').catch(() => null)]); jadwal.value = r[0]; blokInfo.value = r[3]; jhari.value = jq.value = jblok.value = jGuruFilter.value = ''; if (r[1]) kelasNama.value = r[1]; if (r[2]) guru.value = r[2]; }
+      if (k === 'jadwal') { const r = await Promise.all([api('jadwalList'), canJadwal.value || hasWakurTask(user.value) ? api('kelasSemua') : null, ['ADMIN', 'WAKUR'].includes(user.value.role) || hasWakurTask(user.value) ? api('guruList') : null, api('blokInfo').catch(() => null)]); jadwal.value = r[0]; blokInfo.value = r[3]; jhari.value = jq.value = jblok.value = jGuruFilter.value = ''; if (r[1]) kelasNama.value = r[1]; if (r[2]) guru.value = r[2]; }
       if (k === 'guru') { gq.value = grole.value = ''; await refreshGuru(); }
       if (k === 'akun') { akq.value = akrole.value = akkelas.value = ''; akpilih.value = []; await fetchAkun(); }
       if (k === 'monitor') { const r = await Promise.all([fetchMon(), api('pengaturanGet').catch(() => null)]); if (r[1]) cfg.value = r[1]; }
@@ -4264,7 +4266,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       if (!/^[A-Za-z0-9._-]{3,30}$/.test(gf.username)) throw new Error('Username 3-30 karakter: huruf, angka, titik, minus, atau garis bawah');
       if (!gf.nama) throw new Error('Nama wajib diisi');
       if (!gf.edit && gf.sandi && gf.sandi.length < 6) throw new Error('Sandi minimal 6 karakter');
-      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, sandi: gf.sandi, wali: gf.role !== 'GURU' ? [] : gf.wali } });
+      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, sandi: gf.sandi, wali: (gf.role !== 'GURU' && gf.role !== 'WAKUR') ? [] : gf.wali } });
       showG.value = false; await refreshGuru();
       if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi, role: gf.role }]);
       ok.value = gf.edit ? 'Data guru diperbarui' : 'Akun guru dibuat';
