@@ -3772,6 +3772,7 @@ html body .rapor-page table.rapor-mapel td{overflow-wrap:break-word}
 
 /* ---------- Dalam iframe (Blogger) ---------- */
 html.embedded .login-wrap{min-height:0}
+html.embedded body:has(.login-wrap){background:#fff;margin:0}
 @media (min-width:1024px){html.embedded .login-wrap{min-height:44rem}}
 @media (prefers-reduced-motion:reduce){.login-wrap .lc-card,.login-wrap .lc-dot{animation:none}.login-wrap *{transition:none!important}}
 
@@ -5247,7 +5248,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         let h = a.getBoundingClientRect().height;
         const mb = document.querySelector('.modal-box');
         if (mb) h = Math.max(h, mb.getBoundingClientRect().height + 64);
-        const nh = Math.ceil(h) + 24;
+        const nh = Math.ceil(h) + (user.value ? 24 : 0); // halaman login tanpa ruang tambahan agar tidak ada celah di bawah panel
         if (nh !== window.__lh) { window.__lh = nh; parent.postMessage({ calmHeight: nh }, '*'); }
       };
       if ('ResizeObserver' in window) {
