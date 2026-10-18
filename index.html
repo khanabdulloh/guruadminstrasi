@@ -1267,7 +1267,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <div class="panel-head"><h3 class="font-bold">Kelas perwalian saya</h3><p class="panel-desc">Kehadiran dan bimbingan di kelas yang Anda walikan.</p></div>
         <div v-for="w in dash.waliRingkas" :key="w.kelas" class="text-sm py-2 border-t first:border-t-0 flex flex-wrap gap-x-4 gap-y-1"><b class="w-24">{{w.kelas}}</b><span>{{w.siswa}} siswa</span><span>Hari ini: <b>{{w.persenHariIni==null?'-':w.persenHariIni+'%'}}</b></span><span>Bulan ini: <b>{{w.persenBulan==null?'-':w.persenBulan+'%'}}</b></span><span class="text-rose-600">Alpa {{w.alpaBulan}}</span><span class="text-slate-500">Bimbingan {{w.bimbinganBulan}}</span></div>
       </div>
-      <div v-if="!['SISWA','STAF','ORTU','BK'].includes(dash.tipe)" class="grid lg:grid-cols-2 gap-4 mt-4">
+      <div v-if="!['SISWA','STAF','ORTU','BK','WAKUR'].includes(dash.tipe)" class="grid lg:grid-cols-2 gap-4 mt-4">
         <div class="bg-white rounded-2xl shadow-sm p-4">
           <div class="panel-head"><h3 class="font-bold">Kehadiran 7 hari terakhir</h3><p class="panel-desc">Persentase siswa hadir di seluruh sekolah.</p></div>
           <svg viewBox="0 0 210 100" class="w-full h-40" role="img" aria-label="Persentase kehadiran sekolah selama 7 hari terakhir">
