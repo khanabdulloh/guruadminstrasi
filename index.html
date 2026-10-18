@@ -3790,6 +3790,10 @@ main tbody tr{border-color:#eef2f7}
 .embedded .login-wrap .lg-left{position:relative;top:auto;align-self:stretch;height:auto;min-height:680px}
 .embedded .login-wrap .lg-right{align-self:stretch;justify-content:flex-start;min-height:680px}
 html.embedded,html.embedded body{background:#eef3fc}
+/* Isi penuh tinggi bingkai agar tidak ada strip kosong di bawah */
+.embedded .login-wrap{min-height:100vh;min-height:100dvh}
+.embedded .login-wrap .lg-left,.embedded .login-wrap .lg-right{min-height:100vh;min-height:100dvh}
+.login-wrap .lg-hint-sym{display:inline-block;margin-right:.35rem}
 @media(prefers-reduced-motion:reduce){.login-wrap .up{animation:none}}
 </style>
 <style id="rapor-header-wrap-fix">
