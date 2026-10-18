@@ -4049,6 +4049,17 @@ const app = createApp({
     const tanya = o => dlgBuka({ eyebrow: 'Isian', ...o, field: true });
     const cfmRun = (pesan, fn) => konfirm(pesan).then(y => y && run(fn));
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && dlg.value) { e.stopPropagation(); dlgBatal(); } if (e.key === 'Enter' && dlg.value && !dlg.value.field && document.activeElement && document.activeElement.id !== 'dlg-ok') { e.preventDefault(); dlgOk(); } }, true);
+    // ID perangkat acak (tanpa data pribadi) agar backend dapat membatasi percobaan login gagal per perangkat.
+    let cidMem = '';
+    const clientId = () => {
+      try { const v = localStorage.getItem('cid'); if (v && /^[A-Za-z0-9-]{8,80}$/.test(v)) return v; } catch (e) { /* penyimpanan dinonaktifkan */ }
+      if (!cidMem) {
+        try { cidMem = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ''; } catch (e) { cidMem = ''; }
+        if (!cidMem) cidMem = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+        try { localStorage.setItem('cid', cidMem); } catch (e) { /* tetap dipakai dari memori selama halaman terbuka */ }
+      }
+      return cidMem;
+    };
     const login = () => {
       if (busy.value) return;
       const eu = document.getElementById('in-user'), ep = document.getElementById('in-pass');
@@ -4061,7 +4072,7 @@ const app = createApp({
         return;
       }
       return run(async () => {
-        const d = await api('login', { username: f.username, password: f.password, expectedRole: loginRole.value });
+        const d = await api('login', { username: f.username, password: f.password, expectedRole: loginRole.value, clientId: clientId() });
         token.value = d.token; user.value = d.user; f.password = '';
         ssSet('tk', d.token); ssSet('us', JSON.stringify(d.user));
         go('dashboard');
