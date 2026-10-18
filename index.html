@@ -2452,25 +2452,25 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 
     <section v-if="view==='nilaiMonitor' && (user.role==='WAKUR' || (user.tugasTambahan || '').split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR'))">
       <div class="page-head mb-4"><h2 class="h2">Monitoring Nilai STS dan SAS</h2><p class="desk">Pemantauan seluruh kelas berdasarkan penugasan jadwal. Halaman ini hanya membaca data dan tidak menyediakan aksi edit atau simpan.</p></div>
-      <div v-if="wakurNilai" class="text-sm bg-cyan-50 border border-cyan-200 text-cyan-950 rounded-xl p-3 mb-4">
+      <div v-if="wakurNilai" class="wk-note text-sm bg-cyan-50 border border-cyan-200 text-cyan-950 rounded-xl p-3 mb-4">
         <b>Periode aktif:</b> {{wakurNilai.tahun}} · Semester {{wakurNilai.semester}}.
         <span class="block mt-1">STS memakai kode data UTS, sedangkan SAS memakai kode UAS. Kelengkapan dihitung dari jumlah siswa aktif per kelas dan mata pelajaran; nilai tersimpan dihitung satu kali per siswa.</span>
         <span class="block mt-1">Jika satu kelas dan mata pelajaran memiliki lebih dari satu guru terjadwal, status kelengkapan digabung untuk pasangan kelas-mapel tersebut; nama penginput ditampilkan dari rekaman nilai.</span>
       </div>
-      <div v-if="wakurNilai" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+      <div v-if="wakurNilai" class="wk-stats grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
         <div class="card"><b class="n">{{wakurNilai.totalPenugasan}}</b>Pasangan kelas-mapel</div>
         <div class="card"><b class="n text-emerald-700">{{wakurNilai.ringkasan.stsLengkap}}</b>STS lengkap</div>
         <div class="card"><b class="n text-rose-600">{{wakurNilai.ringkasan.stsBelum}}</b>STS belum lengkap</div>
         <div class="card"><b class="n text-emerald-700">{{wakurNilai.ringkasan.sasLengkap}}</b>SAS lengkap</div>
         <div class="card"><b class="n text-rose-600">{{wakurNilai.ringkasan.sasBelum}}</b>SAS belum lengkap</div>
       </div>
-      <div class="flex flex-wrap gap-3 items-center mb-4">
+      <div class="wk-filter flex flex-wrap gap-3 items-center mb-4">
         <label class="lb">Jenis nilai<select v-model="wakurNilaiJenis" class="inp mt-1"><option value="UTS">STS (UTS)</option><option value="UAS">SAS (UAS)</option></select></label>
         <label class="lb flex-1 min-w-48">Cari kelas, mapel, atau guru<input v-model="wakurNilaiQ" class="inp mt-1 w-full" placeholder="Ketik kata kunci..."></label>
         <button class="btn-o self-end" @click="muatUlangWakurNilai" :disabled="busy">Muat ulang</button>
       </div>
       <div v-if="wakurNilai" class="bg-white rounded-2xl shadow-sm overflow-x-auto">
-        <table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Kelas</th><th>Mata pelajaran</th><th>Guru terjadwal</th><th>Nilai masuk</th><th>Kekurangan</th><th>Status</th><th>Nama penginput</th></tr></thead>
+        <table class="wk-nilai w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Kelas</th><th>Mata pelajaran</th><th>Guru terjadwal</th><th>Nilai masuk</th><th>Kekurangan</th><th>Status</th><th>Nama penginput</th></tr></thead>
           <tbody><tr v-for="r in wakurNilaiTampil" :key="r.kelas+'|'+r.mapel+'|'+r.jenis" class="border-t align-top">
             <td class="p-3 font-semibold whitespace-nowrap">{{r.kelas}}</td><td>{{r.mapel}}</td><td><span v-for="(g,i) in r.guru" :key="g">{{i ? ', ' : ''}}{{g}}</span></td>
             <td class="whitespace-nowrap">{{r.masuk}} / {{r.total}}<span v-if="r.persen!=null" class="block text-xs text-slate-500">{{r.persen}}%</span></td><td>{{r.kurang}}</td>
@@ -3897,6 +3897,61 @@ html.embedded .login-wrap .lc-side,html.embedded .login-wrap .lc-main{min-height
   .login-wrap .lc-feats div>span{font-size:.76rem;line-height:1.4}
 }
 @media screen and (min-width:1024px) and (max-height:640px){.login-wrap .lc-feats{display:none}}
+</style>
+<style id="monitor-nilai-v118">
+/* v118 — Monitoring Nilai STS/SAS: filter, ringkasan, dan tabel (kartu di HP). Hanya tampilan layar. */
+@media screen{
+  #app main#utama .wk-note{padding:.9rem 1.1rem;border-radius:.875rem;background:#f5f8fd;border-color:#dbe6f4;color:#33445f;line-height:1.6}
+  #app main#utama .wk-note>span.block{margin-top:.35rem;color:#51617a}
+  /* Filter: label di atas kontrol, semua sejajar pada garis bawah */
+  #app main#utama .wk-filter{align-items:flex-end;gap:.75rem}
+  #app main#utama .wk-filter>label.lb{display:flex;flex-direction:column;gap:.3rem;min-width:0}
+  #app main#utama .wk-filter>label.lb>.inp{margin:0;width:100%}
+  #app main#utama .wk-filter>label.lb:first-child{flex:0 0 12rem}
+  #app main#utama .wk-filter>label.lb.flex-1{flex:1 1 16rem}
+  #app main#utama .wk-filter>button{min-height:2.625rem;white-space:nowrap}
+  /* Tabel */
+  #app main#utama table.wk-nilai thead th{white-space:nowrap}
+  #app main#utama table.wk-nilai td:nth-child(6)>span{white-space:nowrap}
+}
+@media screen and (max-width:767px){
+  #app main#utama .wk-stats>.card:last-child:nth-child(odd){grid-column:1/-1}
+  #app main#utama .wk-filter>label.lb:first-child,
+  #app main#utama .wk-filter>button{flex:1 1 calc(50% - .375rem)}
+  #app main#utama .wk-filter>button{order:2;min-height:2.75rem}
+  #app main#utama .wk-filter>label.lb.flex-1{flex:1 1 100%;order:3}
+
+  /* Tabel menjadi kartu per kelas-mapel */
+  #app main#utama table.wk-nilai,#app main#utama table.wk-nilai tbody{display:block;min-width:0;width:100%}
+  #app main#utama table.wk-nilai thead{display:none}
+  #app main#utama table.wk-nilai tbody tr:not(:has(td[colspan])){
+    display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:.75rem;row-gap:.15rem;
+    padding:.9rem 1rem;border-top:1px solid #edf1f6;
+  }
+  #app main#utama table.wk-nilai tbody tr:first-child{border-top:0}
+  #app main#utama table.wk-nilai tbody tr:hover{background:transparent}
+  #app main#utama table.wk-nilai tbody tr:not(:has(td[colspan]))>td{display:block;padding:0!important;border:0!important;min-width:0;overflow-wrap:anywhere}
+  #app main#utama table.wk-nilai td:nth-child(1){grid-column:1;grid-row:1;font-size:.95rem;color:#0a2250}
+  #app main#utama table.wk-nilai td:nth-child(2){grid-column:1;grid-row:2;font-size:.82rem;color:#64748b;padding-bottom:.55rem!important}
+  #app main#utama table.wk-nilai td:nth-child(6){grid-column:2;grid-row:1 / span 2;align-self:start;justify-self:end}
+  #app main#utama table.wk-nilai td:nth-child(3),
+  #app main#utama table.wk-nilai td:nth-child(4),
+  #app main#utama table.wk-nilai td:nth-child(5),
+  #app main#utama table.wk-nilai td:nth-child(7){
+    grid-column:1 / -1;display:block!important;overflow:hidden;
+    padding:.4rem 0!important;border-top:1px dashed #e3eaf4!important;font-size:.82rem;text-align:right;
+  }
+  #app main#utama table.wk-nilai td:nth-child(3)::before,
+  #app main#utama table.wk-nilai td:nth-child(4)::before,
+  #app main#utama table.wk-nilai td:nth-child(5)::before,
+  #app main#utama table.wk-nilai td:nth-child(7)::before{float:left;margin-right:1rem;font-weight:600;color:#64748b;text-align:left}
+  #app main#utama table.wk-nilai td:nth-child(3)::before{content:"Guru"}
+  #app main#utama table.wk-nilai td:nth-child(4)::before{content:"Nilai masuk"}
+  #app main#utama table.wk-nilai td:nth-child(5)::before{content:"Kekurangan"}
+  #app main#utama table.wk-nilai td:nth-child(7)::before{content:"Penginput"}
+  #app main#utama table.wk-nilai td:nth-child(4)>span.block{display:inline;margin-left:.4rem}
+  #app main#utama table.wk-nilai td:nth-child(3)>span{display:inline}
+}
 </style>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
