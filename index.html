@@ -1072,24 +1072,24 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 </div>
 <!-- LOGIN -->
 <div v-if="!user" class="login-wrap min-h-screen grid lg:grid-cols-[1.1fr_1fr]">
-  <div class="login-bg lg-left relative hidden lg:flex flex-col justify-between text-white overflow-hidden">
+  <div class="login-bg relative hidden lg:flex flex-col justify-between p-12 text-white overflow-hidden">
     <div class="relative flex items-center gap-3">
-      <span class="lg-logo"><img :src="LOGO" alt="Logo SMK CALM" width="44" height="44" decoding="async" onerror="this.style.visibility='hidden'"></span>
+      <img :src="LOGO" alt="Logo SMK CALM" width="44" height="44" decoding="async" class="h-11 w-11 object-contain" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))">
       <div class="leading-tight"><p class="lg-brand">SMK CALM</p><p class="lg-brand-sub">Yayasan Al-Musaddadiyah Garut</p></div>
     </div>
     <div class="relative up lg-hero">
-      <span class="lg-badge">Terakreditasi A oleh BAN-S/M</span>
-      <h1 class="lg-title">Portal Akademik</h1>
-      <p class="lg-lead">Presensi, nilai, jurnal mengajar, dan bimbingan siswa dalam satu tempat untuk administrator, guru, siswa, dan orang tua.</p>
-      <ul class="lg-feats"><li><b>Presensi</b><span>Harian &amp; rekap</span></li><li><b>Nilai</b><span>Input &amp; leger</span></li><li><b>Jurnal</b><span>Mengajar &amp; wali</span></li><li><b>Bimbingan</b><span>Konseling &amp; karier</span></li></ul>
+      <p class="lg-eyebrow">Portal Akademik</p>
+      <h1 class="lg-title">Pengelolaan akademik yang tertata dan terarah.</h1>
+      <p class="lg-lead">Presensi, nilai, jurnal mengajar, dan bimbingan wali dalam satu tempat untuk guru, siswa, dan orang tua.</p>
+      <ul class="lg-feats"><li>Presensi</li><li>Nilai</li><li>Jurnal</li><li>Bimbingan</li></ul>
     </div>
-    <p class="relative lg-foot">&copy; 2026 SMKS Ciledug Al-Musaddadiyah Garut</p>
+    <p class="relative lg-foot">&copy; 2026 SMKS Ciledug Al-Musaddadiyah Garut &middot; Terakreditasi A</p>
   </div>
-  <div class="lg-right relative flex flex-col items-center justify-center p-5 sm:p-8 bg-navy-50 lg:bg-slate-50">
+  <div class="relative flex flex-col items-center justify-center p-5 sm:p-8 bg-navy-50 lg:bg-slate-50">
     <div class="lg:hidden login-bg absolute inset-x-0 top-0 h-56 rounded-b-[2.5rem]"></div>
     <div class="relative w-full max-w-md up">
       <div class="lg:hidden text-center text-white mb-5 pt-4">
-        <span class="lg-logo lg-logo-lg"><img :src="LOGO" alt="Logo" width="64" height="64" decoding="async" onerror="this.style.visibility='hidden'"></span>
+        <span class="inline-grid place-items-center h-16 w-16"><img :src="LOGO" alt="Logo" width="64" height="64" decoding="async" class="h-16 w-16 object-contain" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,.28))"></span>
         <h1 class="text-2xl font-extrabold mt-3">Portal Akademik</h1>
         <p class="text-xs text-blue-200">SMKS Ciledug Al-Musaddadiyah Garut</p>
       </div>
@@ -3664,139 +3664,64 @@ main tbody tr{border-color:#eef2f7}
 .lg-pill[aria-checked="true"] .lg-pill-t{color:#172554}
 @media(max-width:380px){.lg-pill{padding:.5rem .6rem}}
 </style>
-<style id="login-light-v1">
-/* ===== Login: biru muda elegan + responsif laptop ===== */
-.login-wrap{
-  --navy:#2f62cf;--navy-d:#17306b;--navy-soft:#edf2fc;--line:#e5ebf6;--line-2:#d4def0;
-  --lg-a:#6a8fe6;--lg-b:#4574d8;--lg-c:#2f5fc2;
-  background:#eef3fc;
+<style id="visual-polish-safe-v110">
+/* v110: penyempurnaan visual CSS saja. Tidak mengubah template, state, handler, API, atau data. */
+@media screen {
+  html { scroll-behavior: smooth; }
+  body { color: #24344d; background-color: #f5f7fb; }
+  #app main { min-width: 0; }
+  #app main > section, #app main > div, #app main .card { min-width: 0; }
+  #app .card { border: 1px solid #e7edf5; box-shadow: 0 2px 8px rgba(15, 35, 70, .045); }
+  #app h1, #app h2, #app h3 { text-wrap: pretty; }
+  #app :is(input, select, textarea) { max-width: 100%; }
+  #app .overflow-x-auto { max-width: 100%; }
+  #app table:not(.calm-table-print) { border-spacing: 0; }
+  #app table:not(.calm-table-print) td, #app table:not(.calm-table-print) th { max-width: 100%; }
+  #app .page-head { align-items: center; flex-wrap: wrap; }
+  #app .modal-wrap, #app .dlg-wrap { overscroll-behavior: contain; }
+  @media (max-width: 640px) {
+    #app main { padding-left: 12px; padding-right: 12px; }
+    #app .card { padding: 12px; }
+    #app .grid { min-width: 0; }
+    #app .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+    #app table:not(.calm-table-print) { min-width: 560px; }
+  }
 }
-.login-wrap .login-bg{background:linear-gradient(162deg,var(--lg-a) 0%,var(--lg-b) 48%,var(--lg-c) 100%)}
-.login-wrap .login-bg::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:
-    radial-gradient(640px 420px at 85% 0%,rgba(255,255,255,.20),transparent 70%),
-    radial-gradient(520px 380px at 0% 100%,rgba(20,50,140,.22),transparent 70%),
-    linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);
-  background-size:auto,auto,48px 48px,48px 48px;
-  -webkit-mask-image:none;mask-image:none;
+/* Rapor cetak: cegah kolom melewati batas dan teks bertumpuk. Khusus mode cetak rapor. */
+@media print {
+  html body.cetak-rapor .rapor-page { overflow: visible !important; }
+  html body.cetak-rapor .rapor-page table.calm-table-print {
+    display: table !important; width: 100% !important; min-width: 0 !important;
+    max-width: 100% !important; table-layout: fixed !important;
+    border-collapse: collapse !important; border-spacing: 0 !important;
+  }
+  html body.cetak-rapor .rapor-page table.calm-table-print th,
+  html body.cetak-rapor .rapor-page table.calm-table-print td {
+    box-sizing: border-box !important; min-width: 0 !important; max-width: 100% !important;
+    white-space: normal !important; overflow: visible !important;
+    overflow-wrap: anywhere !important; word-break: normal !important;
+    vertical-align: top !important;
+  }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sts th:nth-child(1) { width: 5% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sts th:nth-child(2) { width: 25% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sts th:nth-child(3) { width: 7% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sts th:nth-child(4) { width: 14% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sts th:nth-child(5) { width: 14% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sts th:nth-child(6) { width: 12% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sts th:nth-child(7) { width: 23% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sas th:nth-child(1) { width: 5% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sas th:nth-child(2) { width: 29% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sas th:nth-child(3) { width: 7% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sas th:nth-child(4) { width: 10% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sas th:nth-child(5) { width: 9% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel-sas th:nth-child(6) { width: 40% !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel td { font-size: 8pt !important; line-height: 1.25 !important; padding: 3pt 3.5pt !important; }
+  html body.cetak-rapor .rapor-page table.rapor-mapel th { font-size: 7.5pt !important; line-height: 1.2 !important; padding: 3pt !important; }
+  html body.cetak-rapor .rapor-page table.rapor-id td { overflow-wrap: anywhere !important; }
+  html body.cetak-rapor .rapor-page table.rapor-hadir td { font-size: 8pt !important; padding: 3pt !important; }
 }
-/* Panel kiri: setinggi layar, tidak ikut memanjang saat kartu di kanan scroll */
-.login-wrap .lg-left{
-  position:sticky;top:0;align-self:start;
-  height:100vh;height:100dvh;min-height:30rem;
-  padding:clamp(1.25rem,4.5vh,3rem) clamp(1.75rem,4vw,3.5rem);
-}
-.login-wrap .lg-logo{display:grid;place-items:center;flex:none;width:3.25rem;height:3.25rem;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35),0 6px 16px -6px rgba(15,40,120,.45);overflow:hidden}
-.login-wrap .lg-logo img{width:78%;height:78%;object-fit:contain}
-.login-wrap .lg-logo-lg{width:4.25rem;height:4.25rem;margin:0 auto}
-.login-wrap .lg-brand{font-size:1.05rem;font-weight:700;letter-spacing:0}
-.login-wrap .lg-brand-sub{font-size:.76rem;color:rgba(255,255,255,.82)}
-.login-wrap .lg-hero{max-width:36rem}
-.login-wrap .lg-badge{display:inline-block;margin:0 0 clamp(.9rem,2.4vh,1.4rem);padding:.4rem .95rem;border:1px solid rgba(255,255,255,.45);border-radius:999px;background:rgba(255,255,255,.14);font-size:.8rem;font-weight:700;color:#fff;backdrop-filter:blur(4px)}
-.login-wrap .lg-title{margin:0;font-size:clamp(2.25rem,4.4vw,3.6rem);line-height:1.08;font-weight:800;letter-spacing:-.035em;color:#fff}
-.login-wrap .lg-lead{margin:clamp(.8rem,2vh,1.25rem) 0 0;max-width:30rem;font-size:clamp(.92rem,1.15vw,1.05rem);line-height:1.65;color:rgba(255,255,255,.92)}
-.login-wrap .lg-feats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.25rem;margin:clamp(1.25rem,4vh,2.4rem) 0 0;padding:0;border:0}
-.login-wrap .lg-feats li{display:block;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.42);font-size:.8rem;color:rgba(255,255,255,.88)}
-.login-wrap .lg-feats li::before{display:none}
-.login-wrap .lg-feats b{display:block;margin-bottom:.15rem;font-size:.95rem;font-weight:700;color:#fff}
-.login-wrap .lg-feats span{display:block;line-height:1.35}
-.login-wrap .lg-foot{font-size:.74rem;color:rgba(255,255,255,.75)}
-
-/* Kolom kanan */
-.login-wrap .lg-right{
-  background:linear-gradient(180deg,#f3f6fd 0%,#e9effb 100%);
-  padding:clamp(1rem,3.5vh,2.5rem) clamp(1rem,3vw,2.5rem);
-}
-@media(max-width:1023px){.login-wrap .lg-right{background:#eef3fc}}
-.login-wrap .lg-card{border-radius:1.5rem;padding:clamp(1.25rem,3.2vh,2.4rem) clamp(1.25rem,2.6vw,2.4rem);box-shadow:0 1px 2px rgba(30,70,160,.06),0 28px 60px -30px rgba(40,85,190,.38)}
-.login-wrap .lg-head h2{color:var(--navy-d);font-weight:700}
-.login-wrap .lg-lab{color:#8a9ab4}
-.login-wrap .lg-pill{border-width:1px;border-color:var(--line-2);border-radius:.85rem}
-.login-wrap .lg-pill:hover{border-color:#a9bde6;background:#f8faff}
-.login-wrap .lg-pill[aria-checked="true"]{border-color:var(--navy);background:var(--navy-soft);box-shadow:0 0 0 1px var(--navy)}
-.login-wrap .lg-pill[aria-checked="true"] svg{color:var(--navy)}
-.login-wrap .lg-pill[aria-checked="true"] .lg-pill-t{color:var(--navy-d)}
-.login-wrap .lg-pill:focus-visible,.login-wrap .lg-admin:focus-visible,.login-wrap .lg-submit:focus-visible{outline:3px solid rgba(47,98,207,.35);outline-offset:2px}
-.login-wrap .lg-card .fld{border-color:var(--line-2)}
-.login-wrap .lg-card .fld:focus{border-color:var(--navy);box-shadow:0 0 0 4px rgba(47,98,207,.14)}
-.login-wrap .lg-submit{background:var(--navy);border-radius:.8rem;box-shadow:0 10px 22px -14px rgba(47,98,207,.85)}
-.login-wrap .lg-submit:hover:not(:disabled){background:#2553b8;box-shadow:0 12px 26px -14px rgba(47,98,207,.9)}
-.login-wrap .text-navy-700{color:var(--navy)}
-.login-wrap .text-navy-700:hover{color:#2553b8}
-
-/* Layar laptop: panel kiri mengecil, kartu dirapatkan agar muat tanpa terpotong */
-@media(min-width:1024px) and (max-width:1279px){
-  .login-wrap{grid-template-columns:minmax(0,.9fr) minmax(0,1fr)!important}
-  .login-wrap .lg-feats{grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem 1.25rem}
-}
-@media(min-width:1024px) and (max-height:1000px){
-  .login-wrap .lg-card{padding:1.35rem 1.6rem 1.2rem}
-  .login-wrap .lg-head{margin-bottom:.9rem}
-  .login-wrap .lg-head h2{font-size:1.3rem}
-  .login-wrap .lg-head p{margin-top:.2rem;font-size:.82rem}
-  .login-wrap .lg-groups{gap:.7rem}
-  .login-wrap .lg-lab{margin-bottom:.3rem}
-  .login-wrap .lg-pills{gap:.4rem}
-  .login-wrap .lg-pill{padding:.45rem .65rem;row-gap:.1rem}
-  .login-wrap .lg-pill-d{font-size:10.5px;line-height:1.3}
-  .login-wrap .lg-hint{margin-top:.6rem;font-size:.74rem}
-  .login-wrap .lg-sep{margin:.9rem 0}
-  .login-wrap .lg-field{margin-bottom:.7rem}
-  .login-wrap .lg-card .fld{min-height:2.6rem}
-  .login-wrap .lg-submit{min-height:2.7rem;margin-top:.9rem}
-  .login-wrap .lg-srv{margin-top:.9rem;padding-top:.75rem}
-  .login-wrap .lg-right>div>p.text-center{margin-top:.75rem}
-}
-/* Tinggi layar pendek (mis. 1366x768): keterangan peran disembunyikan, nama peran tetap jelas */
-@media(min-width:1024px) and (max-height:800px){
-  .login-wrap .lg-pill-d{display:none}
-  .login-wrap .lg-pill{padding:.5rem .65rem}
-  .login-wrap .lg-card{padding:1.1rem 1.4rem 1rem}
-  .login-wrap .lg-sep{margin:.7rem 0}
-  .login-wrap .lg-hero .lg-lead{display:none}
-  .login-wrap .lg-groups>div:first-child .lg-pills{grid-template-columns:repeat(6,minmax(0,1fr))}
-  .login-wrap .lg-groups>div:first-child .lg-pill{grid-column:span 2}
-  .login-wrap .lg-groups>div:first-child .lg-pill:nth-child(n+4){grid-column:span 3}
-  .login-wrap .lg-groups>div:first-child .lg-pill:last-child:nth-child(odd){grid-column:span 3}
-  .login-wrap .lg-pill svg{width:1.05rem;height:1.05rem}
-  .login-wrap .lg-pill-t{font-size:.8rem;line-height:1.2}
-  .login-wrap .lg-head{margin-bottom:.7rem}
-  .login-wrap .lg-hint{margin:.5rem 0 .75rem}
-  .login-wrap .lg-sep{display:none}
-  .login-wrap .lg-field{margin-bottom:.55rem}
-  .login-wrap .lg-flab{margin-bottom:.2rem}
-  .login-wrap .lg-card .fld{min-height:2.4rem;padding-top:.45rem;padding-bottom:.45rem}
-  .login-wrap .lg-submit{min-height:2.55rem;margin-top:.7rem}
-  .login-wrap .lg-srv{margin-top:.6rem;padding-top:.55rem}
-  .login-wrap .lg-right>div>p.text-center{margin-top:.5rem}
-}
-/* Mobile & tablet */
-@media(max-width:1023px){
-  .login-wrap .lg-right{justify-content:flex-start;padding-top:1.25rem;padding-bottom:2rem}
-  .login-wrap .lg-card{border-radius:1.25rem}
-}
-@media(min-width:1024px) and (max-height:700px){
-  .login-wrap .lg-right{padding-top:.75rem;padding-bottom:.75rem}
-  .login-wrap .lg-head p{display:none}
-  .login-wrap .lg-head{margin-bottom:.5rem}
-  .login-wrap .lg-card{padding:.9rem 1.25rem .8rem}
-  .login-wrap .lg-hero .lg-badge{margin-bottom:.7rem}
-}
-/* Di dalam iframe/halaman Blogger */
-.embedded .login-wrap .lg-left{position:relative;height:auto;min-height:680px}
-@media(prefers-reduced-motion:reduce){.login-wrap .up{animation:none}}
 </style>
-<style id="rapor-header-wrap-fix">
-/* Judul kolom tabel rapor boleh turun baris agar tidak saling menimpa */
-html body .rapor-page table.rapor-mapel thead th,
-html body .rapor-page table.calm-table-print thead th{
-  white-space:normal!important;overflow-wrap:break-word;word-break:normal;hyphens:none;
-  overflow:hidden;line-height:1.25;vertical-align:middle;padding-left:3pt;padding-right:3pt;
-}
-html body .rapor-page table.rapor-mapel td{overflow-wrap:break-word}
-</style>
+
 </head>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
