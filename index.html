@@ -1654,14 +1654,14 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <button @click="exportGuru" :disabled="!guruTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
           <button v-if="canEdit" @click="editGuru(null)" class="btn-p">Tambah guru</button></div></div>
       <div class="flex flex-wrap gap-2 mb-3">
-        <select v-model="grole" class="inp"><option value="">Semua peran</option><option value="GURU">Guru</option><option value="WAKUR">WKS Kurikulum (monitor jadwal)</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf</option><option value="BK">Guru BK</option></select>
+        <select v-model="grole" class="inp"><option value="">Semua peran</option><option value="GURU">Guru</option><option value="WAKUR">WKS Kurikulum (tugas tambahan)</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf</option><option value="BK">Guru BK</option></select>
         <input v-model.trim="gq" placeholder="Cari nama / username / kelas..." class="inp flex-1 min-w-[10rem]">
         <span class="text-sm text-slate-500 self-center">{{guruTampil.length}} dari {{gdata.length}} akun</span></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama</th><th>Username</th><th>Peran</th><th>Wali kelas</th><th>Kelas ajar</th><th class="text-center">Jam</th><th v-if="canEdit">Aksi</th></tr></thead>
         <tbody><tr v-for="g in guruTampil" :key="g.username" class="border-t align-top">
           <td class="p-3 font-semibold">{{g.nama}}</td><td>{{g.username}}</td>
-          <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[g.role]">{{ROLE_LBL[g.role]}}</span></td>
+          <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[g.role]">{{ROLE_LBL[g.role]}}</span> <span v-if="String(g.tugasTambahan || "").split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR') || g.role==='WAKUR'" class="text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800">WKS Kurikulum</span></td>
           <td>{{g.wali.join(', ')||'-'}}</td><td class="max-w-[14rem]">{{g.kelasAjar.join(', ')||'-'}}</td><td class="text-center">{{g.jam}}</td>
           <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editGuru(g)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delGuru(g)" class="text-rose-600 font-bold">Hapus</button></td></tr>
         <tr v-if="!guruTampil.length"><td :colspan="canEdit?7:6" class="p-4 text-slate-500">{{gdata.length?'Tidak ada akun yang cocok dengan filter.':canEdit?'Belum ada guru. Klik Tambah guru atau Impor Excel.':'Belum ada data guru.'}}</td></tr></tbody></table></div>
@@ -1670,7 +1670,12 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <h3 class="font-extrabold text-blue-900 mb-4">{{gf.edit?'Ubah guru':'Tambah guru'}}</h3>
         <label class="lb">Username</label><input v-model.trim="gf.username" :disabled="gf.edit" placeholder="mis. budi.santoso" autocapitalize="none" class="inp w-full mt-1 mb-3 disabled:bg-slate-100">
         <label class="lb">Nama lengkap</label><input v-model.trim="gf.nama" maxlength="100" placeholder="Nama beserta gelar" class="inp w-full mt-1 mb-3">
-        <label class="lb">Peran</label><select v-model="gf.role" @change="(gf.role!=='GURU'&&gf.role!=='WAKUR')&&(gf.wali=[])" class="inp w-full mt-1 mb-3"><option value="GURU">Guru</option><option value="WAKUR">WKS Kurikulum (monitor jadwal)</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf / Tata Usaha (hanya lihat &amp; unduh)</option><option value="BK">Guru BK (catatan pelanggaran)</option></select>
+        <label class="lb">Peran utama</label><select v-model="gf.role" @change="(gf.role!=='GURU')&&(gf.wali=[]);(gf.role!=='GURU')&&(gf.tugasWakur=false)" class="inp w-full mt-1 mb-3"><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf / Tata Usaha (hanya lihat &amp; unduh)</option><option value="BK">Guru BK (catatan pelanggaran)</option></select>
+        <div v-if="gf.role==='GURU'" class="rounded-xl border border-cyan-200 bg-cyan-50 p-3 mb-3">
+          <p class="lb mb-2">Peran dan tugas</p>
+          <label class="flex items-start gap-2 text-sm mb-2"><input type="checkbox" checked disabled class="mt-1"><span><b>Guru</b><span class="block text-xs text-slate-600">Peran utama — tetap dapat mengajar dan menginput nilai.</span></span></label>
+          <label class="flex items-start gap-2 text-sm"><input type="checkbox" v-model="gf.tugasWakur" class="mt-1"><span><b>WKS Kurikulum</b><span class="block text-xs text-slate-600">Tugas tambahan — memantau jadwal seluruh kelas dan kelengkapan nilai STS/SAS (baca-saja).</span></span></label>
+        </div>
         <template v-if="!gf.edit"><label class="lb">Sandi awal <span class="font-normal normal-case text-slate-400">(kosongkan = dibuat acak)</span></label><input v-model="gf.sandi" placeholder="min. 6 karakter" class="inp w-full mt-1 mb-3"></template>
         <template v-if="gf.role==='GURU'"><label class="lb">Wali kelas <span class="font-normal normal-case text-slate-400">(opsional, boleh lebih dari satu)</span></label>
           <div class="mt-1 mb-3 max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-2">
@@ -4252,21 +4257,21 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       try { jadwal.value = await api('jadwalList'); } catch (e) { /* */ }
     });
     const gdata = ref([]), gq = ref(''), grole = ref(''), showG = ref(false);
-    const gf = reactive({ edit: false, username: '', nama: '', role: 'GURU', sandi: '', wali: [] });
+    const gf = reactive({ edit: false, username: '', nama: '', role: 'GURU', tugasWakur: false, sandi: '', wali: [] });
     const kred = reactive({ show: false, judul: '', list: [], copied: false });
-    const guruTampil = computed(() => { const t = gq.value.toLowerCase(); return gdata.value.filter(g => (!grole.value || g.role === grole.value) && (!t || (g.nama + ' ' + g.username + ' ' + g.wali.join(' ') + ' ' + g.kelasAjar.join(' ')).toLowerCase().includes(t))); });
+    const guruTampil = computed(() => { const t = gq.value.toLowerCase(); return gdata.value.filter(g => (!grole.value || (grole.value === 'WAKUR' ? String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR') : g.role === grole.value)) && (!t || (g.nama + ' ' + g.username + ' ' + g.wali.join(' ') + ' ' + g.kelasAjar.join(' ')).toLowerCase().includes(t))); });
     const refreshGuru = async () => { [gdata.value, kelasAll.value] = await Promise.all([api('guruDetail'), api('kelasDetail')]); };
     const showKred = (judul, list) => Object.assign(kred, { show: true, judul, list, copied: false });
     const copyKred = async () => {
       const teks = kred.list.map(c => c.nama + '\nUsername: ' + c.username + '\nSandi: ' + c.sandi).join('\n\n');
       try { await navigator.clipboard.writeText(teks); kred.copied = true; } catch (e) { await tanya({ judul: 'Salin kredensial', detail: 'Salin teks berikut secara manual.', nilai: teks, multiline: true, bacaSaja: true, tombol: 'Selesai', tanpaBatal: true }); }
     };
-    const editGuru = g => { err.value = ok.value = ''; Object.assign(gf, { edit: !!g, username: g ? g.username : '', nama: g ? g.nama : '', role: g ? g.role : 'GURU', sandi: '', wali: g ? [...g.wali] : [] }); showG.value = true; };
+    const editGuru = g => { err.value = ok.value = ''; const task = !!g && (String(g.role || '').toUpperCase() === 'WAKUR' || String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR')); Object.assign(gf, { edit: !!g, username: g ? g.username : '', nama: g ? g.nama : '', role: g && g.role === 'WAKUR' ? 'GURU' : (g ? g.role : 'GURU'), tugasWakur: task, sandi: '', wali: g ? [...g.wali] : [] }); showG.value = true; };
     const saveGuru = () => run(async () => {
       if (!/^[A-Za-z0-9._-]{3,30}$/.test(gf.username)) throw new Error('Username 3-30 karakter: huruf, angka, titik, minus, atau garis bawah');
       if (!gf.nama) throw new Error('Nama wajib diisi');
       if (!gf.edit && gf.sandi && gf.sandi.length < 6) throw new Error('Sandi minimal 6 karakter');
-      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, sandi: gf.sandi, wali: (gf.role !== 'GURU' && gf.role !== 'WAKUR') ? [] : gf.wali } });
+      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, tugasTambahan: gf.role === 'GURU' && gf.tugasWakur ? 'WAKUR' : '', sandi: gf.sandi, wali: gf.role !== 'GURU' ? [] : gf.wali } });
       showG.value = false; await refreshGuru();
       if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi, role: gf.role }]);
       ok.value = gf.edit ? 'Data guru diperbarui' : 'Akun guru dibuat';
