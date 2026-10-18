@@ -1068,12 +1068,12 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     </div>
     <div class="lc-hero">
       <h1 class="lc-title">Portal Akademik</h1>
-      <p class="lc-lead">Platform terpadu SMK CALM untuk pengelolaan presensi, penilaian, jurnal pembelajaran, serta bimbingan konseling dan karier, dengan akses yang disesuaikan bagi pimpinan, guru, siswa, dan orang tua.</p>
+      <p class="lc-lead">Satu portal untuk presensi, penilaian, jurnal pembelajaran, serta bimbingan konseling dan karier, dengan akses sesuai peran bagi pimpinan, guru, siswa, dan orang tua.</p>
       <ul class="lc-feats">
         <li><span class="lc-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg></span><div><b>Presensi</b><span>Pencatatan harian dan rekapitulasi kehadiran</span></div></li>
         <li><span class="lc-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><div><b>Penilaian</b><span>Input nilai terstruktur dan leger terintegrasi</span></div></li>
         <li><span class="lc-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3Z"/><path d="M5 17a3 3 0 0 1 3-3h11M9 8h6"/></svg></span><div><b>Jurnal Mengajar</b><span>Dokumentasi pembelajaran dan bimbingan wali kelas</span></div></li>
-        <li><span class="lc-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg></span><div><b>Bimbingan Karir</b><span>Konseling siswa dan perencanaan karier</span></div></li>
+        <li><span class="lc-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg></span><div><b>Bimbingan Karier</b><span>Konseling siswa dan perencanaan karier</span></div></li>
       </ul>
     </div>
     <div class="lc-foot">
@@ -3786,6 +3786,118 @@ html.embedded .login-wrap .lc-side,html.embedded .login-wrap .lc-main{min-height
 
 </style>
 
+<style id="work-area-v116">
+/* v116 — Area kerja (kanan): toolbar, kotak pencarian, dan tombol.
+   Hanya tampilan layar. Tidak mengubah DOM, JavaScript, API, maupun aturan cetak.
+   Diletakkan paling akhir agar menang atas lapisan style sebelumnya. */
+@media screen{
+  /* Kotak pencarian: ikon kaca pembesar lewat CSS (tanpa elemen baru) */
+  #app main#utama input.inp[placeholder^="Cari"],
+  #app main#utama input.inp[placeholder^="Ketik kata kunci"]{
+    padding-left:2.4rem;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:.8rem 50%;
+    background-size:1rem 1rem;
+    text-overflow:ellipsis;
+  }
+  #app main#utama input.inp[placeholder^="Cari"]:focus,
+  #app main#utama input.inp[placeholder^="Ketik kata kunci"]:focus{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b3d91' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+  }
+  /* Input tanggal/bulan: tinggi dan perataan seragam dengan kolom lain */
+  #app main#utama input.inp[type="month"],
+  #app main#utama input.inp[type="date"]{
+    -webkit-appearance:none;appearance:none;
+    min-width:0;line-height:1.3;
+  }
+  #app main#utama input.inp[type="month"]::-webkit-date-and-time-value,
+  #app main#utama input.inp[type="date"]::-webkit-date-and-time-value{text-align:left;min-height:1.3em}
+  /* Judul halaman di dalam toolbar */
+  #app main#utama .page-head.in-row .desk{font-size:.82rem;line-height:1.5}
+}
+
+@media screen and (min-width:768px){
+  /* Kolom pencarian punya lebar yang jelas, tidak mengikuti lebar bawaan browser */
+  #app main#utama section>div.flex.flex-wrap>input.inp[placeholder^="Cari"]:not(.flex-1){
+    flex:0 1 17rem;min-width:11rem;
+  }
+}
+
+@media screen and (max-width:767px){
+  /* ---------- Toolbar: judul satu baris penuh, kontrol berpasangan 2 kolom ---------- */
+  #app main#utama section div.flex.flex-wrap:not([role="tablist"]){gap:.5rem;row-gap:.55rem}
+
+  #app main#utama section>div.flex.flex-wrap>.page-head{display:block}
+  #app main#utama section>div.flex.flex-wrap>.page-head,
+  #app main#utama section>div.flex.flex-wrap>div.mr-auto,
+  #app main#utama section>div.flex.flex-wrap>div.flex.flex-wrap{
+    flex:1 1 100%;min-width:0;max-width:100%;margin:0 0 .15rem;
+  }
+
+  /* Kontrol langsung di dalam baris toolbar */
+  #app main#utama section div.flex.flex-wrap:not([role="tablist"])>:is(input.inp,select.inp,button,label.btn-o,label.btn-p){
+    flex:1 1 calc(50% - .25rem);
+    min-width:0;width:auto;max-width:100%;
+  }
+  /* Kotak pencarian selalu selebar baris */
+  #app main#utama section div.flex.flex-wrap:not([role="tablist"])>input.inp[placeholder^="Cari"],
+  #app main#utama section div.flex.flex-wrap:not([role="tablist"])>input.inp[placeholder^="Ketik"]{
+    flex:1 1 100%;
+  }
+  /* Aksi utama selebar baris, hanya pada toolbar yang memuat filter/pencarian
+     (agar tab berbentuk tombol tidak berubah ukuran saat aktif) */
+  #app main#utama section div.flex.flex-wrap:not([role="tablist"]):has(>input.inp,>select.inp)>.btn-p{
+    flex:1 1 100%;
+  }
+  /* Keterangan jumlah (mis. "12 dari 40 siswa") menempati baris sendiri */
+  #app main#utama section div.flex.flex-wrap:not([role="tablist"])>span.self-center{
+    flex:1 1 100%;margin:.05rem 0;
+  }
+
+  /* Tombol: teks panjang turun baris, tidak meluber */
+  #app main#utama section div.flex.flex-wrap:not([role="tablist"])>:is(button,label.btn-o,label.btn-p){
+    white-space:normal;text-align:center;line-height:1.25;padding-top:.5rem;padding-bottom:.5rem;
+  }
+  /* Tinggi kolom isian seragam (44px) di semua kontrol, termasuk tanggal/bulan */
+  #app main#utama :is(input.inp,select.inp){
+    min-height:2.75rem;padding-top:.55rem;padding-bottom:.55rem;
+  }
+  #app main#utama section div.flex.flex-wrap:not([role="tablist"])>:is(button,label.btn-o,label.btn-p){
+    min-height:2.75rem;
+  }
+
+  /* Tab bergeser: scrollbar disembunyikan, berhenti rapi di tiap tab */
+  #app main#utama [role="tablist"]{scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+  #app main#utama [role="tablist"]::-webkit-scrollbar{display:none}
+  #app main#utama [role="tablist"]>.tab{scroll-snap-align:start}
+}
+</style>
+<style id="login-panel-v117">
+/* v117 — Panel kiri halaman masuk: tipografi dan daftar fitur lebih tenang dan profesional.
+   Hanya tampilan; panel ini memang disembunyikan di layar <1024px. */
+@media screen and (min-width:1024px){
+  .login-wrap .lc-lead{max-width:27rem;font-size:1rem;line-height:1.8;color:rgba(255,255,255,.8);text-wrap:pretty}
+  .login-wrap .lc-feats{gap:0;max-width:27rem;margin-top:2.2rem;border-top:1px solid rgba(255,255,255,.14)}
+  .login-wrap .lc-feats li{align-items:flex-start;gap:1rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.1)}
+  .login-wrap .lc-fi{width:2.5rem;height:2.5rem;border-radius:.7rem;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:#e8d4a2}
+  .login-wrap .lc-fi svg{width:1.15rem;height:1.15rem}
+  .login-wrap .lc-feats b{font-size:.95rem;font-weight:600;line-height:1.3;letter-spacing:0}
+  .login-wrap .lc-feats div>span{margin-top:.2rem;font-size:.82rem;line-height:1.5;color:rgba(255,255,255,.7)}
+}
+@media screen and (min-width:1024px) and (max-height:860px){
+  .login-wrap .lc-feats{margin-top:1.5rem}
+  .login-wrap .lc-feats li{padding:.75rem 0}
+}
+@media screen and (min-width:1024px) and (max-height:760px){
+  .login-wrap .lc-lead{font-size:.9rem;line-height:1.65}
+  .login-wrap .lc-feats{margin-top:1.1rem}
+  .login-wrap .lc-feats li{padding:.55rem 0;gap:.8rem}
+  .login-wrap .lc-fi{width:2.1rem;height:2.1rem}
+  .login-wrap .lc-feats div>span{font-size:.76rem;line-height:1.4}
+}
+@media screen and (min-width:1024px) and (max-height:640px){.login-wrap .lc-feats{display:none}}
+</style>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
 const API_URL = 'https://script.google.com/macros/s/AKfycbwcfPzDxCsJxXTFSRH-R6x2rZEt5goThRhqhWG4hqLE4_0Z6ZD3Icu8sjOoRbDtgwobVw/exec';
