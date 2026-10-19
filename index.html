@@ -1907,7 +1907,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
                 <td class="p-2 text-center"><span v-if="r.aktif" class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700">Aktif</span><span v-else class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-amber-50 text-amber-700">Riwayat lama</span></td>
                 <td class="p-2 noprint"><div class="flex justify-center gap-1">
                   <button class="btn-o !min-h-[2rem] !px-2 text-xs" :disabled="!r.aktif" @click="editRiwayatPenilaian(r)" title="Buka nilai untuk diedit"><icon name="pencil" size="13"/> Edit</button>
-                  <button class="btn-o !min-h-[2rem] !px-2 text-xs !text-rose-700" :disabled="!r.aktif" @click="hapusRiwayatPenilaian(r)" title="Hapus penilaian"><icon name="trash-2" size="13"/> Hapus</button>
+                  <button class="btn-o !min-h-[2rem] !px-2 text-xs !text-rose-700" @click="hapusRiwayatPenilaian(r)" :title="r.aktif?'Hapus penilaian':'Hapus riwayat lama (nilai tidak diubah)'"><icon name="trash-2" size="13"/> Hapus</button>
                 </div></td>
               </tr>
               <tr v-if="!riwayatPenilaianTampil.length"><td colspan="8" class="p-8 text-center"><div class="mx-auto mb-2 rounded-full bg-slate-100 w-10 h-10 flex items-center justify-center"><icon name="history" size="18" color="#64748b"/></div><div class="font-semibold text-slate-700">{{nilaiRiwayatTpDipilih ? 'Tidak ada riwayat untuk TP ini pada periode yang dipilih' : 'Belum ada riwayat pada periode ini'}}</div><p class="text-slate-500 text-sm mt-1">Simpan nilai sumatif melalui menu Input Nilai. Riwayat akan tercatat otomatis dengan waktu dan semester penyimpanan.</p></td></tr>
@@ -4906,11 +4906,14 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       ok.value = 'Penilaian dimuat untuk diedit. Periksa nilainya lalu tekan Simpan Nilai.';
     });
     const hapusRiwayatPenilaian = async r => {
-      if (!(await konfirm('Hapus penilaian ' + r.mapel + ' — ' + r.tp + ' (' + jl(r.jenis) + ')?\n\nNilai siswa pada penilaian ini akan dihapus jika belum diganti setelah riwayat dicatat.'))) return;
+      const lama = !r.aktif;
+      if (!(await konfirm(lama
+        ? 'Hapus riwayat lama ' + r.mapel + ' — ' + r.tp + ' (' + jl(r.jenis) + ')?\n\nHanya catatan riwayat yang dihapus. Nilai siswa di sheet Nilai TIDAK diubah.'
+        : 'Hapus penilaian ' + r.mapel + ' — ' + r.tp + ' (' + jl(r.jenis) + ')?\n\nNilai siswa pada penilaian ini akan dihapus jika belum diganti setelah riwayat dicatat.'))) return;
       run(async () => {
-        const d = await api('riwayatPenilaianHapus', { id: r.id });
+        const d = await api('riwayatPenilaianHapus', lama ? { id: r.id, hanyaRiwayat: true } : { id: r.id });
         await loadRiwayatPenilaian();
-        ok.value = 'Penilaian dihapus (' + d.terhapus + ' nilai siswa).';
+        ok.value = lama ? 'Riwayat lama dihapus (nilai tidak diubah).' : 'Penilaian dihapus (' + d.terhapus + ' nilai siswa).';
       });
     };
     const rpPeran = computed(() => !!user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU')), rpFinal = computed(() => !!rp.value && rp.value.status === 'Final'), rpCek = ref(null);
