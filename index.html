@@ -5019,29 +5019,41 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     };
     const rpGuruMap = ref({}), rpGuruDiag = ref(null);
     const rpGuruStat = computed(() => {
-      const d = rp.value; if (!d || !d.siswa || !d.siswa.length || !Array.isArray(d.mapel)) return null;
+      const d = rp.value;
+      if (!d || !Array.isArray(d.siswa) || !d.siswa.length || !Array.isArray(d.mapel)) return null;
       const n = d.siswa.length, nm = new Map();
       d.mapel.forEach(m => nm.set(m.nama, m.label || m.nama));
       (d.kosongMapel || []).forEach(x => { if (!nm.has(x)) nm.set(x, x); });
       if (!nm.size) return null;
-      const ada = f => d.siswa.some(s => s.nilai && Object.keys(s.nilai).some(k => s.nilai[k] && Object.prototype.hasOwnProperty.call(s.nilai[k], f)));
-      const tersedia = { sts: ada('sts'), sas: ada('sas') };
-      const p = (d.periode ? d.periode === 'STS' : rpMeta.periode === 'STS') ? 'sts' : 'sas'; // hanya jenis rapor yang sedang dibuka
-      const isi = v => v != null && v !== '' && v !== '-';
-      const cnt = m => { let a = 0, b = 0; for (const s of d.siswa) { const x = s.nilai && s.nilai[m]; if (!x) continue; if (isi(x.sts)) a++; if (isi(x.sas)) b++; } return { sts: a, sas: b }; };
+      // Indikator harus mengikuti nilai yang benar-benar ditampilkan pada cetak rapor.
+      // Pada rapor STS maupun SAS, kolom nilai yang tampil menggunakan field `akhir`.
+      const isi = v => v != null && String(v).trim() !== '' && String(v).trim() !== '-';
+      const tersedia = d.siswa.some(s => s && s.nilai && Object.keys(s.nilai).some(k => {
+        const x = s.nilai[k]; return x && Object.prototype.hasOwnProperty.call(x, 'akhir') && isi(x.akhir);
+      }));
+      const p = (d.periode ? d.periode === 'STS' : rpMeta.periode === 'STS') ? 'sts' : 'sas';
+      const cnt = m => {
+        let a = 0;
+        for (const s of d.siswa) {
+          const x = s && s.nilai && s.nilai[m];
+          // Nilai 0 adalah nilai yang sah; nilai kosong/tanda strip bukan nilai masuk.
+          if (x && isi(x.akhir)) a++;
+        }
+        return a;
+      };
       const grup = new Map();
       [...nm.keys()].forEach(m => {
         const gs = cariGuruMapel(m, nm.get(m)), nama = gs.length ? gs.join(' / ') : '', key = nama || ('?' + m);
         if (!grup.has(key)) grup.set(key, { key, nama: nama || 'Guru tidak terbaca', dikenal: !!nama, mapel: [] });
-        const c = cnt(m); grup.get(key).mapel.push({ label: nm.get(m), sts: c.sts, sas: c.sas, v: c[p] });
+        const c = cnt(m); grup.get(key).mapel.push({ label: nm.get(m), v: c });
       });
       const list = [...grup.values()].map(g => {
-        const tot = g.mapel.length * n, h1 = g.mapel.reduce((a, m) => a + m.sts, 0), h2 = g.mapel.reduce((a, m) => a + m.sas, 0), hp = g.mapel.reduce((a, m) => a + m.v, 0);
-        return Object.assign(g, { n, tot, stsHas: h1, sasHas: h2, stsPct: Math.round(h1 / tot * 100), sasPct: Math.round(h2 / tot * 100), stsFull: tersedia.sts && h1 === tot, sasFull: tersedia.sas && h2 === tot, pct: Math.round(hp / tot * 100), full: tersedia[p] && hp === tot });
+        const tot = g.mapel.length * n, hp = g.mapel.reduce((a, m) => a + m.v, 0);
+        return Object.assign(g, { n, tot, pct: tot ? Math.round(hp / tot * 100) : 0, full: tersedia && tot > 0 && hp === tot });
       }).sort((a, b) => (a.full ? 1 : 0) - (b.full ? 1 : 0) || a.nama.localeCompare(b.nama));
-      const total = list.length, stsFull = list.filter(g => g.stsFull).length, sasFull = list.filter(g => g.sasFull).length, pFull = list.filter(g => g.full).length;
+      const total = list.length, pFull = list.filter(g => g.full).length;
       const tdk = list.filter(g => !g.dikenal).reduce((a, g) => a + g.mapel.length, 0);
-      return { tdk, list, total, stsFull, sasFull, n, tersedia, p, pLabel: p.toUpperCase(), ok: tersedia[p], pFull, pPct: total ? Math.round(pFull / total * 100) : 0, stsPct: total ? Math.round(stsFull / total * 100) : 0, sasPct: total ? Math.round(sasFull / total * 100) : 0 };
+      return { tdk, list, total, n, tersedia: { sts: tersedia, sas: tersedia }, p, pLabel: p.toUpperCase(), ok: tersedia, pFull, pPct: total ? Math.round(pFull / total * 100) : 0, stsFull: pFull, sasFull: pFull, stsPct: total ? Math.round(pFull / total * 100) : 0, sasPct: total ? Math.round(pFull / total * 100) : 0 };
     });
     let rpTimer = 0;                                   // gabungkan perubahan dropdown beruntun -> 1 panggilan server
     const loadRapor = () => { clearTimeout(rpTimer); rpTimer = 0; return run(muatRapor); };
