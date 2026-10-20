@@ -4080,11 +4080,11 @@ const app = createApp({
     const QK = 'calm_antrean';
     const qBaca = () => { try { const l = JSON.parse(localStorage.getItem(QK) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } };
     const antre = ref(qBaca());
-    const qTulis = l => { try { localStorage.setItem(QK, JSON.stringify(l)); } catch (e) { /* */ } antre.value = l; };
+    const qTulis = l => { let persisted = false; try { const raw = JSON.stringify(l); localStorage.setItem(QK, raw); persisted = localStorage.getItem(QK) === raw; } catch (e) { /* antre tetap tersedia selama halaman ini hidup */ } antre.value = l; return persisted; };
     const antreSaya = computed(() => antre.value.filter(x => user.value && x.user === user.value.username));
     const jaringan = m => m === 'NETWORK' || m === 'TIMEOUT' || m === 'Failed to fetch';
     const qHapusKey = key => { if (user.value) qTulis(qBaca().filter(x => !(x.user === user.value.username && x.key === key))); };
-    const qMasuk = (action, label, key, payload) => { qHapusKey(key); const l = qBaca(); l.push({ id: Date.now() + Math.random().toString(36).slice(2, 6), user: user.value.username, action, label, key, payload: JSON.parse(JSON.stringify(payload)), galat: '' }); qTulis(l); };
+    const qMasuk = (action, label, key, payload) => { const sebelumnya = qBaca(), l = sebelumnya.filter(x => !(x.user === user.value.username && x.key === key)); l.push({ id: Date.now() + Math.random().toString(36).slice(2, 6), user: user.value.username, action, label, key, payload: JSON.parse(JSON.stringify(payload)), galat: '' }); if (!qTulis(l)) { antre.value = sebelumnya; throw new Error('Data belum dapat disimpan secara aman di perangkat ini. Jangan tutup atau muat ulang halaman; periksa ruang penyimpanan browser lalu coba simpan lagi saat koneksi tersedia.'); } };
     const buangAntre = id => qTulis(qBaca().filter(x => x.id !== id));
     let qJalan = false;
     const kirimAntre = async diam => {
@@ -4457,8 +4457,8 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const setSemuaF = s => frows.value.forEach(r => { r.status = s; });
     const saveNilai = () => run(async () => {
       if (!nKey || !nrows.value.length) throw new Error('Daftar siswa belum dimuat untuk isian ini. Isi tujuan pembelajaran lalu tekan Tab/Enter, tunggu daftar muncul, baru simpan.');
-      const bad = nrows.value.find(r => r.skor !== '' && r.skor != null && !(Number(r.skor) >= 0 && Number(r.skor) <= 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus antara 0 dan 100');
-      const body = { ...nKey, rows: nrows.value }, key = 'n|' + [nKey.kelas, nKey.mapel, nKey.tp, nKey.jenis].join('|'); let d;
+      const bad = nrows.value.find(r => r.skor != null && String(r.skor).trim() !== '' && (!Number.isFinite(Number(r.skor)) || Number(r.skor) < 0 || Number(r.skor) > 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus berupa angka antara 0 dan 100');
+      const body = JSON.parse(JSON.stringify({ ...nKey, rows: nrows.value })), key = 'n|' + [nKey.kelas, nKey.mapel, nKey.tp, nKey.jenis].join('|'); let d;
       try { d = await api('nilaiSave', body); } catch (e) { if (!jaringan(e.message)) throw e; qMasuk('nilaiSave', 'Nilai ' + nKey.kelas + ' - ' + nKey.mapel + ' (' + nKey.jenis + ')', key, body); ok.value = 'Tidak ada sinyal. Nilai disimpan di HP dan dikirim otomatis saat tersambung.'; return; }
       qHapusKey(key); ok.value = d.tersimpan + ' nilai tersimpan';
     });
@@ -4510,6 +4510,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const ptabs = computed(() => [{ k: 'input', t: 'Input Kehadiran' }, { k: 'rekap', t: 'Rekapitulasi' }, { k: 'detail', t: 'Detail Harian (1\u201331)' }, { k: 'grafik', t: 'Grafik' }, { k: 'riwayat', t: 'Riwayat Input Presensi' }].filter(t => t.k !== 'input' || canInput.value));
     const mapelOf = k => [...new Set(pilih.value.pairs.filter(p => !k || p.kelas === k).map(p => p.mapel))].sort((a, b) => a.localeCompare(b));
     const pickKelas = (o, auto) => { o.mapel = ''; if (auto && o.kelas) { const m = mapelOf(o.kelas); if (m.length === 1) o.mapel = m[0]; } };
+    const tanggalPresensiValid = v => { if (!/^\d{4}-\d{2}-\d{2}$/.test(String(v || ''))) return false; const a = String(v).split('-').map(Number), d = new Date(a[0], a[1] - 1, a[2]); return d.getFullYear() === a[0] && d.getMonth() === a[1] - 1 && d.getDate() === a[2]; };
     const ringkasInput = computed(() => { const c = { H: 0, I: 0, S: 0, A: 0, D: 0 }; rows.value.forEach(r => { if (c[r.status] !== undefined) c[r.status]++; }); return c; });
     let pReq = 0;
     const loadPresensi = () => {
@@ -4522,7 +4523,11 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     };
     const savePresensi = () => run(async () => {
       if (!pi.kelas || !pi.mapel) throw new Error('Pilih kelas dan mata pelajaran terlebih dahulu');
-      const body = { kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal, rows: rows.value }, key = 'p|' + [pi.kelas, pi.mapel, pi.tanggal].join('|'), r = ringkasInput.value; let d;
+      if (!tanggalPresensiValid(pi.tanggal)) throw new Error('Tanggal presensi tidak valid. Pilih tanggal yang benar terlebih dahulu.');
+      if (!Array.isArray(rows.value) || !rows.value.length) throw new Error('Daftar siswa belum dimuat. Muat ulang kelas dan mata pelajaran sebelum menyimpan presensi.');
+      const statusValid = new Set(ST.map(s => s.k)), seenNis = new Set();
+      for (const r0 of rows.value) { if (!r0 || !statusValid.has(r0.status)) throw new Error('Ada status kehadiran yang tidak valid. Periksa kembali daftar siswa.'); const id = String(r0.nis == null ? '' : r0.nis).trim(); if (id && seenNis.has(id)) throw new Error('Ada NIS siswa ganda pada daftar presensi (' + id + '). Muat ulang data kelas sebelum menyimpan.'); if (id) seenNis.add(id); }
+      const body = JSON.parse(JSON.stringify({ kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal, rows: rows.value })), key = 'p|' + [pi.kelas, pi.mapel, pi.tanggal].join('|'), r = ringkasInput.value; let d;
       try { d = await api('presensiSave', body); } catch (e) { if (!jaringan(e.message)) throw e; qMasuk('presensiSave', 'Presensi ' + pi.kelas + ' - ' + pi.mapel + ' (' + pi.tanggal + ')', key, body); ok.value = 'Tidak ada sinyal. Presensi disimpan di HP dan dikirim otomatis saat tersambung.'; return; }
       qHapusKey(key);
       pi.ada = true; ok.value = d.tersimpan + ' siswa tersimpan (Hadir ' + r.H + ', Izin ' + r.I + ', Sakit ' + r.S + ', Alpa ' + r.A + ', Dispensasi ' + r.D + ')';
