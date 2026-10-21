@@ -2825,30 +2825,30 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       <section class="cover-page cover-biodata"><div class="cv-ihead">BIODATA PESERTA DIDIK</div><table class="cv-itbl"><tbody>
         <tr><td>1. Nama Lengkap Peserta Didik</td><td>:</td><td>{{namaRapi(s.nama)}}</td></tr>
         <tr><td>2. NISN</td><td>:</td><td>{{s.nisn||'-'}}</td></tr>
-        <tr><td>3. Tempat, Tanggal Lahir</td><td>:</td><td>{{biodataUntuk(s.nis).tempatLahir||'-'}}, {{tanggalBiodata(biodataUntuk(s.nis).tanggalLahir)}}</td></tr>
+        <tr><td>3. Tempat, Tanggal Lahir</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).tempatLahir)||'-'}}, {{tanggalBiodata(biodataUntuk(s.nis).tanggalLahir)}}</td></tr>
         <tr><td>4. Jenis Kelamin</td><td>:</td><td>{{s.gender==='L'?'Laki-Laki':s.gender==='P'?'Perempuan':s.gender||'-'}}</td></tr>
-        <tr><td>5. Agama</td><td>:</td><td>{{biodataUntuk(s.nis).agama||'-'}}</td></tr>
-        <tr><td>6. Status dalam Keluarga</td><td>:</td><td>{{biodataUntuk(s.nis).statusKeluarga||'-'}}</td></tr>
+        <tr><td>5. Agama</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).agama)||'-'}}</td></tr>
+        <tr><td>6. Status dalam Keluarga</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).statusKeluarga)||'-'}}</td></tr>
         <tr><td>7. Anak ke</td><td>:</td><td>{{biodataUntuk(s.nis).anakKe||'-'}}</td></tr>
-        <tr><td>8. Alamat Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).alamat||'-'}}</td></tr>
+        <tr><td>8. Alamat Peserta Didik</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).alamat)||'-'}}</td></tr>
         <tr><td>9. Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponRumah||'-'}}</td></tr>
-        <tr><td>10. Sekolah Asal</td><td>:</td><td>{{biodataUntuk(s.nis).sekolahAsal||'-'}}</td></tr>
+        <tr><td>10. Sekolah Asal</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).sekolahAsal)||'-'}}</td></tr>
         <tr><td>11. Diterima di sekolah ini</td><td>:</td><td></td></tr>
         <tr><td style="padding-left:7mm">a. Kelas</td><td>:</td><td>{{biodataUntuk(s.nis).diterimaKelas||'-'}}</td></tr>
         <tr><td style="padding-left:7mm">b. Tanggal</td><td>:</td><td>{{tanggalBiodata(biodataUntuk(s.nis).tanggalDiterima)}}</td></tr>
         <tr><td>12. Nama Orang Tua</td><td>:</td><td></td></tr>
-        <tr><td style="padding-left:7mm">a. Ayah</td><td>:</td><td>{{biodataUntuk(s.nis).namaAyah||'-'}}</td></tr>
-        <tr><td style="padding-left:7mm">b. Ibu</td><td>:</td><td>{{biodataUntuk(s.nis).namaIbu||'-'}}</td></tr>
-        <tr><td>13. Alamat Orang Tua</td><td>:</td><td>{{biodataUntuk(s.nis).alamatOrtu||'-'}}</td></tr>
+        <tr><td style="padding-left:7mm">a. Ayah</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).namaAyah)||'-'}}</td></tr>
+        <tr><td style="padding-left:7mm">b. Ibu</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).namaIbu)||'-'}}</td></tr>
+        <tr><td>13. Alamat Orang Tua</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).alamatOrtu)||'-'}}</td></tr>
         <tr><td style="padding-left:7mm">a. Nomor WA</td><td>:</td><td>{{biodataUntuk(s.nis).kontakOrtu||'-'}}</td></tr>
         <tr><td style="padding-left:7mm">b. Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponOrtu||'-'}}</td></tr>
         <tr><td>14. Pekerjaan Orang Tua</td><td>:</td><td></td></tr>
-        <tr><td style="padding-left:7mm">a. Ayah</td><td>:</td><td>{{biodataUntuk(s.nis).pekerjaanAyah||'-'}}</td></tr>
-        <tr><td style="padding-left:7mm">b. Ibu</td><td>:</td><td>{{biodataUntuk(s.nis).pekerjaanIbu||'-'}}</td></tr>
-        <tr><td>15. Nama Wali Siswa</td><td>:</td><td>{{biodataUntuk(s.nis).namaWali||'-'}}</td></tr>
-        <tr><td>16. Alamat Wali Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).alamatWali||'-'}}</td></tr>
+        <tr><td style="padding-left:7mm">a. Ayah</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).pekerjaanAyah)||'-'}}</td></tr>
+        <tr><td style="padding-left:7mm">b. Ibu</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).pekerjaanIbu)||'-'}}</td></tr>
+        <tr><td>15. Nama Wali Siswa</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).namaWali)||'-'}}</td></tr>
+        <tr><td>16. Alamat Wali Peserta Didik</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).alamatWali)||'-'}}</td></tr>
         <tr><td style="padding-left:7mm">a. Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponWali||'-'}}</td></tr>
-        <tr><td>17. Pekerjaan Wali Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).pekerjaanWali||'-'}}</td></tr>
+        <tr><td>17. Pekerjaan Wali Peserta Didik</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).pekerjaanWali)||'-'}}</td></tr>
       </tbody></table><div class="cv-bio-ttd"><div>{{sek.kabupaten||'Garut'}}, {{tanggalBiodata(rpInfo.tanggal)}}</div><div>Kepala Sekolah</div><div class="cv-bio-space"></div><b>{{cfg.ttd.nama||'-'}}</b><div>NUKS. {{cfg.ttd.nuks||'19023L0130211241174231'}}</div></div></section>
     </template></div>
     <div v-if="rp&&view==='rapor'&&rpTab!=='rekap'&&rpTab!=='atur'&&siapCetak" class="rapor-wrap"><div v-for="s in rpList" :key="s.nis" class="rapor-page">
@@ -5197,6 +5197,23 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       };
       return t.split(' ').map(x => x.split('-').map(kata).join('-')).join(' ');
     };
+    // Biodata cetak: teks KAPITAL/huruf kecil semua dirapikan jadi huruf judul (Abdul Hakim); teks yang sudah campuran dibiarkan.
+    // Singkatan umum (SMPN, RT, RW, dst.) dan angka romawi tetap kapital.
+    const BIO_SINGKAT = { SMP: 'SMP', SMPN: 'SMPN', SMA: 'SMA', SMAN: 'SMAN', SMK: 'SMK', SMKN: 'SMKN', SD: 'SD', SDN: 'SDN', MI: 'MI', MIN: 'MIN', MTS: 'MTs', MTSN: 'MTsN', MA: 'MA', MAN: 'MAN', RT: 'RT', RW: 'RW', WA: 'WA', PNS: 'PNS', TNI: 'TNI', POLRI: 'POLRI', BUMN: 'BUMN', PT: 'PT', CV: 'CV', II: 'II', III: 'III', IV: 'IV', VI: 'VI', VII: 'VII', VIII: 'VIII', IX: 'IX', X: 'X', XI: 'XI', XII: 'XII' };
+    const bioRapi = v => {
+      const t = String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
+      if (!t) return '';
+      const hh = t.replace(/[^A-Za-z]/g, '');
+      if (!hh || (hh !== hh.toUpperCase() && hh !== hh.toLowerCase())) return t;
+      return t.split(' ').map(w => {
+        if (!/[A-Za-z]/.test(w)) return w;
+        return w.toLowerCase().replace(/[a-z]+/g, (run, i, all) => {
+          const sing = BIO_SINGKAT[run.toUpperCase()];
+          if (sing) return sing;
+          return (i === 0 || /[.\-\/(,]/.test(all[i - 1])) ? run.charAt(0).toUpperCase() + run.slice(1) : run;
+        });
+      }).join(' ');
+    };
     const barisR = t => String(t || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 6).map(x => { const i = x.search(/\s[-\u2013|]\s/); return i < 0 ? { a: x, b: '' } : { a: x.slice(0, i).trim(), b: x.slice(i + 3).trim() }; });
     const rpGrup = computed(() => { if (!rp.value) return []; let n = 0; return ['Umum', 'Kejuruan', 'Muatan Lokal', 'Mata Pelajaran Pilihan'].map(g => ({ g: g, items: rp.value.mapel.filter(m => m.grup === g).map(m => Object.assign({ no: ++n }, m)) })).filter(x => x.items.length); });
     const rpList = computed(() => rp.value ? (rpSatu.value ? rp.value.siswa.filter(s => s.nis === rpSatu.value) : rp.value.siswa) : []);
@@ -5704,7 +5721,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         setInterval(kirimTinggiEmbed, 1000);
       }
     }
-    return { roleGroups, predRata, namaRapi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, biodataUntuk, tanggalBiodata, cetakCover, cetakPaketRapor, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, biodataDasarLengkap, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, bimp, bimpCount, templateBiodata, pickBiodata, doImportBiodata, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { roleGroups, predRata, namaRapi, bioRapi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, biodataUntuk, tanggalBiodata, cetakCover, cetakPaketRapor, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, biodataDasarLengkap, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, bimp, bimpCount, templateBiodata, pickBiodata, doImportBiodata, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
