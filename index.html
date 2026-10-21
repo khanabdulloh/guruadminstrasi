@@ -1176,8 +1176,8 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     <p v-if="ok" role="status" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 shadow text-emerald-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{ok}}</span><button @click="ok=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
 
     <div v-if="antreSaya.length" class="noprint mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-2">
-      <div class="flex flex-wrap items-center gap-2"><span class="mr-auto"><b>{{antreSaya.length}}</b> data menunggu dikirim ke server.</span><button @click="kirimAntre(false)" :disabled="busy" class="btn-o !py-1 text-xs">Kirim sekarang</button></div>
-      <div v-for="x in antreSaya" :key="x.id" class="flex items-center gap-2 text-xs mt-1"><span class="flex-1">{{x.label}}<span v-if="x.galat" class="text-rose-600 font-bold"> - ditolak server: {{x.galat}}</span></span><button @click="buangAntre(x.id)" class="text-rose-600 font-bold">Buang</button></div></div>
+      <div class="flex flex-wrap items-center gap-2"><span class="mr-auto"><b>{{antreSaya.length}}</b> data menunggu dikirim ke server.</span><button @click="kirimAntre(false, true)" :disabled="busy" class="btn-o !py-1 text-xs">Kirim sekarang</button></div>
+      <div v-for="x in antreSaya" :key="x.id" class="flex items-center gap-2 text-xs mt-1"><span class="flex-1">{{x.label}}<span v-if="x.galat" class="text-rose-600 font-bold"> - ditolak server: {{x.galat}}</span></span><button v-if="x.stale && x.action==='presensiSave'" @click="perbaikiAntre(x)" :disabled="busy" class="text-sky-700 font-bold">Perbarui daftar siswa</button><button @click="buangAntre(x.id)" class="text-rose-600 font-bold">Buang</button></div></div>
     <section v-if="view==='dashboard'&&!dash&&!err" class="dash" aria-busy="true">
       <p class="sr-only" role="status">Memuat dasbor, mohon tunggu.</p>
       <div class="dash-hero" aria-hidden="true"><div class="sk-lines"><i class="sk sk-l1"></i><i class="sk sk-l2"></i><i class="sk sk-l3"></i></div><span class="dash-sync"><span class="spin-s"></span>Mengambil data dari server…</span></div>
@@ -1339,7 +1339,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
               </tr></tbody>
             </table>
           </div>
-          <p class="text-xs text-slate-500 mt-2">H hadir, I izin, S sakit, A alpa, D dispensasi (dihitung hadir pada persentase).</p>
+          <p class="text-xs text-slate-500 mt-2">H hadir, I izin, S sakit, A alpa, D dispensasi. Persentase kehadiran = (H + D + I + S) dibagi total; hanya Alpa yang mengurangi.</p>
           <button @click="savePresensi" :disabled="busy" class="mt-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">{{pi.ada?'Simpan revisi presensi':'Simpan presensi'}}</button>
         </template>
         <p v-else-if="pi.kelas&&pi.mapel&&!busy" class="text-slate-500 text-sm">Belum ada siswa di kelas ini.</p>
@@ -1584,6 +1584,8 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <div class="flex flex-wrap gap-2">
           <button v-if="canEdit" @click="templateSiswa" class="btn-o">Unduh template</button>
           <label v-if="canEdit" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickFile"></label>
+          <button v-if="canEdit" @click="templateBiodata" class="btn-o">Template biodata</button>
+          <label v-if="canEdit" class="btn-o cursor-pointer">Impor biodata<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickBiodata"></label>
           <button @click="exportSiswa" :disabled="!siswaTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
           <button v-if="canEdit" @click="editSiswa(null)" class="btn-p">Tambah siswa</button></div></div>
       <div class="flex flex-wrap gap-2 mb-3">
@@ -1591,18 +1593,46 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <input v-model.trim="sq" placeholder="Cari NISN / nama..." class="inp flex-1 min-w-[10rem]">
         <span class="text-sm text-slate-500 self-center">{{siswaTampil.length}} dari {{siswa.length}} siswa</span><button v-if="skelas&&canEdit" @click="cetakKartu" :disabled="busy" class="btn-o">Cetak kartu login</button><button v-if="canEdit&&pilihNis.length" @click="bukaPindah" class="btn-p">Pindahkan {{pilihNis.length}} siswa</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th v-if="canEdit" class="p-3 w-8"><input type="checkbox" :checked="semuaDipilih" @change="pilihSemua($event.target.checked)" aria-label="Pilih semua siswa"></th><th :class="canEdit?'':'p-3'">NISN</th><th>Nama</th><th>Jenis kelamin</th><th>Kelas</th><th>Kontak</th><th v-if="canEdit">Aksi</th></tr></thead>
-        <tbody><tr v-for="s in siswaTampil" :key="s.nis" class="border-t"><td v-if="canEdit" class="p-3"><input type="checkbox" :value="s.nis" v-model="pilihNis" :aria-label="'Pilih '+s.nama"></td><td :class="canEdit?'':'p-3'">{{s.nisn||'-'}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td>
+        <thead class="bg-slate-50 text-left"><tr><th v-if="canEdit" class="p-3 w-8"><input type="checkbox" :checked="semuaDipilih" @change="pilihSemua($event.target.checked)" aria-label="Pilih semua siswa"></th><th :class="canEdit?'':'p-3'">NISN</th><th>Nama</th><th>Jenis kelamin</th><th>Kelas</th><th>Kontak</th><th>Biodata</th><th v-if="canEdit">Aksi</th></tr></thead>
+        <tbody><tr v-for="s in siswaTampil" :key="s.nis" class="border-t"><td v-if="canEdit" class="p-3"><input type="checkbox" :value="s.nis" v-model="pilihNis" :aria-label="'Pilih '+s.nama"></td><td :class="canEdit?'':'p-3'">{{s.nisn||'-'}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td><td><span class="text-xs font-semibold" :class="biodataDasarLengkap(s)?'text-emerald-700':'text-amber-700'">{{biodataDasarLengkap(s)?'Data dasar lengkap':'Perlu dilengkapi'}}</span></td>
           <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editSiswa(s)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delSiswa(s)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!siswaTampil.length"><td :colspan="canEdit?7:5" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':canEdit?'Belum ada siswa. Klik Tambah siswa atau Impor Excel.':'Belum ada data siswa.'}}</td></tr></tbody></table></div>
-      <div v-if="showS" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
-        <h3 class="font-extrabold text-blue-900 mb-4">{{sf.edit?'Ubah siswa':'Tambah siswa'}}</h3>
-        <label class="lb">NISN <span class="font-normal text-slate-400">(10 digit angka; hanya Admin yang dapat mengubah)</span></label><input v-model.trim="sf.nisn" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" placeholder="Masukkan 10 digit NISN" class="inp w-full mt-1 mb-3">
+        <tr v-if="!siswaTampil.length"><td :colspan="canEdit?8:6" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':canEdit?'Belum ada siswa. Klik Tambah siswa atau Impor Excel.':'Belum ada data siswa.'}}</td></tr></tbody></table></div>
+      <div v-if="showS" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl">
+        <h3 class="font-extrabold text-blue-900 mb-4">{{sf.edit?'Ubah siswa / Biodata':'Tambah siswa / Biodata'}}</h3>
+        <div class="grid sm:grid-cols-2 gap-3 mb-3"><label class="lb">Nomor Induk / NIS <span class="font-normal text-slate-400">(ID internal, tidak diubah)</span><input :value="sf.nis || (sf.nisn ? 'Mengikuti NISN baru' : 'Dibuat saat disimpan')" readonly class="inp w-full mt-1 bg-slate-50"></label><label class="lb">NISN <span class="font-normal text-slate-400">(10 digit angka)</span><input v-model.trim="sf.nisn" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" placeholder="Masukkan 10 digit NISN" class="inp w-full mt-1"></label></div>
         <input v-model.trim="sf.nama" placeholder="Nama lengkap" class="inp w-full mb-3">
         <div class="flex gap-3 mb-3"><select v-model="sf.gender" class="inp"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
           <select v-model="sf.kelas" class="inp flex-1"><option value="">Pilih kelas</option><option v-for="k in kelasAll" :value="k.kelas">{{k.kelas}}</option></select></div>
-        <input v-model.trim="sf.kontak" placeholder="Kontak (opsional)" class="inp w-full mb-3"><p v-if="err" class="text-sm text-rose-600 mb-2">{{err}}</p>
-        <div class="flex justify-end gap-2"><button @click="showS=false" class="btn-o">Batal</button><button @click="saveSiswa" :disabled="busy" class="btn-p">Simpan</button></div>
+        <input v-model.trim="sf.kontak" placeholder="Kontak siswa (opsional)" class="inp w-full mb-4">
+        <div class="border-t pt-4 mt-1"><h4 class="font-bold text-slate-800 mb-3">Biodata tambahan <span class="font-normal text-xs text-slate-500">(boleh dilengkapi bertahap)</span></h4>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <label class="lb">Tempat lahir<input v-model.trim="sf.tempatLahir" maxlength="80" placeholder="Kabupaten/kota" class="inp w-full mt-1"></label>
+            <label class="lb">Tanggal lahir<input v-model="sf.tanggalLahir" type="date" class="inp w-full mt-1"></label>
+            <label class="lb">Agama<input v-model.trim="sf.agama" maxlength="40" placeholder="Islam" class="inp w-full mt-1"></label>
+            <label class="lb">Status dalam keluarga<input v-model.trim="sf.statusKeluarga" maxlength="60" placeholder="Anak kandung" class="inp w-full mt-1"></label>
+            <label class="lb">Anak ke<input v-model.trim="sf.anakKe" maxlength="20" placeholder="1" class="inp w-full mt-1"></label>
+            <label class="lb">Nomor telepon rumah siswa<input v-model.trim="sf.teleponRumah" maxlength="30" placeholder="Opsional" class="inp w-full mt-1"></label>
+            <label class="lb sm:col-span-2">Alamat peserta didik<textarea v-model.trim="sf.alamat" maxlength="500" rows="2" placeholder="Alamat lengkap peserta didik" class="inp w-full mt-1"></textarea></label>
+            <label class="lb sm:col-span-2">Sekolah asal<input v-model.trim="sf.sekolahAsal" maxlength="150" placeholder="Nama sekolah asal" class="inp w-full mt-1"></label>
+            <label class="lb">Diterima di kelas<input v-model.trim="sf.diterimaKelas" maxlength="50" placeholder="Kelas saat diterima" class="inp w-full mt-1"></label>
+            <label class="lb">Tanggal diterima<input v-model="sf.tanggalDiterima" type="date" class="inp w-full mt-1"></label>
+            <div class="sm:col-span-2 border-t pt-3 mt-1"><h5 class="font-bold text-slate-700 mb-2">Data orang tua</h5></div>
+            <label class="lb">Nama ayah<input v-model.trim="sf.namaAyah" maxlength="100" placeholder="Nama lengkap ayah" class="inp w-full mt-1"></label>
+            <label class="lb">Pekerjaan ayah<input v-model.trim="sf.pekerjaanAyah" maxlength="100" placeholder="Pekerjaan ayah" class="inp w-full mt-1"></label>
+            <label class="lb">Nama ibu<input v-model.trim="sf.namaIbu" maxlength="100" placeholder="Nama lengkap ibu" class="inp w-full mt-1"></label>
+            <label class="lb">Pekerjaan ibu<input v-model.trim="sf.pekerjaanIbu" maxlength="100" placeholder="Pekerjaan ibu" class="inp w-full mt-1"></label>
+            <label class="lb sm:col-span-2">Alamat orang tua<textarea v-model.trim="sf.alamatOrtu" maxlength="500" rows="2" placeholder="Alamat orang tua" class="inp w-full mt-1"></textarea></label>
+            <label class="lb">Telepon rumah orang tua<input v-model.trim="sf.teleponOrtu" maxlength="30" placeholder="Nomor telepon" class="inp w-full mt-1"></label>
+            <label class="lb">Kontak HP/WhatsApp orang tua<input v-model.trim="sf.kontakOrtu" maxlength="30" inputmode="tel" placeholder="Nomor HP/WhatsApp" class="inp w-full mt-1"></label>
+            <div class="sm:col-span-2 border-t pt-3 mt-1"><h5 class="font-bold text-slate-700 mb-2">Data wali (jika ada)</h5></div>
+            <label class="lb">Nama wali<input v-model.trim="sf.namaWali" maxlength="100" placeholder="Nama lengkap wali" class="inp w-full mt-1"></label>
+            <label class="lb">Pekerjaan wali<input v-model.trim="sf.pekerjaanWali" maxlength="100" placeholder="Pekerjaan wali" class="inp w-full mt-1"></label>
+            <label class="lb sm:col-span-2">Alamat wali<textarea v-model.trim="sf.alamatWali" maxlength="500" rows="2" placeholder="Alamat wali" class="inp w-full mt-1"></textarea></label>
+            <label class="lb">Telepon rumah wali<input v-model.trim="sf.teleponWali" maxlength="30" placeholder="Nomor telepon wali" class="inp w-full mt-1"></label>
+          </div><p class="text-xs text-slate-500 mt-2">Data yang belum tersedia dapat dibiarkan kosong dan dilengkapi kemudian.</p>
+        </div>
+        <p v-if="err" class="text-sm text-rose-600 mb-2">{{err}}</p>
+        <div class="flex justify-end gap-2 mt-4"><button @click="showS=false" class="btn-o">Batal</button><button @click="saveSiswa" :disabled="busy" class="btn-p">Simpan biodata</button></div>
       </div></div>
       <div v-if="showP" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-2">Pindah / naik kelas</h3><p class="text-sm text-slate-600 mb-3">{{pilihNis.length}} siswa terpilih akan dipindahkan ke:</p>
@@ -1634,6 +1664,32 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
             {{imp.creds.length}} akun siswa baru dibuat dengan sandi acak. Unduh dan bagikan ke siswa; sandi tidak ditampilkan lagi di sini (tersimpan di sheet <b>Kredensial</b>).
             <div class="mt-2"><button @click="downloadCreds" class="btn-p">Unduh kredensial (Excel)</button></div></div>
           <div class="flex justify-end mt-2"><button @click="imp.show=false" class="btn-o">Tutup</button></div>
+        </template>
+      </div></div>
+      <div v-if="bimp.show" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl">
+        <h3 class="font-extrabold text-blue-900">Impor biodata dari Excel</h3>
+        <p class="text-xs text-slate-500 mb-3">{{bimp.file}}</p>
+        <template v-if="!bimp.done">
+          <p class="text-sm text-slate-600 mb-3">Hanya kolom biodata yang <b>masih kosong</b> yang diisi. Data yang sudah ada tidak diubah, dan siswa baru tidak ditambahkan.</p>
+          <div class="flex flex-wrap gap-2 text-xs font-bold mb-3">
+            <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">{{bimpCount.isi}} siswa akan diisi ({{bimpCount.sel}} kolom)</span>
+            <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{bimpCount.lewat}} tanpa data baru</span>
+            <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">{{bimpCount.error}} bermasalah (dilewati)</span>
+            <span v-if="bimp.kosong" class="px-2 py-1 rounded-full bg-slate-100 text-slate-600">{{bimp.kosong}} baris tanpa biodata diabaikan</span></div>
+          <div class="overflow-auto border rounded-xl max-h-80"><table class="w-full text-xs">
+            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>NIS/NISN</th><th>Nama</th><th>Status</th></tr></thead>
+            <tbody><tr v-for="r in bimp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
+              <td class="p-2">{{r.no}}</td><td>{{r.id||'-'}}</td><td>{{r.nama}}</td>
+              <td :class="r.st==='error'?'text-rose-600':r.st==='isi'?'text-emerald-700':'text-slate-500'">{{r.msg}}</td></tr></tbody></table></div>
+          <p v-if="bimp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{bimp.rows.length}}; semua baris tetap diproses.</p>
+          <p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p>
+          <div class="flex justify-end gap-2 mt-4"><button @click="bimp.show=false" :disabled="busy" class="btn-o">Batal</button>
+            <button @click="doImportBiodata" :disabled="busy||!bimpCount.isi" class="btn-p disabled:opacity-50">{{busy?'Mengimpor...':'Isi biodata '+bimpCount.isi+' siswa'}}</button></div>
+        </template>
+        <template v-else>
+          <p class="rounded-xl bg-emerald-50 text-emerald-700 text-sm px-4 py-3 mb-3">Selesai: {{bimp.done.diisi}} siswa terisi ({{bimp.done.sel}} kolom), {{bimp.done.lewat}} tanpa data baru.</p>
+          <p v-if="bimp.done.catatan" class="rounded-xl bg-amber-50 text-amber-800 text-sm px-4 py-3 mb-3">{{bimp.done.catatan}}</p>
+          <div class="flex justify-end mt-2"><button @click="bimp.show=false" class="btn-o">Tutup</button></div>
         </template>
       </div></div>
     </section>
@@ -1906,11 +1962,11 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
                 <td class="p-2">{{r.olehNama||'-'}}</td>
                 <td class="p-2 text-center"><span v-if="r.aktif" class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700">Aktif</span><span v-else class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-amber-50 text-amber-700">Riwayat lama</span></td>
                 <td class="p-2 noprint"><div class="flex justify-center gap-1">
-                  <button class="btn-o !min-h-[2rem] !px-2 text-xs" :disabled="!r.aktif" @click="editRiwayatPenilaian(r)" title="Buka nilai untuk diedit"><icon name="pencil" size="13"/> Edit</button>
-                  <button class="btn-o !min-h-[2rem] !px-2 text-xs !text-rose-700" @click="hapusRiwayatPenilaian(r)" :title="r.aktif?'Hapus penilaian':'Hapus riwayat lama (nilai tidak diubah)'"><icon name="trash-2" size="13"/> Hapus</button>
+                  <button class="btn-o !min-h-[2rem] !px-2 text-xs" :disabled="!r.aktif" @click="editRiwayatPenilaian(r)" title="Buka nilai untuk diedit"><icon name="pencil" size="13"></icon> Edit</button>
+                  <button class="btn-o !min-h-[2rem] !px-2 text-xs !text-rose-700" @click="hapusRiwayatPenilaian(r)" :title="r.aktif?'Hapus penilaian':'Hapus riwayat lama (nilai tidak diubah)'"><icon name="trash-2" size="13"></icon> Hapus</button>
                 </div></td>
               </tr>
-              <tr v-if="!riwayatPenilaianTampil.length"><td colspan="8" class="p-8 text-center"><div class="mx-auto mb-2 rounded-full bg-slate-100 w-10 h-10 flex items-center justify-center"><icon name="history" size="18" color="#64748b"/></div><div class="font-semibold text-slate-700">{{nilaiRiwayatTpDipilih ? 'Tidak ada riwayat untuk TP ini pada periode yang dipilih' : 'Belum ada riwayat pada periode ini'}}</div><p class="text-slate-500 text-sm mt-1">Simpan nilai sumatif melalui menu Input Nilai. Riwayat akan tercatat otomatis dengan waktu dan semester penyimpanan.</p></td></tr>
+              <tr v-if="!riwayatPenilaianTampil.length"><td colspan="8" class="p-8 text-center"><div class="mx-auto mb-2 rounded-full bg-slate-100 w-10 h-10 flex items-center justify-center"><icon name="history" size="18" color="#64748b"></icon></div><div class="font-semibold text-slate-700">{{nilaiRiwayatTpDipilih ? 'Tidak ada riwayat untuk TP ini pada periode yang dipilih' : 'Belum ada riwayat pada periode ini'}}</div><p class="text-slate-500 text-sm mt-1">Simpan nilai sumatif melalui menu Input Nilai. Riwayat akan tercatat otomatis dengan waktu dan semester penyimpanan.</p></td></tr>
             </tbody>
           </table>
         </div>
@@ -2156,7 +2212,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
                     <div class="font-semibold text-emerald-700">Sudah dinilai</div><div class="text-xs text-slate-500 mb-2">Oleh: {{s.penilai||'Guru BK'}}<br>{{s.olehSaya?'Penilaian Anda':'Terkunci oleh Guru BK lain'}}</div>
                     <div v-if="s.olehSaya" class="flex flex-wrap gap-1">
                       <template v-if="s.editMode"><button @click="simpanEditRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-p !px-2 !py-1">Simpan edit</button><button @click="batalEditRaporBK" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1">Batal</button></template>
-                      <template v-else><button @click="editRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1"><icon name="pencil" size="13"/> Edit</button><button @click="hapusRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1 !text-rose-700"><icon name="trash-2" size="13"/> Hapus</button></template>
+                      <template v-else><button @click="editRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1"><icon name="pencil" size="13"></icon> Edit</button><button @click="hapusRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1 !text-rose-700"><icon name="trash-2" size="13"></icon> Hapus</button></template>
                     </div>
                   </template>
                   <span v-else class="text-xs text-slate-500">Belum disimpan; gunakan tombol Simpan Semua.</span>
@@ -2167,7 +2223,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           </table>
           <div v-if="bkRapor.siswa.some(s=>!s.sudahDinilai)" class="p-4 border-t bg-slate-50 flex flex-wrap items-center justify-between gap-3">
             <div class="text-sm text-slate-600">Isi penilaian untuk semua siswa yang diperlukan, lalu simpan sekali. Baris yang kosong sepenuhnya akan dilewati.</div>
-            <button @click="simpanSemuaRaporBK" :disabled="busy||bkRaporBusy||!bkRapor.siswa.some(s=>!s.sudahDinilai&&(s.kategori||s.nilai!==''&&s.nilai!=null||s.catatan&&s.catatan.trim()))" class="btn-p"><icon name="save" size="15"/> Simpan Semua Penilaian</button>
+            <button @click="simpanSemuaRaporBK" :disabled="busy||bkRaporBusy||!bkRapor.siswa.some(s=>!s.sudahDinilai&&(s.kategori||s.nilai!==''&&s.nilai!=null||s.catatan&&s.catatan.trim()))" class="btn-p"><icon name="save" size="15"></icon> Simpan Semua Penilaian</button>
           </div>
         </div>
       </template>
@@ -2185,7 +2241,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <label class="lb">NUPTK wali kelas<input v-model.trim="rpInfo.nipWali" maxlength="30" :disabled="!bolehEditR" class="inp w-full mt-1 normal-case"></label>
           <label class="lb">Tanggal rapor<input type="date" v-model="rpInfo.tanggal" :disabled="!bolehEditR" class="inp w-full mt-1"></label>
         </div>
-        <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan data rapor</button><button @click="cetakRapor('')" :disabled="!rp.siswa.length" class="btn-o">Cetak semua rapor</button><button @click="cetakCover('')" :disabled="!rp.siswa.length" class="btn-o">Cetak cover rapor</button><label class="inline-flex items-center gap-1.5 text-xs text-slate-600"><input type="checkbox" v-model="coverIdentitas"> sertakan halaman identitas sekolah</label></div>
+        <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan data rapor</button><button @click="cetakRapor('')" :disabled="!rp.siswa.length" class="btn-o">Cetak semua rapor</button><button @click="cetakPaketRapor('')" :disabled="!rp.siswa.length" class="btn-p">Cetak paket lengkap</button><button @click="cetakCover('')" :disabled="!rp.siswa.length" class="btn-o">Cetak cover rapor</button><label class="inline-flex items-center gap-1.5 text-xs text-slate-600"><input type="checkbox" v-model="coverIdentitas"> sertakan halaman identitas sekolah</label></div>
         <div class="rc-list">
           <article v-for="(s,i) in rp.siswa" :key="s.nis" class="rc-card">
             <header class="rc-head">
@@ -2196,7 +2252,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
                 <span :class="s.belum?'is-bad':''"><small>&lt; KKTP</small><b>{{s.belum}}</b></span>
                 <span><small>S / I / A</small><b>{{s.hadir.S}}/{{s.hadir.I}}/{{s.hadir.A}}</b></span>
               </div>
-              <div class="rc-act noprint"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button> <button @click="cetakCover(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cover</button></div>
+              <div class="rc-act noprint"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button> <button @click="cetakPaketRapor(s.nis)" class="btn-p !min-h-[2rem] !px-2 text-xs">Paket</button> <button @click="cetakCover(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cover</button></div>
             </header>
             <div class="rc-body">
               <div class="rc-f"><span class="rc-l">Ekstrakurikuler</span><select :disabled="!bolehEditR" class="rc-sel" aria-label="Pilih kegiatan ekstrakurikuler" @change="if($event.target.value && $event.target.value!=='__manual__'){rpF[s.nis].ekskul=((rpF[s.nis].ekskul||'').trim() ? rpF[s.nis].ekskul.trim()+'\n' : '')+$event.target.value+' - Baik';$event.target.value=''}else{$event.target.value=''}">
@@ -2766,6 +2822,27 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <div><div class="cv-sek">{{sek.nama}}</div><div class="cv-alamat">{{[sek.alamat,sek.kelurahan,sek.kecamatan,sek.kabupaten,sek.provinsi,sek.kodepos].filter(Boolean).join(', ')}}</div></div>
       </section>
       <section v-if="coverIdentitas" class="cover-page cover-identitas"><div class="cv-ihead">IDENTITAS SEKOLAH</div><table class="cv-itbl"><tbody><tr v-for="r in sekBaris" :key="r[0]"><td>{{r[0]}}</td><td>:</td><td>{{r[1]}}</td></tr></tbody></table></section>
+      <section class="cover-page cover-biodata"><div class="cv-ihead">BIODATA PESERTA DIDIK</div><table class="cv-itbl"><tbody>
+        <tr><td>1. Nama Lengkap Peserta Didik</td><td>:</td><td>{{namaRapi(s.nama)}}</td></tr>
+        <tr><td>2. NISN</td><td>:</td><td>{{s.nisn||'-'}}</td></tr>
+        <tr><td>3. Tempat, Tanggal Lahir</td><td>:</td><td>{{biodataUntuk(s.nis).tempatLahir||'-'}}, {{tanggalBiodata(biodataUntuk(s.nis).tanggalLahir)}}</td></tr>
+        <tr><td>4. Jenis Kelamin</td><td>:</td><td>{{s.gender==='L'?'Laki-Laki':s.gender==='P'?'Perempuan':s.gender||'-'}}</td></tr>
+        <tr><td>5. Agama</td><td>:</td><td>{{biodataUntuk(s.nis).agama||'-'}}</td></tr>
+        <tr><td>6. Status dalam Keluarga</td><td>:</td><td>{{biodataUntuk(s.nis).statusKeluarga||'-'}}</td></tr>
+        <tr><td>7. Anak ke</td><td>:</td><td>{{biodataUntuk(s.nis).anakKe||'-'}}</td></tr>
+        <tr><td>8. Alamat Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).alamat||'-'}}</td></tr>
+        <tr><td>9. Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponRumah||'-'}}</td></tr>
+        <tr><td>10. Sekolah Asal</td><td>:</td><td>{{biodataUntuk(s.nis).sekolahAsal||'-'}}</td></tr>
+        <tr><td>11. Diterima di sekolah ini</td><td>:</td><td>Kelas {{biodataUntuk(s.nis).diterimaKelas||'-'}}; tanggal {{tanggalBiodata(biodataUntuk(s.nis).tanggalDiterima)}}</td></tr>
+        <tr><td>12. Nama Orang Tua</td><td>:</td><td>a. Ayah: {{biodataUntuk(s.nis).namaAyah||'-'}}<br>b. Ibu: {{biodataUntuk(s.nis).namaIbu||'-'}}</td></tr>
+        <tr><td>13. Alamat Orang Tua</td><td>:</td><td>{{biodataUntuk(s.nis).alamatOrtu||'-'}}</td></tr>
+        <tr><td>Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponOrtu||'-'}}</td></tr>
+        <tr><td>14. Pekerjaan Orang Tua</td><td>:</td><td>a. Ayah: {{biodataUntuk(s.nis).pekerjaanAyah||'-'}}<br>b. Ibu: {{biodataUntuk(s.nis).pekerjaanIbu||'-'}}</td></tr>
+        <tr><td>15. Nama Wali Siswa</td><td>:</td><td>{{biodataUntuk(s.nis).namaWali||'-'}}</td></tr>
+        <tr><td>16. Alamat Wali Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).alamatWali||'-'}}</td></tr>
+        <tr><td>Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponWali||'-'}}</td></tr>
+        <tr><td>17. Pekerjaan Wali Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).pekerjaanWali||'-'}}</td></tr>
+      </tbody></table><div class="cv-bio-ttd"><div>{{sek.kabupaten||'Garut'}}, {{tanggalBiodata(rpInfo.tanggal)}}</div><div>Kepala Sekolah</div><div class="cv-bio-space"></div><b>{{cfg.ttd.nama||'-'}}</b><div>{{cfg.ttd.nip?'NIP/Nuks. '+cfg.ttd.nip:''}}</div></div></section>
     </template></div>
     <div v-if="rp&&view==='rapor'&&rpTab!=='rekap'&&rpTab!=='atur'&&siapCetak" class="rapor-wrap"><div v-for="s in rpList" :key="s.nis" class="rapor-page">
       <div class="rapor-bg" aria-hidden="true"><img v-if="cfg.kop.logoKiri||cfg.kop.logoKanan" :src="cfg.kop.logoKiri||cfg.kop.logoKanan" alt=""></div>
@@ -3288,6 +3365,20 @@ body.cetak-rapor .rapor-page table.rapor-mapel-sts tbody tr > td.rapor-ket:last-
   body.cetak-cover .cv-itbl td{padding:3.2mm 1.5mm;vertical-align:top;border-bottom:.5pt solid #cbd5e1;overflow-wrap:anywhere}
   body.cetak-cover .cv-itbl td:nth-child(1){width:34%}
   body.cetak-cover .cv-itbl td:nth-child(2){width:3%;text-align:center}
+  body.cetak-paket main>*:not(.cover-wrap):not(.rapor-wrap){display:none!important}
+  body.cetak-paket .cover-wrap,body.cetak-paket .rapor-wrap{display:block!important}
+  body.cetak-paket .cover-wrap{page:cover;width:100%}
+  body.cetak-paket .cover-page{break-after:page!important;page-break-after:always!important}
+  body.cetak-paket .rapor-wrap{page:rapor}
+  body.cetak-paket .rapor-page:last-child,body.cetak-paket .cover-wrap>.cover-page:last-child{break-after:auto!important;page-break-after:auto!important}
+  body.cetak-paket .cover-biodata{padding:12mm 13mm;font-size:9.5pt}
+  body.cetak-paket .cover-biodata .cv-ihead{margin-bottom:5mm}
+  body.cetak-paket .cover-biodata .cv-itbl{font-size:8.7pt;line-height:1.18}
+  body.cetak-paket .cover-biodata .cv-itbl td{padding:1.5mm 1mm;border-bottom:.35pt solid #d1d5db}
+  body.cetak-paket .cover-biodata .cv-itbl td:first-child{width:37%}
+  body.cetak-paket .cover-biodata .cv-itbl td:nth-child(2){width:3%}
+  body.cetak-paket .cv-bio-ttd{margin-top:5mm;text-align:center;margin-left:58%;line-height:1.3;font-size:9pt}
+  body.cetak-paket .cv-bio-space{height:14mm}
 }
 </style>
 <style id="calm-rapor-cards-v111">
@@ -4087,16 +4178,33 @@ const app = createApp({
     const qMasuk = (action, label, key, payload) => { const sebelumnya = qBaca(), l = sebelumnya.filter(x => !(x.user === user.value.username && x.key === key)); l.push({ id: Date.now() + Math.random().toString(36).slice(2, 6), user: user.value.username, action, label, key, payload: JSON.parse(JSON.stringify(payload)), galat: '' }); if (!qTulis(l)) { antre.value = sebelumnya; throw new Error('Data belum dapat disimpan secara aman di perangkat ini. Jangan tutup atau muat ulang halaman; periksa ruang penyimpanan browser lalu coba simpan lagi saat koneksi tersedia.'); } };
     const buangAntre = id => qTulis(qBaca().filter(x => x.id !== id));
     let qJalan = false;
-    const kirimAntre = async diam => {
+    // Galat "permanen": mengirim ulang data yang sama pasti ditolak lagi. Item itu tidak dicoba otomatis; hanya lewat tombol
+    // "Kirim sekarang" (manual) atau setelah diperbaiki. Pola ini sejajar dengan klasifikasi offlineKlasifikasi_ di server.
+    const antreStale = m => /Muat ulang daftar siswa|Daftar siswa (berubah|tidak lengkap)|tidak ditemukan pada kelas|NIS duplikat|Data siswa duplikat/.test(String(m || ''));
+    const antrePermanen = m => antreStale(m) || /dikunci|Akses ditolak|bukan kelas ajar|tidak ada di jadwal|tidak valid|wajib diisi|harus 0-100/.test(String(m || ''));
+    const kirimAntre = async (diam, manual) => {
       if (qJalan || !user.value) return; qJalan = true; let n = 0;
       try {
         for (const x of qBaca().filter(y => y.user === user.value.username)) {
+          if (!manual && x.permanen) continue;
           try { await api(x.action, x.payload); buangAntre(x.id); n++; }
-          catch (e) { if (jaringan(e.message) || /Sesi/.test(e.message)) break; qTulis(qBaca().map(y => y.id === x.id ? { ...y, galat: e.message } : y)); }
+          catch (e) { if (jaringan(e.message) || /Sesi/.test(e.message)) break; qTulis(qBaca().map(y => y.id === x.id ? { ...y, galat: e.message, permanen: antrePermanen(e.message), stale: antreStale(e.message) } : y)); }
         }
       } finally { qJalan = false; }
       if (n && !diam) ok.value = n + ' data tertunda berhasil dikirim';
     };
+    // Presensi tertunda yang daftar siswanya sudah berubah: muat daftar siswa terkini, pertahankan status yang sudah diisi guru.
+    // Siswa baru diberi status bawaan server (Hadir) dan harus diperiksa guru sebelum dikirim; siswa yang sudah keluar dibuang.
+    const perbaikiAntre = x => run(async () => {
+      if (x.action !== 'presensiSave') throw new Error('Perbaikan otomatis hanya untuk presensi. Untuk nilai, buang item ini lalu isi ulang.');
+      const p = x.payload, d = await api('presensiGet', { kelas: p.kelas, mapel: p.mapel, tanggal: p.tanggal });
+      const lama = new Map((p.rows || []).map(r => [String(r.nis), r])), kini = new Set(d.rows.map(r => String(r.nis)));
+      let baru = 0;
+      const rowsBaru = d.rows.map(r => { const q = lama.get(String(r.nis)); if (!q) baru++; return { nis: r.nis, nama: r.nama, status: q ? q.status : r.status, keterangan: q ? (q.keterangan || '') : (r.keterangan || '') }; });
+      const keluar = [...lama.keys()].filter(n => !kini.has(n)).length;
+      qTulis(qBaca().map(y => y.id === x.id ? { ...y, payload: { ...p, rows: rowsBaru }, galat: '', permanen: false, stale: false } : y));
+      ok.value = 'Daftar siswa diperbarui (' + baru + ' siswa baru berstatus Hadir, ' + keluar + ' siswa keluar dibuang). Periksa lalu klik "Kirim sekarang".';
+    });
     window.addEventListener('online', () => kirimAntre(false));
     Vue.watch(() => user.value && user.value.username, u => { if (u) setTimeout(() => kirimAntre(false), 1500); });
     setInterval(() => { if (navigator.onLine && antreSaya.value.some(x => !x.galat)) kirimAntre(true); }, 60000);
@@ -4107,6 +4215,7 @@ const app = createApp({
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]);
     const cfg = ref({ kop: { logoKiri: '', logoKanan: '', baris: [] }, ttd: { kota: '', jabatan: '', nama: '', nip: '' } }), resetTxt = ref(''), backupUrl = ref('');
+    Vue.watch(cfg, v => { const b = { kop: { logoKiri: '', logoKanan: '', baris: [] }, ttd: { kota: '', jabatan: '', nama: '', nip: '' } }; if (v && v.kop && Array.isArray(v.kop.baris) && v.ttd) return; v = (v && typeof v === 'object') ? v : {}; cfg.value = { ...v, kop: { ...b.kop, ...(v.kop || {}), baris: Array.isArray(v.kop && v.kop.baris) ? v.kop.baris : [] }, ttd: { ...b.ttd, ...(v.ttd || {}) } }; }, { flush: 'sync' });
 
     /* ---- v109: cover rapor + biodata sekolah (hanya tambahan; tidak mengubah alur cetak rapor) ---- */
     const SEK_FIELD = [['kementerian', 'Kementerian (teks atas cover)', 120], ['nama', 'Nama sekolah', 100], ['npsn', 'NPSN', 20], ['alamat', 'Alamat sekolah', 150], ['kelurahan', 'Kelurahan / Desa', 60], ['kecamatan', 'Kecamatan', 60], ['kabupaten', 'Kabupaten / Kota', 60], ['provinsi', 'Provinsi', 60], ['kodepos', 'Kode pos', 10], ['telepon', 'Telepon', 40], ['email', 'Email', 100], ['website', 'Website', 120]];
@@ -4114,6 +4223,11 @@ const app = createApp({
     const sek = ref({ ...SEK_KOSONG }), siapCover = ref(false), coverNis = ref(''), coverIdentitas = ref(true);
     const coverList = computed(() => rp.value ? (coverNis.value ? rp.value.siswa.filter(s => s.nis === coverNis.value) : rp.value.siswa) : []);
     const coverLogo = computed(() => LOGO.replace(/\/s\d+\//, '/s800/'));
+    const bioKelas = ref({});
+    // Biodata dimuat per kelas lewat aksi biodataKelas (boleh untuk wali kelas); siswaList hanya untuk Admin/Staf.
+    const muatBioKelas = () => api('biodataKelas', { kelas: rp.value.kelas }).then(d => { bioKelas.value = d && typeof d === 'object' ? d : {}; });
+    const biodataUntuk = nis => bioKelas.value[String(nis)] || (siswa.value || []).find(x => String(x.nis) === String(nis)) || {};
+    const tanggalBiodata = v => { const x = String(v || '').slice(0, 10); if (!/^\d{4}-\d{2}-\d{2}$/.test(x)) return x || '-'; const [y,m,d] = x.split('-').map(Number); return new Date(y,m-1,d).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}); };
     const sekBaris = computed(() => {
       const x = sek.value || {}, v = k => String(x[k] || '').trim() || '-', kepsek = String(cfg.value.ttd && cfg.value.ttd.nama || '').trim() || '-';
       return [['Nama Sekolah', v('nama')], ['NPSN', v('npsn')], ['Alamat Sekolah', v('alamat')], ['Kelurahan / Desa', v('kelurahan')], ['Kecamatan', v('kecamatan')], ['Kabupaten / Kota', v('kabupaten')], ['Provinsi', v('provinsi')], ['Kode Pos', v('kodepos')], ['Telepon', v('telepon')], ['Email', v('email')], ['Website', v('website')], ['Kepala Sekolah', kepsek]];
@@ -4125,15 +4239,45 @@ const app = createApp({
       const m = t.match(/^(.*\S)\s+(REPUBLIK\s+INDONESIA)\s*$/i);
       return m ? [m[1], m[2]] : [t];
     });
+    const tungguGambar = (root, ms) => new Promise(res => { const im = root ? [...root.querySelectorAll('img')].filter(i => !i.complete) : []; if (!im.length) return res(); let n = im.length; const d = () => { if (--n <= 0) res(); }; im.forEach(i => { i.addEventListener('load', d, { once: true }); i.addEventListener('error', d, { once: true }); }); setTimeout(res, ms); });
     let coverPrintActive = false;
     const cetakCover = nis => {
       if (coverPrintActive || raporPrintActive || !rp.value || !rp.value.siswa.length) return;
       coverPrintActive = true; coverNis.value = nis || ''; siapCover.value = true;
+      const muatBio = muatBioKelas().catch(e => { err.value = 'Biodata siswa belum berhasil dimuat (cover tercetak dengan isian "-"): ' + (e.message || e); toTop(); });
       document.body.classList.add('cetak-cover');
       const beres = () => { document.body.classList.remove('cetak-cover'); coverNis.value = ''; siapCover.value = false; coverPrintActive = false; window.removeEventListener('afterprint', beres); };
       window.addEventListener('afterprint', beres, { once: true });
-      const tungguGambar = (root, ms) => new Promise(res => { const im = root ? [...root.querySelectorAll('img')].filter(i => !i.complete) : []; if (!im.length) return res(); let n = im.length; const d = () => { if (--n <= 0) res(); }; im.forEach(i => { i.addEventListener('load', d, { once: true }); i.addEventListener('error', d, { once: true }); }); setTimeout(res, ms); });
-      Vue.nextTick(() => setTimeout(() => { tungguGambar(document.querySelector('.cover-wrap'), 4000).then(() => { try { window.print(); } catch (e) { beres(); } }); }, 60));
+      Vue.nextTick(() => setTimeout(() => { Promise.all([muatBio, tungguGambar(document.querySelector('.cover-wrap'), 4000)]).then(() => Vue.nextTick()).then(() => { try { window.print(); } catch (e) { beres(); } }); }, 60));
+    };
+    let paketPrintActive = false;
+    const cetakPaketRapor = async nis => {
+      if (paketPrintActive || raporPrintActive || coverPrintActive || !rp.value || !rp.value.siswa.length) return;
+      if (rp.value.bukanAktif && rp.value.status !== 'Final') { err.value = 'Paket rapor tidak dapat dicetak: periode rapor bukan periode aktif dan belum difinalkan.'; toTop(); return; }
+      if (rp.value.status !== 'Final') { err.value = 'Finalkan rapor terlebih dahulu sebelum mencetak paket lengkap.'; toTop(); return; }
+      paketPrintActive = true; coverPrintActive = true; raporPrintActive = true;
+      try {
+        await muatBioKelas();
+        await muatSekolah();
+        coverNis.value = nis || ''; rpSatu.value = nis || '';
+        siapCover.value = true; siapCetak.value = true;
+        document.body.classList.add('cetak-cover', 'cetak-rapor', 'cetak-paket');
+        const beres = () => {
+          document.body.classList.remove('cetak-cover', 'cetak-rapor', 'cetak-paket');
+          coverNis.value = ''; rpSatu.value = ''; siapCover.value = false; siapCetak.value = false;
+          paketPrintActive = false; coverPrintActive = false; raporPrintActive = false;
+          window.removeEventListener('afterprint', beres);
+        };
+        window.addEventListener('afterprint', beres, { once: true });
+        await Vue.nextTick(); await new Promise(r => setTimeout(r, 60));
+        await Promise.all([tungguGambar(document.querySelector('.cover-wrap'), 4000), tungguGambar(document.querySelector('.rapor-wrap'), 4000)]);
+        setTimeout(() => { try { window.print(); } catch (e) { beres(); err.value = 'Gagal membuka dialog cetak: ' + e.message; } }, 100);
+      } catch (e) {
+        document.body.classList.remove('cetak-cover', 'cetak-rapor', 'cetak-paket');
+        coverNis.value = ''; rpSatu.value = ''; siapCover.value = false; siapCetak.value = false;
+        paketPrintActive = false; coverPrintActive = false; raporPrintActive = false;
+        err.value = 'Data paket rapor belum berhasil disiapkan: ' + (e.message || e); toTop();
+      }
     };
     const muatSekolah = () => api('sekolahGet').then(d => { if (d) sek.value = { ...SEK_KOSONG, ...d }; }, () => {});
     const simpanSekolah = () => run(async () => { await api('sekolahSimpan', { sekolah: sek.value }); await muatSekolah(); ok.value = 'Biodata sekolah tersimpan.'; });
@@ -4145,7 +4289,7 @@ const app = createApp({
     const segs = h => { let y = 80; return h.total ? ['H', 'D', 'I', 'S', 'A'].map(k => { const ht = (h[k] || 0) / h.total * 80; y -= ht; return { k, y, ht }; }) : []; };
     const jurnal = ref([]), bimb = ref([]), bulan = ref(hari0.slice(0, 7)), q = ref(''), showJ = ref(false), showB = ref(false), bk = ref([]), bsiswa = ref([]);
     const jr = reactive({ id: '', info: '', tanggal: hari0, pi: '', materi: '', catatan: '' }), bf = reactive({ tanggal: hari0, kelas: '', nis: '', catatan: '', solusi: '' });
-    const sf = reactive({ edit: false, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
+    const sf = reactive({ edit: false, nis: '', nisn: '', nama: '', gender: 'L', kelas: '', kontak: '', tempatLahir: '', tanggalLahir: '', alamat: '', namaAyah: '', namaIbu: '', namaWali: '', kontakOrtu: '', agama: '', statusKeluarga: '', anakKe: '', teleponRumah: '', sekolahAsal: '', diterimaKelas: '', tanggalDiterima: '', alamatOrtu: '', teleponOrtu: '', pekerjaanAyah: '', pekerjaanIbu: '', alamatWali: '', teleponWali: '', pekerjaanWali: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
     const jf = reactive({ id: '', hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '', blok: '' }), nm = reactive({ tp: '', jenis: 'Harian' }), jGuruFilter = ref('');
     const READ = new Set(['raporBKGet', 'formatifGet', 'kktpTpGet', 'raporRekapMapel', 'raporCfgGet', 'raporCek', 'naikPreview', 'perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'riwayatPenilaianList', 'riwayatNilaiAuditList', 'nilaiArsipList', 'siswaList']);
     READ.add('raporKoreksiSumberGet');
@@ -4331,6 +4475,7 @@ const app = createApp({
     const refresh = async () => { kelasList.value = []; kelasAll.value = await api('kelasDetail'); };
     const skelas = ref(''), sq = ref('');
     const siswaTampil = computed(() => { const t = sq.value.toLowerCase(); return siswa.value.filter(s => (!skelas.value || s.kelas === skelas.value) && (!t || (s.nisn + ' ' + s.nama).toLowerCase().includes(t))); });
+    const biodataDasarLengkap = s => !!(String(s.alamat || '').trim() && String(s.kontakOrtu || '').trim() && (String(s.namaAyah || '').trim() || String(s.namaIbu || '').trim() || String(s.namaWali || '').trim()));
     const nisnMap = computed(() => { const m = new Map(); for (const s of siswa.value) m.set(String(s.nis), String(s.nisn || '')); return m; });
 const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis); const nisn = nisnMap.value.get(key); return String(langsung || nisn || key || '-'); };
     const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', XL_GAGAL = 'Pustaka Excel gagal dimuat. Periksa koneksi internet lalu coba lagi.';
@@ -4354,14 +4499,14 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     }
     const exportSiswa = () => run(async () => {
       const list = siswaTampil.value.slice().sort((a, b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
-      const aoa = [['No', 'NISN', 'Nama', 'L/P', 'Kelas', 'Kontak']].concat(list.map((s, i) => [i + 1, String(s.nisn || ''), s.nama, s.gender, s.kelas, s.kontak]));
-      await saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 16, 32, 5, 12, 18]]]);
+      const aoa = [['No', 'NISN', 'Nama', 'L/P', 'Kelas', 'Kontak Siswa', 'Tempat Lahir', 'Tanggal Lahir', 'Alamat', 'Nama Ayah', 'Nama Ibu', 'Nama Wali', 'Kontak Orang Tua/Wali', 'Agama', 'Status dalam Keluarga', 'Anak ke-', 'Telepon Rumah', 'Sekolah Asal', 'Kelas Saat Diterima', 'Tanggal Diterima', 'Alamat Orang Tua', 'Telepon Orang Tua', 'Pekerjaan Ayah', 'Pekerjaan Ibu', 'Alamat Wali', 'Telepon Wali', 'Pekerjaan Wali']].concat(list.map((s, i) => [i + 1, String(s.nisn || ''), s.nama, s.gender, s.kelas, s.kontak, s.tempatLahir || '', s.tanggalLahir || '', s.alamat || '', s.namaAyah || '', s.namaIbu || '', s.namaWali || '', s.kontakOrtu || '', s.agama || '', s.statusKeluarga || '', s.anakKe || '', s.teleponRumah || '', s.sekolahAsal || '', s.diterimaKelas || '', s.tanggalDiterima || '', s.alamatOrtu || '', s.teleponOrtu || '', s.pekerjaanAyah || '', s.pekerjaanIbu || '', s.alamatWali || '', s.teleponWali || '', s.pekerjaanWali || '']));
+      await saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 16, 32, 5, 12, 18, 18, 16, 45, 28, 28, 28, 22]]]);
       ok.value = list.length + ' siswa diekspor';
     });
     const templateSiswa = () => run(async () => {
       await saveXlsx('Template_Impor_Siswa.xlsx', [
-        ['Data Siswa', [['NISN', 'Nama', 'L/P', 'Kelas', 'Kontak'], ['0012345678', 'Contoh Siswa Satu', 'L', 'X TKJ 1', '081234567890'], ['0012345679', 'Contoh Siswa Dua', 'P', 'X TKJ 1', '']], [16, 32, 6, 14, 18]],
-        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Siswa"; hapus dua baris contoh.'], ['2. Kolom wajib: NISN, Nama, dan Kelas. NISN harus tepat 10 digit angka. L/P diisi L atau P (kosong dianggap L).'], ['3. Untuk siswa baru, NISN digunakan sebagai username login. Untuk siswa lama, sistem mencocokkan NISN ke data master agar riwayat dan akun tetap terhubung.'], ['4. Format NISN sebagai Teks agar angka 0 di depan tidak hilang.'], ['5. Kelas baru otomatis dibuat. Akun login siswa baru dibuat otomatis dengan sandi acak.']], [100]]]);
+        ['Data Siswa', [['NISN', 'Nama', 'L/P', 'Kelas', 'Kontak', 'Tempat Lahir', 'Tanggal Lahir', 'Alamat', 'Nama Ayah', 'Nama Ibu', 'Nama Wali', 'Kontak Orang Tua/Wali', 'Agama', 'Status dalam Keluarga', 'Anak ke-', 'Telepon Rumah', 'Sekolah Asal', 'Kelas Saat Diterima', 'Tanggal Diterima', 'Alamat Orang Tua', 'Telepon Orang Tua', 'Pekerjaan Ayah', 'Pekerjaan Ibu', 'Alamat Wali', 'Telepon Wali', 'Pekerjaan Wali'], ['0012345678', 'Contoh Siswa Satu', 'L', 'X TKJ 1', '081234567890', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''], ['0012345679', 'Contoh Siswa Dua', 'P', 'X TKJ 1', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '' ]], [16, 32, 6, 14, 18, 18, 16, 45, 28, 28, 28, 22]],
+        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Siswa"; hapus dua baris contoh.'], ['2. Kolom wajib: NISN, Nama, dan Kelas. NISN harus tepat 10 digit angka. L/P diisi L atau P (kosong dianggap L).'], ['3. NISN adalah identitas utama pada template ini; tidak perlu mengisi kolom NIS/ID Login. Untuk siswa lama, sistem mencocokkan NISN ke data master agar riwayat dan akun tetap terhubung.'], ['4. Format NISN sebagai Teks agar angka 0 di depan tidak hilang.'], ['5. Kelas baru otomatis dibuat. Akun login siswa baru dibuat otomatis dengan sandi acak.']], [100]]]);
     });
     const imp = reactive({ show: false, rows: [], file: '', update: true, done: null, creds: [] });
     const impCount = computed(() => { const c = { baru: 0, ubah: 0, error: 0 }; imp.rows.forEach(r => c[r.st]++); c.siap = c.baru + (imp.update ? c.ubah : 0); return c; });
@@ -4369,11 +4514,11 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     async function pickFile(ev) {
       const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
       await run(async () => {
-        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array' });
-        const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
+        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array', cellDates: true });
+        const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, dateNF: 'yyyy-mm-dd', defval: '' });
         const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
         const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
-        const c = { nis: col(['idlogin', 'idlogininternal', 'nis', 'nomorinduk', 'username']), nisn: col(['nisn']), nama: col(['nama', 'namasiswa', 'namalengkap']), jk: col(['lp', 'jk', 'gender', 'jeniskelamin']), kelas: col(['kelas', 'rombel']), kontak: col(['kontak', 'hp', 'telepon', 'telp', 'wa', 'nohp']) };
+        const c = { nis: col(['idlogin', 'idlogininternal', 'nis', 'nomorinduk', 'username']), nisn: col(['nisn']), nama: col(['nama', 'namasiswa', 'namalengkap']), jk: col(['lp', 'jk', 'gender', 'jeniskelamin']), kelas: col(['kelas', 'rombel']), kontak: col(['kontak', 'kontaksiswa', 'hp', 'telepon', 'telp', 'wa', 'nohp']), tempatLahir: col(['tempatlahir']), tanggalLahir: col(['tanggallahir']), alamat: col(['alamat', 'alamatlengkap']), namaAyah: col(['namaayah', 'ayah']), namaIbu: col(['namaibu', 'ibu']), namaWali: col(['namawali', 'wali']), kontakOrtu: col(['kontakorangtuawali', 'kontakortu', 'hportu', 'nowaortu']), agama: col(['agama']), statusKeluarga: col(['statuskeluarga', 'statusdalamkeluarga']), anakKe: col(['anakke']), teleponRumah: col(['teleponrumah', 'nomorteleponrumah']), sekolahAsal: col(['sekolahasal']), diterimaKelas: col(['diterimakelas', 'kelassaatditerima', 'diterimadisekolahinikelas']), tanggalDiterima: col(['tanggalditerima', 'tanggalditerimadisekolahini']), alamatOrtu: col(['alamatortu', 'alamatorangtua']), teleponOrtu: col(['teleponortu', 'nomorteleponorangtua']), pekerjaanAyah: col(['pekerjaanayah']), pekerjaanIbu: col(['pekerjaanibu']), alamatWali: col(['alamatwali', 'alamatwalipesertadidik']), teleponWali: col(['teleponwali', 'nomorteleponwali']), pekerjaanWali: col(['pekerjaanwali']) };
         if (c.nisn < 0 || c.nama < 0 || c.kelas < 0) throw new Error('Baris pertama harus berisi NISN, Nama, dan Kelas. Template lama dengan kolom ID Login/NIS tetap didukung.');
         const ada = new Set(siswa.value.map(x => String(x.nis))), seen = new Set(), seenNisn = new Set(), rows = [];
         aoa.slice(1).forEach((r, i) => {
@@ -4382,11 +4527,11 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
           const existing = siswa.value.find(s => String(s.nisn || '') === nisn);
           const key = explicitKey || (existing ? String(existing.nis) : nisn);
           const g = c.jk < 0 ? '' : norm(r[c.jk]).toUpperCase();
-          const o = { no: i + 2, nis: key, nisn, nama: norm(r[c.nama]), gender: g.startsWith('P') ? 'P' : 'L', kelas: norm(r[c.kelas]), kontak: c.kontak < 0 ? '' : norm(r[c.kontak]), st: 'baru', msg: '' };
+          const o = { no: i + 2, nis: key, nisn, nama: norm(r[c.nama]), gender: g.startsWith('P') ? 'P' : g.startsWith('L') ? 'L' : '', kelas: norm(r[c.kelas]), kontak: c.kontak < 0 ? '' : norm(r[c.kontak]), tempatLahir: c.tempatLahir < 0 ? '' : norm(r[c.tempatLahir]), tanggalLahir: c.tanggalLahir < 0 ? '' : norm(r[c.tanggalLahir]), alamat: c.alamat < 0 ? '' : norm(r[c.alamat]), namaAyah: c.namaAyah < 0 ? '' : norm(r[c.namaAyah]), namaIbu: c.namaIbu < 0 ? '' : norm(r[c.namaIbu]), namaWali: c.namaWali < 0 ? '' : norm(r[c.namaWali]), kontakOrtu: c.kontakOrtu < 0 ? '' : norm(r[c.kontakOrtu]), agama: c.agama < 0 ? '' : norm(r[c.agama]), statusKeluarga: c.statusKeluarga < 0 ? '' : norm(r[c.statusKeluarga]), anakKe: c.anakKe < 0 ? '' : norm(r[c.anakKe]), teleponRumah: c.teleponRumah < 0 ? '' : norm(r[c.teleponRumah]), sekolahAsal: c.sekolahAsal < 0 ? '' : norm(r[c.sekolahAsal]), diterimaKelas: c.diterimaKelas < 0 ? '' : norm(r[c.diterimaKelas]), tanggalDiterima: c.tanggalDiterima < 0 ? '' : norm(r[c.tanggalDiterima]), alamatOrtu: c.alamatOrtu < 0 ? '' : norm(r[c.alamatOrtu]), teleponOrtu: c.teleponOrtu < 0 ? '' : norm(r[c.teleponOrtu]), pekerjaanAyah: c.pekerjaanAyah < 0 ? '' : norm(r[c.pekerjaanAyah]), pekerjaanIbu: c.pekerjaanIbu < 0 ? '' : norm(r[c.pekerjaanIbu]), alamatWali: c.alamatWali < 0 ? '' : norm(r[c.alamatWali]), teleponWali: c.teleponWali < 0 ? '' : norm(r[c.teleponWali]), pekerjaanWali: c.pekerjaanWali < 0 ? '' : norm(r[c.pekerjaanWali]), st: 'baru', msg: '' };
           if (!o.nisn || !/^\d{10}$/.test(o.nisn)) { o.st = 'error'; o.msg = 'NISN wajib 10 digit angka'; }
           else if (seen.has(o.nis)) { o.st = 'error'; o.msg = 'NISN ganda di file'; }
           else if (seenNisn.has(o.nisn)) { o.st = 'error'; o.msg = 'NISN ganda di file'; }
-          else if (siswa.value.some(s => String(s.nisn || '') === o.nisn && String(s.nis) !== o.nis) && !existing) { o.st = 'error'; o.msg = 'NISN sudah dipakai siswa lain'; }
+          else if (siswa.value.some(s => String(s.nisn || '') === o.nisn && String(s.nis) !== o.nis)) { o.st = 'error'; o.msg = 'NISN sudah dipakai siswa lain'; }
           else if (!o.nama) { o.st = 'error'; o.msg = 'Nama kosong'; }
           else if (!o.kelas) { o.st = 'error'; o.msg = 'Kelas kosong'; }
           else if (ada.has(o.nis) && !explicitKey && !existing && siswa.value.some(s => String(s.nis) === o.nis && String(s.nisn || '') !== o.nisn)) { o.st = 'error'; o.msg = 'NISN bertabrakan dengan kunci data siswa lain'; }
@@ -4398,7 +4543,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       });
     }
     const doImport = () => run(async () => {
-      const list = imp.rows.filter(r => r.st !== 'error' && (imp.update || r.st === 'baru')).map(r => ({ nis: r.nis, nisn: r.nisn, nama: r.nama, gender: r.gender, kelas: r.kelas, kontak: r.kontak }));
+      const list = imp.rows.filter(r => r.st !== 'error' && (imp.update || r.st === 'baru')).map(r => ({ nis: r.nis, nisn: r.nisn, nama: r.nama, gender: r.gender, kelas: r.kelas, kontak: r.kontak, tempatLahir: r.tempatLahir, tanggalLahir: r.tanggalLahir, alamat: r.alamat, namaAyah: r.namaAyah, namaIbu: r.namaIbu, namaWali: r.namaWali, kontakOrtu: r.kontakOrtu, agama: r.agama, statusKeluarga: r.statusKeluarga, anakKe: r.anakKe, teleponRumah: r.teleponRumah, sekolahAsal: r.sekolahAsal, diterimaKelas: r.diterimaKelas, tanggalDiterima: r.tanggalDiterima, alamatOrtu: r.alamatOrtu, teleponOrtu: r.teleponOrtu, pekerjaanAyah: r.pekerjaanAyah, pekerjaanIbu: r.pekerjaanIbu, alamatWali: r.alamatWali, teleponWali: r.teleponWali, pekerjaanWali: r.pekerjaanWali }));
       let baru = 0, ubah = 0, creds = [], gagal = '';
       try {
         for (let i = 0; i < list.length; i += 100) {
@@ -4411,14 +4556,95 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       try { siswa.value = await api('siswaList'); kelasAll.value = await api('kelasDetail'); } catch (e) { /* */ }
       if (gagal) throw new Error(gagal + (baru + ubah ? ' (' + (baru + ubah) + ' siswa sudah diproses; sandi akun baru dapat diunduh pada jendela impor)' : ''));
     });
+    /* ---- Impor biodata (hanya mengisi kolom kosong; tidak menimpa) ---- */
+    const BIO_ID = ['nis', 'nisn', 'nisnisn', 'nisnnis', 'nisdannisn', 'idlogin', 'idlogininternal', 'nomorinduk', 'username'];
+    const BIO_KOL = [['tempatLahir', 'Tempat Lahir', ['tempatlahir']], ['tanggalLahir', 'Tanggal Lahir', ['tanggallahir']], ['agama', 'Agama', ['agama']], ['statusKeluarga', 'Status dalam Keluarga', ['statuskeluarga', 'statusdalamkeluarga']], ['anakKe', 'Anak ke-', ['anakke']], ['teleponRumah', 'Telepon Rumah', ['teleponrumah', 'nomorteleponrumah']], ['alamat', 'Alamat', ['alamat', 'alamatlengkap']], ['sekolahAsal', 'Sekolah Asal', ['sekolahasal']], ['diterimaKelas', 'Kelas Saat Diterima', ['diterimakelas', 'kelassaatditerima', 'diterimadisekolahinikelas']], ['tanggalDiterima', 'Tanggal Diterima', ['tanggalditerima', 'tanggalditerimadisekolahini']], ['namaAyah', 'Nama Ayah', ['namaayah', 'ayah']], ['pekerjaanAyah', 'Pekerjaan Ayah', ['pekerjaanayah']], ['namaIbu', 'Nama Ibu', ['namaibu', 'ibu']], ['pekerjaanIbu', 'Pekerjaan Ibu', ['pekerjaanibu']], ['alamatOrtu', 'Alamat Orang Tua', ['alamatortu', 'alamatorangtua']], ['teleponOrtu', 'Telepon Orang Tua', ['teleponortu', 'nomorteleponorangtua']], ['kontakOrtu', 'Kontak Orang Tua/Wali', ['kontakorangtuawali', 'kontakortu', 'hportu', 'nowaortu']], ['namaWali', 'Nama Wali', ['namawali', 'wali']], ['pekerjaanWali', 'Pekerjaan Wali', ['pekerjaanwali']], ['alamatWali', 'Alamat Wali', ['alamatwali', 'alamatwalipesertadidik']], ['teleponWali', 'Telepon Wali', ['teleponwali', 'nomorteleponwali']]];
+    const BIO_TGL = ['tanggalLahir', 'tanggalDiterima'], BIO_LABEL = Object.fromEntries(BIO_KOL.map(k => [k[0], k[1]]));
+    const bimp = reactive({ show: false, rows: [], file: '', kosong: 0, done: null });
+    const bimpCount = computed(() => { const c = { isi: 0, lewat: 0, error: 0, sel: 0 }; bimp.rows.forEach(r => { if (r.st === 'error') c.error++; else if (r.st === 'isi') { c.isi++; c.sel += r.isi.length; } else c.lewat++; }); return c; });
+    const bioTgl = v => { // -> 'yyyy-mm-dd', atau null bila tidak dikenali
+      v = norm(v); let m = /^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/.exec(v), y, mo, d;
+      if (m) { y = +m[1]; mo = +m[2]; d = +m[3]; } else if ((m = /^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/.exec(v))) { d = +m[1]; mo = +m[2]; y = +m[3]; } else return null;
+      const t = new Date(Date.UTC(y, mo - 1, d)); if (t.getUTCFullYear() !== y || t.getUTCMonth() !== mo - 1 || t.getUTCDate() !== d) return null;
+      return y + '-' + ('0' + mo).slice(-2) + '-' + ('0' + d).slice(-2);
+    };
+    const templateBiodata = () => run(async () => {
+      const X = await XL(), wb = X.utils.book_new();
+      const list = siswaTampil.value.slice().sort((a, b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
+      const aoa = [['NIS/NISN', 'Nama (acuan)', 'Kelas (acuan)'].concat(BIO_KOL.map(k => k[1]))];
+      (list.length ? list : [{ nisn: '0012345678', nama: 'Contoh Siswa', kelas: 'X TKJ 1' }]).forEach(s => aoa.push([String(s.nisn || s.nis), s.nama, s.kelas].concat(BIO_KOL.map(() => ''))));
+      const ws = X.utils.aoa_to_sheet(aoa), rg = X.utils.decode_range(ws['!ref']);
+      for (let R = 1; R <= rg.e.r; R++) for (let C = 0; C <= rg.e.c; C++) { const a = X.utils.encode_cell({ r: R, c: C }); if (!ws[a]) ws[a] = { t: 's', v: '' }; ws[a].z = '@'; } // format teks: angka 0 di depan nomor tidak hilang
+      ws['!cols'] = [16, 28, 14].concat(BIO_KOL.map(k => /^alamat/.test(k[0]) ? 40 : /^(nama|sekolah)/.test(k[0]) ? 26 : 18)).map(w => ({ wch: w }));
+      X.utils.book_append_sheet(wb, ws, 'Data Biodata');
+      const pt = [['Petunjuk pengisian'], ['1. Kolom NIS/NISN wajib terisi (NISN 10 digit atau NIS/ID login). Kolom Nama dan Kelas hanya acuan dan tidak diimpor.'], ['2. Isi hanya kolom biodata yang diperlukan. Kolom yang tidak dipakai boleh dihapus; baris tanpa biodata dilewati.'], ['3. Impor hanya MENGISI kolom yang masih kosong di sistem. Data yang sudah ada tidak akan ditimpa; untuk mengubahnya gunakan tombol Ubah pada Data Siswa.'], ['4. Tanggal ditulis tahun-bulan-tanggal (mis. 2009-05-17) atau tanggal/bulan/tahun (mis. 17/05/2009). Tanggal yang tidak valid diabaikan.'], ['5. Siswa yang tidak ditemukan tidak ditambahkan. Gunakan Impor Excel untuk menambah siswa baru.']];
+      X.utils.book_append_sheet(wb, Object.assign(X.utils.aoa_to_sheet(pt), { '!cols': [{ wch: 110 }] }), 'Petunjuk');
+      X.writeFile(wb, 'Template_Biodata_Siswa.xlsx');
+    });
+    async function pickBiodata(ev) {
+      const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+      await run(async () => {
+        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array', cellDates: true });
+        let aoa = null, hd = null, ci = -1;
+        for (const nm of wb.SheetNames) { // sheet pertama yang memiliki kolom NIS/NISN
+          const a = X.utils.sheet_to_json(wb.Sheets[nm], { header: 1, raw: false, dateNF: 'yyyy-mm-dd', defval: '' });
+          const h2 = (a[0] || []).map(x => norm(x).toLowerCase().replace(/[^a-z]/g, '')), i = h2.findIndex(x => BIO_ID.indexOf(x) >= 0);
+          if (i >= 0) { aoa = a; hd = h2; ci = i; break; }
+        }
+        if (!aoa) throw new Error('Baris pertama harus berisi kolom NIS/NISN. Unduh "Template biodata" agar formatnya sesuai.');
+        const kc = BIO_KOL.map(k => [k[0], hd.findIndex(x => k[2].indexOf(x) >= 0)]).filter(p => p[1] >= 0);
+        if (!kc.length) throw new Error('Tidak ada kolom biodata yang dikenali pada file ini.');
+        const byNisn = new Map(), byNis = new Map(); siswa.value.forEach(s => { if (s.nisn) byNisn.set(String(s.nisn), s); byNis.set(String(s.nis), s); });
+        const seen = new Set(), rows = []; let kosong = 0;
+        aoa.slice(1).forEach((r, i) => {
+          const id = norm(r[ci]), vals = {}, buruk = [];
+          kc.forEach(([k, j]) => { const raw = norm(r[j]); if (!raw) return; if (BIO_TGL.indexOf(k) >= 0) { const t = bioTgl(raw); if (t === null) { buruk.push(k); return; } vals[k] = t; } else vals[k] = raw; });
+          if (!id && r.every(v => !norm(v))) return;
+          if (id && !Object.keys(vals).length && !buruk.length) { kosong++; return; }
+          const o = { no: i + 2, id, nis: '', nama: '', vals, isi: [], st: 'error', msg: '' };
+          let s = byNisn.get(id) || null; const t = byNis.get(id) || null;
+          if (!s && /^\d{1,9}$/.test(id)) s = byNisn.get(id.padStart(10, '0')) || null;
+          if (!id) o.msg = 'NIS/NISN kosong';
+          else if (s && t && s !== t) o.msg = 'NIS/NISN cocok dengan dua siswa berbeda';
+          else if (!(s = s || t)) o.msg = 'Tidak ditemukan di data siswa (tidak ditambahkan)';
+          else if (seen.has(String(s.nis))) o.msg = 'Siswa ganda di file';
+          else {
+            seen.add(String(s.nis)); o.nis = String(s.nis); o.nama = s.nama;
+            o.isi = Object.keys(vals).filter(k => !String(s[k] || '').trim());
+            o.st = o.isi.length ? 'isi' : 'lewat';
+            const ada = Object.keys(vals).length - o.isi.length;
+            o.msg = (o.isi.length ? 'Mengisi ' + o.isi.length + ' kolom: ' + o.isi.map(k => BIO_LABEL[k]).join(', ') : 'Tidak ada kolom kosong yang bisa diisi') + (ada ? ' (' + ada + ' sudah terisi, tidak diubah)' : '') + (buruk.length ? ' (tanggal tidak valid diabaikan: ' + buruk.map(k => BIO_LABEL[k]).join(', ') + ')' : '');
+          }
+          if (o.st === 'error') o.nama = o.nama || '-';
+          rows.push(o);
+        });
+        if (!rows.length) throw new Error(kosong ? 'Tidak ada biodata yang terisi di file ini.' : 'Tidak ada data di file.');
+        Object.assign(bimp, { show: true, rows, file: f.name, kosong, done: null });
+      });
+    }
+    const doImportBiodata = () => run(async () => {
+      const list = bimp.rows.filter(r => r.st === 'isi').map(r => { const o = { nis: r.nis }; r.isi.forEach(k => { o[k] = r.vals[k]; }); return o; });
+      let diisi = 0, sel = 0, lewat = 0, gagal = '', ket = [];
+      try {
+        for (let i = 0; i < list.length; i += 100) {
+          const d = await api('siswaBiodataImport', { rows: list.slice(i, i + 100) });
+          diisi += d.diisi; sel += d.sel; lewat += d.lewat;
+          if (d.tidakAda && d.tidakAda.length) ket.push(d.tidakAda.length + ' tidak ditemukan');
+          if (d.ambigu && d.ambigu.length) ket.push(d.ambigu.length + ' ID ambigu');
+        }
+      } catch (e) { gagal = niceErr(e.message); }
+      bimp.done = { diisi, sel, lewat, catatan: ket.join(', ') };
+      try { siswa.value = await api('siswaList'); } catch (e) { /* */ }
+      if (gagal) throw new Error(gagal + (diisi ? ' (' + diisi + ' siswa sudah diproses)' : ''));
+    });
     const downloadCreds = () => run(async () => {
       await saveXlsx('Kredensial_Siswa_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['Username siswa', 'Nama', 'Kelas', 'Sandi awal']].concat(imp.creds.map(x => [String(x.nis), x.nama, x.kelas, String(x.sandi)])), [18, 32, 14, 14]]]);
     });
-    const editSiswa = s => { Object.assign(sf, { edit: !!s, nis: '', nisn: '', nama: '', gender: 'L', kelas: '', kontak: '' }, s || {}); showS.value = true; };
+    const editSiswa = s => { Object.assign(sf, { edit: !!s, nis: '', nisn: '', nama: '', gender: 'L', kelas: '', kontak: '', tempatLahir: '', tanggalLahir: '', alamat: '', namaAyah: '', namaIbu: '', namaWali: '', kontakOrtu: '', agama: '', statusKeluarga: '', anakKe: '', teleponRumah: '', sekolahAsal: '', diterimaKelas: '', tanggalDiterima: '', alamatOrtu: '', teleponOrtu: '', pekerjaanAyah: '', pekerjaanIbu: '', alamatWali: '', teleponWali: '', pekerjaanWali: '' }, s || {}); showS.value = true; };
     const saveSiswa = () => run(async () => {
       const nisn = String(sf.nisn || '').trim();
       if (!/^\d{10}$/.test(nisn)) throw new Error('NISN wajib terdiri dari 10 digit angka');
-      await api('siswaSave', { edit: sf.edit, s: { nis: sf.edit ? sf.nis : nisn, nisn, nama: sf.nama, gender: sf.gender, kelas: sf.kelas, kontak: sf.kontak } });
+      await api('siswaSave', { edit: sf.edit, s: { nis: sf.edit ? sf.nis : nisn, nisn, nama: sf.nama, gender: sf.gender, kelas: sf.kelas, kontak: sf.kontak, tempatLahir: sf.tempatLahir, tanggalLahir: sf.tanggalLahir, alamat: sf.alamat, namaAyah: sf.namaAyah, namaIbu: sf.namaIbu, namaWali: sf.namaWali, kontakOrtu: sf.kontakOrtu, agama: sf.agama, statusKeluarga: sf.statusKeluarga, anakKe: sf.anakKe, teleponRumah: sf.teleponRumah, sekolahAsal: sf.sekolahAsal, diterimaKelas: sf.diterimaKelas, tanggalDiterima: sf.tanggalDiterima, alamatOrtu: sf.alamatOrtu, teleponOrtu: sf.teleponOrtu, pekerjaanAyah: sf.pekerjaanAyah, pekerjaanIbu: sf.pekerjaanIbu, alamatWali: sf.alamatWali, teleponWali: sf.teleponWali, pekerjaanWali: sf.pekerjaanWali } });
       showS.value = false; siswa.value = await api('siswaList'); await refresh(); ok.value = 'Data siswa tersimpan';
     });
     const delSiswa = s => cfmRun('Hapus ' + s.nama + '? Akun login siswa ikut terhapus.', async () => { await api('siswaDelete', { nis: s.nis }); siswa.value = await api('siswaList'); await refresh(); });
@@ -5193,7 +5419,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const muatUlangWakurNilai = () => run(loadWakurNilai);
     const bandMax = computed(() => mon.value ? Math.max(0, ...mon.value.bands.map(b => b.n)) : 0);
     const waLink = r => {
-      let n = String(r.kontak || '').replace(/\D/g, ''); if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n;
+      let n = String(r.kontak || '').replace(/\D/g, ''); if (n.startsWith('620')) n = '62' + n.slice(3); else if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n;
       if (!/^62\d{8,13}$/.test(n)) return '';
       const t = 'Yth. Bapak/Ibu orang tua/wali dari ' + r.nama + ' (' + r.kelas + '). Kami dari SMK CALM menginformasikan bahwa pada ' + fmtBln(mon.value.bulan) + ' ananda tercatat alpa ' + r.alpa + ' kali dengan kehadiran ' + r.persen + '%. Mohon kerja samanya untuk memantau kehadiran ananda. Terima kasih.';
       return 'https://wa.me/' + n + '?text=' + encodeURIComponent(t);
@@ -5224,7 +5450,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       await hasilAkun('Akun dan sandi awal', r); });
     const portalUrl = () => EMB ? (document.referrer || location.href) : location.href.split(/[?#]/)[0];
     const teksAkun = c => 'Akun Portal Akademik SMK CALM\nNama: ' + c.nama + '\nUsername: ' + c.username + '\nSandi: ' + c.sandi + '\nAlamat: ' + portalUrl() + '\nSegera ganti sandi lewat menu Ganti Sandi setelah masuk.';
-    const noWa = k => { let n = String(k || '').replace(/\D/g, ''); if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n; return /^62\d{8,13}$/.test(n) ? n : ''; };
+    const noWa = k => { let n = String(k || '').replace(/\D/g, ''); if (n.startsWith('620')) n = '62' + n.slice(3); else if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n; return /^62\d{8,13}$/.test(n) ? n : ''; };
     const waAkun = c => 'https://wa.me/' + noWa(c.kontak) + '?text=' + encodeURIComponent(teksAkun(c));
     const cetakKred = () => {
       kartu.value = { kelas: kred.judul, siswa: kred.list.map(c => ({ nis: c.username, nama: c.nama, sandi: c.sandi, ket: (ROLE_LBL[c.role] || '') + (c.kelas ? ' ' + c.kelas : '') || 'Akun' })) };
@@ -5458,7 +5684,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         setInterval(kirimTinggiEmbed, 1000);
       }
     }
-    return { roleGroups, predRata, namaRapi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, cetakCover, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { roleGroups, predRata, namaRapi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, biodataUntuk, tanggalBiodata, cetakCover, cetakPaketRapor, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, biodataDasarLengkap, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, bimp, bimpCount, templateBiodata, pickBiodata, doImportBiodata, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
@@ -5468,7 +5694,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai, nMode, frows, kt, saveFormatif, saveKktp, setSemuaF, jl, cekTahunR, opsiTahun,
-      antreSaya, kirimAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
+      antreSaya, kirimAntre, perbaikiAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
       anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu, ca, caSiswa, caHari, caWali, caBulanLabel, cetakAbsen, DESK, roleNama, salam, memuat,
       hasWakurTask, canManageJadwal, editJadwal };
   }
