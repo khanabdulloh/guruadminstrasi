@@ -2836,13 +2836,14 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <tr><td>11. Diterima di sekolah ini</td><td>:</td><td>Kelas {{biodataUntuk(s.nis).diterimaKelas||'-'}}; tanggal {{tanggalBiodata(biodataUntuk(s.nis).tanggalDiterima)}}</td></tr>
         <tr><td>12. Nama Orang Tua</td><td>:</td><td>a. Ayah: {{biodataUntuk(s.nis).namaAyah||'-'}}<br>b. Ibu: {{biodataUntuk(s.nis).namaIbu||'-'}}</td></tr>
         <tr><td>13. Alamat Orang Tua</td><td>:</td><td>{{biodataUntuk(s.nis).alamatOrtu||'-'}}</td></tr>
-        <tr><td>Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponOrtu||'-'}}</td></tr>
+        <tr><td style="padding-left:5mm">Nomor WA</td><td>:</td><td>{{biodataUntuk(s.nis).kontakOrtu||'-'}}</td></tr>
+        <tr><td style="padding-left:5mm">Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponOrtu||'-'}}</td></tr>
         <tr><td>14. Pekerjaan Orang Tua</td><td>:</td><td>a. Ayah: {{biodataUntuk(s.nis).pekerjaanAyah||'-'}}<br>b. Ibu: {{biodataUntuk(s.nis).pekerjaanIbu||'-'}}</td></tr>
         <tr><td>15. Nama Wali Siswa</td><td>:</td><td>{{biodataUntuk(s.nis).namaWali||'-'}}</td></tr>
         <tr><td>16. Alamat Wali Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).alamatWali||'-'}}</td></tr>
         <tr><td>Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponWali||'-'}}</td></tr>
         <tr><td>17. Pekerjaan Wali Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).pekerjaanWali||'-'}}</td></tr>
-      </tbody></table><div class="cv-bio-ttd"><div>{{sek.kabupaten||'Garut'}}, {{tanggalBiodata(rpInfo.tanggal)}}</div><div>Kepala Sekolah</div><div class="cv-bio-space"></div><b>{{cfg.ttd.nama||'-'}}</b><div>{{cfg.ttd.nip?'NIP/Nuks. '+cfg.ttd.nip:''}}</div></div></section>
+      </tbody></table><div class="cv-bio-ttd"><div>{{sek.kabupaten||'Garut'}}, {{tanggalBiodata(rpInfo.tanggal)}}</div><div>Kepala Sekolah</div><div class="cv-bio-space"></div><b>{{cfg.ttd.nama||'-'}}</b><div>NUKS. {{cfg.ttd.nuks||'19023L0130211241174231'}}</div></div></section>
     </template></div>
     <div v-if="rp&&view==='rapor'&&rpTab!=='rekap'&&rpTab!=='atur'&&siapCetak" class="rapor-wrap"><div v-for="s in rpList" :key="s.nis" class="rapor-page">
       <div class="rapor-bg" aria-hidden="true"><img v-if="cfg.kop.logoKiri||cfg.kop.logoKanan" :src="cfg.kop.logoKiri||cfg.kop.logoKanan" alt=""></div>
