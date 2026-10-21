@@ -2833,7 +2833,9 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <tr><td>8. Alamat Peserta Didik</td><td>:</td><td>{{biodataUntuk(s.nis).alamat||'-'}}</td></tr>
         <tr><td>9. Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponRumah||'-'}}</td></tr>
         <tr><td>10. Sekolah Asal</td><td>:</td><td>{{biodataUntuk(s.nis).sekolahAsal||'-'}}</td></tr>
-        <tr><td>11. Diterima di sekolah ini</td><td>:</td><td>a. Kelas : {{biodataUntuk(s.nis).diterimaKelas||'-'}}<br>b. Tanggal : {{tanggalBiodata(biodataUntuk(s.nis).tanggalDiterima)}}</td></tr>
+        <tr><td>11. Diterima di sekolah ini</td><td>:</td><td></td></tr>
+        <tr><td>Kelas</td><td>:</td><td>{{biodataUntuk(s.nis).diterimaKelas||'-'}}</td></tr>
+        <tr><td>Tanggal</td><td>:</td><td>{{tanggalBiodata(biodataUntuk(s.nis).tanggalDiterima)}}</td></tr>
         <tr><td>12. Nama Orang Tua</td><td>:</td><td>a. Ayah: {{biodataUntuk(s.nis).namaAyah||'-'}}<br>b. Ibu: {{biodataUntuk(s.nis).namaIbu||'-'}}</td></tr>
         <tr><td>13. Alamat Orang Tua</td><td>:</td><td>{{biodataUntuk(s.nis).alamatOrtu||'-'}}</td></tr>
         <tr><td>Nomor WA</td><td>:</td><td>{{biodataUntuk(s.nis).kontakOrtu||'-'}}</td></tr>
