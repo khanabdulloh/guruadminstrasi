@@ -3365,6 +3365,19 @@ body.cetak-rapor .rapor-page table.rapor-mapel-sts tbody tr > td.rapor-ket:last-
   body.cetak-cover .cv-itbl td{padding:3.2mm 1.5mm;vertical-align:top;border-bottom:.5pt solid #cbd5e1;overflow-wrap:anywhere}
   body.cetak-cover .cv-itbl td:nth-child(1){width:34%}
   body.cetak-cover .cv-itbl td:nth-child(2){width:3%;text-align:center}
+  /* Cover saja: halaman biodata diberi padding halaman + blok tanda tangan kepala sekolah dilonggarkan.
+     Diletakkan sebelum aturan cetak-paket (specificity sama) agar tampilan paket tidak berubah. */
+  body.cetak-cover .cover-biodata{padding:12mm 15mm;font-size:9.5pt}
+  body.cetak-cover .cover-biodata .cv-ihead{margin-bottom:5mm}
+  body.cetak-cover .cover-biodata .cv-itbl{font-size:8.7pt;line-height:1.18}
+  body.cetak-cover .cover-biodata .cv-itbl td{padding:1.5mm 1mm;border-bottom:.35pt solid #d1d5db}
+  body.cetak-cover .cover-biodata .cv-itbl td:first-child{width:37%}
+  body.cetak-cover .cover-biodata .cv-itbl td:nth-child(2){width:3%}
+  body.cetak-cover .cv-bio-ttd{margin-top:9mm;margin-left:55%;text-align:center;line-height:1.5;font-size:9.5pt;break-inside:avoid;page-break-inside:avoid}
+  body.cetak-cover .cv-bio-space{height:20mm}
+  /* Paket lengkap: aturan sembunyi cetak-cover & cetak-rapor (specificity 0,2,2) mengalahkan aturan tampil cetak-paket (0,2,1)
+     sehingga hasil cetak kosong. Aturan di bawah sengaja lebih spesifik. */
+  html body.cetak-paket main>.cover-wrap,html body.cetak-paket main>.rapor-wrap{display:block!important}
   body.cetak-paket main>*:not(.cover-wrap):not(.rapor-wrap){display:none!important}
   body.cetak-paket .cover-wrap,body.cetak-paket .rapor-wrap{display:block!important}
   body.cetak-paket .cover-wrap{page:cover;width:100%}
