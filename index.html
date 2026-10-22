@@ -6217,8 +6217,9 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const editLayanan=r=>{resetTuF(tuLAF,r);showLA.value=true;};
     const saveLayanan=()=>run(async()=>{const id=tuLAF.id;await api(id?'layananAdminEdit':'layananAdminSave',{...tuLAF});showLA.value=false;await loadLayanan();ok.value=id?'Layanan diperbarui':'Layanan tersimpan';});
     const delLayanan=r=>cfmRun('Hapus layanan ini?', async()=>{await api('layananAdminDelete',{id:r.id});await loadLayanan();});
-    const openMutasi=()=>{err.value='';tuMUStatusAwal.value='';resetTuF(tuMUF,{id:'',tanggal:hari0,nis:'',jenis:'Naik Kelas',kelasTujuan:'',alasan:'',dokumenUrl:'',status:'Diajukan'});showMU.value=true;if(!siswa.value.length)run(async()=>{[siswa.value,kelasAll.value]=await Promise.all([api('siswaList'),api('kelasDetail')]);});};
-    const editMutasi=r=>{err.value='';tuMUStatusAwal.value=r.status||'Diajukan';resetTuF(tuMUF,{id:r.id,tanggal:r.tanggal||hari0,nis:r.nis,jenis:r.jenis||'Naik Kelas',kelasTujuan:r.kelasTujuan||'',alasan:r.alasan||'',dokumenUrl:r.dokumenUrl||'',status:r.status||'Diajukan'});showMU.value=true;if(!siswa.value.length)run(async()=>{[siswa.value,kelasAll.value]=await Promise.all([api('siswaList'),api('kelasDetail')]);});};
+    const muFokus=()=>Vue.nextTick(()=>setTimeout(()=>{try{const e=document.querySelector('.mu-modal');if(e)e.scrollIntoView({block:'start',behavior:'smooth'});}catch(x){}},60));
+    const openMutasi=()=>{muFokus();err.value='';tuMUStatusAwal.value='';resetTuF(tuMUF,{id:'',tanggal:hari0,nis:'',jenis:'Naik Kelas',kelasTujuan:'',alasan:'',dokumenUrl:'',status:'Diajukan'});showMU.value=true;if(!siswa.value.length)run(async()=>{[siswa.value,kelasAll.value]=await Promise.all([api('siswaList'),api('kelasDetail')]);});};
+    const editMutasi=r=>{muFokus();err.value='';tuMUStatusAwal.value=r.status||'Diajukan';resetTuF(tuMUF,{id:r.id,tanggal:r.tanggal||hari0,nis:r.nis,jenis:r.jenis||'Naik Kelas',kelasTujuan:r.kelasTujuan||'',alasan:r.alasan||'',dokumenUrl:r.dokumenUrl||'',status:r.status||'Diajukan'});showMU.value=true;if(!siswa.value.length)run(async()=>{[siswa.value,kelasAll.value]=await Promise.all([api('siswaList'),api('kelasDetail')]);});};
     const saveMutasi=()=>run(async()=>{const editing=!!tuMUF.id;const result=await api('mutasiSiswaSave',{...tuMUF});showMU.value=false;await Promise.all([loadMutasi(),api('siswaList').then(x=>siswa.value=x)]);ok.value=tuMUF.status==='Selesai'?'Mutasi selesai dan kelas siswa diperbarui':editing?'Catatan mutasi diperbarui':'Catatan mutasi tersimpan';});
     const delMutasi=r=>cfmRun('Hapus riwayat mutasi ini?', async()=>{await api('mutasiSiswaDelete',{id:r.id});await loadMutasi();});
     const resetCetakSurat=()=>Object.assign(cs,{jenis:'Surat Keterangan Aktif',nomor:'',tanggal:hari0,kepada:'',perihal:'',isi:'',namaTtd:'',nipTtd:''});
@@ -6320,6 +6321,16 @@ html body #bi-print-root .bi-print-signature b{margin-bottom:24mm!important}
 html body .bi-detail-overlay .bi-print-signature{margin-top:30px!important;border:0!important}
 html body .bi-detail-overlay .bi-print-signature b{margin-bottom:56px!important}
 html body .bi-detail-overlay .bi-print-signature i{border:0!important;display:block!important;height:0!important;overflow:hidden!important}
+</style>
+<style id="mu-modal-v2">
+html body #app .mu-modal{max-width:34rem!important;border:0!important;border-radius:1.1rem!important;box-shadow:0 28px 60px -22px rgba(10,34,80,.55),0 0 0 1px rgba(10,34,80,.06)!important;scroll-margin-top:12px}
+html body #app .mu-mh{position:relative;flex:none;padding:1.2rem 3.2rem 1rem 1.5rem!important;background:linear-gradient(135deg,#0b3d91,#1d5fd1);color:#fff}
+html body #app .mu-mh h3{position:static!important;margin:0!important;padding:0!important;background:none!important;border:0!important;font-size:1.15rem!important;line-height:1.3!important;font-weight:800;color:#fff!important;letter-spacing:-.01em;overflow:visible!important;white-space:normal!important}
+html body #app .mu-mh p{margin:.3rem 0 0!important;font-size:.8rem;line-height:1.45;color:rgba(255,255,255,.82)!important}
+html body #app .mu-steps{flex:none;padding:.85rem 1.5rem!important;background:#f8fafc}
+html body #app .mu-mb{flex:1 1 auto;min-height:0;padding:.3rem 1.5rem 1.1rem!important}
+html body #app .mu-mf{flex:none;padding:.85rem 1.5rem!important}
+@media(max-width:767px){html body #app .mu-mh{padding:1rem 1.1rem .9rem!important}html body #app .mu-steps{padding:.75rem 1.1rem!important}html body #app .mu-mb{padding:.3rem 1.1rem 1rem!important}html body #app .mu-mf{padding:.8rem 1.1rem!important}}
 </style>
 </body>
 </html>
