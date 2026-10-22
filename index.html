@@ -1206,6 +1206,74 @@ html body .bi-detail-overlay .bi-history-table{min-width:0;width:100%}
 #bi-print-root .bi-history-card{margin:0 0 3mm!important}
 }
 </style>
+
+<style id="admin-document-ux-polish">
+/* Penyegaran visual khusus Administrasi & Dokumen. Tidak mengubah state, API, atau alur kerja. */
+#app .admin-doc-view{color:#243247}
+#app .admin-doc-view .page-head{margin-bottom:1.15rem}
+#app .admin-doc-view .page-head .h2{margin-bottom:.25rem;font-size:clamp(1.35rem,2vw,1.7rem);letter-spacing:-.035em;color:#102a56}
+#app .admin-doc-view .desk{max-width:68ch;color:#64748b;font-size:.88rem;line-height:1.65}
+#app .admin-doc-view>.flex.flex-wrap{padding:1rem 1.1rem;margin-bottom:1rem;background:linear-gradient(135deg,#fff 0%,#f8fbff 100%);border:1px solid #e2eaf4;border-radius:16px;box-shadow:0 4px 16px rgba(15,42,82,.035)}
+#app .admin-doc-view>.flex.flex-wrap .page-head{min-width:12rem}
+#app .admin-doc-view>.flex.flex-wrap input.inp,
+#app .admin-doc-view>.flex.flex-wrap select.inp{min-height:2.65rem;max-width:100%;border-color:#d5dfec;background:#fff;border-radius:10px;font-size:.84rem;box-shadow:0 1px 2px rgba(15,23,42,.025)}
+#app .admin-doc-view>.flex.flex-wrap input.inp:focus,
+#app .admin-doc-view>.flex.flex-wrap select.inp:focus{border-color:#3b70bd;box-shadow:0 0 0 3px rgba(59,112,189,.12)}
+#app .admin-doc-view .btn-p{min-height:2.65rem;padding:.68rem 1rem;border-radius:10px;background:linear-gradient(135deg,#123c7a,#1d58a8);box-shadow:0 3px 8px rgba(18,60,122,.13);transition:transform .15s,box-shadow .15s}
+#app .admin-doc-view .btn-p:hover:not(:disabled){box-shadow:0 6px 14px rgba(18,60,122,.2);transform:translateY(-1px)}
+#app .admin-doc-view .btn-o{min-height:2.5rem;border-radius:10px}
+#app .admin-doc-view>.bg-white.rounded-2xl.shadow-sm.overflow-x-auto{border:1px solid #e0e8f2;border-radius:16px;box-shadow:0 5px 20px rgba(15,42,82,.045);overflow-x:auto;background:#fff}
+#app .admin-doc-view table:not(.srt-table){width:100%;border-collapse:separate;border-spacing:0;font-size:.84rem;color:#334155}
+#app .admin-doc-view table:not(.srt-table) thead th{padding:.9rem .85rem;background:#f4f7fb;color:#52637a;border-bottom:1px solid #e1e8f1;font-size:.7rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase;white-space:nowrap}
+#app .admin-doc-view table:not(.srt-table) thead th:first-child{padding-left:1.1rem}
+#app .admin-doc-view table:not(.srt-table) tbody td{padding:.85rem;border-bottom:1px solid #edf1f6;vertical-align:middle;line-height:1.55;overflow-wrap:anywhere}
+#app .admin-doc-view table:not(.srt-table) tbody td:first-child{padding-left:1.1rem}
+#app .admin-doc-view table:not(.srt-table) tbody tr:last-child td{border-bottom:0}
+#app .admin-doc-view table:not(.srt-table) tbody tr:hover td{background:#f8fbff}
+#app .admin-doc-view table:not(.srt-table) tbody td button,
+#app .admin-doc-view table:not(.srt-table) tbody td a{border-radius:8px}
+#app .admin-doc-view .srt-stats{gap:.75rem;margin-bottom:1rem}
+#app .admin-doc-view .srt-stat{min-height:5.5rem;padding:1rem 1.1rem;border-radius:15px;box-shadow:0 3px 12px rgba(15,42,82,.035)}
+#app .admin-doc-view .srt-stat-n{font-size:1.8rem;letter-spacing:-.04em}
+#app .admin-doc-view .srt-stat-l{font-size:.78rem}
+#app .admin-doc-view .srt-bar{gap:.7rem;padding:1rem;border-radius:15px;border-color:#e1e8f1;box-shadow:0 3px 12px rgba(15,42,82,.025)}
+#app .admin-doc-view .srt-search{height:2.7rem;border-radius:10px;background:#f8fafc}
+#app .admin-doc-view .srt-bar .inp,#app .admin-doc-view .srt-bar .btn-o,#app .admin-doc-view .srt-bar .btn-p{height:2.7rem}
+#app .admin-doc-view .srt-card{border-color:#e0e8f2;border-radius:16px;box-shadow:0 5px 20px rgba(15,42,82,.045)}
+#app .admin-doc-view .srt-table thead th{padding:.85rem .9rem;background:#f4f7fb;color:#52637a;font-size:.7rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase;border-bottom-color:#e1e8f1}
+#app .admin-doc-view .srt-table tbody td{padding:.9rem;border-bottom-color:#edf1f6;line-height:1.55}
+#app .admin-doc-view .srt-table tbody tr:not(.srt-emptyrow):hover td{background:#f8fbff}
+#app .admin-doc-view .srt-act{transition:background .15s,border-color .15s}
+#app .admin-doc-view .srt-modal{border:1px solid #e1e8f1;border-radius:18px;box-shadow:0 24px 70px rgba(15,23,42,.22)}
+#app .admin-doc-view .srt-mh{padding:1.35rem 3.4rem 1rem 1.5rem;background:linear-gradient(135deg,#fff,#f7faff)}
+#app .admin-doc-view .srt-mh h3{font-size:1.15rem;letter-spacing:-.025em}
+#app .admin-doc-view .srt-mb{padding: .5rem 1.5rem 1.25rem}
+#app .admin-doc-view .srt-mb .inp{min-height:2.65rem;border-color:#d5dfec;border-radius:10px;background:#fff}
+#app .admin-doc-view .srt-mf{padding:.9rem 1.5rem;background:#f8fafc}
+#app .admin-doc-view .srt-empty{padding:3rem 1rem}
+#app .admin-doc-view a.text-blue-800{overflow-wrap:anywhere;text-underline-offset:3px}
+@media(max-width:767px){
+ #app .admin-doc-view>.flex.flex-wrap{align-items:stretch;padding:.85rem;margin-bottom:.85rem;gap:.65rem}
+ #app .admin-doc-view>.flex.flex-wrap .page-head{flex:1 1 100%;min-width:0}
+ #app .admin-doc-view>.flex.flex-wrap input.inp{flex:1 1 9rem;width:100%;min-width:0}
+ #app .admin-doc-view>.flex.flex-wrap .btn-p{flex:1 1 auto}
+ #app .admin-doc-view>.bg-white.rounded-2xl.shadow-sm.overflow-x-auto{border-radius:12px}
+ #app .admin-doc-view table:not(.srt-table){min-width:680px}
+ #app .admin-doc-view .srt-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+ #app .admin-doc-view .srt-stat{min-height:4.7rem;padding:.75rem .85rem}
+ #app .admin-doc-view .srt-stat-n{font-size:1.55rem}
+ #app .admin-doc-view .srt-bar{padding:.75rem}
+ #app .admin-doc-view .srt-search{flex-basis:100%}
+ #app .admin-doc-view .srt-f{flex:1 1 8rem;min-width:0}
+ #app .admin-doc-view .srt-f .inp{width:100%;min-width:0}
+ #app .admin-doc-view .srt-modal{max-height:calc(100dvh - 1rem);border-radius:15px}
+ #app .admin-doc-view .srt-mh{padding:1.1rem 3rem .85rem 1rem}
+ #app .admin-doc-view .srt-mb{padding:.35rem 1rem 1rem}
+ #app .admin-doc-view .srt-mf{padding:.75rem 1rem}
+}
+@media(prefers-reduced-motion:reduce){#app .admin-doc-view *{transition:none!important}}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="splash" role="status" aria-live="polite">
@@ -1371,7 +1439,6 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     <div class="load-wrap noprint" aria-hidden="false"><div v-if="busy&&view!=='dashboard'" class="load-chip" role="status" aria-live="polite"><span class="spin-s" aria-hidden="true"></span>{{memuat?'Memuat data…':'Memproses…'}}</div></div>
     <div class="hidden md:flex items-center gap-2 mb-4 noprint"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="badge[user.role].c" :title="roleNama[user.role]" :aria-label="roleNama[user.role]">{{badge[user.role].t}}</span><span class="text-sm text-slate-500">{{user.nama}}</span></div>
     <p v-if="err" role="alert" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-rose-50 border border-rose-200 shadow text-rose-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{err}}</span><button @click="err=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
-    <p v-if="roKep&&MON_VIEWS.includes(view)" role="note" class="noprint mb-4 rounded-xl bg-violet-50 border border-violet-200 text-violet-800 text-sm px-4 py-2"><b>Mode monitoring.</b> Anda dapat melihat dan mencetak data. Menambah, mengubah, dan menghapus dinonaktifkan untuk Kepala Sekolah.</p>
     <p v-if="ok" role="status" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 shadow text-emerald-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{ok}}</span><button @click="ok=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
 
     <div v-if="antreSaya.length" class="noprint mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-2">
@@ -1690,32 +1757,41 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     </section>
 
     <!-- STAFF / TU: Surat masuk -->
-    <section v-if="view==='suratmasuk'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Surat Masuk</h2><p class="desk">{{DESK.suratmasuk}}</p></div><input v-model.trim="tuSM.q" @keyup.enter="loadSuratMasuk" placeholder="Cari nomor, asal, perihal..." class="inp"><input type="month" v-model="tuSM.bulan" @change="loadSuratMasuk" class="inp"><button v-if="!roKep" @click="openSuratMasuk()" class="btn-p">Tambah surat</button></div>
-      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Nomor</th><th>Asal</th><th>Perihal</th><th>Sifat</th><th>Status</th><th v-if="roKep">Petugas</th><th v-if="!roKep">Aksi</th></tr></thead>
-      <tbody><tr v-for="r in suratMasuk.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.nomor}}</td><td>{{r.asal}}</td><td class="max-w-xs">{{r.perihal}}</td><td>{{r.sifat}}</td><td><span class="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold">{{r.status}}</span></td><td v-if="roKep">{{petugasDari(r)||'-'}}</td><td v-if="!roKep" class="pr-3 whitespace-nowrap"><button @click="editSuratMasuk(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delSuratMasuk(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!suratMasuk.rows.length"><td colspan="8" class="p-4 text-slate-500">Belum ada surat masuk.</td></tr></tbody></table></div>
-      <div v-if="showSM" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuSMF.id?'Ubah':'Tambah'}} surat masuk</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuSMF.tanggal" class="inp w-full mt-1"></label><label class="lb">Nomor surat<input v-model.trim="tuSMF.nomor" class="inp w-full mt-1"></label></div><input v-model.trim="tuSMF.asal" placeholder="Asal surat" class="inp w-full mt-3"><input v-model.trim="tuSMF.perihal" placeholder="Perihal" class="inp w-full mt-3"><div class="grid sm:grid-cols-3 gap-3 mt-3"><select v-model="tuSMF.kategori" class="inp"><option value="">Kategori</option><option>Undangan</option><option>Pemberitahuan</option><option>Permohonan</option><option>Dinas</option><option>Lainnya</option></select><select v-model="tuSMF.sifat" class="inp"><option>Biasa</option><option>Penting</option><option>Rahasia</option></select><select v-model="tuSMF.status" class="inp"><option>Baru</option><option>Dibaca</option><option>Diproses</option><option>Selesai</option></select></div><input v-model.trim="tuSMF.fileUrl" placeholder="Tautan file (https://...) opsional" class="inp w-full mt-3"><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showSM=false" class="btn-o">Batal</button><button @click="saveSuratMasuk" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
+    <section v-if="view==='suratmasuk'" class="admin-doc-view">
+      <div class="page-head mb-4"><h2 class="h2">Surat Masuk</h2><p class="desk">{{DESK.suratmasuk}}</p></div>
+      <div class="srt-stats" role="group" aria-label="Ringkasan status surat masuk"><button type="button" class="srt-stat srt-all" :class="{on:!tuSM.status}" :aria-pressed="!tuSM.status" @click="tuSM.status=''" title="Tampilkan semua status"><span class="srt-stat-n">{{suratMasukRingkasan.total}}</span><span class="srt-stat-l">Semua surat</span></button><button v-for="s in srmStatus" :key="s" type="button" class="srt-stat" :class="['srt-s-'+s.toLowerCase(),{on:tuSM.status===s}]" :aria-pressed="tuSM.status===s" @click="tuSM.status=tuSM.status===s?'':s" :title="'Klik untuk menyaring status '+s"><span class="srt-stat-n">{{suratMasukRingkasan[s]}}</span><span class="srt-stat-l">{{s}}</span></button></div>
+      <div class="srt-bar"><label class="srt-search"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input v-model.trim="tuSM.q" @keyup.enter="loadSuratMasuk" placeholder="Cari nomor, asal, atau perihal lalu tekan Enter" aria-label="Cari surat masuk"></label><label class="srt-f"><span>Bulan</span><input aria-label="Filter bulan" type="month" v-model="tuSM.bulan" @change="loadSuratMasuk" class="inp"></label><label class="srt-f"><span>Sifat</span><select v-model="tuSM.sifat" class="inp" aria-label="Filter sifat"><option value="">Semua sifat</option><option>Biasa</option><option>Penting</option><option>Rahasia</option></select></label><button type="button" @click="loadSuratMasuk" class="btn-o">Cari</button><button type="button" v-if="tuSM.q||tuSM.bulan||tuSM.sifat||tuSM.status" @click="tuSM.q='';tuSM.bulan='';tuSM.sifat='';tuSM.status='';loadSuratMasuk()" class="srt-reset">Reset filter</button><button type="button" v-if="!roKep" @click="openSuratMasuk()" class="btn-p srt-add">+ Tambah surat</button></div>
+      <p class="srt-count" aria-live="polite">Menampilkan <b>{{suratMasukTampil.length}}</b> surat<span v-if="tuSM.status"> berstatus <b>{{tuSM.status}}</b></span>. <span class="srt-tip">Klik kartu status di atas untuk menyaring.</span></p>
+      <div class="srt-card"><table class="srt-table"><thead><tr><th>Tanggal</th><th>Surat</th><th>Asal</th><th>Sifat</th><th>Status</th><th v-if="roKep">Petugas</th><th class="srt-th-act">{{roKep?'Berkas':'Aksi'}}</th></tr></thead>
+      <tbody><tr v-for="r in suratMasukTampil" :key="r.id"><td data-label="Tanggal" class="srt-nowrap">{{fmtTglRingkas(r.tanggal)||'—'}}</td><td data-label="Surat" class="srt-main"><div><div class="srt-no">{{r.nomor||'—'}}</div><div class="srt-sub">{{r.perihal||'—'}}</div><span v-if="r.kategori" class="srt-cat">{{r.kategori}}</span></div></td><td data-label="Asal">{{r.asal||'—'}}</td><td data-label="Sifat"><span class="srt-sifat" :class="'srt-sf-'+String(r.sifat||'Biasa').toLowerCase()">{{r.sifat||'Biasa'}}</span></td><td data-label="Status"><span class="srt-b" :class="'srt-b-'+String(r.status||'Baru').toLowerCase()">{{r.status||'Baru'}}</span></td><td v-if="roKep" data-label="Petugas" class="srt-sub2">{{petugasDari(r)||'—'}}</td><td data-label="Aksi" class="srt-actions"><a v-if="srUrl(r.fileUrl)" :href="srUrl(r.fileUrl)" target="_blank" rel="noopener noreferrer" class="srt-act">Berkas</a><template v-if="!roKep"><button type="button" @click="editSuratMasuk(r)" class="srt-act">Ubah</button><button type="button" @click="delSuratMasuk(r)" class="srt-act srt-act-del">Hapus</button></template></td></tr>
+      <tr v-if="!suratMasukTampil.length" class="srt-emptyrow"><td :colspan="roKep?7:6"><div class="srt-empty"><b>{{(tuSM.q||tuSM.bulan||tuSM.sifat||tuSM.status)?'Tidak ada surat yang cocok':'Belum ada surat masuk'}}</b><span>{{(tuSM.q||tuSM.bulan||tuSM.sifat||tuSM.status)?'Coba ubah kata kunci, bulan, sifat, atau status.':'Surat yang diterima sekolah akan tercatat di sini.'}}</span><button type="button" v-if="!roKep&&!(tuSM.q||tuSM.bulan||tuSM.sifat||tuSM.status)" @click="openSuratMasuk()" class="btn-p">+ Tambah surat</button></div></td></tr></tbody></table></div>
+      <div v-if="showSM" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20" role="dialog" aria-modal="true" aria-labelledby="sm-judul" @keydown.esc="showSM=false"><div class="modal-box srt-modal bg-white rounded-2xl shadow-xl w-full"><div class="srt-mh"><button type="button" class="srt-x" @click="showSM=false" aria-label="Tutup"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><h3 id="sm-judul">{{tuSMF.id?'Ubah surat masuk':'Tambah surat masuk'}}</h3><p>Catat surat yang diterima sekolah beserta sifat dan statusnya.</p></div><div class="srt-mb"><div class="srt-sec">Data surat</div><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuSMF.tanggal" class="inp w-full mt-1"></label><label class="lb">Nomor surat<input v-model.trim="tuSMF.nomor" class="inp w-full mt-1"></label></div><label class="lb block mt-3">Asal surat<input v-model.trim="tuSMF.asal" class="inp w-full mt-1"></label><label class="lb block mt-3">Perihal<input v-model.trim="tuSMF.perihal" class="inp w-full mt-1"></label><div class="srt-sec">Klasifikasi</div><label class="lb block">Kategori<select v-model="tuSMF.kategori" class="inp w-full mt-1"><option value="">Pilih kategori</option><option>Undangan</option><option>Pemberitahuan</option><option>Permohonan</option><option>Dinas</option><option>Lainnya</option></select></label><div class="lb mt-3" id="sm-sifat-l">Sifat surat</div><div class="srt-seg" role="radiogroup" aria-labelledby="sm-sifat-l"><button v-for="s in ['Biasa','Penting','Rahasia']" :key="s" type="button" role="radio" :aria-checked="tuSMF.sifat===s" :class="{on:tuSMF.sifat===s}" @click="tuSMF.sifat=s">{{s}}</button></div><div class="lb mt-3" id="sm-status-l">Status</div><div class="srt-seg" role="radiogroup" aria-labelledby="sm-status-l"><button v-for="s in srmStatus" :key="s" type="button" role="radio" :aria-checked="tuSMF.status===s" :class="{on:tuSMF.status===s}" @click="tuSMF.status=s">{{s}}</button></div><div class="srt-sec">Berkas</div><label class="lb block">Tautan file <span class="srt-opt">opsional</span><input type="url" v-model.trim="tuSMF.fileUrl" placeholder="https://drive.google.com/…" class="inp w-full mt-1"></label><p class="srt-hint">Tempel tautan berkas surat yang sudah diunggah, diawali https://.</p></div><p v-if="err" class="srt-err" role="alert">{{err}}</p><div class="srt-mf"><button type="button" @click="showSM=false" class="btn-o">Batal</button><button type="button" @click="saveSuratMasuk" :disabled="busy" class="btn-p">{{tuSMF.id?'Simpan perubahan':'Simpan surat'}}</button></div></div></div>
     </section>
 
-    <section v-if="view==='suratkeluar'">
-      <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Surat Keluar</h2><p class="desk">{{DESK.suratkeluar}}</p></div><input v-model.trim="tuSK.q" @keyup.enter="loadSuratKeluar" placeholder="Cari nomor, tujuan, perihal..." class="inp"><input type="month" v-model="tuSK.bulan" @change="loadSuratKeluar" class="inp"><button v-if="!roKep" @click="openSuratKeluar()" class="btn-p">Tambah surat</button></div>
-      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Nomor</th><th>Tujuan</th><th>Perihal</th><th>Status</th><th v-if="roKep">Petugas</th><th v-if="!roKep">Aksi</th></tr></thead><tbody><tr v-for="r in suratKeluar.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.nomor}}</td><td>{{r.tujuan}}</td><td>{{r.perihal}}</td><td>{{r.status}}</td><td v-if="roKep">{{petugasDari(r)||'-'}}</td><td v-if="!roKep" class="pr-3 whitespace-nowrap"><button @click="editSuratKeluar(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delSuratKeluar(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!suratKeluar.rows.length"><td colspan="7" class="p-4 text-slate-500">Belum ada surat keluar.</td></tr></tbody></table></div>
-      <div v-if="showSK" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuSKF.id?'Ubah':'Tambah'}} surat keluar</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuSKF.tanggal" class="inp w-full mt-1"></label><input v-model.trim="tuSKF.nomor" placeholder="Nomor surat" class="inp"></div><input v-model.trim="tuSKF.tujuan" placeholder="Tujuan surat" class="inp w-full mt-3"><input v-model.trim="tuSKF.perihal" placeholder="Perihal" class="inp w-full mt-3"><div class="grid sm:grid-cols-2 gap-3 mt-3"><select v-model="tuSKF.kategori" class="inp"><option value="">Kategori</option><option>Undangan</option><option>Keterangan</option><option>Pengantar</option><option>Dinas</option><option>Lainnya</option></select><select v-model="tuSKF.status" class="inp"><option>Draft</option><option>Diproses</option><option>Ditandatangani</option><option>Dikirim</option><option>Arsip</option></select></div><input v-model.trim="tuSKF.fileUrl" placeholder="Tautan file opsional" class="inp w-full mt-3"><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showSK=false" class="btn-o">Batal</button><button @click="saveSuratKeluar" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
+    <section v-if="view==='suratkeluar'" class="admin-doc-view">
+      <div class="page-head mb-4"><h2 class="h2">Surat Keluar</h2><p class="desk">{{DESK.suratkeluar}}</p></div>
+      <div class="srt-stats" role="group" aria-label="Ringkasan status surat keluar"><button type="button" class="srt-stat srt-all" :class="{on:!tuSK.status}" :aria-pressed="!tuSK.status" @click="tuSK.status=''" title="Tampilkan semua status"><span class="srt-stat-n">{{suratKeluarRingkasan.total}}</span><span class="srt-stat-l">Semua surat</span></button><button v-for="s in srkStatus" :key="s" type="button" class="srt-stat" :class="['srt-s-'+s.toLowerCase(),{on:tuSK.status===s}]" :aria-pressed="tuSK.status===s" @click="tuSK.status=tuSK.status===s?'':s" :title="'Klik untuk menyaring status '+s"><span class="srt-stat-n">{{suratKeluarRingkasan[s]}}</span><span class="srt-stat-l">{{s}}</span></button></div>
+      <div class="srt-bar"><label class="srt-search"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input v-model.trim="tuSK.q" @keyup.enter="loadSuratKeluar" placeholder="Cari nomor, tujuan, atau perihal lalu tekan Enter" aria-label="Cari surat keluar"></label><label class="srt-f"><span>Bulan</span><input aria-label="Filter bulan" type="month" v-model="tuSK.bulan" @change="loadSuratKeluar" class="inp"></label><button type="button" @click="loadSuratKeluar" class="btn-o">Cari</button><button type="button" v-if="tuSK.q||tuSK.bulan||tuSK.status" @click="tuSK.q='';tuSK.bulan='';tuSK.status='';loadSuratKeluar()" class="srt-reset">Reset filter</button><button type="button" v-if="!roKep" @click="openSuratKeluar()" class="btn-p srt-add">+ Tambah surat</button></div>
+      <p class="srt-count" aria-live="polite">Menampilkan <b>{{suratKeluarTampil.length}}</b> surat<span v-if="tuSK.status"> berstatus <b>{{tuSK.status}}</b></span>. <span class="srt-tip">Klik kartu status di atas untuk menyaring.</span></p>
+      <div class="srt-card"><table class="srt-table"><thead><tr><th>Tanggal</th><th>Surat</th><th>Tujuan</th><th>Status</th><th v-if="roKep">Petugas</th><th class="srt-th-act">{{roKep?'Berkas':'Aksi'}}</th></tr></thead>
+      <tbody><tr v-for="r in suratKeluarTampil" :key="r.id"><td data-label="Tanggal" class="srt-nowrap">{{fmtTglRingkas(r.tanggal)||'—'}}</td><td data-label="Surat" class="srt-main"><div><div class="srt-no">{{r.nomor||'—'}}</div><div class="srt-sub">{{r.perihal||'—'}}</div><span v-if="r.kategori" class="srt-cat">{{r.kategori}}</span></div></td><td data-label="Tujuan">{{r.tujuan||'—'}}</td><td data-label="Status"><span class="srt-b" :class="'srt-b-'+String(r.status||'Draft').toLowerCase()">{{r.status||'Draft'}}</span></td><td v-if="roKep" data-label="Petugas" class="srt-sub2">{{petugasDari(r)||'—'}}</td><td data-label="Aksi" class="srt-actions"><a v-if="srUrl(r.fileUrl)" :href="srUrl(r.fileUrl)" target="_blank" rel="noopener noreferrer" class="srt-act">Berkas</a><template v-if="!roKep"><button type="button" @click="editSuratKeluar(r)" class="srt-act">Ubah</button><button type="button" @click="delSuratKeluar(r)" class="srt-act srt-act-del">Hapus</button></template></td></tr>
+      <tr v-if="!suratKeluarTampil.length" class="srt-emptyrow"><td :colspan="roKep?6:5"><div class="srt-empty"><b>{{(tuSK.q||tuSK.bulan||tuSK.status)?'Tidak ada surat yang cocok':'Belum ada surat keluar'}}</b><span>{{(tuSK.q||tuSK.bulan||tuSK.status)?'Coba ubah kata kunci, bulan, atau status.':'Surat yang dikirim sekolah akan tercatat di sini.'}}</span><button type="button" v-if="!roKep&&!(tuSK.q||tuSK.bulan||tuSK.status)" @click="openSuratKeluar()" class="btn-p">+ Tambah surat</button></div></td></tr></tbody></table></div>
+      <div v-if="showSK" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20" role="dialog" aria-modal="true" aria-labelledby="sk-judul" @keydown.esc="showSK=false"><div class="modal-box srt-modal bg-white rounded-2xl shadow-xl w-full"><div class="srt-mh"><button type="button" class="srt-x" @click="showSK=false" aria-label="Tutup"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><h3 id="sk-judul">{{tuSKF.id?'Ubah surat keluar':'Tambah surat keluar'}}</h3><p>Catat surat yang dibuat sekolah dan pantau prosesnya sampai dikirim.</p></div><div class="srt-mb"><div class="srt-sec">Data surat</div><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuSKF.tanggal" class="inp w-full mt-1"></label><label class="lb">Nomor surat<input v-model.trim="tuSKF.nomor" class="inp w-full mt-1"></label></div><label class="lb block mt-3">Tujuan surat<input v-model.trim="tuSKF.tujuan" class="inp w-full mt-1"></label><label class="lb block mt-3">Perihal<input v-model.trim="tuSKF.perihal" class="inp w-full mt-1"></label><div class="srt-sec">Klasifikasi</div><label class="lb block">Kategori<select v-model="tuSKF.kategori" class="inp w-full mt-1"><option value="">Pilih kategori</option><option>Undangan</option><option>Keterangan</option><option>Pengantar</option><option>Dinas</option><option>Lainnya</option></select></label><div class="lb mt-3" id="sk-status-l">Status</div><div class="srt-seg" role="radiogroup" aria-labelledby="sk-status-l"><button v-for="s in srkStatus" :key="s" type="button" role="radio" :aria-checked="tuSKF.status===s" :class="{on:tuSKF.status===s}" @click="tuSKF.status=s">{{s}}</button></div><div class="srt-sec">Berkas</div><label class="lb block">Tautan file <span class="srt-opt">opsional</span><input type="url" v-model.trim="tuSKF.fileUrl" placeholder="https://drive.google.com/…" class="inp w-full mt-1"></label><p class="srt-hint">Tempel tautan berkas surat yang sudah diunggah, diawali https://.</p></div><p v-if="err" class="srt-err" role="alert">{{err}}</p><div class="srt-mf"><button type="button" @click="showSK=false" class="btn-o">Batal</button><button type="button" @click="saveSuratKeluar" :disabled="busy" class="btn-p">{{tuSKF.id?'Simpan perubahan':'Simpan surat'}}</button></div></div></div>
     </section>
 
-    <section v-if="view==='disposisi'">
+    <section v-if="view==='disposisi'" class="admin-doc-view">
       <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Disposisi</h2><p class="desk">{{DESK.disposisi}}</p></div><input v-model.trim="tuDP.q" @keyup.enter="loadDisposisi" placeholder="Cari surat / tujuan..." class="inp"><input type="month" v-model="tuDP.bulan" @change="loadDisposisi" class="inp"><button v-if="!roKep" @click="openDisposisi()" class="btn-p">Buat disposisi</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Nomor surat</th><th>Asal</th><th>Tujuan</th><th>Instruksi</th><th>Batas</th><th>Status</th><th v-if="roKep">Petugas</th><th v-if="!roKep">Aksi</th></tr></thead><tbody><tr v-for="r in disposisi.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.nomorSurat||'-'}}</td><td>{{r.asal||'-'}}</td><td>{{r.tujuan}}</td><td>{{r.instruksi}}</td><td>{{r.batasWaktu?fmtTgl(r.batasWaktu):'-'}}</td><td>{{r.status}}</td><td v-if="roKep">{{petugasDari(r)||'-'}}</td><td v-if="!roKep" class="pr-3 whitespace-nowrap"><button @click="editDisposisi(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delDisposisi(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!disposisi.rows.length"><td colspan="9" class="p-4 text-slate-500">Belum ada disposisi.</td></tr></tbody></table></div>
       <div v-if="showDP" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuDPF.id?'Ubah':'Buat'}} disposisi</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuDPF.tanggal" class="inp w-full mt-1"></label><select v-model="tuDPF.suratId" @change="pilihSuratDisposisi" class="inp"><option value="">Surat terkait (opsional)</option><option v-for="r in suratMasuk.rows" :value="r.id">{{r.nomor}} — {{r.asal}}</option></select></div><div class="grid sm:grid-cols-2 gap-3 mt-3"><input v-model.trim="tuDPF.nomorSurat" placeholder="Nomor surat" class="inp"><input v-model.trim="tuDPF.asal" placeholder="Asal surat" class="inp"></div><input v-model.trim="tuDPF.tujuan" placeholder="Ditujukan kepada/unit" class="inp w-full mt-3"><textarea v-model.trim="tuDPF.instruksi" rows="3" placeholder="Instruksi disposisi" class="inp w-full mt-3"></textarea><div class="grid sm:grid-cols-2 gap-3 mt-3"><label class="lb">Batas waktu<input type="date" v-model="tuDPF.batasWaktu" class="inp w-full mt-1"></label><select v-model="tuDPF.status" class="inp"><option>Baru</option><option>Diproses</option><option>Selesai</option><option>Batal</option></select></div><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showDP=false" class="btn-o">Batal</button><button @click="saveDisposisi" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
     </section>
 
-    <section v-if="view==='arsip'">
+    <section v-if="view==='arsip'" class="admin-doc-view">
       <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Arsip Dokumen</h2><p class="desk">{{DESK.arsip}}</p></div><input v-model.trim="tuAR.q" @keyup.enter="loadArsip" placeholder="Cari kode, judul, kategori..." class="inp"><input type="month" v-model="tuAR.bulan" @change="loadArsip" class="inp"><button v-if="!roKep" @click="openArsip()" class="btn-p">Tambah arsip</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Kode</th><th>Judul</th><th>Kategori</th><th>Tahun</th><th>Lokasi</th><th v-if="roKep">Petugas</th><th>Aksi</th></tr></thead><tbody><tr v-for="r in arsip.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.kode||'-'}}</td><td>{{r.judul}}</td><td>{{r.kategori||'-'}}</td><td>{{r.tahun||'-'}}</td><td>{{r.lokasi||'-'}}</td><td v-if="roKep">{{petugasDari(r)||'-'}}</td><td class="pr-3 whitespace-nowrap"><a v-if="r.fileUrl" :href="r.fileUrl" target="_blank" rel="noopener noreferrer" class="text-blue-800 font-bold mr-3">Buka</a><template v-if="!roKep"><button @click="editArsip(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delArsip(r)" class="text-rose-600 font-bold">Hapus</button></template></td></tr><tr v-if="!arsip.rows.length"><td colspan="8" class="p-4 text-slate-500">Belum ada arsip.</td></tr></tbody></table></div>
       <div v-if="showAR" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuARF.id?'Ubah':'Tambah'}} arsip</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuARF.tanggal" class="inp w-full mt-1"></label><input v-model.trim="tuARF.kode" placeholder="Kode arsip" class="inp"></div><input v-model.trim="tuARF.judul" placeholder="Judul dokumen" class="inp w-full mt-3"><div class="grid sm:grid-cols-3 gap-3 mt-3"><input v-model.trim="tuARF.kategori" placeholder="Kategori" class="inp"><input v-model.trim="tuARF.tahun" placeholder="Tahun" class="inp"><input v-model.trim="tuARF.lokasi" placeholder="Lokasi / rak" class="inp"></div><input v-model.trim="tuARF.fileUrl" placeholder="Tautan file opsional" class="inp w-full mt-3"><textarea v-model.trim="tuARF.keterangan" rows="3" placeholder="Keterangan" class="inp w-full mt-3"></textarea><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showAR=false" class="btn-o">Batal</button><button @click="saveArsip" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
     </section>
 
-    <section v-if="view==='layanan'">
+    <section v-if="view==='layanan'" class="admin-doc-view">
       <div class="flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Layanan Administrasi</h2><p class="desk">{{DESK.layanan}}</p></div><input v-model.trim="tuLA.q" @keyup.enter="loadLayanan" placeholder="Cari pemohon / jenis layanan..." class="inp"><input type="month" v-model="tuLA.bulan" @change="loadLayanan" class="inp"><button v-if="!roKep" @click="openLayanan()" class="btn-p">Tambah layanan</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>No. layanan</th><th>Pemohon</th><th>Jenis</th><th>Keperluan</th><th>Status</th><th>Petugas</th><th v-if="!roKep">Aksi</th></tr></thead><tbody><tr v-for="r in layanan.rows" :key="r.id" class="border-t"><td class="p-3">{{fmtTgl(r.tanggal)}}</td><td>{{r.noLayanan||'-'}}</td><td>{{r.pemohon}}</td><td>{{r.jenis}}</td><td>{{r.keperluan}}</td><td>{{r.status}}</td><td>{{r.petugasNama}}</td><td v-if="!roKep" class="pr-3 whitespace-nowrap"><button @click="editLayanan(r)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delLayanan(r)" class="text-rose-600 font-bold">Hapus</button></td></tr><tr v-if="!layanan.rows.length"><td colspan="8" class="p-4 text-slate-500">Belum ada layanan administrasi.</td></tr></tbody></table></div>
       <div v-if="showLA" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg"><h3 class="font-extrabold text-blue-900 mb-4">{{tuLAF.id?'Ubah':'Tambah'}} layanan</h3><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuLAF.tanggal" class="inp w-full mt-1"></label><input v-model.trim="tuLAF.noLayanan" placeholder="No. layanan (opsional)" class="inp"></div><input v-model.trim="tuLAF.pemohon" placeholder="Nama pemohon" class="inp w-full mt-3"><div class="grid sm:grid-cols-2 gap-3 mt-3"><select v-model="tuLAF.jenis" class="inp"><option value="">Pilih jenis layanan</option><option>Surat keterangan</option><option>Legalisir</option><option>Administrasi siswa</option><option>Administrasi guru/PTK</option><option>Permohonan data</option><option>Lainnya</option></select><select v-model="tuLAF.status" class="inp"><option>Diajukan</option><option>Diproses</option><option>Selesai</option><option>Ditolak</option></select></div><textarea v-model.trim="tuLAF.keperluan" rows="3" placeholder="Keperluan" class="inp w-full mt-3"></textarea><textarea v-model.trim="tuLAF.keterangan" rows="2" placeholder="Keterangan petugas" class="inp w-full mt-3"></textarea><p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p><div class="flex justify-end gap-2 mt-4"><button @click="showLA=false" class="btn-o">Batal</button><button @click="saveLayanan" :disabled="busy" class="btn-p">Simpan</button></div></div></div>
@@ -1730,10 +1806,49 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       <div v-if="showMU" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20" role="dialog" aria-modal="true" aria-labelledby="mu-judul" @click.self="showMU=false" @keydown.esc="showMU=false"><div class="modal-box mu-modal bg-white rounded-2xl shadow-xl w-full max-w-lg"><div class="mu-mh"><button type="button" class="mu-x" @click="showMU=false" aria-label="Tutup"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><h3 id="mu-judul">{{tuMUF.id?'Ubah catatan mutasi':'Catat mutasi siswa'}}</h3><p>Isi data inti terlebih dahulu. Kelas siswa baru berubah saat status Selesai.</p></div><div class="mu-steps" aria-label="Alur status"><span :class="{on:tuMUF.status==='Diajukan',done:['Diproses','Selesai'].includes(tuMUF.status)}">1 Diajukan</span><i></i><span :class="{on:tuMUF.status==='Diproses',done:tuMUF.status==='Selesai'}">2 Diproses</span><i></i><span :class="{on:tuMUF.status==='Selesai'}">3 Selesai</span></div><div class="mu-mb"><div class="mu-sec">Data mutasi</div><div class="grid sm:grid-cols-2 gap-3"><label class="lb">Tanggal<input type="date" v-model="tuMUF.tanggal" class="inp w-full mt-1"></label><label class="lb">Jenis mutasi<select v-model="tuMUF.jenis" class="inp w-full mt-1"><option>Naik Kelas</option><option>Pindah Masuk</option><option>Pindah Keluar</option><option>Lainnya</option></select></label></div><label class="lb block mt-3">Siswa <span class="mu-req">wajib</span><select v-model="tuMUF.nis" :disabled="!!tuMUF.id" class="inp w-full mt-1"><option value="">Pilih siswa</option><option v-for="s in siswa" :value="s.nis">{{labelNisn(s.nis, s.nisn)}} — {{s.nama}} ({{s.kelas}})</option></select></label><p v-if="tuMUF.nis" class="mu-hint">Kelas saat ini: <b>{{(siswa.find(s=>s.nis===tuMUF.nis)||{}).kelas || '—'}}</b></p><label class="lb block mt-3">Kelas tujuan<select v-model="tuMUF.kelasTujuan" class="inp w-full mt-1"><option value="">Pilih kelas tujuan</option><option v-for="k in kelasAll" :value="k.kelas">{{k.kelas}}</option></select></label><div class="mu-sec">Keterangan</div><label class="lb block">Alasan / keterangan<textarea v-model.trim="tuMUF.alasan" rows="3" maxlength="400" placeholder="Tuliskan alasan mutasi secara ringkas dan jelas" class="inp w-full mt-1"></textarea></label><p class="mu-hint mu-right">{{(tuMUF.alasan||'').length}}/400</p><label class="lb block mt-2">Tautan dokumen pendukung <span class="mu-opt">opsional</span><input v-model.trim="tuMUF.dokumenUrl" type="url" placeholder="https://drive.google.com/…" class="inp w-full mt-1"></label><div class="mu-sec">Status</div><label class="lb block"><select v-model="tuMUF.status" class="inp w-full mt-1"><option value="Diajukan" :disabled="!!tuMUF.id && tuMUStatusAwal!=='Diajukan'">Diajukan</option><option value="Diproses" :disabled="!tuMUF.id || tuMUStatusAwal==='Batal'">Diproses</option><option value="Selesai" :disabled="!tuMUF.id || tuMUStatusAwal!=='Diproses'">Selesai</option><option value="Batal" :disabled="tuMUStatusAwal==='Selesai'">Batal</option></select></label><p class="mu-note">Status <b>Selesai</b> hanya tersedia setelah berstatus <b>Diproses</b> dan akan memperbarui kelas siswa. Mutasi keluar tidak dapat diselesaikan melalui alur ini.</p><p v-if="err" class="mu-err" role="alert">{{err}}</p></div><div class="mu-mf"><button type="button" @click="showMU=false" class="btn-o">Batal</button><button type="button" @click="saveMutasi" :disabled="busy||!tuMUF.nis" class="btn-p">{{tuMUF.id?'Simpan perubahan':'Simpan mutasi'}}</button></div></div></div>
     </section>
 
-    <section v-if="view==='cetaksurat'">
-      <div class="noprint flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Cetak Surat</h2><p class="desk">{{DESK.cetaksurat}}</p></div><select v-model="cs.jenis" class="inp"><option>Surat Keterangan Aktif</option><option>Surat Keterangan</option><option>Surat Pengantar</option><option>Surat Tugas</option><option>Undangan</option><option>Surat Izin</option></select><button @click="resetCetakSurat" class="btn-o">Kosongkan</button><button @click="printSurat" class="btn-p">Cetak</button></div>
-      <div class="noprint bg-white rounded-2xl shadow-sm p-5 grid lg:grid-cols-2 gap-3"><input v-model.trim="cs.nomor" placeholder="Nomor surat" class="inp"><input v-model.trim="cs.tanggal" type="date" class="inp"><input v-model.trim="cs.kepada" placeholder="Kepada / nama penerima" class="inp lg:col-span-2"><input v-model.trim="cs.perihal" placeholder="Perihal" class="inp lg:col-span-2"><textarea v-model.trim="cs.isi" rows="12" placeholder="Isi surat" class="inp lg:col-span-2"></textarea><div class="grid sm:grid-cols-2 gap-3 lg:col-span-2"><input v-model.trim="cs.namaTtd" placeholder="Nama penandatangan" class="inp"><input v-model.trim="cs.nipTtd" placeholder="NUPTK / identitas penandatangan" class="inp"></div></div>
-      <div class="hidden print:block bg-white min-h-screen p-8"><kop :k="cfg.kop"></kop><div class="text-center mt-4"><h2 class="font-extrabold underline">{{cs.jenis.toUpperCase()}}</h2><p v-if="cs.nomor">Nomor: {{cs.nomor}}</p></div><p class="mt-8">{{cs.kepada?'Kepada Yth. '+cs.kepada:''}}</p><p v-if="cs.perihal" class="font-bold mt-3">Perihal: {{cs.perihal}}</p><p class="whitespace-pre-line leading-7 mt-5">{{cs.isi}}</p><div class="mt-12 ml-auto w-64 text-center"><p>{{cfg.ttd&&cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{fmtTgl(cs.tanggal)}}</p><p>{{cfg.ttd&&cfg.ttd.jabatan?cfg.ttd.jabatan:''}}</p><div class="h-20"></div><p class="font-bold underline">{{cs.namaTtd||cfg.ttd&&cfg.ttd.nama||'-'}}</p><p v-if="cs.nipTtd||cfg.ttd&&cfg.ttd.nip">NUPTK / Identitas: {{cs.nipTtd||cfg.ttd&&cfg.ttd.nip}}</p></div></div>
+    <section v-if="view==='cetaksurat'" class="srt-print-sec admin-doc-view">
+      <div class="noprint srt-head"><div class="page-head in-row mr-auto"><h2 class="h2">Cetak Surat</h2><p class="desk">{{DESK.cetaksurat}}</p></div><div class="srt-head-act"><button type="button" @click="resetCetakSurat" class="btn-o">Kosongkan</button><button type="button" @click="printSurat" class="btn-p"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></svg>Cetak surat</button></div></div>
+      <div class="noprint srt-tabs" role="tablist" aria-label="Tampilan"><button type="button" role="tab" :aria-selected="csTab==='isi'" :class="{on:csTab==='isi'}" @click="csTab='isi'">Isi surat</button><button type="button" role="tab" :aria-selected="csTab==='pratinjau'" :class="{on:csTab==='pratinjau'}" @click="csTab='pratinjau'">Pratinjau</button></div>
+      <div class="srt-layout">
+        <div class="noprint srt-pane" v-show="csTab==='isi'"><div class="srt-formcard">
+          <div class="srt-sec">Jenis dan nomor</div>
+          <div class="srt-form">
+            <label class="lb srt-span2">Jenis surat<select v-model="cs.jenis" class="inp w-full mt-1"><option>Surat Keterangan Aktif</option><option>Surat Keterangan</option><option>Surat Pengantar</option><option>Surat Tugas</option><option>Undangan</option><option>Surat Izin</option></select></label>
+            <label class="lb">Nomor surat<input v-model.trim="cs.nomor" class="inp w-full mt-1"></label>
+            <label class="lb">Tanggal surat<input v-model.trim="cs.tanggal" type="date" class="inp w-full mt-1"></label>
+          </div>
+          <div class="srt-sec">Isi surat</div>
+          <div class="srt-form">
+            <label class="lb srt-span2">Kepada <span class="srt-opt">opsional</span><input v-model.trim="cs.kepada" placeholder="Nama atau jabatan penerima" class="inp w-full mt-1"></label>
+            <label class="lb srt-span2">Perihal <span class="srt-opt">opsional</span><input v-model.trim="cs.perihal" class="inp w-full mt-1"></label>
+            <label class="lb srt-span2">Isi surat<textarea v-model.trim="cs.isi" rows="12" placeholder="Tulis isi surat di sini" class="inp w-full mt-1"></textarea><span class="srt-hint block">Wajib diisi sebelum mencetak. Baris baru yang Anda ketik akan tercetak apa adanya.</span></label>
+          </div>
+          <div class="srt-sec">Penandatangan</div>
+          <div class="srt-form">
+            <label class="lb">Nama<input v-model.trim="cs.namaTtd" :placeholder="(cfg.ttd&&cfg.ttd.nama)||'Nama penandatangan'" class="inp w-full mt-1"></label>
+            <label class="lb">NUPTK / identitas<input v-model.trim="cs.nipTtd" :placeholder="(cfg.ttd&&cfg.ttd.nip)||'NUPTK atau identitas'" class="inp w-full mt-1"></label>
+          </div>
+          <p class="srt-hint">Jika dikosongkan, surat memakai penandatangan yang diatur di menu Pengaturan.</p>
+        </div></div>
+        <div class="srt-pane srt-pane-prev" v-show="csTab==='pratinjau'"><div class="srt-preview" role="group" aria-label="Pratinjau surat pada kertas A4">
+          <div class="srt-paper"><div class="srt-flow">
+            <div class="srt-fh"><div class="srt-fr"><div class="srt-fc"><div class="srt-sp"></div></div></div></div>
+            <div class="srt-fb">
+              <div class="srt-fr"><div class="srt-fc srt-headrow">
+                <kop :k="cfg.kop"></kop>
+                <div class="srt-judul"><div class="srt-judul-t">{{cs.jenis.toUpperCase()}}</div><div v-if="cs.nomor">Nomor: {{cs.nomor}}</div><div v-else class="srt-ph">Nomor: …</div></div>
+                <div v-if="cs.kepada" class="srt-kepada">Kepada Yth.<br><b>{{cs.kepada}}</b></div>
+                <div v-if="cs.perihal" class="srt-perihal">Perihal: {{cs.perihal}}</div>
+              </div></div>
+              <template v-if="cs.isi"><div class="srt-fr" v-for="(l,i) in csBaris" :key="i"><div class="srt-fc srt-isi">{{l||'\u00a0'}}</div></div></template>
+              <div v-else class="srt-fr"><div class="srt-fc srt-isi srt-ph">Isi surat akan tampil di sini.</div></div>
+              <div class="srt-fr"><div class="srt-fc"><div class="srt-ttd"><div>{{cfg.ttd&&cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{fmtTglSurat(cs.tanggal)}}</div><div>{{cfg.ttd&&cfg.ttd.jabatan?cfg.ttd.jabatan:''}}</div><div class="srt-ttd-sp"></div><div><b style="text-decoration:underline">{{cs.namaTtd||cfg.ttd&&cfg.ttd.nama||'-'}}</b></div><div v-if="cs.nipTtd||cfg.ttd&&cfg.ttd.nip">NUPTK / Identitas: {{cs.nipTtd||cfg.ttd&&cfg.ttd.nip}}</div></div></div></div>
+            </div>
+            <div class="srt-ff"><div class="srt-fr"><div class="srt-fc"><div class="srt-sp"></div></div></div></div>
+          </div></div>
+          <p class="srt-note noprint">Pratinjau perkiraan hasil cetak pada kertas A4 tegak.</p>
+        </div></div>
+      </div>
     </section>
 
     <!-- STAFF / TU: Cetak absensi kelas -->
@@ -2661,7 +2776,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     </section>
 
     <!-- Dokumen digital -->
-    <section v-if="view==='dokumen'">
+    <section v-if="view==='dokumen'" class="admin-doc-view">
       <div class="flex flex-wrap items-center gap-3 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Dokumen Digital</h2><p class="desk">{{DESK.dokumen}}</p></div>
         <input v-model.trim="q" @keyup.enter="loadDok" placeholder="Cari, lalu Enter" class="inp"><button v-if="!roKep" @click="showD=true" class="btn-p">Simpan tautan</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
@@ -4548,6 +4663,162 @@ html.embedded #app .bi-detail-print{max-height:none!important;overflow:visible!i
 html.embedded #app .bi-detail-content{overflow:visible!important}
 }
 </style>
+<style id="calm-surat-v1">
+/* ===== Surat Masuk, Surat Keluar, Cetak Surat (awalan srt- hanya dipakai tiga menu ini) ===== */
+#app .srt-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.65rem;margin:0 0 1rem}
+#app .srt-stat{display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;padding:.8rem 1rem;text-align:left;background:#fff;border:1px solid #dbe4ef;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);cursor:pointer;transition:border-color .12s,box-shadow .12s,background-color .12s}
+#app .srt-stat:hover{box-shadow:0 6px 16px rgba(15,23,42,.08)}
+#app .srt-stat:focus-visible{outline:2px solid #0b3d91;outline-offset:2px}
+#app .srt-stat.on{background:color-mix(in srgb,var(--mc,#0b3d91) 8%,#fff);border-color:var(--mc,#0b3d91);box-shadow:0 0 0 1px var(--mc,#0b3d91)}
+#app .srt-stat-n{font-size:1.65rem;font-weight:800;line-height:1.1;color:var(--mc,#0b3d91);font-variant-numeric:tabular-nums}
+#app .srt-stat-l{font-size:.75rem;font-weight:600;color:#475569}
+#app .srt-all{--mc:#0b3d91}
+#app .srt-s-baru{--mc:#2563eb}#app .srt-s-dibaca{--mc:#64748b}#app .srt-s-diproses{--mc:#d97706}#app .srt-s-selesai{--mc:#059669}
+#app .srt-s-draft{--mc:#64748b}#app .srt-s-ditandatangani{--mc:#7c3aed}#app .srt-s-dikirim{--mc:#059669}#app .srt-s-arsip{--mc:#0284c7}
+
+#app .srt-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:.6rem;padding:.85rem;margin:0 0 .6rem;background:#fff;border:1px solid #dbe4ef;border-radius:14px}
+#app .srt-search{flex:1 1 15rem;display:flex;align-items:center;gap:.5rem;height:2.5rem;padding:0 .8rem;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc;color:#64748b}
+#app .srt-search:focus-within{border-color:#0b3d91;background:#fff;box-shadow:0 0 0 3px rgba(11,61,145,.12)}
+#app .srt-search svg{width:1rem;height:1rem;flex:none}
+#app .srt-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:.85rem;color:#0f172a}
+#app .srt-f{display:flex;flex-direction:column;gap:.2rem}
+#app .srt-f span{font-size:.72rem;font-weight:700;color:#64748b}
+#app .srt-bar .inp,#app .srt-bar .btn-o,#app .srt-bar .btn-p{height:2.5rem}
+#app .srt-reset{height:2.5rem;padding:0 .6rem;font-size:.8rem;font-weight:700;color:#be123c;background:none;border:0;cursor:pointer}
+#app .srt-reset:hover{text-decoration:underline}
+#app .srt-add{margin-left:auto}
+#app .srt-count{margin:0 0 .6rem;font-size:.8rem;color:#475569}
+#app .srt-tip{color:#94a3b8}
+
+#app .srt-card{background:#fff;border:1px solid #dbe4ef;border-radius:14px;overflow:auto;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+#app .srt-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.84rem}
+#app .srt-table thead th{padding:.7rem .85rem;text-align:left;font-size:.74rem;font-weight:700;letter-spacing:0;color:#475569;background:#f1f5f9;border-bottom:1px solid #dbe4ef;white-space:nowrap}
+#app .srt-table tbody td{padding:.8rem .85rem;vertical-align:top;border-bottom:1px solid #eef2f7;color:#334155}
+#app .srt-table tbody tr:last-child td{border-bottom:0}
+#app .srt-table tbody tr:not(.srt-emptyrow):hover td{background:#f8fafc}
+#app .srt-nowrap{white-space:nowrap}
+#app .srt-main{min-width:15rem}
+#app .srt-no{font-weight:700;color:#0f172a;overflow-wrap:anywhere}
+#app .srt-sub{margin-top:.1rem;max-width:34rem;font-size:.8rem;line-height:1.45;color:#475569}
+#app .srt-sub2{font-size:.78rem;color:#64748b}
+#app .srt-cat{display:inline-block;margin-top:.4rem;padding:.08rem .5rem;font-size:.7rem;font-weight:600;color:#334155;background:#f1f5f9;border-radius:6px}
+#app .srt-sifat{display:inline-block;font-size:.78rem;font-weight:600}
+#app .srt-sf-biasa{font-weight:500;color:#64748b}
+#app .srt-sf-penting{padding:.12rem .55rem;border-radius:99px;background:#fef3c7;color:#92400e}
+#app .srt-sf-rahasia{padding:.12rem .55rem;border-radius:99px;background:#ffe4e6;color:#9f1239}
+#app .srt-b{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .6rem;font-size:.74rem;font-weight:700;border-radius:99px;white-space:nowrap}
+#app .srt-b::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:currentColor}
+#app .srt-b-baru{background:#dbeafe;color:#1e40af}#app .srt-b-dibaca{background:#f1f5f9;color:#475569}#app .srt-b-diproses{background:#fef3c7;color:#92400e}#app .srt-b-selesai{background:#d1fae5;color:#065f46}
+#app .srt-b-draft{background:#f1f5f9;color:#475569}#app .srt-b-ditandatangani{background:#ede9fe;color:#5b21b6}#app .srt-b-dikirim{background:#d1fae5;color:#065f46}#app .srt-b-arsip{background:#e0f2fe;color:#075985}
+#app .srt-actions{white-space:nowrap;text-align:right}
+#app .srt-th-act{text-align:right!important}
+#app #utama .srt-act{box-sizing:border-box;display:inline-flex;align-items:center;height:2.1rem;min-height:2.1rem;padding:0 .7rem;margin-left:.3rem;font-size:.76rem;font-weight:700;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#1e3a8a;cursor:pointer;text-decoration:none}
+#app #utama .srt-act:hover{background:#eef3fb}
+#app #utama .srt-act:focus-visible{outline:2px solid #0b3d91;outline-offset:2px}
+#app #utama .srt-act-del{color:#be123c;border-color:#fecdd3}#app #utama .srt-act-del:hover{background:#fff1f2}
+#app .srt-empty{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:2.2rem 1rem;text-align:center;color:#64748b}
+#app .srt-empty b{font-size:.95rem;color:#0f172a}
+#app .srt-empty .btn-p{margin-top:.5rem}
+
+/* modal tambah/ubah */
+#app .srt-modal{padding:0!important;overflow:hidden;display:flex;flex-direction:column;max-width:34rem;max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem)}
+#app .srt-mh{position:relative;padding:1.15rem 3.2rem .8rem 1.4rem;border-bottom:1px solid #eef2f7}
+#app .srt-mh h3{margin:0;font-size:1.1rem;font-weight:800;color:#0b2a66}
+#app .srt-mh p{margin:.2rem 0 0;font-size:.8rem;line-height:1.45;color:#64748b}
+#app #utama .srt-x{position:absolute;top:.9rem;right:.9rem;display:grid;place-items:center;width:2rem;height:2rem;min-height:2rem;padding:0;color:#64748b;background:none;border:0;border-radius:8px;cursor:pointer}
+#app #utama .srt-x:hover{background:#f1f5f9;color:#0f172a}
+#app #utama .srt-x:focus-visible{outline:2px solid #0b3d91;outline-offset:2px}
+#app .srt-mb{flex:1 1 auto;min-height:0;padding:.3rem 1.4rem 1.1rem;overflow:auto}
+#app .srt-sec{margin:1.15rem 0 .6rem;font-size:.82rem;font-weight:700;color:#0b2a66}
+#app .srt-opt{margin-left:.3rem;font-size:.68rem;font-weight:600;letter-spacing:0;color:#94a3b8}
+#app .srt-hint{margin:.35rem 0 0;font-size:.74rem;font-weight:400;letter-spacing:0;line-height:1.45;color:#64748b}
+#app .srt-err{margin:0 1.4rem .8rem;padding:.55rem .8rem;font-size:.8rem;color:#9f1239;background:#fff1f2;border:1px solid #fecdd3;border-radius:10px}
+#app .srt-mf{display:flex;justify-content:flex-end;gap:.5rem;padding:.8rem 1.4rem;background:#f8fafc;border-top:1px solid #e2e8f0}
+#app .srt-seg{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.25rem}
+#app .srt-seg button{flex:1 1 auto;min-height:2.25rem;padding:.3rem .8rem;font-size:.8rem;font-weight:600;color:#475569;background:#fff;border:1px solid #cbd5e1;border-radius:9px;cursor:pointer;transition:background-color .12s,border-color .12s,color .12s}
+#app .srt-seg button:hover{background:#f8fafc;border-color:#94a3b8}
+#app .srt-seg button.on{color:#fff;background:#0b3d91;border-color:#0b3d91}
+#app .srt-seg button:focus-visible{outline:2px solid #0b3d91;outline-offset:2px}
+
+/* Cetak Surat: formulir di kiri, pratinjau kertas A4 di kanan */
+#app .srt-head{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-bottom:1rem}
+#app .srt-head-act{display:flex;gap:.5rem;margin-left:auto}
+#app .srt-tabs{display:flex;gap:4px;margin:0 0 .75rem;padding:4px;background:#eef2f7;border-radius:12px}
+#app .srt-tabs button{flex:1;padding:.5rem .75rem;font-size:.82rem;font-weight:700;color:#64748b;background:transparent;border:0;border-radius:9px;cursor:pointer}
+#app .srt-tabs button.on{color:#0b2a66;background:#fff;box-shadow:0 1px 3px rgba(15,23,42,.14)}
+#app .srt-tabs button:focus-visible{outline:2px solid #0b3d91;outline-offset:1px}
+#app .srt-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;align-items:start}
+#app .srt-pane{min-width:0}
+#app .srt-formcard{background:#fff;border:1px solid #dbe4ef;border-radius:14px;padding:1.1rem 1.25rem 1.25rem;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+#app .srt-formcard .srt-sec:first-child{margin-top:.1rem}
+#app .srt-form{display:grid;grid-template-columns:minmax(0,1fr);gap:.9rem}
+#app .srt-span2{grid-column:1/-1}
+@media(min-width:640px){#app .srt-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#app .srt-form textarea.inp{line-height:1.55;resize:vertical}
+#app .srt-preview{container-type:inline-size;container-name:srtp;padding:.75rem;background:#e6ecf4;border:1px solid #dbe4ef;border-radius:14px}
+#app .srt-note{margin:.6rem 0 0;font-size:.74rem;text-align:center;color:#64748b}
+@media(min-width:1280px){
+  #app .srt-layout{grid-template-columns:minmax(0,1fr) 32rem}
+  #app .srt-layout>.srt-pane{display:block!important}
+  #app .srt-tabs{display:none}
+  #app .srt-pane-prev{position:sticky;top:1rem}
+}
+
+/* kertas surat (dipakai untuk pratinjau layar dan cetak) */
+#app .srt-paper{zoom:.5;width:210mm;min-height:297mm;margin:0 auto;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.1),0 14px 28px -14px rgba(15,23,42,.35);border-radius:2px;font-family:'Times New Roman',Times,'Liberation Serif',serif;font-size:12pt;line-height:1.5;color:#000}
+@container srtp (max-width:285px){#app .srt-paper{zoom:.32}}
+@container srtp (min-width:286px){#app .srt-paper{zoom:.36}}
+@container srtp (min-width:333px){#app .srt-paper{zoom:.42}}
+@container srtp (min-width:397px){#app .srt-paper{zoom:.5}}
+@container srtp (min-width:477px){#app .srt-paper{zoom:.6}}
+@container srtp (min-width:556px){#app .srt-paper{zoom:.7}}
+@container srtp (min-width:675px){#app .srt-paper{zoom:.85}}
+@container srtp (min-width:794px){#app .srt-paper{zoom:1}}
+/* margin kertas dibuat dari baris pengisi atas/bawah agar berulang di setiap halaman */
+#app .srt-flow{display:table;table-layout:fixed;width:100%}
+#app .srt-fh{display:table-header-group}#app .srt-fb{display:table-row-group}#app .srt-ff{display:table-footer-group}
+#app .srt-fr{display:table-row}
+#app .srt-fc{display:table-cell;padding:0 22mm;vertical-align:top}
+#app .srt-sp{height:18mm}
+#app .srt-judul{margin:4mm 0 0;text-align:center}
+#app .srt-judul-t{font-weight:700;text-decoration:underline;letter-spacing:.02em}
+#app .srt-kepada{margin-top:8mm}
+#app .srt-perihal{margin-top:4mm;font-weight:700}
+#app .srt-headrow{padding-bottom:5mm}
+#app .srt-isi{white-space:pre-line;text-align:justify;overflow-wrap:anywhere}
+#app .srt-ttd{width:70mm;margin:7mm 0 0 auto;text-align:center;break-inside:avoid;page-break-inside:avoid}
+#app .srt-ttd-sp{height:22mm}
+#app .srt-ph{color:#94a3b8;font-style:italic}
+
+@page srtsurat{size:A4 portrait;margin:0}
+@media print{
+  #app>div:has(.srt-print-sec){display:block!important;min-height:0!important}
+  main:has(.srt-print-sec)>*:not(.srt-print-sec){display:none!important}
+  .srt-print-sec{display:block!important;padding:0!important;page:srtsurat;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .srt-print-sec .srt-layout{display:block!important}
+  .srt-print-sec .srt-pane-prev{display:block!important;position:static!important}
+  .srt-print-sec .srt-preview{container-type:normal!important;contain:none!important;padding:0!important;background:none!important;border:0!important;border-radius:0!important}
+  .srt-print-sec .srt-paper{zoom:1!important;width:auto!important;min-height:0!important;margin:0!important;box-shadow:none!important;border-radius:0!important}
+  .srt-print-sec .srt-ph,.srt-print-sec .srt-note{display:none!important}
+}
+
+@media(max-width:767px){
+  #app .srt-add{margin-left:0;flex:1 1 100%}
+  #app .srt-card{background:transparent;border:0;box-shadow:none;overflow:visible}
+  #app .srt-table,#app .srt-table tbody,#app .srt-table tr,#app .srt-table td{display:block;width:100%}
+  #app .srt-table thead{display:none}
+  #app .srt-table tbody tr{margin-bottom:.7rem;padding:.35rem .85rem;background:#fff;border:1px solid #dbe4ef;border-radius:14px}
+  #app .srt-table tbody td{display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;border-bottom:1px dashed #e8edf3;text-align:right}
+  #app .srt-table tbody td::before{content:attr(data-label);flex:none;font-size:.72rem;font-weight:700;color:#94a3b8;text-align:left}
+  #app .srt-table tbody td:last-child{border-bottom:0;justify-content:flex-end}
+  #app .srt-table tbody tr:not(.srt-emptyrow):hover td{background:transparent}
+  #app .srt-main{min-width:0}
+  #app .srt-sub{max-width:none}
+  #app .srt-actions:empty{display:none}
+  #app .srt-emptyrow td::before{content:none}
+  #app .srt-modal{border-radius:1.1rem 1.1rem 0 0}
+}
+</style>
 <script>
 // Ganti dengan URL Web App hasil deploy Apps Script
 const API_URL = 'https://script.google.com/macros/s/AKfycbwcfPzDxCsJxXTFSRH-R6x2rZEt5goThRhqhWG4hqLE4_0Z6ZD3Icu8sjOoRbDtgwobVw/exec';
@@ -6196,7 +6467,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const suratMasuk=ref({rows:[]}), suratKeluar=ref({rows:[]}), disposisi=ref({rows:[]}), arsip=ref({rows:[]}), layanan=ref({rows:[]}), mutasi=ref({rows:[]}), rekapAdmin=ref(null);
     const mutasiTampil = computed(() => (mutasi.value.rows || []).filter(r => (!tuMU.jenis || r.jenis === tuMU.jenis) && (!tuMU.status || (r.status || 'Diajukan') === tuMU.status)));
     const mutasiRingkasan = computed(() => { const a=(mutasi.value.rows||[]).filter(r=>!tuMU.jenis||r.jenis===tuMU.jenis); const c=k=>a.filter(r=>(r.status||'Diajukan')===k).length; return {total:a.length,diajukan:c('Diajukan'),diproses:c('Diproses'),selesai:c('Selesai'),batal:c('Batal')}; });
-    const tuSM=reactive({bulan:'',q:''}), tuSK=reactive({bulan:'',q:''}), tuDP=reactive({bulan:'',q:''}), tuAR=reactive({bulan:'',q:''}), tuLA=reactive({bulan:'',q:''}), tuMU=reactive({bulan:'',q:'',jenis:'',status:''}), tuRK=reactive({bulan:hari0.slice(0,7)});
+    const tuSM=reactive({bulan:'',q:'',sifat:'',status:''}), tuSK=reactive({bulan:'',q:'',status:''}), tuDP=reactive({bulan:'',q:''}), tuAR=reactive({bulan:'',q:''}), tuLA=reactive({bulan:'',q:''}), tuMU=reactive({bulan:'',q:'',jenis:'',status:''}), tuRK=reactive({bulan:hari0.slice(0,7)});
     const showSM=ref(false), showSK=ref(false), showDP=ref(false), showAR=ref(false), showLA=ref(false), showMU=ref(false);
     const tuMUStatusAwal=ref('');
     const tuSMF=reactive({id:'',tanggal:hari0,nomor:'',asal:'',perihal:'',kategori:'',sifat:'Biasa',status:'Baru',fileUrl:''});
@@ -6206,6 +6477,16 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const tuLAF=reactive({id:'',tanggal:hari0,noLayanan:'',pemohon:'',jenis:'',keperluan:'',status:'Diajukan',keterangan:''});
     const tuMUF=reactive({id:'',tanggal:hari0,nis:'',jenis:'Naik Kelas',kelasTujuan:'',alasan:'',dokumenUrl:'',status:'Diajukan'});
     const cs=reactive({jenis:'Surat Keterangan Aktif',nomor:'',tanggal:hari0,kepada:'',perihal:'',isi:'',namaTtd:'',nipTtd:''});
+    const srmStatus=['Baru','Dibaca','Diproses','Selesai'], srkStatus=['Draft','Diproses','Ditandatangani','Dikirim','Arsip'];
+    const suratMasukTampil=computed(()=>(suratMasuk.value.rows||[]).filter(r=>(!tuSM.sifat||(r.sifat||'Biasa')===tuSM.sifat)&&(!tuSM.status||(r.status||'Baru')===tuSM.status)));
+    const suratMasukRingkasan=computed(()=>{const a=(suratMasuk.value.rows||[]).filter(r=>!tuSM.sifat||(r.sifat||'Biasa')===tuSM.sifat),o={total:a.length};srmStatus.forEach(k=>{o[k]=a.filter(r=>(r.status||'Baru')===k).length;});return o;});
+    const suratKeluarTampil=computed(()=>(suratKeluar.value.rows||[]).filter(r=>!tuSK.status||(r.status||'Draft')===tuSK.status));
+    const suratKeluarRingkasan=computed(()=>{const a=suratKeluar.value.rows||[],o={total:a.length};srkStatus.forEach(k=>{o[k]=a.filter(r=>(r.status||'Draft')===k).length;});return o;});
+    const fmtTglRingkas=s=>/^\d{4}-\d{2}-\d{2}/.test(String(s||''))?new Date(String(s).slice(0,10)+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):String(s||'');
+    const fmtTglSurat=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||''))?new Date(s+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'';
+    const srUrl=u=>{u=String(u||'').trim();return /^https?:\/\//i.test(u)?u:'';};
+    const csBaris=computed(()=>String(cs.isi||'').split('\n'));
+    const csTab=ref('isi');
     const tuLoad=async(a,b)=>{const d=await api(a,b); return {rows:d};};
     const loadSuratMasuk=()=>run(async()=>{suratMasuk.value=await tuLoad('suratMasukList',{bulan:tuSM.bulan,q:tuSM.q});});
     const loadSuratKeluar=()=>run(async()=>{suratKeluar.value=await tuLoad('suratKeluarList',{bulan:tuSK.bulan,q:tuSK.q});});
@@ -6307,7 +6588,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       }
     }
     return { roKep, MON_VIEWS, petugasDari, pk, pkData, loadPekerjaanStaf, PK_MOD, pkRingkas, pkTotal, pkAktivitas, roleGroups, predRata, namaRapi, bioRapi, biRapi, pt, cekPT, ptTanggal, ptIsi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, biodataUntuk, tanggalBiodata, cetakCover, cetakPaketRapor, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, biodataDasarLengkap, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, bimp, bimpCount, templateBiodata, pickBiodata, doImportBiodata, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, biRows, biReqs, biQ, biKelas, biTerpilih, biShowForm, biForm, biFields, biCatatan, biRiwayat, biRiwayatLoading, biRiwayatError, biMapel, biKelasOptions, biTampil, muatBukuInduk, biNuptkPetugas, biBukaDetail, biBukaAjukan, biAjukan, biProses, windowPrintSafe, biCetakSatu, biEkspor, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
-      suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, mutasiTampil, mutasiRingkasan, biTab, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, tuMUStatusAwal, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, editMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
+      suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, mutasiTampil, mutasiRingkasan, biTab, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, tuMUStatusAwal, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, editMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat, srmStatus, srkStatus, suratMasukTampil, suratMasukRingkasan, suratKeluarTampil, suratKeluarRingkasan, fmtTglRingkas, fmtTglSurat, srUrl, csBaris, csTab,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, hasilSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
