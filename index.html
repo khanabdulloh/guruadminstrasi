@@ -1969,18 +1969,19 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <input v-model.trim="gq" placeholder="Cari nama / username / kelas..." class="inp flex-1 min-w-[10rem]">
         <span class="text-sm text-slate-500 self-center">{{guruTampil.length}} dari {{gdata.length}} akun</span></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama</th><th>Username</th><th>Peran</th><th>Wali kelas</th><th>Kelas ajar</th><th class="text-center">Jam</th><th v-if="canEdit">Aksi</th></tr></thead>
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama</th><th>Username</th><th>NUPTK</th><th>Peran</th><th>Wali kelas</th><th>Kelas ajar</th><th class="text-center">Jam</th><th v-if="canEdit">Aksi</th></tr></thead>
         <tbody><tr v-for="g in guruTampil" :key="g.username" class="border-t align-top">
-          <td class="p-3 font-semibold">{{g.nama}}</td><td>{{g.username}}</td>
+          <td class="p-3 font-semibold">{{g.nama}}</td><td>{{g.username}}</td><td>{{g.nuptk||'-'}}</td>
           <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[g.role]">{{ROLE_LBL[g.role]}}</span> <span v-if="String(g.tugasTambahan || '').split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR') || g.role==='WAKUR'" class="text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800">WKS Kurikulum</span></td>
           <td>{{g.wali.join(', ')||'-'}}</td><td class="max-w-[14rem]">{{g.kelasAjar.join(', ')||'-'}}</td><td class="text-center">{{g.jam}}</td>
           <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editGuru(g)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delGuru(g)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!guruTampil.length"><td :colspan="canEdit?7:6" class="p-4 text-slate-500">{{gdata.length?'Tidak ada akun yang cocok dengan filter.':canEdit?'Belum ada guru. Klik Tambah guru atau Impor Excel.':'Belum ada data guru.'}}</td></tr></tbody></table></div>
+        <tr v-if="!guruTampil.length"><td :colspan="canEdit?8:7" class="p-4 text-slate-500">{{gdata.length?'Tidak ada akun yang cocok dengan filter.':canEdit?'Belum ada guru. Klik Tambah guru atau Impor Excel.':'Belum ada data guru.'}}</td></tr></tbody></table></div>
       <p v-if="canEdit" class="text-xs text-slate-500 mt-2">Guru yang dipilih sebagai wali kelas otomatis dapat mengisi Bimbingan Wali untuk kelasnya.</p>
       <div v-if="showG" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{gf.edit?'Ubah guru':'Tambah guru'}}</h3>
         <label class="lb">Username</label><input v-model.trim="gf.username" :disabled="gf.edit" placeholder="mis. budi.santoso" autocapitalize="none" class="inp w-full mt-1 mb-3 disabled:bg-slate-100">
         <label class="lb">Nama lengkap</label><input v-model.trim="gf.nama" maxlength="100" placeholder="Nama beserta gelar" class="inp w-full mt-1 mb-3">
+        <label class="lb">NUPTK <span class="font-normal normal-case text-slate-400">(opsional)</span></label><input v-model.trim="gf.nuptk" maxlength="30" inputmode="numeric" placeholder="Nomor Unik Pendidik dan Tenaga Kependidikan" class="inp w-full mt-1 mb-3">
         <label class="lb">Peran utama</label><select v-model="gf.role" @change="(gf.role!=='GURU')&&(gf.wali=[]);(gf.role!=='GURU')&&(gf.tugasWakur=false)" class="inp w-full mt-1 mb-3"><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf / Tata Usaha (hanya lihat &amp; unduh)</option><option value="BK">Guru BK (catatan pelanggaran)</option></select>
         <div v-if="gf.role==='GURU'" class="rounded-xl border border-cyan-200 bg-cyan-50 p-3 mb-3">
           <p class="lb mb-2">Peran dan tugas</p>
@@ -2006,9 +2007,9 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
             <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">{{gimpCount.error}} bermasalah (dilewati)</span></div>
           <label class="flex items-center gap-2 text-sm mb-3"><input type="checkbox" v-model="gimp.update"> Perbarui data guru yang username-nya sudah ada</label>
           <div class="overflow-auto border rounded-xl max-h-80"><table class="w-full text-xs">
-            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>Username</th><th>Nama</th><th>Peran</th><th>Wali kelas</th><th>Status</th></tr></thead>
+            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>Username</th><th>Nama</th><th>NUPTK</th><th>Peran</th><th>Wali kelas</th><th>Status</th></tr></thead>
             <tbody><tr v-for="r in gimp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
-              <td class="p-2">{{r.no}}</td><td>{{r.username}}</td><td>{{r.nama}}</td><td>{{r.role==='KEPSEK'?'Kepsek':r.role==='STAF'?'Staf':'Guru'}}</td><td>{{r.wali.join(', ')}}</td>
+              <td class="p-2">{{r.no}}</td><td>{{r.username}}</td><td>{{r.nama}}</td><td>{{r.nuptk||'-'}}</td><td>{{r.role==='KEPSEK'?'Kepsek':r.role==='STAF'?'Staf':'Guru'}}</td><td>{{r.wali.join(', ')}}</td>
               <td :class="r.st==='error'?'text-rose-600':r.st==='ubah'?'text-blue-800':'text-emerald-700'">{{r.st==='error'?r.msg:r.st==='ubah'?(gimp.update?'Diperbarui':'Dilewati'):'Baru'}}</td></tr></tbody></table></div>
           <p v-if="gimp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{gimp.rows.length}}; semua baris tetap diproses.</p>
           <div v-if="busy&&gimp.prog" class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden"><div class="h-full bg-blue-700 transition-all" :style="{width:gimp.prog+'%'}"></div></div>
@@ -5285,33 +5286,33 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       try { jadwal.value = await api('jadwalList'); } catch (e) { /* */ }
     });
     const gdata = ref([]), gq = ref(''), grole = ref(''), showG = ref(false);
-    const gf = reactive({ edit: false, username: '', nama: '', role: 'GURU', tugasWakur: false, sandi: '', wali: [] });
+    const gf = reactive({ edit: false, username: '', nama: '', nuptk: '', role: 'GURU', tugasWakur: false, sandi: '', wali: [] });
     const kred = reactive({ show: false, judul: '', list: [], copied: false });
-    const guruTampil = computed(() => { const t = gq.value.toLowerCase(); return gdata.value.filter(g => (!grole.value || (grole.value === 'WAKUR' ? String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR') : g.role === grole.value)) && (!t || (g.nama + ' ' + g.username + ' ' + g.wali.join(' ') + ' ' + g.kelasAjar.join(' ')).toLowerCase().includes(t))); });
+    const guruTampil = computed(() => { const t = gq.value.toLowerCase(); return gdata.value.filter(g => (!grole.value || (grole.value === 'WAKUR' ? String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR') : g.role === grole.value)) && (!t || (g.nama + ' ' + g.username + ' ' + (g.nuptk||'') + ' ' + g.wali.join(' ') + ' ' + g.kelasAjar.join(' ')).toLowerCase().includes(t))); });
     const refreshGuru = async () => { [gdata.value, kelasAll.value] = await Promise.all([api('guruDetail'), api('kelasDetail')]); };
     const showKred = (judul, list) => Object.assign(kred, { show: true, judul, list, copied: false });
     const copyKred = async () => {
       const teks = kred.list.map(c => c.nama + '\nUsername: ' + c.username + '\nSandi: ' + c.sandi).join('\n\n');
       try { await navigator.clipboard.writeText(teks); kred.copied = true; } catch (e) { await tanya({ judul: 'Salin kredensial', detail: 'Salin teks berikut secara manual.', nilai: teks, multiline: true, bacaSaja: true, tombol: 'Selesai', tanpaBatal: true }); }
     };
-    const editGuru = g => { err.value = ok.value = ''; const task = !!g && (String(g.role || '').toUpperCase() === 'WAKUR' || String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR')); Object.assign(gf, { edit: !!g, username: g ? g.username : '', nama: g ? g.nama : '', role: g && g.role === 'WAKUR' ? 'GURU' : (g ? g.role : 'GURU'), tugasWakur: task, sandi: '', wali: g ? [...g.wali] : [] }); showG.value = true; };
+    const editGuru = g => { err.value = ok.value = ''; const task = !!g && (String(g.role || '').toUpperCase() === 'WAKUR' || String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR')); Object.assign(gf, { edit: !!g, username: g ? g.username : '', nama: g ? g.nama : '', nuptk: g ? (g.nuptk||'') : '', role: g && g.role === 'WAKUR' ? 'GURU' : (g ? g.role : 'GURU'), tugasWakur: task, sandi: '', wali: g ? [...g.wali] : [] }); showG.value = true; };
     const saveGuru = () => run(async () => {
       if (!/^[A-Za-z0-9._-]{3,30}$/.test(gf.username)) throw new Error('Username 3-30 karakter: huruf, angka, titik, minus, atau garis bawah');
       if (!gf.nama) throw new Error('Nama wajib diisi');
       if (!gf.edit && gf.sandi && gf.sandi.length < 6) throw new Error('Sandi minimal 6 karakter');
-      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, tugasTambahan: gf.role === 'GURU' && gf.tugasWakur ? 'WAKUR' : '', sandi: gf.sandi, wali: gf.role !== 'GURU' ? [] : gf.wali } });
+      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, nuptk: gf.nuptk, role: gf.role, tugasTambahan: gf.role === 'GURU' && gf.tugasWakur ? 'WAKUR' : '', sandi: gf.sandi, wali: gf.role !== 'GURU' ? [] : gf.wali } });
       showG.value = false; await refreshGuru();
       if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi, role: gf.role }]);
       ok.value = gf.edit ? 'Data guru diperbarui' : 'Akun guru dibuat';
     });
     const delGuru = g => cfmRun('Hapus akun ' + g.nama + '? Status wali kelasnya ikut dilepas.', async () => { await api('guruDelete', { username: g.username }); await refreshGuru(); ok.value = 'Akun dihapus'; });
     const exportGuru = () => run(async () => {
-      const aoa = [['No', 'Username', 'Nama', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, ROLE_LBL[g.role] || 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
-      await saveXlsx('Data_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Guru', aoa, [5, 20, 32, 16, 20, 30, 12]]]); ok.value = guruTampil.value.length + ' akun diekspor';
+      const aoa = [['No', 'Username', 'Nama', 'NUPTK', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, g.nuptk||'', ROLE_LBL[g.role] || 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
+      await saveXlsx('Data_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Guru', aoa, [5, 20, 32, 20, 16, 20, 30, 12]]]); ok.value = guruTampil.value.length + ' akun diekspor';
     });
     const templateGuru = () => run(async () => {
       await saveXlsx('Template_Impor_Guru.xlsx', [
-        ['Data Guru', [['Username', 'Nama', 'Peran', 'Wali Kelas', 'Sandi'], ['budi.santoso', 'Budi Santoso, S.Pd.', 'Guru', 'X TKJ 1', ''], ['siti.aminah', 'Siti Aminah, S.Kom.', 'Guru', 'XI TM 1, XI TM 2', 'rahasia123'], ['kepsek', 'Drs. Contoh, M.Pd.', 'Kepala Sekolah', '', ''], ['staf.tu', 'Rina Lestari', 'Staf', '', '']], [20, 34, 16, 24, 16]],
+        ['Data Guru', [['Username', 'Nama', 'NUPTK', 'Peran', 'Wali Kelas', 'Sandi'], ['budi.santoso', 'Budi Santoso, S.Pd.', '', 'Guru', 'X TKJ 1', ''], ['siti.aminah', 'Siti Aminah, S.Kom.', '', 'Guru', 'XI TM 1, XI TM 2', 'rahasia123'], ['kepsek', 'Drs. Contoh, M.Pd.', '', 'Kepala Sekolah', '', ''], ['staf.tu', 'Rina Lestari', '', 'Staf', '', '']], [20, 34, 20, 16, 24, 16]],
         ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Guru"; hapus baris contoh.'], ['2. Kolom wajib: Username (3-30 karakter: huruf, angka, titik, minus, garis bawah) dan Nama.'], ['3. Peran: Guru, Kepala Sekolah, atau Staf (staf hanya dapat melihat dan mengunduh data guru dan siswa). Kosong = Guru. Hanya guru yang bisa menjadi wali kelas.'], ['4. Wali Kelas: nama kelas yang SUDAH ada di Kelola Kelas; beberapa kelas dipisah koma. Kosong = tidak mengubah.'], ['5. Sandi: opsional, min. 6 karakter. Kosong = dibuat acak (dapat diunduh setelah impor). Untuk akun yang sudah ada, kolom ini diabaikan.']], [100]]]);
     });
     const gimp = reactive({ show: false, rows: [], file: '', update: true, done: null, creds: [], gagal: [], prog: 0 });
@@ -5323,14 +5324,14 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
         const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
         const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
-        const c = { un: col(['username', 'user', 'id', 'nip', 'nuptk']), nama: col(['nama', 'namaguru', 'namalengkap']), role: col(['peran', 'role', 'jabatan']), wali: col(['walikelas', 'wali', 'kelaswali']), sandi: col(['sandi', 'password', 'katasandi']) };
+        const c = { un: col(['username', 'user', 'id']), nuptk: col(['nuptk']), nama: col(['nama', 'namaguru', 'namalengkap']), role: col(['peran', 'role', 'jabatan']), wali: col(['walikelas', 'wali', 'kelaswali']), sandi: col(['sandi', 'password', 'katasandi']) };
         if (c.un < 0 || c.nama < 0) throw new Error('Baris pertama harus berisi judul kolom Username dan Nama. Gunakan tombol "Unduh template".');
         await refreshGuru();
         const ada = new Set(gdata.value.map(x => x.username)), seen = new Set(), kmap = {}, out = [];
         kelasAll.value.forEach(k => kmap[k.kelas.toLowerCase()] = k.kelas);
         aoa.slice(1).forEach((r, i) => {
           if (r.every(v => !norm(v))) return;
-          const o = { no: i + 2, username: norm(r[c.un]), nama: norm(r[c.nama]), role: roleDari(c.role >= 0 ? norm(r[c.role]) : ''), wali: [], sandi: c.sandi < 0 ? '' : norm(r[c.sandi]), st: 'baru', msg: '' };
+          const o = { no: i + 2, username: norm(r[c.un]), nama: norm(r[c.nama]), nuptk: c.nuptk < 0 ? '' : norm(r[c.nuptk]), role: roleDari(c.role >= 0 ? norm(r[c.role]) : ''), wali: [], sandi: c.sandi < 0 ? '' : norm(r[c.sandi]), st: 'baru', msg: '' };
           const walis = c.wali < 0 ? [] : norm(r[c.wali]).split(/[,;|\n]/).map(s => s.trim()).filter(Boolean), salah = [];
           walis.forEach(w => { const k = kmap[w.toLowerCase()]; if (k) { if (o.wali.indexOf(k) < 0) o.wali.push(k); } else salah.push(w); });
           if (!o.username) { o.st = 'error'; o.msg = 'Username kosong'; }
@@ -5348,7 +5349,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       });
     }
     const doImportGuru = () => run(async () => {
-      const list = gimp.rows.filter(r => r.st !== 'error' && (gimp.update || r.st === 'baru')).map(r => ({ username: r.username, nama: r.nama, role: r.role, wali: r.wali, sandi: r.sandi }));
+      const list = gimp.rows.filter(r => r.st !== 'error' && (gimp.update || r.st === 'baru')).map(r => ({ username: r.username, nama: r.nama, nuptk: r.nuptk, role: r.role, wali: r.wali, sandi: r.sandi }));
       let baru = 0, ubah = 0, creds = [], gagal = [];
       gimp.prog = 1;
       try {
