@@ -446,6 +446,18 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 .cfm-eyebrow{margin:0 0 .5rem;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .modal-box.cfm .cfm-title{position:static;margin:0;padding:0;background:none;border:0;border-radius:0;font-size:1.25rem;line-height:1.3;font-weight:700;letter-spacing:-.02em;color:var(--navy-d)}
 .cfm-list{margin:1rem 0 0;display:flex;flex-direction:column;gap:.5rem}
+.pt-box{max-width:26rem}
+.pt-msg{margin:.5rem 0 0}
+.pt-list{margin:1rem 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.4rem;max-height:46vh;overflow-y:auto}
+.pt-item{display:flex;align-items:center;gap:.75rem;width:100%;padding:.6rem .75rem;border:1px solid var(--line);border-radius:.75rem;background:#fff;text-align:left;transition:background-color .12s,border-color .12s}
+.pt-item:hover,.pt-item:focus-visible{background:#f8fafc;border-color:#cbd5e1}
+.pt-tgl{flex:none;min-width:3.6rem;font-size:.75rem;font-weight:600;color:var(--mut)}
+.pt-tgl.pt-hr{color:#b45309}
+.pt-isi{flex:1;min-width:0;font-size:.875rem;color:var(--ink);line-height:1.35}
+.pt-isi small{display:block;font-size:.75rem;color:var(--faint)}
+.pt-go{flex:none;font-size:.8rem;font-weight:600;color:var(--navy-d)}
+.pt-note{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:0 0 1rem;padding:.65rem .9rem;border:1px solid #fde68a;border-radius:.75rem;background:#fffbeb;color:#92400e;font-size:.85rem}
+.pt-note button{flex:none;font-weight:700;color:#b45309;text-decoration:underline}
 .cfm-list li{position:relative;padding-left:1rem;font-size:.875rem;line-height:1.5;color:var(--mut)}
 .cfm-list li::before{content:"";position:absolute;left:0;top:.55em;width:.375rem;height:.375rem;border-radius:50%;background:#f59e0b}
 .cfm-list b{font-weight:600;color:#b45309}
@@ -1187,6 +1199,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     </section>
     <!-- Dashboard -->
     <section v-if="view==='dashboard' && dash" class="dash">
+      <div v-if="user.role==='GURU'&&pt.total" class="pt-note noprint" role="status"><span><b>{{pt.total}} sesi</b> di jadwal Anda belum diisi presensinya.</span><button type="button" @click="pt.show=true">Lihat</button></div>
       <div class="dash-hero">
         <div class="dash-hero-main">
           <p class="dash-role" :title="roleNama[user.role]">{{user.role==='ADMIN'?'\u2699\uFE0E':roleNama[user.role]}}<span v-if="user.role==='SISWA'&&user.kelas">, Kelas {{user.kelas}}</span><span v-if="dash.tipe==='ORTU'&&dash.anak">, orang tua {{dash.anak.nama}} (Kelas {{dash.anak.kelas}})</span></p>
@@ -2799,6 +2812,17 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       <input v-model="pw.konf" type="password" placeholder="Ulangi sandi baru" class="inp w-full mb-4">
       <button @click="ganti" :disabled="busy" class="rounded-xl bg-blue-800 text-white font-bold px-6 py-2.5 disabled:opacity-60">Simpan sandi</button>
     </section>
+      <div v-if="pt.show&&pt.daftar.length" class="modal-wrap cfm-wrap dlg-wrap pt-wrap noprint fixed inset-0" role="presentation" @keydown.esc="pt.show=false" @click.self="pt.show=false">
+        <section class="modal-box cfm pt-box" role="alertdialog" aria-modal="true" aria-labelledby="pt-judul">
+          <p class="cfm-eyebrow">Pengingat presensi</p>
+          <h3 id="pt-judul" class="cfm-title">{{pt.total}} sesi belum diisi presensinya</h3>
+          <p class="cfm-msg pt-msg">Sesuai jadwal mengajar Anda, {{pt.cek}} hari terakhir{{pt.hariIni?' (termasuk hari ini)':''}}. Ketuk sesi untuk langsung mengisi.</p>
+          <ul class="pt-list">
+            <li v-for="x in pt.daftar" :key="x.tanggal+x.kelas+x.mapel"><button type="button" class="pt-item" @click="ptIsi(x)"><span class="pt-tgl" :class="x.tanggal===hari0?'pt-hr':''">{{ptTanggal(x.tanggal)}}</span><span class="pt-isi"><b>{{x.kelas}}</b> &middot; {{x.mapel}}<small>{{x.hari}}, {{x.jam}}</small></span><span class="pt-go" aria-hidden="true">Isi &rsaquo;</span></button></li>
+          </ul>
+          <div class="cfm-actions"><button type="button" @click="pt.show=false" class="cfm-ghost">Nanti saja</button><button type="button" @click="ptIsi(pt.daftar[0])" class="cfm-primary">Isi sekarang</button></div>
+        </section>
+      </div>
       <div v-if="kred.show" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-2">{{kred.judul}}</h3>
         <p class="text-sm text-slate-600 mb-3">Bagikan ke pemilik akun lewat WhatsApp, salinan, atau kartu cetak. Sandi ini tersimpan di sheet <b>Kredensial</b> hanya sampai pengguna menggantinya sendiri.</p>
@@ -4312,7 +4336,7 @@ const app = createApp({
     const jr = reactive({ id: '', info: '', tanggal: hari0, pi: '', materi: '', catatan: '' }), bf = reactive({ tanggal: hari0, kelas: '', nis: '', catatan: '', solusi: '' });
     const sf = reactive({ edit: false, nis: '', nisn: '', nama: '', gender: 'L', kelas: '', kontak: '', tempatLahir: '', tanggalLahir: '', alamat: '', namaAyah: '', namaIbu: '', namaWali: '', kontakOrtu: '', agama: '', statusKeluarga: '', anakKe: '', teleponRumah: '', sekolahAsal: '', diterimaKelas: '', tanggalDiterima: '', alamatOrtu: '', teleponOrtu: '', pekerjaanAyah: '', pekerjaanIbu: '', alamatWali: '', teleponWali: '', pekerjaanWali: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
     const jf = reactive({ id: '', hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '', blok: '' }), nm = reactive({ tp: '', jenis: 'Harian' }), jGuruFilter = ref('');
-    const READ = new Set(['raporBKGet', 'formatifGet', 'kktpTpGet', 'raporRekapMapel', 'raporCfgGet', 'raporCek', 'naikPreview', 'perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'riwayatPenilaianList', 'riwayatNilaiAuditList', 'nilaiArsipList', 'siswaList']);
+    const READ = new Set(['presensiTertunggak', 'raporBKGet', 'formatifGet', 'kktpTpGet', 'raporRekapMapel', 'raporCfgGet', 'raporCek', 'naikPreview', 'perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'riwayatPenilaianList', 'riwayatNilaiAuditList', 'nilaiArsipList', 'siswaList']);
     READ.add('raporKoreksiSumberGet');
     READ.add('wakurMonitorNilai');
     READ.add('sekolahGet');
@@ -4424,6 +4448,7 @@ const app = createApp({
         try { const c = JSON.parse(sessionStorage.getItem(ck) || 'null'); if (c && c.d && Date.now() - c.t < 300000) pakai(c.d); } catch (e) { /* */ }
         const d = await api('dashboard'); if (view.value !== k) return; pakai(d);
         try { sessionStorage.setItem(ck, JSON.stringify({ t: Date.now(), d })); } catch (e) { /* */ }
+        if (user.value.role === 'GURU') cekPT(true);
         if (['ADMIN', 'GURU', 'KEPSEK', 'STAF'].includes(user.value.role)) api('pengaturanGet').catch(() => { /* */ });
         if (!Array.isArray(d.peng)) await fetchPeng();
         if (!Array.isArray(d.agenda)) await fetchAg();
@@ -4760,6 +4785,23 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const tanggalPresensiValid = v => { if (!/^\d{4}-\d{2}-\d{2}$/.test(String(v || ''))) return false; const a = String(v).split('-').map(Number), d = new Date(a[0], a[1] - 1, a[2]); return d.getFullYear() === a[0] && d.getMonth() === a[1] - 1 && d.getDate() === a[2]; };
     const ringkasInput = computed(() => { const c = { H: 0, I: 0, S: 0, A: 0, D: 0 }; rows.value.forEach(r => { if (c[r.status] !== undefined) c[r.status]++; }); return c; });
     let pReq = 0;
+    // Pengingat presensi harian: sesi di jadwal guru (hari ini s.d. 6 hari lalu) yang belum diisi. Hanya membaca; gagal = diam.
+    const pt = reactive({ show: false, daftar: [], total: 0, hariIni: 0, cek: 7 });
+    const cekPT = async tampil => {
+      if (!user.value || user.value.role !== 'GURU') return;
+      try {
+        const d = await api('presensiTertunggak');
+        pt.daftar = Array.isArray(d && d.daftar) ? d.daftar : []; pt.total = (d && d.total) || 0; pt.hariIni = (d && d.hariIni) || 0; pt.cek = (d && d.cek) || 7;
+        if (!pt.daftar.length) { pt.show = false; return; }
+        if (tampil) {
+          const k = 'pt_' + user.value.username + '_' + hari0; let sudah = '';
+          try { sudah = sessionStorage.getItem(k) || ''; } catch (e) { /* */ }
+          if (!sudah) { pt.show = true; try { sessionStorage.setItem(k, '1'); } catch (e) { /* */ } }
+        }
+      } catch (e) { /* pengingat tidak boleh mengganggu alur utama */ }
+    };
+    const ptTanggal = t => { const a = String(t || '').split('-').map(Number); if (a.length !== 3) return t; return t === hari0 ? 'Hari ini' : a[2] + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][a[1] - 1]; };
+    const ptIsi = async x => { pt.show = false; await go('presensi'); ptab.value = 'input'; Object.assign(pi, { tanggal: x.tanggal, kelas: x.kelas, mapel: x.mapel, ada: false }); loadPresensi(); };
     const loadPresensi = () => {
       rows.value = []; pi.ada = false; const rid = ++pReq;
       if (pi.kelas && pi.mapel && pi.tanggal) run(async () => {
@@ -4777,7 +4819,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       const body = JSON.parse(JSON.stringify({ kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal, rows: rows.value })), key = 'p|' + [pi.kelas, pi.mapel, pi.tanggal].join('|'), r = ringkasInput.value; let d;
       try { d = await api('presensiSave', body); } catch (e) { if (!jaringan(e.message)) throw e; qMasuk('presensiSave', 'Presensi ' + pi.kelas + ' - ' + pi.mapel + ' (' + pi.tanggal + ')', key, body); ok.value = 'Tidak ada sinyal. Presensi disimpan di HP dan dikirim otomatis saat tersambung.'; return; }
       qHapusKey(key);
-      pi.ada = true; ok.value = d.tersimpan + ' siswa tersimpan (Hadir ' + r.H + ', Izin ' + r.I + ', Sakit ' + r.S + ', Alpa ' + r.A + ', Dispensasi ' + r.D + ')';
+      pi.ada = true; cekPT(false); ok.value = d.tersimpan + ' siswa tersimpan (Hadir ' + r.H + ', Izin ' + r.I + ', Sakit ' + r.S + ', Alpa ' + r.A + ', Dispensasi ' + r.D + ')';
     });
     const fetchSesi = async () => {
       if (pr.jenis === 'Harian' ? !pr.tanggal : !pr.bulan) throw new Error('Pilih ' + (pr.jenis === 'Harian' ? 'tanggal' : 'bulan') + ' terlebih dahulu');
@@ -5722,7 +5764,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         setInterval(kirimTinggiEmbed, 1000);
       }
     }
-    return { roleGroups, predRata, namaRapi, bioRapi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, biodataUntuk, tanggalBiodata, cetakCover, cetakPaketRapor, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, biodataDasarLengkap, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, bimp, bimpCount, templateBiodata, pickBiodata, doImportBiodata, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { roleGroups, predRata, namaRapi, bioRapi, pt, cekPT, ptTanggal, ptIsi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, biodataUntuk, tanggalBiodata, cetakCover, cetakPaketRapor, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, biodataDasarLengkap, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, bimp, bimpCount, templateBiodata, pickBiodata, doImportBiodata, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
