@@ -1204,8 +1204,9 @@ body:has(.bi-detail-overlay){overflow:hidden}
 </style>
 <style id="buku-induk-print-v11">
 /* Cetak biodata: satu halaman A4 portrait, 3 kolom, dikelompokkan. Blok ini menimpa aturan cetak terdahulu. */
-@page biPortrait{size:A4 portrait;margin:10mm 14mm 9mm}
+@page biPortrait{size:A4 portrait;margin:0}
 @media print{
+html body.bi-print-one #app section.bukuinduk-view .bi-detail-overlay > .bi-detail-print{box-sizing:border-box!important;padding:10mm 14mm 9mm!important;-webkit-box-decoration-break:clone!important;box-decoration-break:clone!important}
 html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-student-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:8mm!important;margin:0 0 3mm!important;padding:0 0 3.5mm!important;border-bottom:1.4pt solid #1f2937!important}
 html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-student-title{display:block!important;flex:1 1 auto!important;min-width:0!important;text-align:left!important}
 html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-school{font-size:8.5pt!important;font-weight:700!important;letter-spacing:.09em!important;color:#374151!important;margin:0 0 3.5mm!important}
@@ -1230,6 +1231,7 @@ html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-si
 html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-signature i{font-style:normal!important;color:#374151!important;white-space:nowrap!important}
 }
 </style>
+<style id="buku-induk-print-list-pad">@media print{html body.bi-print-list #app main{padding:10mm 12mm!important}}</style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="splash" role="status" aria-live="polite">
@@ -4577,8 +4579,11 @@ const app = createApp({
     const biProses=(r,status)=>run(async()=>{await api('bukuIndukProses',{id:r.id,status,catatanAdmin:biCatatan[r.id]||''});await muatBukuInduk();ok.value='Status pengajuan diperbarui. Jika disetujui, Admin perlu memperbarui data melalui Kelola Siswa.';});
     const biMulaiCetak=(mode)=>{
       const cls=mode==='biodata'?'bi-print-one':'bi-print-list';
-      const bersih=()=>{document.body.classList.remove('bi-print-list','bi-print-one');window.removeEventListener('afterprint',bersih);};
-      bersih();document.body.classList.add(cls);window.addEventListener('afterprint',bersih,{once:true});
+      const bersih=()=>{document.body.classList.remove('bi-print-list','bi-print-one');const ps=document.getElementById('bi-page-style');if(ps)ps.remove();window.removeEventListener('afterprint',bersih);};
+      bersih();document.body.classList.add(cls);
+      // Biodata selalu A4 portrait. Halaman bernama (page:biPortrait) tidak diterapkan Chrome bila ada pembungkus flex, sehingga @page global landscape ikut terpakai.
+      if(mode==='biodata'){const ps=document.createElement('style');ps.id='bi-page-style';ps.textContent='@page{size:A4 portrait;margin:0}';document.head.appendChild(ps);}
+      window.addEventListener('afterprint',bersih,{once:true});
       // Fallback untuk browser yang tidak memicu afterprint.
       setTimeout(()=>{try{window.print();}finally{setTimeout(bersih,1200);}},80);
     };
