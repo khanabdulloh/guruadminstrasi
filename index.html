@@ -446,18 +446,6 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
 .cfm-eyebrow{margin:0 0 .5rem;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .modal-box.cfm .cfm-title{position:static;margin:0;padding:0;background:none;border:0;border-radius:0;font-size:1.25rem;line-height:1.3;font-weight:700;letter-spacing:-.02em;color:var(--navy-d)}
 .cfm-list{margin:1rem 0 0;display:flex;flex-direction:column;gap:.5rem}
-.pt-box{max-width:26rem}
-.pt-msg{margin:.5rem 0 0}
-.pt-list{margin:1rem 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.4rem;max-height:46vh;overflow-y:auto}
-.pt-item{display:flex;align-items:center;gap:.75rem;width:100%;padding:.6rem .75rem;border:1px solid var(--line);border-radius:.75rem;background:#fff;text-align:left;transition:background-color .12s,border-color .12s}
-.pt-item:hover,.pt-item:focus-visible{background:#f8fafc;border-color:#cbd5e1}
-.pt-tgl{flex:none;min-width:3.6rem;font-size:.75rem;font-weight:600;color:var(--mut)}
-.pt-tgl.pt-hr{color:#b45309}
-.pt-isi{flex:1;min-width:0;font-size:.875rem;color:var(--ink);line-height:1.35}
-.pt-isi small{display:block;font-size:.75rem;color:var(--faint)}
-.pt-go{flex:none;font-size:.8rem;font-weight:600;color:var(--navy-d)}
-.pt-note{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:0 0 1rem;padding:.65rem .9rem;border:1px solid #fde68a;border-radius:.75rem;background:#fffbeb;color:#92400e;font-size:.85rem}
-.pt-note button{flex:none;font-weight:700;color:#b45309;text-decoration:underline}
 .cfm-list li{position:relative;padding-left:1rem;font-size:.875rem;line-height:1.5;color:var(--mut)}
 .cfm-list li::before{content:"";position:absolute;left:0;top:.55em;width:.375rem;height:.375rem;border-radius:50%;background:#f59e0b}
 .cfm-list b{font-weight:600;color:#b45309}
@@ -570,12 +558,8 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
   body.cetak-absen .absen-title{font-size:12pt;margin:6pt 0 2pt}
   body.cetak-absen .absen-meta{font-size:8.5pt;margin-bottom:6pt;color:#111}
   body.cetak-absen .absen-note{font-size:7.5pt;color:#333}
-  /* Jarak atas tanda tangan memakai padding (bukan margin) agar tetap ada saat blok pindah ke halaman berikutnya;
-     3 baris terakhir tabel + keterangan ikut pindah bersama tanda tangan supaya tidak berdiri sendiri di halaman kosong. */
-  body.cetak-absen .absen-note{margin-bottom:0;break-after:avoid;page-break-after:avoid}
-  body.cetak-absen .absen-table tbody tr:nth-last-child(-n+3){break-after:avoid;page-break-after:avoid}
-  body.cetak-absen .absen-ttd{font-size:9pt;margin-top:0;padding:24pt 14pt 0;line-height:1.45;break-inside:avoid;page-break-inside:avoid}
-  body.cetak-absen .absen-ttd .sp{height:48pt}
+  body.cetak-absen .absen-ttd{font-size:9pt;margin-top:10pt;break-inside:avoid;page-break-inside:avoid}
+  body.cetak-absen .absen-ttd .sp{height:38pt}
 }
 @page absen{size:A4 portrait;margin:12mm}
 @media print{
@@ -1024,262 +1008,6 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td:nth-child(6) { width: 25.5% !important; text-align: left !important; padding-left: 5pt !important; white-space: nowrap !important; }
 }
 </style>
-<style id="absen-repeat-kop-fix">
-@media print {
-  body.cetak-absen .absen-section { padding: 0 12mm 12mm !important; }
-  body.cetak-absen .absen-sheet { overflow: visible !important; }
-  body.cetak-absen .absen-scroll { overflow: visible !important; }
-  body.cetak-absen .absen-table { width: 100% !important; }
-  body.cetak-absen .absen-table thead { display: table-header-group !important; }
-  body.cetak-absen .absen-table .absen-repeat-heading { break-inside: avoid !important; page-break-inside: avoid !important; }
-  body.cetak-absen .absen-table .absen-repeat-heading > th {
-    padding: 8mm 2pt 5pt !important;
-    border: 0 !important;
-    background: #fff !important;
-    vertical-align: top !important;
-  }
-  body.cetak-absen .absen-repeat-heading .absen-title { margin: 5pt 0 2pt !important; }
-  body.cetak-absen .absen-repeat-heading .absen-meta { margin-bottom: 5pt !important; }
-  body.cetak-absen .absen-table tr { break-inside: avoid; page-break-inside: avoid; }
-}
-</style>
-
-<style id="buku-induk-detail-modal-css">
-/* Modal detail Buku Induk: minimal, modern, viewport-safe. Gaya visual hanya untuk layar; tata letak cetak diatur di blok print terpisah. */
-.bi-detail-label{text-transform:uppercase}
-.bi-detail-value{white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal}
-.bi-detail-field{min-width:0}
-.bi-detail-grid{display:grid}
-@media screen{
-.bi-detail-overlay{position:fixed!important;inset:0!important;z-index:99999!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;padding:clamp(12px,4vh,32px)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;background:rgba(15,23,42,.46)!important;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:biFade .16s ease-out}
-.bi-detail-print{position:relative!important;display:flex;flex-direction:column;flex:0 0 auto!important;width:min(820px,100%)!important;max-width:820px!important;max-height:calc(100dvh - 2*clamp(12px,4vh,32px))!important;min-height:0!important;margin:auto!important;overflow:hidden!important;background:#fff!important;border:1px solid rgba(226,232,240,.9);border-radius:18px!important;box-shadow:0 24px 64px -12px rgba(15,23,42,.32),0 2px 6px rgba(15,23,42,.06)!important;color:#0f172a;animation:biRise .2s cubic-bezier(.2,.7,.2,1)}
-.bi-detail-toolbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 26px 18px;background:#fff;border-bottom:1px solid #eef1f6}
-.bi-detail-identity{display:flex;align-items:center;gap:14px;min-width:0}
-.bi-detail-avatar{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border-radius:50%;background:#eef3fb;color:#0b3d91;font-size:18px;font-weight:800;letter-spacing:-.02em}
-.bi-detail-heading{min-width:0}
-.bi-detail-kicker{margin:0 0 3px;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8}
-.bi-detail-name{margin:0;font-size:clamp(17px,2.2vw,21px);line-height:1.25;font-weight:750;letter-spacing:-.02em;color:#0f172a;overflow-wrap:anywhere}
-.bi-detail-meta{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0;font-size:11.5px;color:#475569}
-.bi-detail-meta span{padding:2px 9px;border-radius:999px;background:#f1f5f9;font-variant-numeric:tabular-nums;font-weight:600}
-.bi-detail-close{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:#94a3b8;transition:background .15s,color .15s}
-.bi-detail-close svg{width:18px;height:18px}
-.bi-detail-close:hover{background:#f1f5f9;color:#0f172a}
-.bi-detail-content{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:6px 26px 22px;scrollbar-width:thin;scrollbar-color:#d5dce6 transparent}
-.bi-detail-section-title{display:none}
-.bi-detail-grid{grid-template-columns:repeat(3,minmax(0,1fr));column-gap:28px;row-gap:0}
-.bi-detail-group{grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:20px 0 6px;font-size:10.5px;font-weight:750;letter-spacing:.11em;text-transform:uppercase;color:#0b3d91}
-.bi-detail-group:first-child{margin-top:14px}
-.bi-detail-group::after{content:"";flex:1;height:1px;background:#e8edf3}
-.bi-detail-field{padding:9px 0;border:0;background:transparent}
-.bi-detail-field.bi-wide{grid-column:1/-1}
-.bi-detail-label{margin-bottom:3px;font-size:11.5px;font-weight:600;line-height:1.4;letter-spacing:0;text-transform:none;color:#64748b}
-.bi-detail-value{font-size:13.5px;font-weight:500;line-height:1.5;color:#0f172a}
-.bi-detail-field.is-empty .bi-detail-value{color:#cbd5e1}
-.bi-detail-footer{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 26px;background:#fafbfd;border-top:1px solid #eef1f6}
-.bi-detail-footer>span{font-size:11.5px;color:#94a3b8}
-.bi-detail-footer>div{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.bi-detail-secondary,.bi-detail-primary{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:8px 16px;border-radius:9px;font-size:12.5px;font-weight:650;transition:background .15s,border-color .15s,transform .12s}
-.bi-detail-primary svg{width:15px;height:15px}
-.bi-detail-secondary{border:1px solid #e2e8f0;background:#fff;color:#334155}
-.bi-detail-secondary:hover{background:#f8fafc;border-color:#cbd5e1}
-.bi-detail-primary{border:1px solid #0b3d91;background:#0b3d91;color:#fff}
-.bi-detail-primary:hover{background:#082f70;border-color:#082f70}
-.bi-detail-primary:active,.bi-detail-secondary:active{transform:translateY(1px)}
-.bi-detail-close:focus-visible,.bi-detail-secondary:focus-visible,.bi-detail-primary:focus-visible{outline:2px solid rgba(11,61,145,.4);outline-offset:2px}
-body:has(.bi-detail-overlay){overflow:hidden}
-@keyframes biFade{from{opacity:0}to{opacity:1}}
-@keyframes biRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-}
-@media screen and (max-width:760px){.bi-detail-overlay{align-items:flex-start!important;padding:10px!important}.bi-detail-print{width:100%!important;max-height:calc(100dvh - 20px)!important;border-radius:14px!important}.bi-detail-toolbar{padding:16px 16px 14px;gap:10px}.bi-detail-avatar{flex-basis:40px;width:40px;height:40px;font-size:16px}.bi-detail-content{padding:4px 16px 18px}.bi-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}.bi-detail-footer{padding:12px 16px;align-items:stretch;flex-direction:column}.bi-detail-footer>span{display:none}.bi-detail-footer>div{width:100%}.bi-detail-footer>div button{flex:1}}
-@media screen and (max-width:480px){.bi-detail-grid{grid-template-columns:minmax(0,1fr)}.bi-detail-field.bi-wide{grid-column:auto}}
-@media (prefers-reduced-motion:reduce){.bi-detail-overlay,.bi-detail-print{animation:none}.bi-detail-close,.bi-detail-primary,.bi-detail-secondary{transition:none}}
-</style>
-<style id="buku-induk-print-css">
-.bi-print-heading,.bi-print-student-head,.bi-print-signature{display:none}
-.bi-photo-placeholder{display:none}
-@page biPortrait{size:A4 portrait;margin:14mm}
-@media print{
-  body.bi-print-list #app .bi-toolbar,
-  body.bi-print-one #app .bi-toolbar,
-  body.bi-print-list #app .noprint,
-  body.bi-print-one #app .noprint{display:none!important}
-  body.bi-print-list #app section.bukuinduk-view,
-  body.bi-print-one #app section.bukuinduk-view{display:block!important;visibility:visible!important}
-  body.bi-print-list #app section.bukuinduk-view>*:not(.bi-print-heading):not(.bi-list-print){display:none!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-print-heading{display:block!important;text-align:center!important;margin:0 0 10pt!important;color:#000!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-print-heading h1{font-size:15pt!important;font-weight:800!important;letter-spacing:.04em!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-print-heading p{font-size:9pt!important;margin-top:2pt!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-list-print{display:block!important;overflow:visible!important;box-shadow:none!important;margin:0!important;border-radius:0!important;background:#fff!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-list-print table{display:table!important;width:100%!important;min-width:0!important;border-collapse:collapse!important;table-layout:auto!important;font-size:8pt!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-list-print thead{display:table-header-group!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-list-print tr{break-inside:avoid!important;page-break-inside:avoid!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-list-print th,
-  body.bi-print-list #app section.bukuinduk-view .bi-list-print td{padding:4pt!important;border:1px solid #9ca3af!important;color:#000!important;background:#fff!important;white-space:normal!important;font-size:8pt!important}
-  body.bi-print-list #app section.bukuinduk-view .bi-list-print th:last-child,
-  body.bi-print-list #app section.bukuinduk-view .bi-list-print td:last-child{display:none!important}
-  body.bi-print-one #app section.bukuinduk-view>*:not(.bi-detail-overlay){display:none!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-overlay{display:block!important;visibility:visible!important;position:static!important;inset:auto!important;width:100%!important;height:auto!important;min-height:0!important;padding:0!important;margin:0!important;background:#fff!important;backdrop-filter:none!important;overflow:visible!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-overlay>.bi-detail-print{display:block!important;visibility:visible!important;position:static!important;page:biPortrait;width:100%!important;max-width:none!important;max-height:none!important;min-height:0!important;overflow:visible!important;box-shadow:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;color:#111827!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-toolbar,
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-footer{display:none!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-student-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12mm!important;margin:0 0 9mm!important;padding:0 0 6mm!important;border-bottom:1.2pt solid #1f2937!important;break-inside:avoid!important;page-break-inside:avoid!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-title{flex:1 1 auto!important;min-width:0!important;text-align:left!important;color:#111827!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-print-school{font-size:10pt!important;font-weight:800!important;letter-spacing:.04em!important;margin-bottom:5mm!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-title h1{font-size:17pt!important;font-weight:800!important;line-height:1.2!important;margin:0 0 2mm!important;color:#111827!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-print-subtitle{font-size:9pt!important;font-weight:700!important;letter-spacing:.08em!important;margin-bottom:6mm!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-name{font-size:13pt!important;font-weight:800!important;margin-bottom:2mm!important;overflow-wrap:anywhere!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-id{font-size:9pt!important;color:#374151!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-photo-placeholder{display:flex!important;flex:0 0 30mm!important;width:30mm!important;height:40mm!important;box-sizing:border-box!important;border:1pt solid #374151!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;gap:2mm!important;color:#6b7280!important;background:#fff!important;font-size:9pt!important;text-align:center!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-photo-placeholder strong{font-size:8pt!important;font-weight:600!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-content{padding:0!important;margin:0!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-section-title{font-size:10pt!important;font-weight:800!important;margin:0 0 3mm!important;color:#111827!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0 8mm!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-field{display:block!important;min-width:0!important;border:0!important;border-bottom:.5pt solid #cbd5e1!important;border-radius:0!important;padding:3mm 1mm!important;background:#fff!important;break-inside:avoid!important;page-break-inside:avoid!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-label{font-size:7.5pt!important;font-weight:700!important;letter-spacing:.03em!important;color:#4b5563!important;margin-bottom:1mm!important;text-transform:uppercase!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-value{font-size:9pt!important;line-height:1.35!important;font-weight:500!important;color:#111827!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;word-break:normal!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-print-signature{display:flex!important;justify-content:space-between!important;gap:20mm!important;margin-top:14mm!important;font-size:9pt!important;line-height:1.5!important;color:#111827!important;text-align:center!important;break-inside:avoid!important;page-break-inside:avoid!important}
-  body.bi-print-one #app section.bukuinduk-view .bi-print-signature>div{width:45%!important}
-  body.bi-print-list #app main,body.bi-print-one #app main{padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
-  body.bi-print-list #app aside,body.bi-print-one #app aside,
-  body.bi-print-list #app header,body.bi-print-one #app header,
-  body.bi-print-list #splash,body.bi-print-one #splash{display:none!important}
-  body.bi-print-list,body.bi-print-one{background:#fff!important;color:#000!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-}
-</style>
-
-<style id="buku-induk-print-final-fix">
-/* Final print layout for Buku Induk: A4 portrait with a manual 3 x 4 cm photo box. */
-@page biPortrait { size: A4 portrait; margin: 12mm 14mm 14mm; }
-@media print {
-  html body.bi-print-one { margin:0!important; padding:0!important; background:#fff!important; }
-  body.bi-print-one #app { display:block!important; width:100%!important; max-width:none!important; margin:0!important; padding:0!important; }
-  body.bi-print-one #app section.bukuinduk-view { display:block!important; width:100%!important; margin:0!important; padding:0!important; overflow:visible!important; }
-  body.bi-print-one #app section.bukuinduk-view > *:not(.bi-detail-overlay) { display:none!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-overlay { display:block!important; position:static!important; inset:auto!important; width:100%!important; max-width:none!important; height:auto!important; max-height:none!important; min-height:0!important; padding:0!important; margin:0!important; overflow:visible!important; background:#fff!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-overlay > .bi-detail-print { display:block!important; position:static!important; width:100%!important; max-width:none!important; height:auto!important; max-height:none!important; min-height:0!important; margin:0!important; padding:0!important; overflow:visible!important; border:0!important; border-radius:0!important; box-shadow:none!important; background:#fff!important; color:#111!important; page:biPortrait!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-toolbar,
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-footer { display:none!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-head { display:flex!important; visibility:visible!important; align-items:flex-start!important; justify-content:space-between!important; gap:8mm!important; width:100%!important; box-sizing:border-box!important; margin:0 0 7mm!important; padding:0 0 5mm!important; border-bottom:1.2pt solid #1f2937!important; overflow:visible!important; break-inside:avoid!important; page-break-inside:avoid!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-title { display:block!important; flex:1 1 auto!important; min-width:0!important; text-align:left!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-school { font-size:9pt!important; line-height:1.35!important; font-weight:800!important; letter-spacing:.035em!important; margin:0 0 4mm!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-title h1 { font-size:16pt!important; line-height:1.2!important; font-weight:800!important; margin:0 0 1.5mm!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-subtitle { font-size:8.5pt!important; font-weight:700!important; letter-spacing:.07em!important; margin:0 0 5mm!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-name { font-size:12pt!important; line-height:1.35!important; font-weight:800!important; margin:0 0 1.5mm!important; overflow-wrap:anywhere!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-student-id { font-size:8.5pt!important; line-height:1.4!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-photo-placeholder { display:flex!important; visibility:visible!important; flex:0 0 30mm!important; width:30mm!important; min-width:30mm!important; height:40mm!important; min-height:40mm!important; box-sizing:border-box!important; align-items:center!important; justify-content:center!important; flex-direction:column!important; gap:2mm!important; margin:0!important; padding:2mm!important; border:1pt dashed #475569!important; border-radius:0!important; background:#fff!important; color:#64748b!important; text-align:center!important; font-size:9pt!important; line-height:1.3!important; break-inside:avoid!important; page-break-inside:avoid!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-photo-placeholder span { display:block!important; font-size:10pt!important; font-weight:800!important; letter-spacing:.08em!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-photo-placeholder strong { display:block!important; font-size:8pt!important; font-weight:600!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-content { display:block!important; width:100%!important; margin:0!important; padding:0!important; overflow:visible!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-section-title { font-size:9.5pt!important; font-weight:800!important; margin:0 0 2mm!important; padding:0 0 1.5mm!important; border-bottom:.6pt solid #9ca3af!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-grid { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:0 8mm!important; width:100%!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-field { display:block!important; min-width:0!important; padding:2.4mm 1mm!important; border:0!important; border-bottom:.5pt solid #d1d5db!important; border-radius:0!important; background:#fff!important; break-inside:avoid!important; page-break-inside:avoid!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-label { font-size:7pt!important; line-height:1.3!important; font-weight:800!important; letter-spacing:.035em!important; color:#4b5563!important; margin:0 0 1mm!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-detail-value { font-size:8.5pt!important; line-height:1.35!important; font-weight:500!important; color:#111827!important; white-space:pre-wrap!important; overflow-wrap:anywhere!important; word-break:normal!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-signature { display:flex!important; justify-content:space-between!important; gap:15mm!important; margin-top:9mm!important; font-size:8.5pt!important; line-height:1.5!important; color:#111!important; text-align:center!important; break-inside:avoid!important; page-break-inside:avoid!important; }
-  body.bi-print-one #app section.bukuinduk-view .bi-print-signature > div { width:45%!important; }
-  body.bi-print-one #app aside, body.bi-print-one #app header, body.bi-print-one #splash { display:none!important; }
-}
-</style>
-
-
-<style id="buku-induk-print-isolation-v10">
-@media print {
-  /* Isolasi cetak Buku Induk memakai root aplikasi yang benar (#app). */
-  body.bi-print-one #app { display:block!important; position:static!important; height:auto!important; min-height:0!important; overflow:visible!important; }
-  body.bi-print-one #app > aside, body.bi-print-one #app > header, body.bi-print-one #app > nav,
-  body.bi-print-one #app .sidebar, body.bi-print-one #app .app-header, body.bi-print-one #app .toast,
-  body.bi-print-one #app .notification, body.bi-print-one #app .bi-toolbar,
-  body.bi-print-one #app .bi-summary, body.bi-print-one #app .bi-filter,
-  body.bi-print-one #app .bi-list-print, body.bi-print-one #app .bi-requests,
-  body.bi-print-one #app .bi-request-list { display:none!important; }
-  body.bi-print-one #app main { display:block!important; position:static!important; width:100%!important; height:auto!important; min-height:0!important; max-width:none!important; margin:0!important; padding:0!important; overflow:visible!important; }
-  body.bi-print-one #app main > section:not(.bukuinduk-view) { display:none!important; }
-  body.bi-print-one #app section.bukuinduk-view { display:block!important; position:static!important; width:100%!important; height:auto!important; min-height:0!important; margin:0!important; padding:0!important; overflow:visible!important; }
-  body.bi-print-one #app section.bukuinduk-view > *:not(.bi-detail-overlay) { display:none!important; }
-  body.bi-print-one #app .bi-detail-overlay { display:block!important; position:static!important; inset:auto!important; width:100%!important; height:auto!important; max-height:none!important; margin:0!important; padding:0!important; overflow:visible!important; background:#fff!important; }
-  body.bi-print-one #app .bi-detail-print { display:block!important; position:static!important; width:100%!important; height:auto!important; max-height:none!important; overflow:visible!important; }
-  body.bi-print-list #app main > section:not(.bukuinduk-view) { display:none!important; }
-  body.bi-print-list #app section.bukuinduk-view { display:block!important; }
-}
-</style>
-<style id="buku-induk-print-v11">
-/* Cetak biodata: satu halaman A4 portrait, 3 kolom, dikelompokkan. Blok ini menimpa aturan cetak terdahulu. */
-@page biPortrait{size:A4 portrait;margin:0}
-@media print{
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-overlay > .bi-detail-print{box-sizing:border-box!important;padding:10mm 14mm 9mm!important;-webkit-box-decoration-break:clone!important;box-decoration-break:clone!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-student-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:8mm!important;margin:0 0 3mm!important;padding:0 0 3.5mm!important;border-bottom:1.4pt solid #1f2937!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-student-title{display:block!important;flex:1 1 auto!important;min-width:0!important;text-align:left!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-school{font-size:8.5pt!important;font-weight:700!important;letter-spacing:.09em!important;color:#374151!important;margin:0 0 3.5mm!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-student-title h1{font-size:17pt!important;font-weight:800!important;line-height:1.15!important;letter-spacing:.01em!important;margin:0 0 1mm!important;color:#111827!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-subtitle{font-size:8pt!important;font-weight:600!important;letter-spacing:.12em!important;color:#6b7280!important;margin:0 0 5mm!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-student-name{font-size:12pt!important;font-weight:800!important;line-height:1.3!important;margin:0 0 1mm!important;color:#111827!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-student-id{font-size:8.5pt!important;line-height:1.4!important;color:#4b5563!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-photo-placeholder{border:.8pt dashed #6b7280!important;color:#6b7280!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-section-title{display:none!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-content{display:block!important;padding:0!important;margin:0!important;overflow:visible!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;column-gap:7mm!important;row-gap:0!important;width:100%!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-group{display:block!important;grid-column:1/-1!important;margin:3.2mm 0 .6mm!important;padding:0 0 1mm!important;border-bottom:.7pt solid #6b7280!important;font-size:7.5pt!important;font-weight:800!important;letter-spacing:.12em!important;text-transform:uppercase!important;color:#1f2937!important;break-after:avoid!important;page-break-after:avoid!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-group::after{content:none!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-field{display:block!important;padding:1.4mm 0!important;border:0!important;border-bottom:.4pt solid #e5e7eb!important;background:#fff!important;break-inside:avoid!important;page-break-inside:avoid!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-field.bi-wide{grid-column:1/-1!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-label{font-size:7.5pt!important;font-weight:600!important;line-height:1.3!important;letter-spacing:0!important;text-transform:none!important;color:#4b5563!important;margin:0 0 .6mm!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-value{font-size:9pt!important;font-weight:500!important;line-height:1.35!important;color:#111827!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-detail-field.is-empty .bi-detail-value{color:#9ca3af!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-signature{display:flex!important;justify-content:space-between!important;gap:20mm!important;margin:6mm 0 0!important;font-size:9pt!important;line-height:1.5!important;color:#111827!important;break-inside:avoid!important;page-break-inside:avoid!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-signature>div{display:flex!important;flex-direction:column!important;align-items:center!important;width:46%!important;text-align:center!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-signature b{font-weight:700!important;margin-bottom:15mm!important}
-html body.bi-print-one #app section.bukuinduk-view .bi-detail-print .bi-print-signature i{font-style:normal!important;color:#374151!important;white-space:nowrap!important}
-}
-</style>
-<style id="buku-induk-print-list-pad">
-/* Cetak daftar: A4 portrait. Margin kertas 0 (aturan v103), jarak tepi lewat padding yang diulang di tiap halaman. */
-@media print{
-html body.bi-print-list #app > div.min-h-screen{display:block!important;min-height:0!important}
-html body.bi-print-list #app main{display:block!important;box-sizing:border-box!important;padding:10mm 12mm!important;-webkit-box-decoration-break:clone!important;box-decoration-break:clone!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print table{table-layout:fixed!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th,html body.bi-print-list #app section.bukuinduk-view .bi-list-print td{padding:3.5pt 4pt!important;font-size:7.5pt!important;line-height:1.3!important;overflow-wrap:anywhere!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th{background:#e8edf3!important;font-weight:800!important;text-align:left!important}
-
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th:nth-child(1),html body.bi-print-list #app section.bukuinduk-view .bi-list-print td:nth-child(1){width:7%!important;text-align:center!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th:nth-child(2),html body.bi-print-list #app section.bukuinduk-view .bi-list-print td:nth-child(2){width:16%!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th:nth-child(3),html body.bi-print-list #app section.bukuinduk-view .bi-list-print td:nth-child(3){width:31%!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th:nth-child(4),html body.bi-print-list #app section.bukuinduk-view .bi-list-print td:nth-child(4){width:6%!important;text-align:center!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th:nth-child(5),html body.bi-print-list #app section.bukuinduk-view .bi-list-print td:nth-child(5){width:12%!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th:nth-child(6),html body.bi-print-list #app section.bukuinduk-view .bi-list-print td:nth-child(6){width:17%!important}
-html body.bi-print-list #app section.bukuinduk-view .bi-list-print th:nth-child(7),html body.bi-print-list #app section.bukuinduk-view .bi-list-print td:nth-child(7){width:11%!important}
-}
-</style>
-<style id="bi-koreksi-modal-polish">
-/* Riwayat akademik pada detail Buku Induk: tabel ringkas, responsif, dan tetap terbaca saat dicetak. */
-.bi-history-section{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid #dbe4ef;break-inside:avoid}
-.bi-history-note{font-size:.78rem;line-height:1.5;color:#64748b;margin:.35rem 0 .8rem}
-.bi-history-list{display:grid;gap:.8rem}
-.bi-history-card{border:1px solid #dbe4ef;border-radius:12px;overflow:hidden;background:#fff;break-inside:avoid}
-.bi-history-head{display:flex;justify-content:space-between;align-items:center;gap:.75rem;padding:.7rem .85rem;background:#f8fafc;border-bottom:1px solid #e2e8f0}
-.bi-history-head strong,.bi-history-head span,.bi-exkul-item strong,.bi-exkul-item span{display:block}
-.bi-history-head strong{font-size:.86rem;color:#0f172a}.bi-history-head span,.bi-exkul-item span{font-size:.74rem;color:#64748b;margin-top:.15rem}
-.bi-history-average{font-size:.75rem;white-space:nowrap;color:#075985;background:#e0f2fe;padding:.35rem .55rem;border-radius:8px}
-.bi-history-table{width:100%;border-collapse:collapse;font-size:.75rem;min-width:540px}
-.bi-history-table th,.bi-history-table td{padding:.5rem .65rem;text-align:left;border-bottom:1px solid #edf2f7;vertical-align:top}
-.bi-history-table th{font-weight:700;color:#475569;background:#fff}
-.bi-history-table tbody tr:last-child td{border-bottom:0}
-.bi-history-empty{padding:.75rem;border:1px dashed #cbd5e1;border-radius:10px;color:#64748b;font-size:.8rem}
-.bi-history-error{color:#b91c1c;background:#fef2f2;border-color:#fecaca}
-.bi-history-subtitle{margin-top:1.25rem}
-.bi-exkul-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.6rem}
-.bi-exkul-item{display:flex;align-items:flex-start;gap:.65rem;padding:.7rem .8rem;border:1px solid #dbe4ef;border-radius:10px;background:#fff;break-inside:avoid}
-.bi-exkul-dot{flex:0 0 9px;width:9px;height:9px;margin-top:.35rem;border-radius:50%;background:#0f766e}
-.bi-exkul-item strong{font-size:.82rem;color:#0f172a}
-@media print{.bi-history-section{margin-top:1rem;padding-top:.8rem}.bi-history-card,.bi-exkul-item{box-shadow:none!important}.bi-history-table{font-size:9pt}.bi-history-table th,.bi-history-table td{padding:5px}.bi-history-note{font-size:8pt}}
-
-/* Modal Ajukan Koreksi Buku Induk: lebih ringkas tanpa mengubah fungsi form. */
-.bi-koreksi-box{width:min(100%,30rem);max-width:30rem;padding:1.25rem!important;border-radius:1.1rem}
-.bi-koreksi-box>h3:first-child{top:-1.25rem;margin:-1.25rem -1.25rem 1rem;padding:1rem 1.25rem;font-size:1rem}
-.bi-koreksi-box .flex.justify-end.gap-2{bottom:-1.25rem;margin:1.15rem -1.25rem -1.25rem;padding:.85rem 1.25rem}
-.bi-koreksi-box .inp{width:100%;min-width:0;transition:border-color .15s,box-shadow .15s}
-.bi-koreksi-box textarea{resize:vertical;min-height:4rem;line-height:1.5}
-@media(max-width:767px){.bi-koreksi-box{width:100%;max-width:100%;padding:1.15rem!important;border-radius:1.1rem 1.1rem 0 0}.bi-koreksi-box>h3:first-child{top:-1.15rem;margin:-1.15rem -1.15rem 1rem;padding:.95rem 1.15rem}.bi-koreksi-box .flex.justify-end.gap-2{margin:1rem -1.15rem -1.15rem;padding:.85rem 1.15rem}}
-</style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="splash" role="status" aria-live="polite">
@@ -1448,8 +1176,8 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     <p v-if="ok" role="status" class="sticky top-14 md:top-2 z-30 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 shadow text-emerald-700 text-sm px-4 py-2 flex gap-2"><span class="flex-1">{{ok}}</span><button @click="ok=''" aria-label="Tutup pesan" class="font-bold">&times;</button></p>
 
     <div v-if="antreSaya.length" class="noprint mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-2">
-      <div class="flex flex-wrap items-center gap-2"><span class="mr-auto"><b>{{antreSaya.length}}</b> data menunggu dikirim ke server.</span><button @click="kirimAntre(false, true)" :disabled="busy" class="btn-o !py-1 text-xs">Kirim sekarang</button></div>
-      <div v-for="x in antreSaya" :key="x.id" class="flex items-center gap-2 text-xs mt-1"><span class="flex-1">{{x.label}}<span v-if="x.galat" class="text-rose-600 font-bold"> - ditolak server: {{x.galat}}</span></span><button v-if="x.stale && x.action==='presensiSave'" @click="perbaikiAntre(x)" :disabled="busy" class="text-sky-700 font-bold">Perbarui daftar siswa</button><button @click="buangAntre(x.id)" class="text-rose-600 font-bold">Buang</button></div></div>
+      <div class="flex flex-wrap items-center gap-2"><span class="mr-auto"><b>{{antreSaya.length}}</b> data menunggu dikirim ke server.</span><button @click="kirimAntre(false)" :disabled="busy" class="btn-o !py-1 text-xs">Kirim sekarang</button></div>
+      <div v-for="x in antreSaya" :key="x.id" class="flex items-center gap-2 text-xs mt-1"><span class="flex-1">{{x.label}}<span v-if="x.galat" class="text-rose-600 font-bold"> - ditolak server: {{x.galat}}</span></span><button @click="buangAntre(x.id)" class="text-rose-600 font-bold">Buang</button></div></div>
     <section v-if="view==='dashboard'&&!dash&&!err" class="dash" aria-busy="true">
       <p class="sr-only" role="status">Memuat dasbor, mohon tunggu.</p>
       <div class="dash-hero" aria-hidden="true"><div class="sk-lines"><i class="sk sk-l1"></i><i class="sk sk-l2"></i><i class="sk sk-l3"></i></div><span class="dash-sync"><span class="spin-s"></span>Mengambil data dari server…</span></div>
@@ -1458,7 +1186,6 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     </section>
     <!-- Dashboard -->
     <section v-if="view==='dashboard' && dash" class="dash">
-      <div v-if="user.role==='GURU'&&pt.total" class="pt-note noprint" role="status"><span><b>{{pt.total}} sesi</b> di jadwal Anda belum diisi presensinya.</span><button type="button" @click="pt.show=true">Lihat</button></div>
       <div class="dash-hero">
         <div class="dash-hero-main">
           <p class="dash-role" :title="roleNama[user.role]">{{user.role==='ADMIN'?'\u2699\uFE0E':roleNama[user.role]}}<span v-if="user.role==='SISWA'&&user.kelas">, Kelas {{user.kelas}}</span><span v-if="dash.tipe==='ORTU'&&dash.anak">, orang tua {{dash.anak.nama}} (Kelas {{dash.anak.kelas}})</span></p>
@@ -1612,7 +1339,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
               </tr></tbody>
             </table>
           </div>
-          <p class="text-xs text-slate-500 mt-2">H hadir, I izin, S sakit, A alpa, D dispensasi. Persentase kehadiran = (H + D + I + S) dibagi total; hanya Alpa yang mengurangi.</p>
+          <p class="text-xs text-slate-500 mt-2">H hadir, I izin, S sakit, A alpa, D dispensasi (dihitung hadir pada persentase).</p>
           <button @click="savePresensi" :disabled="busy" class="mt-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">{{pi.ada?'Simpan revisi presensi':'Simpan presensi'}}</button>
         </template>
         <p v-else-if="pi.kelas&&pi.mapel&&!busy" class="text-slate-500 text-sm">Belum ada siswa di kelas ini.</p>
@@ -1825,14 +1552,15 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       <p v-if="!ca.kelas" class="nl-empty noprint">Pilih kelas untuk melihat pratinjau daftar hadir.</p>
       <p v-else-if="!caSiswa.length" class="nl-empty noprint">Belum ada siswa di kelas ini.</p>
       <div v-else class="absen-sheet">
+        <kop :k="cfg.kop"></kop>
+        <p class="absen-title">DAFTAR HADIR SISWA</p>
+        <div class="absen-meta"><span>Kelas: <b>{{ca.kelas}}</b></span><span>Minggu: <b>{{caBulanLabel}}</b></span><span v-if="cfg.tahun&&cfg.tahun.tahun">Tahun ajaran: <b>{{cfg.tahun.tahun}}</b></span><span>Wali kelas: <b>{{caWali||'-'}}</b></span><span v-if="ca.ket"><b>{{ca.ket}}</b></span></div>
         <div class="absen-scroll"><table class="absen-table calm-table-print">
           <colgroup><col style="width:30px"><col style="width:84px"><col style="width:190px"><col style="width:28px"><col v-for="h in caHari" :key="'c'+h.d"><col style="width:30px"><col style="width:30px"><col style="width:30px"></colgroup>
-          <thead>
-            <tr class="absen-repeat-heading"><th :colspan="caHari.length + 7"><kop :k="cfg.kop"></kop><p class="absen-title">DAFTAR HADIR SISWA</p><div class="absen-meta"><span>Kelas: <b>{{ca.kelas}}</b></span><span>Minggu: <b>{{caBulanLabel}}</b></span><span v-if="cfg.tahun&&cfg.tahun.tahun">Tahun ajaran: <b>{{cfg.tahun.tahun}}</b></span><span>Wali kelas: <b>{{caWali||'-'}}</b></span><span v-if="ca.ket"><b>{{ca.ket}}</b></span></div></th></tr>
-            <tr><th rowspan="2">No</th><th rowspan="2">NISN</th><th rowspan="2">Nama</th><th rowspan="2">L/P</th><th :colspan="caHari.length">Kehadiran</th><th colspan="3">Jumlah</th></tr>
+          <thead><tr><th rowspan="2">No</th><th rowspan="2">NISN</th><th rowspan="2">Nama</th><th rowspan="2">L/P</th><th :colspan="caHari.length">Kehadiran</th><th colspan="3">Jumlah</th></tr>
             <tr><th v-for="h in caHari" :key="h.d">{{h.nama}}<br><span class="absen-tg">{{h.tgl}}/{{h.bln+1}}</span></th><th>S</th><th>I</th><th>A</th></tr></thead>
           <tbody>
-            <tr v-for="(s,i) in caSiswa" :key="s.nis"><td>{{i+1}}</td><td>{{s.nisn||'-'}}</td><td class="nm">{{namaRapi(s.nama)}}</td><td>{{s.gender}}</td><td v-for="h in caHari" :key="h.d"></td><td></td><td></td><td></td></tr>
+            <tr v-for="(s,i) in caSiswa" :key="s.nis"><td>{{i+1}}</td><td>{{s.nisn||'-'}}</td><td class="nm">{{s.nama}}</td><td>{{s.gender}}</td><td v-for="h in caHari" :key="h.d"></td><td></td><td></td><td></td></tr>
             <tr v-for="n in ca.extra" :key="'x'+n"><td>{{caSiswa.length+n}}</td><td></td><td class="nm"></td><td></td><td v-for="h in caHari" :key="h.d"></td><td></td><td></td><td></td></tr>
           </tbody></table></div>
         <p class="absen-note">Keterangan: H = hadir, S = sakit, I = izin, A = alpa, D = dispensasi.</p>
@@ -1850,38 +1578,12 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       <p v-else class="text-sm text-slate-500">Memuat rekap...</p>
     </section>
 
-    <!-- Buku Induk Peserta Didik -->
-    <section v-if="view==='bukuinduk'" class="bukuinduk-view">
-      <div class="bi-toolbar flex flex-wrap items-center gap-2 mb-4"><div class="page-head in-row mr-auto"><h2 class="h2">Buku Induk Peserta Didik</h2><p class="desk">Data induk resmi peserta didik · akses baca untuk Staff/TU</p></div><button class="btn-o" @click="muatBukuInduk">Muat ulang</button><button class="btn-o" @click="biEkspor">Ekspor Excel</button><button class="btn-o" @click="windowPrintSafe">Cetak daftar</button></div><div class="bi-print-heading"><h1>BUKU INDUK PESERTA DIDIK</h1><p>SMKS CILEDUG AL-MUSADDADIYAH GARUT</p><p>Dicetak: {{new Date().toLocaleDateString('id-ID')}}</p></div>
-      <div class="bi-summary grid md:grid-cols-3 gap-3 mb-4"><div class="card"><span class="text-xs uppercase font-bold">Total peserta didik</span><b class="n">{{biRows.length}}</b></div><div class="card"><span class="text-xs uppercase font-bold">Pengajuan koreksi</span><b class="n">{{biReqs.length}}</b></div><div class="card"><span class="text-xs uppercase font-bold">Menunggu verifikasi</span><b class="n">{{biReqs.filter(x=>x.status==='Menunggu').length}}</b></div></div>
-      <div class="bi-filter bg-white rounded-2xl shadow-sm p-4 mb-4"><div class="flex flex-wrap gap-2"><input v-model.trim="biQ" class="inp flex-1 min-w-[12rem]" placeholder="Cari NISN, nama, atau kelas..."><select v-model="biKelas" class="inp"><option value="">Semua kelas</option><option v-for="k in biKelasOptions" :key="k" :value="k">{{k}}</option></select></div></div>
-      <div class="bi-list-print bg-white rounded-2xl shadow-sm overflow-x-auto mb-5"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">No.</th><th class="p-3">NISN</th><th class="p-3">Nama lengkap</th><th class="p-3">L/P</th><th class="p-3">Kelas</th><th class="p-3">Sekolah asal</th><th class="p-3">Tanggal diterima</th><th class="p-3">Aksi</th></tr></thead><tbody><tr v-for="(s,i) in biTampil" :key="s.nis" class="border-t"><td class="p-3">{{i+1}}</td><td class="p-3">{{s.nisn||'-'}}</td><td class="p-3 font-semibold">{{namaRapi(s.nama)}}</td><td class="p-3">{{s.gender||'-'}}</td><td class="p-3">{{s.kelas||'-'}}</td><td class="p-3">{{biRapi(s.sekolahAsal)||'-'}}</td><td class="p-3">{{s.tanggalDiterima||'-'}}</td><td class="p-3 whitespace-nowrap"><button class="text-blue-800 font-bold mr-3" @click="biBukaDetail(s)">Lihat</button><button class="text-emerald-700 font-bold" @click="biBukaAjukan(s)">Ajukan koreksi</button></td></tr><tr v-if="!biTampil.length"><td colspan="8" class="p-4 text-slate-500">Tidak ada data yang cocok.</td></tr></tbody></table></div>
-      <div v-if="biTerpilih" class="bi-detail-overlay" @click.self="biTerpilih=null" @keydown.esc="biTerpilih=null" role="dialog" aria-modal="true" aria-labelledby="bi-detail-title" tabindex="-1">
-        <div class="bi-detail-print" role="document">
-          <div class="bi-detail-toolbar">
-            <div class="bi-detail-identity"><span class="bi-detail-avatar" aria-hidden="true">{{(namaRapi(biTerpilih.nama)||'?').trim().charAt(0).toUpperCase()}}</span><div class="bi-detail-heading"><p class="bi-detail-kicker">Buku Induk Peserta Didik</p><h3 id="bi-detail-title" class="bi-detail-name">{{namaRapi(biTerpilih.nama)||'Biodata siswa'}}</h3><p class="bi-detail-meta"><span>NISN {{biTerpilih.nisn||'-'}}</span><span v-if="biTerpilih.kelas">{{biTerpilih.kelas}}</span></p></div></div>
-            <button type="button" class="bi-detail-close" @click="biTerpilih=null" aria-label="Tutup detail biodata" title="Tutup (Esc)"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          </div>
-          <div class="bi-print-student-head" aria-hidden="true"><div class="bi-print-student-title"><div class="bi-print-school">SMKS CILEDUG AL-MUSADDADIYAH GARUT</div><h1>BIODATA PESERTA DIDIK</h1><div class="bi-print-subtitle">BUKU INDUK PESERTA DIDIK</div><div class="bi-print-student-name">{{namaRapi(biTerpilih.nama)||'Biodata siswa'}}</div><div class="bi-print-student-id">NISN: {{biTerpilih.nisn||'-'}}</div></div><div class="bi-photo-placeholder"><span>FOTO</span><strong>3 × 4 cm</strong></div></div>
-          <div class="bi-detail-content"><div class="bi-detail-section-title">Informasi peserta didik</div><div class="bi-detail-grid"><template v-for="f in biFields" :key="f.k"><div v-if="f.g" class="bi-detail-group">{{f.g}}</div><div class="bi-detail-field" :class="{'bi-wide':f.w,'is-empty':!biTerpilih[f.k]}"><div class="bi-detail-label">{{f.t}}</div><div class="bi-detail-value">{{(f.m==='n'?namaRapi(biTerpilih[f.k]):f.m==='t'?biRapi(biTerpilih[f.k]):biTerpilih[f.k])||'-'}}</div></div></template></div>
-            <section class="bi-history-section"><div class="bi-detail-section-title">Rekap nilai per semester</div><p class="bi-history-note">Menampilkan nilai rapor yang sudah difinalkan dan tersimpan di arsip sekolah. Periode yang belum difinalkan tidak ditampilkan.</p><p v-if="biRiwayatLoading" class="bi-history-empty">Memuat riwayat akademik…</p><p v-else-if="biRiwayatError" class="bi-history-empty bi-history-error">{{biRiwayatError}}</p><template v-else-if="biRiwayat"><div v-if="biRiwayat.nilai.length" class="bi-history-list"><article v-for="r in biRiwayat.nilai" :key="r.id" class="bi-history-card"><div class="bi-history-head"><div><strong>{{r.tahun}} · Semester {{r.semester}}</strong><span>{{r.periode}} · Kelas {{r.kelas||'-'}}</span></div><b v-if="r.rata!=null" class="bi-history-average">Rata-rata {{r.rata}}</b></div><div class="overflow-x-auto"><table class="bi-history-table"><thead><tr><th>Mata pelajaran</th><th>SLM</th><th>STS</th><th>SAS</th><th>Nilai akhir</th><th>Predikat</th></tr></thead><tbody><tr v-for="m in r.mapel" :key="m.nama"><td>{{m.nama}}</td><td>{{m.slm??'-'}}</td><td>{{m.sts??'-'}}</td><td>{{m.sas??'-'}}</td><td><strong>{{m.akhir??'-'}}</strong></td><td>{{m.pred||'-'}}</td></tr></tbody></table></div></article></div><p v-else class="bi-history-empty">Belum ada arsip nilai rapor final untuk siswa ini.</p></template>
-            <div class="bi-detail-section-title bi-history-subtitle">Ekstrakurikuler yang pernah diikuti</div><div v-if="biRiwayatLoading" class="bi-history-empty">Memuat riwayat ekstrakurikuler…</div><template v-else-if="biRiwayat"><div v-if="biRiwayat.ekskul.length" class="bi-exkul-list"><div v-for="e in biRiwayat.ekskul" :key="e.id" class="bi-exkul-item"><span class="bi-exkul-dot" aria-hidden="true"></span><div><strong>{{e.nama}}</strong><span>{{e.tahun}} · Semester {{e.semester}}<template v-if="e.kelas"> · Kelas {{e.kelas}}</template></span></div></div></div><p v-else class="bi-history-empty">Belum ada catatan ekstrakurikuler pada arsip rapor.</p></template></section>
-            <div class="bi-print-signature"><div><span>Mengetahui,</span><b>Kepala Sekolah</b><i>( ............................................ )</i></div><div><span>Garut, ................................</span><b>Petugas Buku Induk</b><i>( ............................................ )</i></div></div></div>
-          <div class="bi-detail-footer"><span>Sesuai catatan Buku Induk</span><div><button type="button" class="bi-detail-secondary" @click="biTerpilih=null">Tutup</button><button type="button" class="bi-detail-primary" @click="biCetakSatu"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2M7 14h10v6H7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg>Cetak biodata</button></div></div>
-        </div>
-      </div>
-      <div class="bi-requests bg-white rounded-2xl shadow-sm p-5 mb-5"><h3 class="font-extrabold text-blue-900 mb-3">Permohonan Koreksi Data</h3><p class="text-sm text-slate-600 mb-3">Staff tidak mengubah data induk secara langsung. Pengajuan diperiksa Admin; setelah disetujui, Admin melakukan perubahan melalui menu Kelola Siswa.</p><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th class="p-3">Siswa</th><th class="p-3">Koreksi</th><th class="p-3">Data diminta</th><th class="p-3">Status</th><th v-if="canEdit" class="p-3">Proses Admin</th></tr></thead><tbody><tr v-for="r in biReqs" :key="r.id" class="border-t"><td class="p-3">{{String(r.waktu||'').slice(0,10)}}</td><td class="p-3">{{r.namaSiswa}}<div class="text-xs text-slate-500">{{r.nis}}</div></td><td class="p-3">{{r.jenisKoreksi}}<div class="text-xs text-slate-500">{{r.alasan}}</div></td><td class="p-3 whitespace-pre-wrap">{{r.dataDiminta}}</td><td class="p-3 font-bold" :class="r.status==='Menunggu'?'text-amber-700':r.status==='Disetujui'?'text-emerald-700':'text-rose-700'">{{r.status}}</td><td v-if="canEdit" class="p-3"><div v-if="r.status==='Menunggu'" class="flex flex-col gap-2"><input v-model="biCatatan[r.id]" class="inp" placeholder="Catatan admin (opsional)"><button class="btn-p" @click="biProses(r,'Disetujui')">Setujui</button><button class="btn-o" @click="biProses(r,'Ditolak')">Tolak</button></div><span v-else class="text-xs text-slate-500">{{r.diprosesOleh||''}} {{r.catatanAdmin||''}}</span></td></tr><tr v-if="!biReqs.length"><td :colspan="canEdit?6:5" class="p-4 text-slate-500">Belum ada pengajuan koreksi.</td></tr></tbody></table></div></div>
-      <div v-if="biShowForm" class="bi-modal fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-40"><div class="modal-box bi-koreksi-box bg-white rounded-2xl shadow-xl p-6 w-full"><h3 class="font-extrabold text-blue-900 mb-2">Ajukan Koreksi Buku Induk</h3><p class="text-sm text-slate-600 mb-4">{{biForm.nama}} · NIS {{biForm.nis}}</p><label class="lb mb-3">Bagian yang perlu dikoreksi<select v-model="biForm.jenisKoreksi" class="inp w-full mt-1"><option value="">Pilih data</option><option v-for="f in biFields" :key="f.k" :value="f.t">{{f.t}}</option><option value="Data lainnya">Data lainnya</option></select></label><label class="lb mb-3">Data yang seharusnya<textarea v-model.trim="biForm.dataDiminta" rows="3" maxlength="2000" class="inp w-full mt-1" placeholder="Tuliskan data yang benar"></textarea></label><label class="lb mb-4">Alasan koreksi<textarea v-model.trim="biForm.alasan" rows="2" maxlength="1000" class="inp w-full mt-1" placeholder="Contoh: sesuai akta kelahiran"></textarea></label><div class="flex justify-end gap-2"><button class="btn-o" @click="biShowForm=false">Batal</button><button class="btn-p" @click="biAjukan">Kirim pengajuan</button></div></div></div>
-    </section>
-
     <!-- Siswa -->
     <section v-if="view==='siswa'">
       <div class="flex flex-wrap justify-between items-center gap-2 mb-4"><div class="page-head in-row"><h2 class="h2">{{canEdit?'Kelola Siswa':'Data Siswa'}}</h2><p class="desk">{{DESK.siswa}}</p></div>
         <div class="flex flex-wrap gap-2">
           <button v-if="canEdit" @click="templateSiswa" class="btn-o">Unduh template</button>
           <label v-if="canEdit" class="btn-o cursor-pointer">Impor Excel<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickFile"></label>
-          <button v-if="canEdit" @click="templateBiodata" class="btn-o">Template biodata</button>
-          <label v-if="canEdit" class="btn-o cursor-pointer">Impor biodata<input type="file" accept=".xlsx,.xls,.csv" class="hidden" @change="pickBiodata"></label>
           <button @click="exportSiswa" :disabled="!siswaTampil.length" class="btn-o disabled:opacity-50">Ekspor Excel</button>
           <button v-if="canEdit" @click="editSiswa(null)" class="btn-p">Tambah siswa</button></div></div>
       <div class="flex flex-wrap gap-2 mb-3">
@@ -1889,46 +1591,18 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <input v-model.trim="sq" placeholder="Cari NISN / nama..." class="inp flex-1 min-w-[10rem]">
         <span class="text-sm text-slate-500 self-center">{{siswaTampil.length}} dari {{siswa.length}} siswa</span><button v-if="skelas&&canEdit" @click="cetakKartu" :disabled="busy" class="btn-o">Cetak kartu login</button><button v-if="canEdit&&pilihNis.length" @click="bukaPindah" class="btn-p">Pindahkan {{pilihNis.length}} siswa</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th v-if="canEdit" class="p-3 w-8"><input type="checkbox" :checked="semuaDipilih" @change="pilihSemua($event.target.checked)" aria-label="Pilih semua siswa"></th><th :class="canEdit?'':'p-3'">NISN</th><th>Nama</th><th>Jenis kelamin</th><th>Kelas</th><th>Kontak</th><th>Biodata</th><th v-if="canEdit">Aksi</th></tr></thead>
-        <tbody><tr v-for="s in siswaTampil" :key="s.nis" class="border-t"><td v-if="canEdit" class="p-3"><input type="checkbox" :value="s.nis" v-model="pilihNis" :aria-label="'Pilih '+s.nama"></td><td :class="canEdit?'':'p-3'">{{s.nisn||'-'}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td><td><span class="text-xs font-semibold" :class="biodataDasarLengkap(s)?'text-emerald-700':'text-amber-700'">{{biodataDasarLengkap(s)?'Data dasar lengkap':'Perlu dilengkapi'}}</span></td>
+        <thead class="bg-slate-50 text-left"><tr><th v-if="canEdit" class="p-3 w-8"><input type="checkbox" :checked="semuaDipilih" @change="pilihSemua($event.target.checked)" aria-label="Pilih semua siswa"></th><th :class="canEdit?'':'p-3'">NISN</th><th>Nama</th><th>Jenis kelamin</th><th>Kelas</th><th>Kontak</th><th v-if="canEdit">Aksi</th></tr></thead>
+        <tbody><tr v-for="s in siswaTampil" :key="s.nis" class="border-t"><td v-if="canEdit" class="p-3"><input type="checkbox" :value="s.nis" v-model="pilihNis" :aria-label="'Pilih '+s.nama"></td><td :class="canEdit?'':'p-3'">{{s.nisn||'-'}}</td><td>{{s.nama}}</td><td>{{s.gender}}</td><td>{{s.kelas}}</td><td>{{s.kontak}}</td>
           <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editSiswa(s)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delSiswa(s)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!siswaTampil.length"><td :colspan="canEdit?8:6" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':canEdit?'Belum ada siswa. Klik Tambah siswa atau Impor Excel.':'Belum ada data siswa.'}}</td></tr></tbody></table></div>
-      <div v-if="showS" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl">
-        <h3 class="font-extrabold text-blue-900 mb-4">{{sf.edit?'Ubah siswa / Biodata':'Tambah siswa / Biodata'}}</h3>
-        <div class="grid sm:grid-cols-2 gap-3 mb-3"><label class="lb">Nomor Induk / NIS <span class="font-normal text-slate-400">(ID internal, tidak diubah)</span><input :value="sf.nis || (sf.nisn ? 'Mengikuti NISN baru' : 'Dibuat saat disimpan')" readonly class="inp w-full mt-1 bg-slate-50"></label><label class="lb">NISN <span class="font-normal text-slate-400">(10 digit angka)</span><input v-model.trim="sf.nisn" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" placeholder="Masukkan 10 digit NISN" class="inp w-full mt-1"></label></div>
+        <tr v-if="!siswaTampil.length"><td :colspan="canEdit?7:5" class="p-4 text-slate-500">{{siswa.length?'Tidak ada siswa yang cocok dengan filter.':canEdit?'Belum ada siswa. Klik Tambah siswa atau Impor Excel.':'Belum ada data siswa.'}}</td></tr></tbody></table></div>
+      <div v-if="showS" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+        <h3 class="font-extrabold text-blue-900 mb-4">{{sf.edit?'Ubah siswa':'Tambah siswa'}}</h3>
+        <label class="lb">NISN <span class="font-normal text-slate-400">(10 digit angka; hanya Admin yang dapat mengubah)</span></label><input v-model.trim="sf.nisn" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" placeholder="Masukkan 10 digit NISN" class="inp w-full mt-1 mb-3">
         <input v-model.trim="sf.nama" placeholder="Nama lengkap" class="inp w-full mb-3">
         <div class="flex gap-3 mb-3"><select v-model="sf.gender" class="inp"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
           <select v-model="sf.kelas" class="inp flex-1"><option value="">Pilih kelas</option><option v-for="k in kelasAll" :value="k.kelas">{{k.kelas}}</option></select></div>
-        <input v-model.trim="sf.kontak" placeholder="Kontak siswa (opsional)" class="inp w-full mb-4">
-        <div class="border-t pt-4 mt-1"><h4 class="font-bold text-slate-800 mb-3">Biodata tambahan <span class="font-normal text-xs text-slate-500">(boleh dilengkapi bertahap)</span></h4>
-          <div class="grid sm:grid-cols-2 gap-3">
-            <label class="lb">Tempat lahir<input v-model.trim="sf.tempatLahir" maxlength="80" placeholder="Kabupaten/kota" class="inp w-full mt-1"></label>
-            <label class="lb">Tanggal lahir<input v-model="sf.tanggalLahir" type="date" class="inp w-full mt-1"></label>
-            <label class="lb">Agama<input v-model.trim="sf.agama" maxlength="40" placeholder="Islam" class="inp w-full mt-1"></label>
-            <label class="lb">Status dalam keluarga<input v-model.trim="sf.statusKeluarga" maxlength="60" placeholder="Anak kandung" class="inp w-full mt-1"></label>
-            <label class="lb">Anak ke<input v-model.trim="sf.anakKe" maxlength="20" placeholder="1" class="inp w-full mt-1"></label>
-            <label class="lb">Nomor telepon rumah siswa<input v-model.trim="sf.teleponRumah" maxlength="30" placeholder="Opsional" class="inp w-full mt-1"></label>
-            <label class="lb sm:col-span-2">Alamat peserta didik<textarea v-model.trim="sf.alamat" maxlength="500" rows="2" placeholder="Alamat lengkap peserta didik" class="inp w-full mt-1"></textarea></label>
-            <label class="lb sm:col-span-2">Sekolah asal<input v-model.trim="sf.sekolahAsal" maxlength="150" placeholder="Nama sekolah asal" class="inp w-full mt-1"></label>
-            <label class="lb">Diterima di kelas<input v-model.trim="sf.diterimaKelas" maxlength="50" placeholder="Kelas saat diterima" class="inp w-full mt-1"></label>
-            <label class="lb">Tanggal diterima<input v-model="sf.tanggalDiterima" type="date" class="inp w-full mt-1"></label>
-            <div class="sm:col-span-2 border-t pt-3 mt-1"><h5 class="font-bold text-slate-700 mb-2">Data orang tua</h5></div>
-            <label class="lb">Nama ayah<input v-model.trim="sf.namaAyah" maxlength="100" placeholder="Nama lengkap ayah" class="inp w-full mt-1"></label>
-            <label class="lb">Pekerjaan ayah<input v-model.trim="sf.pekerjaanAyah" maxlength="100" placeholder="Pekerjaan ayah" class="inp w-full mt-1"></label>
-            <label class="lb">Nama ibu<input v-model.trim="sf.namaIbu" maxlength="100" placeholder="Nama lengkap ibu" class="inp w-full mt-1"></label>
-            <label class="lb">Pekerjaan ibu<input v-model.trim="sf.pekerjaanIbu" maxlength="100" placeholder="Pekerjaan ibu" class="inp w-full mt-1"></label>
-            <label class="lb sm:col-span-2">Alamat orang tua<textarea v-model.trim="sf.alamatOrtu" maxlength="500" rows="2" placeholder="Alamat orang tua" class="inp w-full mt-1"></textarea></label>
-            <label class="lb">Telepon rumah orang tua<input v-model.trim="sf.teleponOrtu" maxlength="30" placeholder="Nomor telepon" class="inp w-full mt-1"></label>
-            <label class="lb">Kontak HP/WhatsApp orang tua<input v-model.trim="sf.kontakOrtu" maxlength="30" inputmode="tel" placeholder="Nomor HP/WhatsApp" class="inp w-full mt-1"></label>
-            <div class="sm:col-span-2 border-t pt-3 mt-1"><h5 class="font-bold text-slate-700 mb-2">Data wali (jika ada)</h5></div>
-            <label class="lb">Nama wali<input v-model.trim="sf.namaWali" maxlength="100" placeholder="Nama lengkap wali" class="inp w-full mt-1"></label>
-            <label class="lb">Pekerjaan wali<input v-model.trim="sf.pekerjaanWali" maxlength="100" placeholder="Pekerjaan wali" class="inp w-full mt-1"></label>
-            <label class="lb sm:col-span-2">Alamat wali<textarea v-model.trim="sf.alamatWali" maxlength="500" rows="2" placeholder="Alamat wali" class="inp w-full mt-1"></textarea></label>
-            <label class="lb">Telepon rumah wali<input v-model.trim="sf.teleponWali" maxlength="30" placeholder="Nomor telepon wali" class="inp w-full mt-1"></label>
-          </div><p class="text-xs text-slate-500 mt-2">Data yang belum tersedia dapat dibiarkan kosong dan dilengkapi kemudian.</p>
-        </div>
-        <p v-if="err" class="text-sm text-rose-600 mb-2">{{err}}</p>
-        <div class="flex justify-end gap-2 mt-4"><button @click="showS=false" class="btn-o">Batal</button><button @click="saveSiswa" :disabled="busy" class="btn-p">Simpan biodata</button></div>
+        <input v-model.trim="sf.kontak" placeholder="Kontak (opsional)" class="inp w-full mb-3"><p v-if="err" class="text-sm text-rose-600 mb-2">{{err}}</p>
+        <div class="flex justify-end gap-2"><button @click="showS=false" class="btn-o">Batal</button><button @click="saveSiswa" :disabled="busy" class="btn-p">Simpan</button></div>
       </div></div>
       <div v-if="showP" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-2">Pindah / naik kelas</h3><p class="text-sm text-slate-600 mb-3">{{pilihNis.length}} siswa terpilih akan dipindahkan ke:</p>
@@ -1962,32 +1636,6 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <div class="flex justify-end mt-2"><button @click="imp.show=false" class="btn-o">Tutup</button></div>
         </template>
       </div></div>
-      <div v-if="bimp.show" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-3xl">
-        <h3 class="font-extrabold text-blue-900">Impor biodata dari Excel</h3>
-        <p class="text-xs text-slate-500 mb-3">{{bimp.file}}</p>
-        <template v-if="!bimp.done">
-          <p class="text-sm text-slate-600 mb-3">Hanya kolom biodata yang <b>masih kosong</b> yang diisi. Data yang sudah ada tidak diubah, dan siswa baru tidak ditambahkan.</p>
-          <div class="flex flex-wrap gap-2 text-xs font-bold mb-3">
-            <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">{{bimpCount.isi}} siswa akan diisi ({{bimpCount.sel}} kolom)</span>
-            <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{bimpCount.lewat}} tanpa data baru</span>
-            <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">{{bimpCount.error}} bermasalah (dilewati)</span>
-            <span v-if="bimp.kosong" class="px-2 py-1 rounded-full bg-slate-100 text-slate-600">{{bimp.kosong}} baris tanpa biodata diabaikan</span></div>
-          <div class="overflow-auto border rounded-xl max-h-80"><table class="w-full text-xs">
-            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>NIS/NISN</th><th>Nama</th><th>Status</th></tr></thead>
-            <tbody><tr v-for="r in bimp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
-              <td class="p-2">{{r.no}}</td><td>{{r.id||'-'}}</td><td>{{r.nama}}</td>
-              <td :class="r.st==='error'?'text-rose-600':r.st==='isi'?'text-emerald-700':'text-slate-500'">{{r.msg}}</td></tr></tbody></table></div>
-          <p v-if="bimp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{bimp.rows.length}}; semua baris tetap diproses.</p>
-          <p v-if="err" class="text-sm text-rose-600 mt-2">{{err}}</p>
-          <div class="flex justify-end gap-2 mt-4"><button @click="bimp.show=false" :disabled="busy" class="btn-o">Batal</button>
-            <button @click="doImportBiodata" :disabled="busy||!bimpCount.isi" class="btn-p disabled:opacity-50">{{busy?'Mengimpor...':'Isi biodata '+bimpCount.isi+' siswa'}}</button></div>
-        </template>
-        <template v-else>
-          <p class="rounded-xl bg-emerald-50 text-emerald-700 text-sm px-4 py-3 mb-3">Selesai: {{bimp.done.diisi}} siswa terisi ({{bimp.done.sel}} kolom), {{bimp.done.lewat}} tanpa data baru.</p>
-          <p v-if="bimp.done.catatan" class="rounded-xl bg-amber-50 text-amber-800 text-sm px-4 py-3 mb-3">{{bimp.done.catatan}}</p>
-          <div class="flex justify-end mt-2"><button @click="bimp.show=false" class="btn-o">Tutup</button></div>
-        </template>
-      </div></div>
     </section>
 
     <!-- Guru (Admin) -->
@@ -2003,19 +1651,18 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <input v-model.trim="gq" placeholder="Cari nama / username / kelas..." class="inp flex-1 min-w-[10rem]">
         <span class="text-sm text-slate-500 self-center">{{guruTampil.length}} dari {{gdata.length}} akun</span></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
-        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama</th><th>Username</th><th>NUPTK</th><th>Peran</th><th>Wali kelas</th><th>Kelas ajar</th><th class="text-center">Jam</th><th v-if="canEdit">Aksi</th></tr></thead>
+        <thead class="bg-slate-50 text-left"><tr><th class="p-3">Nama</th><th>Username</th><th>Peran</th><th>Wali kelas</th><th>Kelas ajar</th><th class="text-center">Jam</th><th v-if="canEdit">Aksi</th></tr></thead>
         <tbody><tr v-for="g in guruTampil" :key="g.username" class="border-t align-top">
-          <td class="p-3 font-semibold">{{g.nama}}</td><td>{{g.username}}</td><td>{{g.nuptk||'-'}}</td>
+          <td class="p-3 font-semibold">{{g.nama}}</td><td>{{g.username}}</td>
           <td><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="ROLE_CLS[g.role]">{{ROLE_LBL[g.role]}}</span> <span v-if="String(g.tugasTambahan || '').split(/[,;|]/).map(x=>x.trim().toUpperCase()).includes('WAKUR') || g.role==='WAKUR'" class="text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800">WKS Kurikulum</span></td>
           <td>{{g.wali.join(', ')||'-'}}</td><td class="max-w-[14rem]">{{g.kelasAjar.join(', ')||'-'}}</td><td class="text-center">{{g.jam}}</td>
           <td v-if="canEdit" class="whitespace-nowrap pr-3"><button @click="editGuru(g)" class="text-blue-800 font-bold mr-3">Ubah</button><button @click="delGuru(g)" class="text-rose-600 font-bold">Hapus</button></td></tr>
-        <tr v-if="!guruTampil.length"><td :colspan="canEdit?8:7" class="p-4 text-slate-500">{{gdata.length?'Tidak ada akun yang cocok dengan filter.':canEdit?'Belum ada guru. Klik Tambah guru atau Impor Excel.':'Belum ada data guru.'}}</td></tr></tbody></table></div>
+        <tr v-if="!guruTampil.length"><td :colspan="canEdit?7:6" class="p-4 text-slate-500">{{gdata.length?'Tidak ada akun yang cocok dengan filter.':canEdit?'Belum ada guru. Klik Tambah guru atau Impor Excel.':'Belum ada data guru.'}}</td></tr></tbody></table></div>
       <p v-if="canEdit" class="text-xs text-slate-500 mt-2">Guru yang dipilih sebagai wali kelas otomatis dapat mengisi Bimbingan Wali untuk kelasnya.</p>
       <div v-if="showG" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-4">{{gf.edit?'Ubah guru':'Tambah guru'}}</h3>
         <label class="lb">Username</label><input v-model.trim="gf.username" :disabled="gf.edit" placeholder="mis. budi.santoso" autocapitalize="none" class="inp w-full mt-1 mb-3 disabled:bg-slate-100">
         <label class="lb">Nama lengkap</label><input v-model.trim="gf.nama" maxlength="100" placeholder="Nama beserta gelar" class="inp w-full mt-1 mb-3">
-        <label class="lb">NUPTK <span class="font-normal normal-case text-slate-400">(opsional)</span></label><input v-model.trim="gf.nuptk" maxlength="30" inputmode="numeric" placeholder="Nomor Unik Pendidik dan Tenaga Kependidikan" class="inp w-full mt-1 mb-3">
         <label class="lb">Peran utama</label><select v-model="gf.role" @change="(gf.role!=='GURU')&&(gf.wali=[]);(gf.role!=='GURU')&&(gf.tugasWakur=false)" class="inp w-full mt-1 mb-3"><option value="GURU">Guru</option><option value="KEPSEK">Kepala sekolah</option><option value="STAF">Staf / Tata Usaha (hanya lihat &amp; unduh)</option><option value="BK">Guru BK (catatan pelanggaran)</option></select>
         <div v-if="gf.role==='GURU'" class="rounded-xl border border-cyan-200 bg-cyan-50 p-3 mb-3">
           <p class="lb mb-2">Peran dan tugas</p>
@@ -2041,9 +1688,9 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
             <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">{{gimpCount.error}} bermasalah (dilewati)</span></div>
           <label class="flex items-center gap-2 text-sm mb-3"><input type="checkbox" v-model="gimp.update"> Perbarui data guru yang username-nya sudah ada</label>
           <div class="overflow-auto border rounded-xl max-h-80"><table class="w-full text-xs">
-            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>Username</th><th>Nama</th><th>NUPTK</th><th>Peran</th><th>Wali kelas</th><th>Status</th></tr></thead>
+            <thead class="bg-slate-50 text-left sticky top-0"><tr><th class="p-2">Baris</th><th>Username</th><th>Nama</th><th>Peran</th><th>Wali kelas</th><th>Status</th></tr></thead>
             <tbody><tr v-for="r in gimp.rows.slice(0,200)" :key="r.no" class="border-t" :class="r.st==='error'?'bg-rose-50':''">
-              <td class="p-2">{{r.no}}</td><td>{{r.username}}</td><td>{{r.nama}}</td><td>{{r.nuptk||'-'}}</td><td>{{r.role==='KEPSEK'?'Kepsek':r.role==='STAF'?'Staf':'Guru'}}</td><td>{{r.wali.join(', ')}}</td>
+              <td class="p-2">{{r.no}}</td><td>{{r.username}}</td><td>{{r.nama}}</td><td>{{r.role==='KEPSEK'?'Kepsek':r.role==='STAF'?'Staf':'Guru'}}</td><td>{{r.wali.join(', ')}}</td>
               <td :class="r.st==='error'?'text-rose-600':r.st==='ubah'?'text-blue-800':'text-emerald-700'">{{r.st==='error'?r.msg:r.st==='ubah'?(gimp.update?'Diperbarui':'Dilewati'):'Baru'}}</td></tr></tbody></table></div>
           <p v-if="gimp.rows.length>200" class="text-xs text-slate-500 mt-1">Menampilkan 200 baris pertama dari {{gimp.rows.length}}; semua baris tetap diproses.</p>
           <div v-if="busy&&gimp.prog" class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden"><div class="h-full bg-blue-700 transition-all" :style="{width:gimp.prog+'%'}"></div></div>
@@ -2259,11 +1906,11 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
                 <td class="p-2">{{r.olehNama||'-'}}</td>
                 <td class="p-2 text-center"><span v-if="r.aktif" class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700">Aktif</span><span v-else class="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-amber-50 text-amber-700">Riwayat lama</span></td>
                 <td class="p-2 noprint"><div class="flex justify-center gap-1">
-                  <button class="btn-o !min-h-[2rem] !px-2 text-xs" :disabled="!r.aktif" @click="editRiwayatPenilaian(r)" title="Buka nilai untuk diedit"><icon name="pencil" size="13"></icon> Edit</button>
-                  <button class="btn-o !min-h-[2rem] !px-2 text-xs !text-rose-700" @click="hapusRiwayatPenilaian(r)" :title="r.aktif?'Hapus penilaian':'Hapus riwayat lama (nilai tidak diubah)'"><icon name="trash-2" size="13"></icon> Hapus</button>
+                  <button class="btn-o !min-h-[2rem] !px-2 text-xs" :disabled="!r.aktif" @click="editRiwayatPenilaian(r)" title="Buka nilai untuk diedit"><icon name="pencil" size="13"/> Edit</button>
+                  <button class="btn-o !min-h-[2rem] !px-2 text-xs !text-rose-700" @click="hapusRiwayatPenilaian(r)" :title="r.aktif?'Hapus penilaian':'Hapus riwayat lama (nilai tidak diubah)'"><icon name="trash-2" size="13"/> Hapus</button>
                 </div></td>
               </tr>
-              <tr v-if="!riwayatPenilaianTampil.length"><td colspan="8" class="p-8 text-center"><div class="mx-auto mb-2 rounded-full bg-slate-100 w-10 h-10 flex items-center justify-center"><icon name="history" size="18" color="#64748b"></icon></div><div class="font-semibold text-slate-700">{{nilaiRiwayatTpDipilih ? 'Tidak ada riwayat untuk TP ini pada periode yang dipilih' : 'Belum ada riwayat pada periode ini'}}</div><p class="text-slate-500 text-sm mt-1">Simpan nilai sumatif melalui menu Input Nilai. Riwayat akan tercatat otomatis dengan waktu dan semester penyimpanan.</p></td></tr>
+              <tr v-if="!riwayatPenilaianTampil.length"><td colspan="8" class="p-8 text-center"><div class="mx-auto mb-2 rounded-full bg-slate-100 w-10 h-10 flex items-center justify-center"><icon name="history" size="18" color="#64748b"/></div><div class="font-semibold text-slate-700">{{nilaiRiwayatTpDipilih ? 'Tidak ada riwayat untuk TP ini pada periode yang dipilih' : 'Belum ada riwayat pada periode ini'}}</div><p class="text-slate-500 text-sm mt-1">Simpan nilai sumatif melalui menu Input Nilai. Riwayat akan tercatat otomatis dengan waktu dan semester penyimpanan.</p></td></tr>
             </tbody>
           </table>
         </div>
@@ -2306,6 +1953,20 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Mata pelajaran</th><th>Tujuan pembelajaran</th><th>Jenis</th><th>Skor</th></tr></thead>
         <tbody><tr v-for="(r,i) in nilaiSaya" class="border-t"><td class="p-3">{{i+1}}</td><td>{{r.mapel}}</td><td>{{r.tp}}</td><td>{{jl(r.jenis)}}</td><td class="font-bold">{{r.skor}}</td></tr>
         <tr v-if="!nilaiSaya.length"><td colspan="5" class="p-4 text-slate-500">Belum ada nilai.</td></tr></tbody></table></div>
+      <div class="page-head mt-6"><h3 class="h2">Rapor Semester (STS/SAS)</h3><p class="desk">Hanya menampilkan nilai rapor yang sudah difinalkan sekolah.</p></div>
+      <p v-if="!hasilSaya.rapor.length" class="bg-white rounded-2xl p-4 text-sm text-slate-500">Rapor STS/SAS final belum tersedia.</p>
+      <div v-for="r in hasilSaya.rapor" :key="r.id" class="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
+        <div class="p-4 border-b bg-slate-50 flex flex-wrap gap-2 items-center justify-between"><div><b>Rapor {{r.periode}} · {{r.semester}} {{r.tahun}}</b><div class="text-xs text-slate-500">Kelas {{r.kelas}}<span v-if="r.tanggal"> · Final {{r.tanggal}}</span></div></div><span class="rounded-full bg-emerald-100 text-emerald-800 px-2 py-1 text-xs font-bold">FINAL</span></div>
+        <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Mata pelajaran</th><th>SLM</th><th>STS</th><th>SAS</th><th>Nilai rapor</th><th>Predikat</th></tr></thead><tbody>
+          <tr v-for="m in r.mapel" :key="m.nama" class="border-t"><td class="p-3 font-medium">{{m.nama}}</td><td>{{m.slm==null?'—':m.slm}}</td><td>{{m.sts==null?'—':m.sts}}</td><td>{{m.sas==null?'—':m.sas}}</td><td class="font-bold">{{m.akhir==null?'—':m.akhir}}</td><td>{{m.pred||'—'}}</td></tr>
+          <tr v-if="!r.mapel.length"><td colspan="6" class="p-4 text-slate-500">Belum ada rincian nilai pada snapshot rapor ini.</td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="page-head mt-6"><h3 class="h2">Ekstrakurikuler</h3><p class="desk">Data yang tersimpan pada rapor semester.</p></div>
+      <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tahun ajaran</th><th>Semester</th><th>Kelas</th><th>Ekstrakurikuler</th></tr></thead><tbody>
+        <tr v-for="e in hasilSaya.ekstrakurikuler" :key="e.id" class="border-t"><td class="p-3">{{e.tahun}}</td><td>{{e.semester}}</td><td>{{e.kelas||'—'}}</td><td>{{e.nama}}</td></tr>
+        <tr v-if="!hasilSaya.ekstrakurikuler.length"><td colspan="4" class="p-4 text-slate-500">Belum ada data ekstrakurikuler yang disimpan.</td></tr>
+      </tbody></table></div>
     </section>
 
     <!-- Jurnal -->
@@ -2509,7 +2170,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
                     <div class="font-semibold text-emerald-700">Sudah dinilai</div><div class="text-xs text-slate-500 mb-2">Oleh: {{s.penilai||'Guru BK'}}<br>{{s.olehSaya?'Penilaian Anda':'Terkunci oleh Guru BK lain'}}</div>
                     <div v-if="s.olehSaya" class="flex flex-wrap gap-1">
                       <template v-if="s.editMode"><button @click="simpanEditRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-p !px-2 !py-1">Simpan edit</button><button @click="batalEditRaporBK" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1">Batal</button></template>
-                      <template v-else><button @click="editRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1"><icon name="pencil" size="13"></icon> Edit</button><button @click="hapusRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1 !text-rose-700"><icon name="trash-2" size="13"></icon> Hapus</button></template>
+                      <template v-else><button @click="editRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1"><icon name="pencil" size="13"/> Edit</button><button @click="hapusRaporBK(s)" :disabled="busy||bkRaporBusy" class="btn-o !px-2 !py-1 !text-rose-700"><icon name="trash-2" size="13"/> Hapus</button></template>
                     </div>
                   </template>
                   <span v-else class="text-xs text-slate-500">Belum disimpan; gunakan tombol Simpan Semua.</span>
@@ -2520,7 +2181,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           </table>
           <div v-if="bkRapor.siswa.some(s=>!s.sudahDinilai)" class="p-4 border-t bg-slate-50 flex flex-wrap items-center justify-between gap-3">
             <div class="text-sm text-slate-600">Isi penilaian untuk semua siswa yang diperlukan, lalu simpan sekali. Baris yang kosong sepenuhnya akan dilewati.</div>
-            <button @click="simpanSemuaRaporBK" :disabled="busy||bkRaporBusy||!bkRapor.siswa.some(s=>!s.sudahDinilai&&(s.kategori||s.nilai!==''&&s.nilai!=null||s.catatan&&s.catatan.trim()))" class="btn-p"><icon name="save" size="15"></icon> Simpan Semua Penilaian</button>
+            <button @click="simpanSemuaRaporBK" :disabled="busy||bkRaporBusy||!bkRapor.siswa.some(s=>!s.sudahDinilai&&(s.kategori||s.nilai!==''&&s.nilai!=null||s.catatan&&s.catatan.trim()))" class="btn-p"><icon name="save" size="15"/> Simpan Semua Penilaian</button>
           </div>
         </div>
       </template>
@@ -2538,7 +2199,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <label class="lb">NUPTK wali kelas<input v-model.trim="rpInfo.nipWali" maxlength="30" :disabled="!bolehEditR" class="inp w-full mt-1 normal-case"></label>
           <label class="lb">Tanggal rapor<input type="date" v-model="rpInfo.tanggal" :disabled="!bolehEditR" class="inp w-full mt-1"></label>
         </div>
-        <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan data rapor</button><button @click="cetakRapor('')" :disabled="!rp.siswa.length" class="btn-o">Cetak semua rapor</button><button @click="cetakPaketRapor('')" :disabled="!rp.siswa.length" class="btn-p">Cetak paket lengkap</button><button @click="cetakCover('')" :disabled="!rp.siswa.length" class="btn-o">Cetak cover rapor</button><label class="inline-flex items-center gap-1.5 text-xs text-slate-600"><input type="checkbox" v-model="coverIdentitas"> sertakan halaman identitas sekolah</label></div>
+        <div class="flex flex-wrap gap-2 mb-3"><button v-if="bolehEditR" @click="simpanRapor" :disabled="busy||!rp.siswa.length" class="btn-p">Simpan data rapor</button><button @click="cetakRapor('')" :disabled="!rp.siswa.length" class="btn-o">Cetak semua rapor</button><button @click="cetakCover('')" :disabled="!rp.siswa.length" class="btn-o">Cetak cover rapor</button><label class="inline-flex items-center gap-1.5 text-xs text-slate-600"><input type="checkbox" v-model="coverIdentitas"> sertakan halaman identitas sekolah</label></div>
         <div class="rc-list">
           <article v-for="(s,i) in rp.siswa" :key="s.nis" class="rc-card">
             <header class="rc-head">
@@ -2549,7 +2210,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
                 <span :class="s.belum?'is-bad':''"><small>&lt; KKTP</small><b>{{s.belum}}</b></span>
                 <span><small>S / I / A</small><b>{{s.hadir.S}}/{{s.hadir.I}}/{{s.hadir.A}}</b></span>
               </div>
-              <div class="rc-act noprint"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button> <button @click="cetakPaketRapor(s.nis)" class="btn-p !min-h-[2rem] !px-2 text-xs">Paket</button> <button @click="cetakCover(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cover</button></div>
+              <div class="rc-act noprint"><button @click="cetakRapor(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cetak</button> <button @click="cetakCover(s.nis)" class="btn-o !min-h-[2rem] !px-2 text-xs">Cover</button></div>
             </header>
             <div class="rc-body">
               <div class="rc-f"><span class="rc-l">Ekstrakurikuler</span><select :disabled="!bolehEditR" class="rc-sel" aria-label="Pilih kegiatan ekstrakurikuler" @change="if($event.target.value && $event.target.value!=='__manual__'){rpF[s.nis].ekskul=((rpF[s.nis].ekskul||'').trim() ? rpF[s.nis].ekskul.trim()+'\n' : '')+$event.target.value+' - Baik';$event.target.value=''}else{$event.target.value=''}">
@@ -2900,7 +2561,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <div class="card"><b class="n">{{anak.rekap.I+anak.rekap.S}}</b>Izin dan sakit</div>
           <div class="card"><b class="n text-rose-600">{{anak.rekap.A}}</b>Alpa</div>
         </div>
-        <div class="flex flex-wrap gap-2 mb-3"><button v-for="t in [{k:'hadir',t:'Kehadiran'},{k:'nilai',t:'Nilai'},{k:'bimb',t:'Catatan Bimbingan'}]" :key="t.k" @click="atab=t.k" :class="atab===t.k?'btn-p':'btn-o'">{{t.t}}</button></div>
+        <div class="flex flex-wrap gap-2 mb-3"><button v-for="t in [{k:'hadir',t:'Kehadiran'},{k:'nilai',t:'Nilai'},{k:'rapor',t:'Rapor STS/SAS & Ekskul'},{k:'bimb',t:'Catatan Bimbingan'}]" :key="t.k" @click="atab=t.k" :class="atab===t.k?'btn-p':'btn-o'">{{t.t}}</button></div>
         <div v-if="atab==='hadir'" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
           <thead class="bg-slate-50 text-left"><tr><th class="p-3">Tanggal</th><th>Mata pelajaran</th><th>Status</th><th>Keterangan</th></tr></thead>
           <tbody><tr v-for="(r,i) in anak.riwayat" :key="i" class="border-t"><td class="p-3 whitespace-nowrap">{{fmtTgl(r.tanggal)}}</td><td>{{r.mapel||'-'}}</td>
@@ -2913,6 +2574,22 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
             <thead class="bg-slate-50 text-left"><tr><th class="p-3">Mata pelajaran</th><th>Tujuan pembelajaran</th><th>Jenis</th><th>Skor</th></tr></thead>
             <tbody><tr v-for="(r,i) in anak.nilai" :key="i" class="border-t"><td class="p-3">{{r.mapel}}</td><td>{{r.tp}}</td><td>{{jl(r.jenis)}}</td><td class="font-bold">{{r.skor}}</td></tr>
             <tr v-if="!anak.nilai.length"><td colspan="4" class="p-4 text-slate-500">Belum ada nilai.</td></tr></tbody></table></div></div>
+        <div v-if="atab==='rapor'">
+          <div class="page-head"><h3 class="h2">Rapor Semester (STS/SAS)</h3><p class="desk">Hanya nilai rapor yang sudah difinalkan sekolah.</p></div>
+          <p v-if="!anak.hasilSemester.rapor.length" class="bg-white rounded-2xl p-4 text-sm text-slate-500">Rapor STS/SAS final belum tersedia.</p>
+          <div v-for="r in anak.hasilSemester.rapor" :key="r.id" class="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
+            <div class="p-4 border-b bg-slate-50 flex flex-wrap gap-2 items-center justify-between"><div><b>Rapor {{r.periode}} · {{r.semester}} {{r.tahun}}</b><div class="text-xs text-slate-500">Kelas {{r.kelas}}<span v-if="r.tanggal"> · Final {{r.tanggal}}</span></div></div><span class="rounded-full bg-emerald-100 text-emerald-800 px-2 py-1 text-xs font-bold">FINAL</span></div>
+            <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Mata pelajaran</th><th>SLM</th><th>STS</th><th>SAS</th><th>Nilai rapor</th><th>Predikat</th></tr></thead><tbody>
+              <tr v-for="m in r.mapel" :key="m.nama" class="border-t"><td class="p-3 font-medium">{{m.nama}}</td><td>{{m.slm==null?'—':m.slm}}</td><td>{{m.sts==null?'—':m.sts}}</td><td>{{m.sas==null?'—':m.sas}}</td><td class="font-bold">{{m.akhir==null?'—':m.akhir}}</td><td>{{m.pred||'—'}}</td></tr>
+              <tr v-if="!r.mapel.length"><td colspan="6" class="p-4 text-slate-500">Belum ada rincian nilai pada snapshot rapor ini.</td></tr>
+            </tbody></table></div>
+          </div>
+          <div class="page-head mt-6"><h3 class="h2">Ekstrakurikuler</h3><p class="desk">Data yang tersimpan pada rapor semester.</p></div>
+          <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-left"><tr><th class="p-3">Tahun ajaran</th><th>Semester</th><th>Kelas</th><th>Ekstrakurikuler</th></tr></thead><tbody>
+            <tr v-for="e in anak.hasilSemester.ekstrakurikuler" :key="e.id" class="border-t"><td class="p-3">{{e.tahun}}</td><td>{{e.semester}}</td><td>{{e.kelas||'—'}}</td><td>{{e.nama}}</td></tr>
+            <tr v-if="!anak.hasilSemester.ekstrakurikuler.length"><td colspan="4" class="p-4 text-slate-500">Belum ada data ekstrakurikuler yang disimpan.</td></tr>
+          </tbody></table></div>
+        </div>
         <div v-if="atab==='bimb'">
           <div class="flex flex-wrap gap-2 mb-3"><button @click="bimbTab='wali'" :class="bimbTab==='wali'?'btn-p':'btn-o'">Bimbingan Wali Kelas</button><button @click="bimbTab='bk'" :class="bimbTab==='bk'?'btn-p':'btn-o'">Konseling Guru BK</button></div>
           <div v-if="bimbTab==='wali'" class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
@@ -3095,17 +2772,6 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       <input v-model="pw.konf" type="password" placeholder="Ulangi sandi baru" class="inp w-full mb-4">
       <button @click="ganti" :disabled="busy" class="rounded-xl bg-blue-800 text-white font-bold px-6 py-2.5 disabled:opacity-60">Simpan sandi</button>
     </section>
-      <div v-if="pt.show&&pt.daftar.length" class="modal-wrap cfm-wrap dlg-wrap pt-wrap noprint fixed inset-0" role="presentation" @keydown.esc="pt.show=false" @click.self="pt.show=false">
-        <section class="modal-box cfm pt-box" role="alertdialog" aria-modal="true" aria-labelledby="pt-judul">
-          <p class="cfm-eyebrow">Pengingat presensi</p>
-          <h3 id="pt-judul" class="cfm-title">{{pt.total}} sesi belum diisi presensinya</h3>
-          <p class="cfm-msg pt-msg">Sesuai jadwal mengajar Anda, {{pt.cek}} hari terakhir{{pt.hariIni?' (termasuk hari ini)':''}}. Ketuk sesi untuk langsung mengisi.</p>
-          <ul class="pt-list">
-            <li v-for="x in pt.daftar" :key="x.tanggal+x.kelas+x.mapel"><button type="button" class="pt-item" @click="ptIsi(x)"><span class="pt-tgl" :class="x.tanggal===hari0?'pt-hr':''">{{ptTanggal(x.tanggal)}}</span><span class="pt-isi"><b>{{x.kelas}}</b> &middot; {{x.mapel}}<small>{{x.hari}}, {{x.jam}}</small></span><span class="pt-go" aria-hidden="true">Isi &rsaquo;</span></button></li>
-          </ul>
-          <div class="cfm-actions"><button type="button" @click="pt.show=false" class="cfm-ghost">Nanti saja</button><button type="button" @click="ptIsi(pt.daftar[0])" class="cfm-primary">Isi sekarang</button></div>
-        </section>
-      </div>
       <div v-if="kred.show" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-900/50 modal-wrap p-4 z-20"><div class="modal-box bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
         <h3 class="font-extrabold text-blue-900 mb-2">{{kred.judul}}</h3>
         <p class="text-sm text-slate-600 mb-3">Bagikan ke pemilik akun lewat WhatsApp, salinan, atau kartu cetak. Sandi ini tersimpan di sheet <b>Kredensial</b> hanya sampai pengguna menggantinya sendiri.</p>
@@ -3130,34 +2796,6 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <div><div class="cv-sek">{{sek.nama}}</div><div class="cv-alamat">{{[sek.alamat,sek.kelurahan,sek.kecamatan,sek.kabupaten,sek.provinsi,sek.kodepos].filter(Boolean).join(', ')}}</div></div>
       </section>
       <section v-if="coverIdentitas" class="cover-page cover-identitas"><div class="cv-ihead">IDENTITAS SEKOLAH</div><table class="cv-itbl"><tbody><tr v-for="r in sekBaris" :key="r[0]"><td>{{r[0]}}</td><td>:</td><td>{{r[1]}}</td></tr></tbody></table></section>
-      <section class="cover-page cover-biodata"><div class="cv-ihead">BIODATA PESERTA DIDIK</div><table class="cv-itbl"><tbody>
-        <tr><td>1. Nama Lengkap Peserta Didik</td><td>:</td><td>{{namaRapi(s.nama)}}</td></tr>
-        <tr><td>2. NISN</td><td>:</td><td>{{s.nisn||'-'}}</td></tr>
-        <tr><td>3. Tempat, Tanggal Lahir</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).tempatLahir)||'-'}}, {{tanggalBiodata(biodataUntuk(s.nis).tanggalLahir)}}</td></tr>
-        <tr><td>4. Jenis Kelamin</td><td>:</td><td>{{s.gender==='L'?'Laki-Laki':s.gender==='P'?'Perempuan':s.gender||'-'}}</td></tr>
-        <tr><td>5. Agama</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).agama)||'-'}}</td></tr>
-        <tr><td>6. Status dalam Keluarga</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).statusKeluarga)||'-'}}</td></tr>
-        <tr><td>7. Anak ke</td><td>:</td><td>{{biodataUntuk(s.nis).anakKe||'-'}}</td></tr>
-        <tr><td>8. Alamat Peserta Didik</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).alamat)||'-'}}</td></tr>
-        <tr><td>9. Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponRumah||'-'}}</td></tr>
-        <tr><td>10. Sekolah Asal</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).sekolahAsal)||'-'}}</td></tr>
-        <tr><td>11. Diterima di sekolah ini</td><td>:</td><td></td></tr>
-        <tr><td style="padding-left:7mm">a. Kelas</td><td>:</td><td>{{biodataUntuk(s.nis).diterimaKelas||'-'}}</td></tr>
-        <tr><td style="padding-left:7mm">b. Tanggal</td><td>:</td><td>{{tanggalBiodata(biodataUntuk(s.nis).tanggalDiterima)}}</td></tr>
-        <tr><td>12. Nama Orang Tua</td><td>:</td><td></td></tr>
-        <tr><td style="padding-left:7mm">a. Ayah</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).namaAyah)||'-'}}</td></tr>
-        <tr><td style="padding-left:7mm">b. Ibu</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).namaIbu)||'-'}}</td></tr>
-        <tr><td>13. Alamat Orang Tua</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).alamatOrtu)||'-'}}</td></tr>
-        <tr><td style="padding-left:7mm">a. Nomor WA</td><td>:</td><td>{{biodataUntuk(s.nis).kontakOrtu||'-'}}</td></tr>
-        <tr><td style="padding-left:7mm">b. Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponOrtu||'-'}}</td></tr>
-        <tr><td>14. Pekerjaan Orang Tua</td><td>:</td><td></td></tr>
-        <tr><td style="padding-left:7mm">a. Ayah</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).pekerjaanAyah)||'-'}}</td></tr>
-        <tr><td style="padding-left:7mm">b. Ibu</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).pekerjaanIbu)||'-'}}</td></tr>
-        <tr><td>15. Nama Wali Siswa</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).namaWali)||'-'}}</td></tr>
-        <tr><td>16. Alamat Wali Peserta Didik</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).alamatWali)||'-'}}</td></tr>
-        <tr><td style="padding-left:7mm">a. Nomor Telepon Rumah</td><td>:</td><td>{{biodataUntuk(s.nis).teleponWali||'-'}}</td></tr>
-        <tr><td>17. Pekerjaan Wali Peserta Didik</td><td>:</td><td>{{bioRapi(biodataUntuk(s.nis).pekerjaanWali)||'-'}}</td></tr>
-      </tbody></table><div class="cv-bio-ttd"><div>{{sek.kabupaten||'Garut'}}, {{tanggalBiodata(rpInfo.tanggal)}}</div><div>Kepala Sekolah</div><div class="cv-bio-space"></div><b>{{cfg.ttd.nama||'-'}}</b><div>NUKS. {{cfg.ttd.nuks||'19023L0130211241174231'}}</div></div></section>
     </template></div>
     <div v-if="rp&&view==='rapor'&&rpTab!=='rekap'&&rpTab!=='atur'&&siapCetak" class="rapor-wrap"><div v-for="s in rpList" :key="s.nis" class="rapor-page">
       <div class="rapor-bg" aria-hidden="true"><img v-if="cfg.kop.logoKiri||cfg.kop.logoKanan" :src="cfg.kop.logoKiri||cfg.kop.logoKanan" alt=""></div>
@@ -3330,7 +2968,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
   body.cetak-pelanggaran main       { padding: 10mm 11mm 12mm !important; }
 
   /* Absensi kelas: ruang 12 mm */
-  body.cetak-absen .absen-section   { padding: 0 12mm 12mm !important; }
+  body.cetak-absen .absen-section   { padding: 12mm !important; }
 
   /* Cetak tabel umum (leger, rekap, jurnal, bimbingan, monitor) */
   body.cetak-tabel main             { padding: 12mm !important; }
@@ -3680,33 +3318,6 @@ body.cetak-rapor .rapor-page table.rapor-mapel-sts tbody tr > td.rapor-ket:last-
   body.cetak-cover .cv-itbl td{padding:3.2mm 1.5mm;vertical-align:top;border-bottom:.5pt solid #cbd5e1;overflow-wrap:anywhere}
   body.cetak-cover .cv-itbl td:nth-child(1){width:34%}
   body.cetak-cover .cv-itbl td:nth-child(2){width:3%;text-align:center}
-  /* Cover saja: halaman biodata diberi padding halaman + blok tanda tangan kepala sekolah dilonggarkan.
-     Diletakkan sebelum aturan cetak-paket (specificity sama) agar tampilan paket tidak berubah. */
-  body.cetak-cover .cover-biodata{padding:12mm 15mm;font-size:9.5pt}
-  body.cetak-cover .cover-biodata .cv-ihead{margin-bottom:5mm}
-  body.cetak-cover .cover-biodata .cv-itbl{font-size:8.7pt;line-height:1.18}
-  body.cetak-cover .cover-biodata .cv-itbl td{padding:1.5mm 1mm;border-bottom:.35pt solid #d1d5db}
-  body.cetak-cover .cover-biodata .cv-itbl td:first-child{width:37%}
-  body.cetak-cover .cover-biodata .cv-itbl td:nth-child(2){width:3%}
-  body.cetak-cover .cv-bio-ttd{margin-top:9mm;margin-left:55%;text-align:center;line-height:1.5;font-size:9.5pt;break-inside:avoid;page-break-inside:avoid}
-  body.cetak-cover .cv-bio-space{height:20mm}
-  /* Paket lengkap: aturan sembunyi cetak-cover & cetak-rapor (specificity 0,2,2) mengalahkan aturan tampil cetak-paket (0,2,1)
-     sehingga hasil cetak kosong. Aturan di bawah sengaja lebih spesifik. */
-  html body.cetak-paket main>.cover-wrap,html body.cetak-paket main>.rapor-wrap{display:block!important}
-  body.cetak-paket main>*:not(.cover-wrap):not(.rapor-wrap){display:none!important}
-  body.cetak-paket .cover-wrap,body.cetak-paket .rapor-wrap{display:block!important}
-  body.cetak-paket .cover-wrap{page:cover;width:100%}
-  body.cetak-paket .cover-page{break-after:page!important;page-break-after:always!important}
-  body.cetak-paket .rapor-wrap{page:rapor}
-  body.cetak-paket .rapor-page:last-child,body.cetak-paket .cover-wrap>.cover-page:last-child{break-after:auto!important;page-break-after:auto!important}
-  body.cetak-paket .cover-biodata{padding:12mm 13mm;font-size:9.5pt}
-  body.cetak-paket .cover-biodata .cv-ihead{margin-bottom:5mm}
-  body.cetak-paket .cover-biodata .cv-itbl{font-size:8.7pt;line-height:1.18}
-  body.cetak-paket .cover-biodata .cv-itbl td{padding:1.5mm 1mm;border-bottom:.35pt solid #d1d5db}
-  body.cetak-paket .cover-biodata .cv-itbl td:first-child{width:37%}
-  body.cetak-paket .cover-biodata .cv-itbl td:nth-child(2){width:3%}
-  body.cetak-paket .cv-bio-ttd{margin-top:5mm;text-align:center;margin-left:58%;line-height:1.3;font-size:9pt}
-  body.cetak-paket .cv-bio-space{height:14mm}
 }
 </style>
 <style id="calm-rapor-cards-v111">
@@ -4437,8 +4048,8 @@ const app = createApp({
     tick(); setInterval(tick, 1000);
     const mnav = ref(false);
     const openMenuGroup = ref('Ringkasan');
-    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', nilaiMonitor: 'Monitoring Nilai STS/SAS', dashboard: 'Dashboard', bukuinduk: 'Buku Induk Peserta Didik', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', pkl: 'PKL / Prakerin', tahun: 'Tahun Ajaran', sandi: 'Ganti Sandi', anak: 'Data Anak', notif: 'Pemberitahuan', pelanggaran: 'Pelanggaran Siswa', pengurangan: 'Pengurangan Poin', konseling: 'Konseling BK', perangkat: 'Perangkat Ajar' };
-    const MENU = { WAKUR: ['dashboard', 'jadwal', 'nilaiMonitor', 'sandi'], ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'bukuinduk', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'dokumen', 'sandi'], STAF: ['dashboard', 'bukuinduk', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'cetakabsen', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'notif', 'bimbingan', 'konseling', 'pelanggaran', 'pengurangan', 'rapor', 'sandi'] };
+    const M = { guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', nilaiMonitor: 'Monitoring Nilai STS/SAS', dashboard: 'Dashboard', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', pkl: 'PKL / Prakerin', tahun: 'Tahun Ajaran', sandi: 'Ganti Sandi', anak: 'Data Anak', notif: 'Pemberitahuan', pelanggaran: 'Pelanggaran Siswa', pengurangan: 'Pengurangan Poin', konseling: 'Konseling BK', perangkat: 'Perangkat Ajar' };
+    const MENU = { WAKUR: ['dashboard', 'jadwal', 'nilaiMonitor', 'sandi'], ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'dokumen', 'sandi'], STAF: ['dashboard', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'cetakabsen', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'notif', 'bimbingan', 'konseling', 'pelanggaran', 'pengurangan', 'rapor', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -4455,7 +4066,6 @@ const app = createApp({
       riwayat: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
       nilaisaya: '<circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 8 5-3 5 3-1.5-8"/>',
       keluar: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>' };
-    ICON.bukuinduk = '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M4 5.5v14A2.5 2.5 0 0 1 6.5 17H20M8 7h8M8 10h8"/>';
     ICON.bimbingansaya = ICON.catatan = ICON.catatansaya = ICON.bimbingan; ICON.izin = ICON.dokumen;
     ICON.guru = '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/><path d="M17 3l2 2 3-3"/>';
     ICON.rapor = ICON.nilaisaya; ICON.log = ICON.riwayat; ICON.tahun = ICON.jadwal;
@@ -4463,7 +4073,7 @@ const app = createApp({
     ICON.monitor = '<path d="M3 12h4l3-8 4 16 3-8h4"/>'; ICON.nilaiMonitor = '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="m9 10 2 2 4-4"/>';
     ICON.perangkat = ICON.dokumen; ICON.notif = '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>'; ICON.pelanggaran = '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/>'; ICON.pengurangan = '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'; ICON.konseling = '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="M8 12h8M12 8v8"/>'; ICON.anak = ICON.siswa;
     ICON.akun = '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l3 3M14 9l2 2"/>'; ICON.suratmasuk = ICON.dokumen; ICON.suratkeluar = ICON.dokumen; ICON.disposisi = ICON.bimbingan; ICON.arsip = ICON.dokumen; ICON.layanan = ICON.dokumen; ICON.mutasi = ICON.siswa; ICON.cetaksurat = ICON.dokumen; ICON.cetakabsen = ICON.presensi; ICON.rekapadmin = ICON.leger;
-    const MS = { dashboard: 'Dashboard TU', bukuinduk: 'Buku Induk Peserta Didik', siswa: 'Data Siswa', guru: 'Data Guru/PTK', suratmasuk: 'Surat Masuk', suratkeluar: 'Surat Keluar', disposisi: 'Disposisi', arsip: 'Arsip Dokumen', layanan: 'Layanan Administrasi', mutasi: 'Mutasi Siswa', cetaksurat: 'Cetak Surat', cetakabsen: 'Cetak Absensi', rekapadmin: 'Rekap Administrasi' };
+    const MS = { dashboard: 'Dashboard TU', siswa: 'Data Siswa', guru: 'Data Guru/PTK', suratmasuk: 'Surat Masuk', suratkeluar: 'Surat Keluar', disposisi: 'Disposisi', arsip: 'Arsip Dokumen', layanan: 'Layanan Administrasi', mutasi: 'Mutasi Siswa', cetaksurat: 'Cetak Surat', cetakabsen: 'Cetak Absensi', rekapadmin: 'Rekap Administrasi' };
     const hasWakurTask = u => !!u && (String(u.role || '').toUpperCase() === 'WAKUR' || (String(u.role || '').toUpperCase() === 'GURU' && String(u.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR')));
     const menuKeys = u => [...new Set([...(MENU[u && u.role] || []), ...(hasWakurTask(u) ? ['nilaiMonitor'] : [])])];
     const menu = computed(() => user.value ? menuKeys(user.value).filter(k => !user.value.wajib || k === 'sandi').map(k => ({ k, t: (user.value.role === 'STAF' && MS[k]) || (user.value.role === 'BK' && k === 'rapor' ? 'Penilaian Rapor BK' : M[k]) })) : []);
@@ -4481,7 +4091,7 @@ const app = createApp({
         { label: 'Akademik', keys: ['jadwal', 'nilaiMonitor', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'perangkat', 'pkl', 'riwayat', 'nilaisaya'] },
         { label: 'Data & Pengguna', keys: ['kelas', 'siswa', 'guru', 'akun', 'tahun', 'pengaturan', 'log'] },
         { label: 'Bimbingan & Komunikasi', keys: ['izin', 'bimbingan', 'bimbingansaya', 'konseling', 'pelanggaran', 'pengurangan', 'catatan', 'catatansaya', 'notif'] },
-        { label: 'Administrasi & Dokumen', keys: ['bukuinduk', 'dokumen', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'cetakabsen', 'rekapadmin'] },
+        { label: 'Administrasi & Dokumen', keys: ['dokumen', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'cetakabsen', 'rekapadmin'] },
         { label: 'Akun Saya', keys: ['anak', 'sandi'] }
       ];
       return defs.map(d => ({ label: d.label, items: menu.value.filter(m => d.keys.includes(m.k)) })).filter(g => g.items.length);
@@ -4500,40 +4110,23 @@ const app = createApp({
     const QK = 'calm_antrean';
     const qBaca = () => { try { const l = JSON.parse(localStorage.getItem(QK) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } };
     const antre = ref(qBaca());
-    const qTulis = l => { let persisted = false; try { const raw = JSON.stringify(l); localStorage.setItem(QK, raw); persisted = localStorage.getItem(QK) === raw; } catch (e) { /* antre tetap tersedia selama halaman ini hidup */ } antre.value = l; return persisted; };
+    const qTulis = l => { try { localStorage.setItem(QK, JSON.stringify(l)); } catch (e) { /* */ } antre.value = l; };
     const antreSaya = computed(() => antre.value.filter(x => user.value && x.user === user.value.username));
     const jaringan = m => m === 'NETWORK' || m === 'TIMEOUT' || m === 'Failed to fetch';
     const qHapusKey = key => { if (user.value) qTulis(qBaca().filter(x => !(x.user === user.value.username && x.key === key))); };
-    const qMasuk = (action, label, key, payload) => { const sebelumnya = qBaca(), l = sebelumnya.filter(x => !(x.user === user.value.username && x.key === key)); l.push({ id: Date.now() + Math.random().toString(36).slice(2, 6), user: user.value.username, action, label, key, payload: JSON.parse(JSON.stringify(payload)), galat: '' }); if (!qTulis(l)) { antre.value = sebelumnya; throw new Error('Data belum dapat disimpan secara aman di perangkat ini. Jangan tutup atau muat ulang halaman; periksa ruang penyimpanan browser lalu coba simpan lagi saat koneksi tersedia.'); } };
+    const qMasuk = (action, label, key, payload) => { qHapusKey(key); const l = qBaca(); l.push({ id: Date.now() + Math.random().toString(36).slice(2, 6), user: user.value.username, action, label, key, payload: JSON.parse(JSON.stringify(payload)), galat: '' }); qTulis(l); };
     const buangAntre = id => qTulis(qBaca().filter(x => x.id !== id));
     let qJalan = false;
-    // Galat "permanen": mengirim ulang data yang sama pasti ditolak lagi. Item itu tidak dicoba otomatis; hanya lewat tombol
-    // "Kirim sekarang" (manual) atau setelah diperbaiki. Pola ini sejajar dengan klasifikasi offlineKlasifikasi_ di server.
-    const antreStale = m => /Muat ulang daftar siswa|Daftar siswa (berubah|tidak lengkap)|tidak ditemukan pada kelas|NIS duplikat|Data siswa duplikat/.test(String(m || ''));
-    const antrePermanen = m => antreStale(m) || /dikunci|Akses ditolak|bukan kelas ajar|tidak ada di jadwal|tidak valid|wajib diisi|harus 0-100/.test(String(m || ''));
-    const kirimAntre = async (diam, manual) => {
+    const kirimAntre = async diam => {
       if (qJalan || !user.value) return; qJalan = true; let n = 0;
       try {
         for (const x of qBaca().filter(y => y.user === user.value.username)) {
-          if (!manual && x.permanen) continue;
           try { await api(x.action, x.payload); buangAntre(x.id); n++; }
-          catch (e) { if (jaringan(e.message) || /Sesi/.test(e.message)) break; qTulis(qBaca().map(y => y.id === x.id ? { ...y, galat: e.message, permanen: antrePermanen(e.message), stale: antreStale(e.message) } : y)); }
+          catch (e) { if (jaringan(e.message) || /Sesi/.test(e.message)) break; qTulis(qBaca().map(y => y.id === x.id ? { ...y, galat: e.message } : y)); }
         }
       } finally { qJalan = false; }
       if (n && !diam) ok.value = n + ' data tertunda berhasil dikirim';
     };
-    // Presensi tertunda yang daftar siswanya sudah berubah: muat daftar siswa terkini, pertahankan status yang sudah diisi guru.
-    // Siswa baru diberi status bawaan server (Hadir) dan harus diperiksa guru sebelum dikirim; siswa yang sudah keluar dibuang.
-    const perbaikiAntre = x => run(async () => {
-      if (x.action !== 'presensiSave') throw new Error('Perbaikan otomatis hanya untuk presensi. Untuk nilai, buang item ini lalu isi ulang.');
-      const p = x.payload, d = await api('presensiGet', { kelas: p.kelas, mapel: p.mapel, tanggal: p.tanggal });
-      const lama = new Map((p.rows || []).map(r => [String(r.nis), r])), kini = new Set(d.rows.map(r => String(r.nis)));
-      let baru = 0;
-      const rowsBaru = d.rows.map(r => { const q = lama.get(String(r.nis)); if (!q) baru++; return { nis: r.nis, nama: r.nama, status: q ? q.status : r.status, keterangan: q ? (q.keterangan || '') : (r.keterangan || '') }; });
-      const keluar = [...lama.keys()].filter(n => !kini.has(n)).length;
-      qTulis(qBaca().map(y => y.id === x.id ? { ...y, payload: { ...p, rows: rowsBaru }, galat: '', permanen: false, stale: false } : y));
-      ok.value = 'Daftar siswa diperbarui (' + baru + ' siswa baru berstatus Hadir, ' + keluar + ' siswa keluar dibuang). Periksa lalu klik "Kirim sekarang".';
-    });
     window.addEventListener('online', () => kirimAntre(false));
     Vue.watch(() => user.value && user.value.username, u => { if (u) setTimeout(() => kirimAntre(false), 1500); });
     setInterval(() => { if (navigator.onLine && antreSaya.value.some(x => !x.galat)) kirimAntre(true); }, 60000);
@@ -4542,9 +4135,8 @@ const app = createApp({
     const pasang = async () => { const e = window.__pwa; if (!e) { showPwaHelp.value = true; return; } e.prompt(); try { await e.userChoice; } catch (x) { /* */ } window.__pwa = null; pwa.value = false; };
     const tutupPwaHelp = () => { showPwaHelp.value = false; };
     const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]);
+    const siswa = ref([]), showS = ref(false), kelasAll = ref([]), jadwal = ref([]), guru = ref([]), pil = ref([]), pilIdx = ref(''), nrows = ref([]), nilaiSaya = ref([]), hasilSaya = ref({ rapor: [], ekstrakurikuler: [] });
     const cfg = ref({ kop: { logoKiri: '', logoKanan: '', baris: [] }, ttd: { kota: '', jabatan: '', nama: '', nip: '' } }), resetTxt = ref(''), backupUrl = ref('');
-    Vue.watch(cfg, v => { const b = { kop: { logoKiri: '', logoKanan: '', baris: [] }, ttd: { kota: '', jabatan: '', nama: '', nip: '' } }; if (v && v.kop && Array.isArray(v.kop.baris) && v.ttd) return; v = (v && typeof v === 'object') ? v : {}; cfg.value = { ...v, kop: { ...b.kop, ...(v.kop || {}), baris: Array.isArray(v.kop && v.kop.baris) ? v.kop.baris : [] }, ttd: { ...b.ttd, ...(v.ttd || {}) } }; }, { flush: 'sync' });
 
     /* ---- v109: cover rapor + biodata sekolah (hanya tambahan; tidak mengubah alur cetak rapor) ---- */
     const SEK_FIELD = [['kementerian', 'Kementerian (teks atas cover)', 120], ['nama', 'Nama sekolah', 100], ['npsn', 'NPSN', 20], ['alamat', 'Alamat sekolah', 150], ['kelurahan', 'Kelurahan / Desa', 60], ['kecamatan', 'Kecamatan', 60], ['kabupaten', 'Kabupaten / Kota', 60], ['provinsi', 'Provinsi', 60], ['kodepos', 'Kode pos', 10], ['telepon', 'Telepon', 40], ['email', 'Email', 100], ['website', 'Website', 120]];
@@ -4552,11 +4144,6 @@ const app = createApp({
     const sek = ref({ ...SEK_KOSONG }), siapCover = ref(false), coverNis = ref(''), coverIdentitas = ref(true);
     const coverList = computed(() => rp.value ? (coverNis.value ? rp.value.siswa.filter(s => s.nis === coverNis.value) : rp.value.siswa) : []);
     const coverLogo = computed(() => LOGO.replace(/\/s\d+\//, '/s800/'));
-    const bioKelas = ref({});
-    // Biodata dimuat per kelas lewat aksi biodataKelas (boleh untuk wali kelas); siswaList hanya untuk Admin/Staf.
-    const muatBioKelas = () => api('biodataKelas', { kelas: rp.value.kelas }).then(d => { bioKelas.value = d && typeof d === 'object' ? d : {}; });
-    const biodataUntuk = nis => bioKelas.value[String(nis)] || (siswa.value || []).find(x => String(x.nis) === String(nis)) || {};
-    const tanggalBiodata = v => { const x = String(v || '').slice(0, 10); if (!/^\d{4}-\d{2}-\d{2}$/.test(x)) return x || '-'; const [y,m,d] = x.split('-').map(Number); return new Date(y,m-1,d).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}); };
     const sekBaris = computed(() => {
       const x = sek.value || {}, v = k => String(x[k] || '').trim() || '-', kepsek = String(cfg.value.ttd && cfg.value.ttd.nama || '').trim() || '-';
       return [['Nama Sekolah', v('nama')], ['NPSN', v('npsn')], ['Alamat Sekolah', v('alamat')], ['Kelurahan / Desa', v('kelurahan')], ['Kecamatan', v('kecamatan')], ['Kabupaten / Kota', v('kabupaten')], ['Provinsi', v('provinsi')], ['Kode Pos', v('kodepos')], ['Telepon', v('telepon')], ['Email', v('email')], ['Website', v('website')], ['Kepala Sekolah', kepsek]];
@@ -4568,45 +4155,15 @@ const app = createApp({
       const m = t.match(/^(.*\S)\s+(REPUBLIK\s+INDONESIA)\s*$/i);
       return m ? [m[1], m[2]] : [t];
     });
-    const tungguGambar = (root, ms) => new Promise(res => { const im = root ? [...root.querySelectorAll('img')].filter(i => !i.complete) : []; if (!im.length) return res(); let n = im.length; const d = () => { if (--n <= 0) res(); }; im.forEach(i => { i.addEventListener('load', d, { once: true }); i.addEventListener('error', d, { once: true }); }); setTimeout(res, ms); });
     let coverPrintActive = false;
     const cetakCover = nis => {
       if (coverPrintActive || raporPrintActive || !rp.value || !rp.value.siswa.length) return;
       coverPrintActive = true; coverNis.value = nis || ''; siapCover.value = true;
-      const muatBio = muatBioKelas().catch(e => { err.value = 'Biodata siswa belum berhasil dimuat (cover tercetak dengan isian "-"): ' + (e.message || e); toTop(); });
       document.body.classList.add('cetak-cover');
       const beres = () => { document.body.classList.remove('cetak-cover'); coverNis.value = ''; siapCover.value = false; coverPrintActive = false; window.removeEventListener('afterprint', beres); };
       window.addEventListener('afterprint', beres, { once: true });
-      Vue.nextTick(() => setTimeout(() => { Promise.all([muatBio, tungguGambar(document.querySelector('.cover-wrap'), 4000)]).then(() => Vue.nextTick()).then(() => { try { window.print(); } catch (e) { beres(); } }); }, 60));
-    };
-    let paketPrintActive = false;
-    const cetakPaketRapor = async nis => {
-      if (paketPrintActive || raporPrintActive || coverPrintActive || !rp.value || !rp.value.siswa.length) return;
-      if (rp.value.bukanAktif && rp.value.status !== 'Final') { err.value = 'Paket rapor tidak dapat dicetak: periode rapor bukan periode aktif dan belum difinalkan.'; toTop(); return; }
-      if (rp.value.status !== 'Final') { err.value = 'Finalkan rapor terlebih dahulu sebelum mencetak paket lengkap.'; toTop(); return; }
-      paketPrintActive = true; coverPrintActive = true; raporPrintActive = true;
-      try {
-        await muatBioKelas();
-        await muatSekolah();
-        coverNis.value = nis || ''; rpSatu.value = nis || '';
-        siapCover.value = true; siapCetak.value = true;
-        document.body.classList.add('cetak-cover', 'cetak-rapor', 'cetak-paket');
-        const beres = () => {
-          document.body.classList.remove('cetak-cover', 'cetak-rapor', 'cetak-paket');
-          coverNis.value = ''; rpSatu.value = ''; siapCover.value = false; siapCetak.value = false;
-          paketPrintActive = false; coverPrintActive = false; raporPrintActive = false;
-          window.removeEventListener('afterprint', beres);
-        };
-        window.addEventListener('afterprint', beres, { once: true });
-        await Vue.nextTick(); await new Promise(r => setTimeout(r, 60));
-        await Promise.all([tungguGambar(document.querySelector('.cover-wrap'), 4000), tungguGambar(document.querySelector('.rapor-wrap'), 4000)]);
-        setTimeout(() => { try { window.print(); } catch (e) { beres(); err.value = 'Gagal membuka dialog cetak: ' + e.message; } }, 100);
-      } catch (e) {
-        document.body.classList.remove('cetak-cover', 'cetak-rapor', 'cetak-paket');
-        coverNis.value = ''; rpSatu.value = ''; siapCover.value = false; siapCetak.value = false;
-        paketPrintActive = false; coverPrintActive = false; raporPrintActive = false;
-        err.value = 'Data paket rapor belum berhasil disiapkan: ' + (e.message || e); toTop();
-      }
+      const tungguGambar = (root, ms) => new Promise(res => { const im = root ? [...root.querySelectorAll('img')].filter(i => !i.complete) : []; if (!im.length) return res(); let n = im.length; const d = () => { if (--n <= 0) res(); }; im.forEach(i => { i.addEventListener('load', d, { once: true }); i.addEventListener('error', d, { once: true }); }); setTimeout(res, ms); });
+      Vue.nextTick(() => setTimeout(() => { tungguGambar(document.querySelector('.cover-wrap'), 4000).then(() => { try { window.print(); } catch (e) { beres(); } }); }, 60));
     };
     const muatSekolah = () => api('sekolahGet').then(d => { if (d) sek.value = { ...SEK_KOSONG, ...d }; }, () => {});
     const simpanSekolah = () => run(async () => { await api('sekolahSimpan', { sekolah: sek.value }); await muatSekolah(); ok.value = 'Biodata sekolah tersimpan.'; });
@@ -4618,45 +4175,12 @@ const app = createApp({
     const segs = h => { let y = 80; return h.total ? ['H', 'D', 'I', 'S', 'A'].map(k => { const ht = (h[k] || 0) / h.total * 80; y -= ht; return { k, y, ht }; }) : []; };
     const jurnal = ref([]), bimb = ref([]), bulan = ref(hari0.slice(0, 7)), q = ref(''), showJ = ref(false), showB = ref(false), bk = ref([]), bsiswa = ref([]);
     const jr = reactive({ id: '', info: '', tanggal: hari0, pi: '', materi: '', catatan: '' }), bf = reactive({ tanggal: hari0, kelas: '', nis: '', catatan: '', solusi: '' });
-    const sf = reactive({ edit: false, nis: '', nisn: '', nama: '', gender: 'L', kelas: '', kontak: '', tempatLahir: '', tanggalLahir: '', alamat: '', namaAyah: '', namaIbu: '', namaWali: '', kontakOrtu: '', agama: '', statusKeluarga: '', anakKe: '', teleponRumah: '', sekolahAsal: '', diterimaKelas: '', tanggalDiterima: '', alamatOrtu: '', teleponOrtu: '', pekerjaanAyah: '', pekerjaanIbu: '', alamatWali: '', teleponWali: '', pekerjaanWali: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
+    const sf = reactive({ edit: false, nis: '', nama: '', gender: 'L', kelas: '', kontak: '' }), kf = reactive({ edit: false, kelas: '', wali: '' }), showK = ref(false);
     const jf = reactive({ id: '', hari: '', kelas: '', mapel: '', mulai: '', selesai: '', guru: '', blok: '' }), nm = reactive({ tp: '', jenis: 'Harian' }), jGuruFilter = ref('');
-    const biRows=ref([]), biReqs=ref([]), biQ=ref(''), biKelas=ref(''), biTerpilih=ref(null), biShowForm=ref(false), biCatatan=reactive({});
-    const biRiwayat=ref(null), biRiwayatLoading=ref(false), biRiwayatError=ref('');
-    const biForm=reactive({nis:'',nama:'',jenisKoreksi:'',dataDiminta:'',alasan:''});
-    const biFields=[{k:'nisn',t:'NISN',g:'Identitas peserta didik'},{k:'nama',t:'Nama lengkap',m:'n'},{k:'kelas',t:'Rombongan belajar'},{k:'gender',t:'Jenis kelamin'},{k:'kontak',t:'Kontak siswa'},{k:'tempatLahir',t:'Tempat lahir',g:'Data pribadi',m:'t'},{k:'tanggalLahir',t:'Tanggal lahir'},{k:'agama',t:'Agama',m:'t'},{k:'statusKeluarga',t:'Status dalam keluarga',m:'t'},{k:'anakKe',t:'Anak ke'},{k:'teleponRumah',t:'Telepon rumah'},{k:'alamat',t:'Alamat peserta didik',w:1,m:'t'},{k:'sekolahAsal',t:'Sekolah asal',g:'Riwayat sekolah',m:'t'},{k:'diterimaKelas',t:'Diterima di kelas'},{k:'tanggalDiterima',t:'Tanggal diterima'},{k:'namaAyah',t:'Nama ayah',g:'Orang tua & wali',m:'n'},{k:'pekerjaanAyah',t:'Pekerjaan ayah',m:'t'},{k:'kontakOrtu',t:'Kontak orang tua/wali'},{k:'namaIbu',t:'Nama ibu',m:'n'},{k:'pekerjaanIbu',t:'Pekerjaan ibu',m:'t'},{k:'teleponOrtu',t:'Telepon orang tua'},{k:'namaWali',t:'Nama wali',m:'n'},{k:'pekerjaanWali',t:'Pekerjaan wali',m:'t'},{k:'teleponWali',t:'Telepon wali'},{k:'alamatOrtu',t:'Alamat orang tua',w:1,m:'t'},{k:'alamatWali',t:'Alamat wali',w:1,m:'t'}];
-    const biKelasOptions=computed(()=>[...new Set(biRows.value.map(x=>String(x.kelas||'').trim()).filter(Boolean))].sort());
-    const biTampil=computed(()=>{const q=biQ.value.toLowerCase();return biRows.value.filter(x=>(!biKelas.value||x.kelas===biKelas.value)&&(!q||[x.nis,x.nisn,x.nama,x.kelas].join(' ').toLowerCase().includes(q)));});
-    const muatBukuInduk=()=>run(async()=>{[biRows.value,biReqs.value]=await Promise.all([api('bukuIndukList'),api('bukuIndukPengajuanList')]);});
-    const biBukaDetail=s=>{biTerpilih.value=s;biRiwayat.value=null;biRiwayatError.value='';biRiwayatLoading.value=true;run(async()=>{try{const d=await api('bukuIndukRiwayat',{nis:s.nis});if(biTerpilih.value&&String(biTerpilih.value.nis)===String(s.nis))biRiwayat.value=d;}catch(e){biRiwayatError.value=e.message||'Riwayat nilai belum dapat dimuat.';}finally{biRiwayatLoading.value=false;}});};
-    const biBukaAjukan=s=>{Object.assign(biForm,{nis:s.nis,nama:s.nama,jenisKoreksi:'',dataDiminta:'',alasan:''});biShowForm.value=true;};
-    const biAjukan=()=>run(async()=>{await api('bukuIndukAjukan',{...biForm});biShowForm.value=false;await muatBukuInduk();ok.value='Pengajuan koreksi terkirim kepada Admin.';});
-    const biProses=(r,status)=>run(async()=>{await api('bukuIndukProses',{id:r.id,status,catatanAdmin:biCatatan[r.id]||''});await muatBukuInduk();ok.value='Status pengajuan diperbarui. Jika disetujui, Admin perlu memperbarui data melalui Kelola Siswa.';});
-    const biMulaiCetak=(mode)=>{
-      const cls=mode==='biodata'?'bi-print-one':'bi-print-list';
-      const bersih=()=>{document.body.classList.remove('bi-print-list','bi-print-one');const ps=document.getElementById('bi-page-style');if(ps)ps.remove();window.removeEventListener('afterprint',bersih);};
-      bersih();document.body.classList.add(cls);
-      // Biodata dan daftar selalu A4 portrait. Halaman bernama (page:biPortrait) tidak diterapkan Chrome bila ada pembungkus flex, sehingga @page global landscape ikut terpakai.
-      {const ps=document.createElement('style');ps.id='bi-page-style';ps.textContent='@page{size:A4 portrait;margin:0}';document.head.appendChild(ps);}
-      window.addEventListener('afterprint',bersih,{once:true});
-      // Fallback untuk browser yang tidak memicu afterprint.
-      setTimeout(()=>{try{window.print();}finally{setTimeout(bersih,1200);}},80);
-    };
-    const windowPrintSafe=()=>biMulaiCetak('daftar');
-    const biCetakSatu=()=>{if(!biTerpilih.value)return;biMulaiCetak('biodata');};
-    // Esc menutup detail biodata (handler @keydown pada overlay tidak pernah menerima fokus).
-    window.addEventListener('keydown',e=>{if(e.key==='Escape'&&biTerpilih.value)biTerpilih.value=null;});
-    const biEkspor=()=>run(async()=>{
-      const fields=[['NIS','nis'],['NISN','nisn'],['Nama Lengkap','nama'],['Jenis Kelamin','gender'],['Kelas','kelas'],['Kontak Siswa','kontak'],['Tempat Lahir','tempatLahir'],['Tanggal Lahir','tanggalLahir'],['Agama','agama'],['Alamat Peserta Didik','alamat'],['Kontak Orang Tua/Wali','kontakOrtu'],['Telepon Rumah','teleponRumah'],['Sekolah Asal','sekolahAsal'],['Diterima di Kelas','diterimaKelas'],['Tanggal Diterima','tanggalDiterima'],['Nama Ayah','namaAyah'],['Pekerjaan Ayah','pekerjaanAyah'],['Nama Ibu','namaIbu'],['Pekerjaan Ibu','pekerjaanIbu'],['Nama Wali','namaWali'],['Pekerjaan Wali','pekerjaanWali'],['Status dalam Keluarga','statusKeluarga'],['Anak ke','anakKe'],['Alamat Orang Tua','alamatOrtu'],['Telepon Orang Tua','teleponOrtu'],['Alamat Wali','alamatWali'],['Telepon Wali','teleponWali']];
-      const rows=[['No.',...fields.map(x=>x[0])],...biTampil.value.map((s,i)=>[i+1,...fields.map(x=>String(s[x[1]]??''))])];
-      const widths=[7,14,14,32,15,16,20,18,16,40,22,18,40,24,20,18,28,28,28,28,28,24,10,40,22,40,22,18];
-      await saveXlsx('Buku_Induk_Peserta_Didik_'+new Date().toLocaleDateString('sv-SE')+'.xlsx',[['Buku Induk',rows,widths]]);
-      ok.value=biTampil.value.length+' data Buku Induk diekspor ke Excel.';
-    });
-    const READ = new Set(['presensiTertunggak', 'raporBKGet', 'formatifGet', 'kktpTpGet', 'raporRekapMapel', 'raporCfgGet', 'raporCek', 'naikPreview', 'perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'riwayatPenilaianList', 'riwayatNilaiAuditList', 'nilaiArsipList', 'siswaList']);
+    const READ = new Set(['raporBKGet', 'formatifGet', 'kktpTpGet', 'raporRekapMapel', 'raporCfgGet', 'raporCek', 'naikPreview', 'perangkatList', 'bkSiswa', 'penguranganPoinList', 'notifBaca', 'notifList', 'ortuData', 'pelanggaranPanduan', 'pelanggaranList', 'konselingBKList', 'suratMasukList', 'suratKeluarList', 'disposisiList', 'arsipDokumenList', 'layananAdminList', 'mutasiSiswaList', 'rekapAdministrasi', 'agendaList', 'akademikGet', 'akunList', 'akunSandiAwal', 'alumniList', 'backupStatus', 'bimbinganKelas', 'bimbinganList', 'bimbinganSiswa', 'kopCetakGet', 'catatanGuruList', 'dashboard', 'dokumenList', 'guruDetail', 'guruList', 'izinList', 'jadwalList', 'jurnalList', 'kartuLogin', 'kelasDetail', 'kelasSemua', 'kunciGet', 'legerGet', 'legerKelas', 'logList', 'monitor', 'nilaiGet', 'nilaiSaya', 'pengaturanGet', 'pengumumanList', 'pilihanNilai', 'pklJurnalList', 'pklList', 'presensiGet', 'presensiGrafik', 'presensiPilihan', 'presensiRekap', 'presensiRiwayat', 'presensiSesi', 'raporData', 'raporPilihan', 'riwayatList', 'riwayatSaya', 'riwayatPenilaianList', 'riwayatNilaiAuditList', 'nilaiArsipList', 'siswaList', 'hasilSemesterSaya']);
     READ.add('raporKoreksiSumberGet');
     READ.add('wakurMonitorNilai');
     READ.add('sekolahGet');
-    READ.add('bukuIndukRiwayat');
     const SAFE = a => READ.has(a);
     const CC = new Map(), CC_TTL = 60000;
     const CC_OK = new Set(['pengaturanGet', 'kelasDetail', 'kelasSemua', 'guruList', 'siswaList', 'jadwalList', 'blokInfo', 'pilihanNilai', 'presensiPilihan', 'raporPilihan', 'bimbinganKelas', 'pengumumanList', 'agendaList', 'akademikGet', 'kunciGet', 'legerKelas']);
@@ -4754,7 +4278,7 @@ const app = createApp({
         go('dashboard');
       });
     };
-    function logout() { CC.clear(); token.value = ''; user.value = null; ssClear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
+    function logout() { CC.clear(); token.value = ''; user.value = null; ssClear(); mnav.value = false; view.value = 'dashboard'; dash.value = null; mon.value = null; leger.value = { mapel: [], siswa: [] }; [pkl, alumni, siswa, jadwal, guru, gdata, akun, dokumen, jurnal, bimb, izlist, cglist, peng, agenda, riwayat, nilaiSaya, nrows, rows].forEach(r => r.value = []); hasilSaya.value = { rapor: [], ekstrakurikuler: [] }; rk.value = prRes.value = pgRes.value = prwRes.value = null; imp.creds = []; gimp.creds = []; jimp.show = false; jimp.rows = []; kred.list = []; kred.show = false; jp.value = null; kartu.value = null; f.password = ''; anak.value = null; nlist.value = []; notifN.value = 0; pel.value = { kelas: [], ambang: 50, total: {}, rows: [] }; }
     let dashAt = 0;
     const goDasar = k => run(async () => {
       if (user.value.wajib) k = 'sandi';
@@ -4765,7 +4289,6 @@ const app = createApp({
         try { const c = JSON.parse(sessionStorage.getItem(ck) || 'null'); if (c && c.d && Date.now() - c.t < 300000) pakai(c.d); } catch (e) { /* */ }
         const d = await api('dashboard'); if (view.value !== k) return; pakai(d);
         try { sessionStorage.setItem(ck, JSON.stringify({ t: Date.now(), d })); } catch (e) { /* */ }
-        if (user.value.role === 'GURU') cekPT(true);
         if (['ADMIN', 'GURU', 'KEPSEK', 'STAF'].includes(user.value.role)) api('pengaturanGet').catch(() => { /* */ });
         if (!Array.isArray(d.peng)) await fetchPeng();
         if (!Array.isArray(d.agenda)) await fetchAg();
@@ -4778,7 +4301,6 @@ const app = createApp({
       }
       if (k === 'riwayat') riwayat.value = await api('riwayatSaya');
       if (k === 'siswa') { [siswa.value, kelasAll.value] = await Promise.all([api('siswaList'), api('kelasDetail')]); }
-      if (k === 'bukuinduk') { [biRows.value, biReqs.value] = await Promise.all([api('bukuIndukList'), api('bukuIndukPengajuanList')]); }
       if (k === 'suratmasuk') await loadSuratMasuk();
       if (k === 'suratkeluar') await loadSuratKeluar();
       if (k === 'disposisi') { await Promise.all([loadDisposisi(), loadSuratMasuk()]); }
@@ -4807,7 +4329,7 @@ const app = createApp({
       if (k === 'rapor' && user.value.role === 'BK') { rp.value = null; rpKelas.value = ''; rpTab.value = 'bk'; bkKelas.value = ''; const d = await api('raporBKGet', {}); rpMeta.tahun = d.tahun; rpMeta.sem = d.semester; bkRapor.value = d; }
       if (k === 'rapor' && user.value.role !== 'BK') { const r = await Promise.all([api('pengaturanGet'), api('raporPilihan'), user.value && (user.value.role === 'ADMIN' || user.value.role === 'GURU') ? api('pilihanNilai') : null]); cfg.value = r[0]; rpPil.value = r[1]; if (r[2]) pil.value = r[2]; rp.value = null; rpKelas.value = ''; rkp.value = null; rkpIdx.value = ''; rcf.value = null; rnaik.value = null; rpCek.value = null; const t = cfg.value.tahun; if (t && t.tahun) { rpMeta.tahun = t.tahun; rpMeta.sem = t.semester; } else if (!rpMeta.tahun) rpMeta.tahun = opsiTahun()[2]; rpTab.value = rpTabs.value.length ? rpTabs.value[0].k : 'data'; if (rpTab.value === 'atur') loadRc(); }
       if (k === 'rapor' && user.value.role !== 'BK') muatSekolah();
-      if (k === 'nilaisaya') nilaiSaya.value = await api('nilaiSaya');
+      if (k === 'nilaisaya') { const d = await Promise.all([api('nilaiSaya'), api('hasilSemesterSaya').catch(() => ({ rapor: [], ekstrakurikuler: [] }))]); if (view.value !== k) return; nilaiSaya.value = d[0]; hasilSaya.value = d[1] || { rapor: [], ekstrakurikuler: [] }; }
       if (k === 'anak') { const d = await api('ortuData'); if (view.value !== k) return; anak.value = d; atab.value = 'hadir'; }
       if (k === 'notif') { const l = await api('notifList'); if (view.value !== k) return; nlist.value = l; await api('notifBaca'); notifN.value = 0; }
       if (k === 'pelanggaran') {
@@ -4839,7 +4361,6 @@ const app = createApp({
     const refresh = async () => { kelasList.value = []; kelasAll.value = await api('kelasDetail'); };
     const skelas = ref(''), sq = ref('');
     const siswaTampil = computed(() => { const t = sq.value.toLowerCase(); return siswa.value.filter(s => (!skelas.value || s.kelas === skelas.value) && (!t || (s.nisn + ' ' + s.nama).toLowerCase().includes(t))); });
-    const biodataDasarLengkap = s => !!(String(s.alamat || '').trim() && String(s.kontakOrtu || '').trim() && (String(s.namaAyah || '').trim() || String(s.namaIbu || '').trim() || String(s.namaWali || '').trim()));
     const nisnMap = computed(() => { const m = new Map(); for (const s of siswa.value) m.set(String(s.nis), String(s.nisn || '')); return m; });
 const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis); const nisn = nisnMap.value.get(key); return String(langsung || nisn || key || '-'); };
     const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', XL_GAGAL = 'Pustaka Excel gagal dimuat. Periksa koneksi internet lalu coba lagi.';
@@ -4863,14 +4384,14 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     }
     const exportSiswa = () => run(async () => {
       const list = siswaTampil.value.slice().sort((a, b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
-      const aoa = [['No', 'NISN', 'Nama', 'L/P', 'Kelas', 'Kontak Siswa', 'Tempat Lahir', 'Tanggal Lahir', 'Alamat', 'Nama Ayah', 'Nama Ibu', 'Nama Wali', 'Kontak Orang Tua/Wali', 'Agama', 'Status dalam Keluarga', 'Anak ke-', 'Telepon Rumah', 'Sekolah Asal', 'Kelas Saat Diterima', 'Tanggal Diterima', 'Alamat Orang Tua', 'Telepon Orang Tua', 'Pekerjaan Ayah', 'Pekerjaan Ibu', 'Alamat Wali', 'Telepon Wali', 'Pekerjaan Wali']].concat(list.map((s, i) => [i + 1, String(s.nisn || ''), s.nama, s.gender, s.kelas, s.kontak, s.tempatLahir || '', s.tanggalLahir || '', s.alamat || '', s.namaAyah || '', s.namaIbu || '', s.namaWali || '', s.kontakOrtu || '', s.agama || '', s.statusKeluarga || '', s.anakKe || '', s.teleponRumah || '', s.sekolahAsal || '', s.diterimaKelas || '', s.tanggalDiterima || '', s.alamatOrtu || '', s.teleponOrtu || '', s.pekerjaanAyah || '', s.pekerjaanIbu || '', s.alamatWali || '', s.teleponWali || '', s.pekerjaanWali || '']));
-      await saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 16, 32, 5, 12, 18, 18, 16, 45, 28, 28, 28, 22]]]);
+      const aoa = [['No', 'NISN', 'Nama', 'L/P', 'Kelas', 'Kontak']].concat(list.map((s, i) => [i + 1, String(s.nisn || ''), s.nama, s.gender, s.kelas, s.kontak]));
+      await saveXlsx('Data_Siswa_' + (skelas.value || 'Semua') + '_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Siswa', aoa, [5, 16, 32, 5, 12, 18]]]);
       ok.value = list.length + ' siswa diekspor';
     });
     const templateSiswa = () => run(async () => {
       await saveXlsx('Template_Impor_Siswa.xlsx', [
-        ['Data Siswa', [['NISN', 'Nama', 'L/P', 'Kelas', 'Kontak', 'Tempat Lahir', 'Tanggal Lahir', 'Alamat', 'Nama Ayah', 'Nama Ibu', 'Nama Wali', 'Kontak Orang Tua/Wali', 'Agama', 'Status dalam Keluarga', 'Anak ke-', 'Telepon Rumah', 'Sekolah Asal', 'Kelas Saat Diterima', 'Tanggal Diterima', 'Alamat Orang Tua', 'Telepon Orang Tua', 'Pekerjaan Ayah', 'Pekerjaan Ibu', 'Alamat Wali', 'Telepon Wali', 'Pekerjaan Wali'], ['0012345678', 'Contoh Siswa Satu', 'L', 'X TKJ 1', '081234567890', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''], ['0012345679', 'Contoh Siswa Dua', 'P', 'X TKJ 1', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '' ]], [16, 32, 6, 14, 18, 18, 16, 45, 28, 28, 28, 22]],
-        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Siswa"; hapus dua baris contoh.'], ['2. Kolom wajib: NISN, Nama, dan Kelas. NISN harus tepat 10 digit angka. L/P diisi L atau P (kosong dianggap L).'], ['3. NISN adalah identitas utama pada template ini; tidak perlu mengisi kolom NIS/ID Login. Untuk siswa lama, sistem mencocokkan NISN ke data master agar riwayat dan akun tetap terhubung.'], ['4. Format NISN sebagai Teks agar angka 0 di depan tidak hilang.'], ['5. Kelas baru otomatis dibuat. Akun login siswa baru dibuat otomatis dengan sandi acak.']], [100]]]);
+        ['Data Siswa', [['NISN', 'Nama', 'L/P', 'Kelas', 'Kontak'], ['0012345678', 'Contoh Siswa Satu', 'L', 'X TKJ 1', '081234567890'], ['0012345679', 'Contoh Siswa Dua', 'P', 'X TKJ 1', '']], [16, 32, 6, 14, 18]],
+        ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Siswa"; hapus dua baris contoh.'], ['2. Kolom wajib: NISN, Nama, dan Kelas. NISN harus tepat 10 digit angka. L/P diisi L atau P (kosong dianggap L).'], ['3. Untuk siswa baru, NISN digunakan sebagai username login. Untuk siswa lama, sistem mencocokkan NISN ke data master agar riwayat dan akun tetap terhubung.'], ['4. Format NISN sebagai Teks agar angka 0 di depan tidak hilang.'], ['5. Kelas baru otomatis dibuat. Akun login siswa baru dibuat otomatis dengan sandi acak.']], [100]]]);
     });
     const imp = reactive({ show: false, rows: [], file: '', update: true, done: null, creds: [] });
     const impCount = computed(() => { const c = { baru: 0, ubah: 0, error: 0 }; imp.rows.forEach(r => c[r.st]++); c.siap = c.baru + (imp.update ? c.ubah : 0); return c; });
@@ -4878,11 +4399,11 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     async function pickFile(ev) {
       const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
       await run(async () => {
-        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array', cellDates: true });
-        const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, dateNF: 'yyyy-mm-dd', defval: '' });
+        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array' });
+        const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
         const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
         const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
-        const c = { nis: col(['idlogin', 'idlogininternal', 'nis', 'nomorinduk', 'username']), nisn: col(['nisn']), nama: col(['nama', 'namasiswa', 'namalengkap']), jk: col(['lp', 'jk', 'gender', 'jeniskelamin']), kelas: col(['kelas', 'rombel']), kontak: col(['kontak', 'kontaksiswa', 'hp', 'telepon', 'telp', 'wa', 'nohp']), tempatLahir: col(['tempatlahir']), tanggalLahir: col(['tanggallahir']), alamat: col(['alamat', 'alamatlengkap']), namaAyah: col(['namaayah', 'ayah']), namaIbu: col(['namaibu', 'ibu']), namaWali: col(['namawali', 'wali']), kontakOrtu: col(['kontakorangtuawali', 'kontakortu', 'hportu', 'nowaortu']), agama: col(['agama']), statusKeluarga: col(['statuskeluarga', 'statusdalamkeluarga']), anakKe: col(['anakke']), teleponRumah: col(['teleponrumah', 'nomorteleponrumah']), sekolahAsal: col(['sekolahasal']), diterimaKelas: col(['diterimakelas', 'kelassaatditerima', 'diterimadisekolahinikelas']), tanggalDiterima: col(['tanggalditerima', 'tanggalditerimadisekolahini']), alamatOrtu: col(['alamatortu', 'alamatorangtua']), teleponOrtu: col(['teleponortu', 'nomorteleponorangtua']), pekerjaanAyah: col(['pekerjaanayah']), pekerjaanIbu: col(['pekerjaanibu']), alamatWali: col(['alamatwali', 'alamatwalipesertadidik']), teleponWali: col(['teleponwali', 'nomorteleponwali']), pekerjaanWali: col(['pekerjaanwali']) };
+        const c = { nis: col(['idlogin', 'idlogininternal', 'nis', 'nomorinduk', 'username']), nisn: col(['nisn']), nama: col(['nama', 'namasiswa', 'namalengkap']), jk: col(['lp', 'jk', 'gender', 'jeniskelamin']), kelas: col(['kelas', 'rombel']), kontak: col(['kontak', 'hp', 'telepon', 'telp', 'wa', 'nohp']) };
         if (c.nisn < 0 || c.nama < 0 || c.kelas < 0) throw new Error('Baris pertama harus berisi NISN, Nama, dan Kelas. Template lama dengan kolom ID Login/NIS tetap didukung.');
         const ada = new Set(siswa.value.map(x => String(x.nis))), seen = new Set(), seenNisn = new Set(), rows = [];
         aoa.slice(1).forEach((r, i) => {
@@ -4891,11 +4412,11 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
           const existing = siswa.value.find(s => String(s.nisn || '') === nisn);
           const key = explicitKey || (existing ? String(existing.nis) : nisn);
           const g = c.jk < 0 ? '' : norm(r[c.jk]).toUpperCase();
-          const o = { no: i + 2, nis: key, nisn, nama: norm(r[c.nama]), gender: g.startsWith('P') ? 'P' : g.startsWith('L') ? 'L' : '', kelas: norm(r[c.kelas]), kontak: c.kontak < 0 ? '' : norm(r[c.kontak]), tempatLahir: c.tempatLahir < 0 ? '' : norm(r[c.tempatLahir]), tanggalLahir: c.tanggalLahir < 0 ? '' : norm(r[c.tanggalLahir]), alamat: c.alamat < 0 ? '' : norm(r[c.alamat]), namaAyah: c.namaAyah < 0 ? '' : norm(r[c.namaAyah]), namaIbu: c.namaIbu < 0 ? '' : norm(r[c.namaIbu]), namaWali: c.namaWali < 0 ? '' : norm(r[c.namaWali]), kontakOrtu: c.kontakOrtu < 0 ? '' : norm(r[c.kontakOrtu]), agama: c.agama < 0 ? '' : norm(r[c.agama]), statusKeluarga: c.statusKeluarga < 0 ? '' : norm(r[c.statusKeluarga]), anakKe: c.anakKe < 0 ? '' : norm(r[c.anakKe]), teleponRumah: c.teleponRumah < 0 ? '' : norm(r[c.teleponRumah]), sekolahAsal: c.sekolahAsal < 0 ? '' : norm(r[c.sekolahAsal]), diterimaKelas: c.diterimaKelas < 0 ? '' : norm(r[c.diterimaKelas]), tanggalDiterima: c.tanggalDiterima < 0 ? '' : norm(r[c.tanggalDiterima]), alamatOrtu: c.alamatOrtu < 0 ? '' : norm(r[c.alamatOrtu]), teleponOrtu: c.teleponOrtu < 0 ? '' : norm(r[c.teleponOrtu]), pekerjaanAyah: c.pekerjaanAyah < 0 ? '' : norm(r[c.pekerjaanAyah]), pekerjaanIbu: c.pekerjaanIbu < 0 ? '' : norm(r[c.pekerjaanIbu]), alamatWali: c.alamatWali < 0 ? '' : norm(r[c.alamatWali]), teleponWali: c.teleponWali < 0 ? '' : norm(r[c.teleponWali]), pekerjaanWali: c.pekerjaanWali < 0 ? '' : norm(r[c.pekerjaanWali]), st: 'baru', msg: '' };
+          const o = { no: i + 2, nis: key, nisn, nama: norm(r[c.nama]), gender: g.startsWith('P') ? 'P' : 'L', kelas: norm(r[c.kelas]), kontak: c.kontak < 0 ? '' : norm(r[c.kontak]), st: 'baru', msg: '' };
           if (!o.nisn || !/^\d{10}$/.test(o.nisn)) { o.st = 'error'; o.msg = 'NISN wajib 10 digit angka'; }
           else if (seen.has(o.nis)) { o.st = 'error'; o.msg = 'NISN ganda di file'; }
           else if (seenNisn.has(o.nisn)) { o.st = 'error'; o.msg = 'NISN ganda di file'; }
-          else if (siswa.value.some(s => String(s.nisn || '') === o.nisn && String(s.nis) !== o.nis)) { o.st = 'error'; o.msg = 'NISN sudah dipakai siswa lain'; }
+          else if (siswa.value.some(s => String(s.nisn || '') === o.nisn && String(s.nis) !== o.nis) && !existing) { o.st = 'error'; o.msg = 'NISN sudah dipakai siswa lain'; }
           else if (!o.nama) { o.st = 'error'; o.msg = 'Nama kosong'; }
           else if (!o.kelas) { o.st = 'error'; o.msg = 'Kelas kosong'; }
           else if (ada.has(o.nis) && !explicitKey && !existing && siswa.value.some(s => String(s.nis) === o.nis && String(s.nisn || '') !== o.nisn)) { o.st = 'error'; o.msg = 'NISN bertabrakan dengan kunci data siswa lain'; }
@@ -4907,7 +4428,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       });
     }
     const doImport = () => run(async () => {
-      const list = imp.rows.filter(r => r.st !== 'error' && (imp.update || r.st === 'baru')).map(r => ({ nis: r.nis, nisn: r.nisn, nama: r.nama, gender: r.gender, kelas: r.kelas, kontak: r.kontak, tempatLahir: r.tempatLahir, tanggalLahir: r.tanggalLahir, alamat: r.alamat, namaAyah: r.namaAyah, namaIbu: r.namaIbu, namaWali: r.namaWali, kontakOrtu: r.kontakOrtu, agama: r.agama, statusKeluarga: r.statusKeluarga, anakKe: r.anakKe, teleponRumah: r.teleponRumah, sekolahAsal: r.sekolahAsal, diterimaKelas: r.diterimaKelas, tanggalDiterima: r.tanggalDiterima, alamatOrtu: r.alamatOrtu, teleponOrtu: r.teleponOrtu, pekerjaanAyah: r.pekerjaanAyah, pekerjaanIbu: r.pekerjaanIbu, alamatWali: r.alamatWali, teleponWali: r.teleponWali, pekerjaanWali: r.pekerjaanWali }));
+      const list = imp.rows.filter(r => r.st !== 'error' && (imp.update || r.st === 'baru')).map(r => ({ nis: r.nis, nisn: r.nisn, nama: r.nama, gender: r.gender, kelas: r.kelas, kontak: r.kontak }));
       let baru = 0, ubah = 0, creds = [], gagal = '';
       try {
         for (let i = 0; i < list.length; i += 100) {
@@ -4920,95 +4441,14 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       try { siswa.value = await api('siswaList'); kelasAll.value = await api('kelasDetail'); } catch (e) { /* */ }
       if (gagal) throw new Error(gagal + (baru + ubah ? ' (' + (baru + ubah) + ' siswa sudah diproses; sandi akun baru dapat diunduh pada jendela impor)' : ''));
     });
-    /* ---- Impor biodata (hanya mengisi kolom kosong; tidak menimpa) ---- */
-    const BIO_ID = ['nis', 'nisn', 'nisnisn', 'nisnnis', 'nisdannisn', 'idlogin', 'idlogininternal', 'nomorinduk', 'username'];
-    const BIO_KOL = [['tempatLahir', 'Tempat Lahir', ['tempatlahir']], ['tanggalLahir', 'Tanggal Lahir', ['tanggallahir']], ['agama', 'Agama', ['agama']], ['statusKeluarga', 'Status dalam Keluarga', ['statuskeluarga', 'statusdalamkeluarga']], ['anakKe', 'Anak ke-', ['anakke']], ['teleponRumah', 'Telepon Rumah', ['teleponrumah', 'nomorteleponrumah']], ['alamat', 'Alamat', ['alamat', 'alamatlengkap']], ['sekolahAsal', 'Sekolah Asal', ['sekolahasal']], ['diterimaKelas', 'Kelas Saat Diterima', ['diterimakelas', 'kelassaatditerima', 'diterimadisekolahinikelas']], ['tanggalDiterima', 'Tanggal Diterima', ['tanggalditerima', 'tanggalditerimadisekolahini']], ['namaAyah', 'Nama Ayah', ['namaayah', 'ayah']], ['pekerjaanAyah', 'Pekerjaan Ayah', ['pekerjaanayah']], ['namaIbu', 'Nama Ibu', ['namaibu', 'ibu']], ['pekerjaanIbu', 'Pekerjaan Ibu', ['pekerjaanibu']], ['alamatOrtu', 'Alamat Orang Tua', ['alamatortu', 'alamatorangtua']], ['teleponOrtu', 'Telepon Orang Tua', ['teleponortu', 'nomorteleponorangtua']], ['kontakOrtu', 'Kontak Orang Tua/Wali', ['kontakorangtuawali', 'kontakortu', 'hportu', 'nowaortu']], ['namaWali', 'Nama Wali', ['namawali', 'wali']], ['pekerjaanWali', 'Pekerjaan Wali', ['pekerjaanwali']], ['alamatWali', 'Alamat Wali', ['alamatwali', 'alamatwalipesertadidik']], ['teleponWali', 'Telepon Wali', ['teleponwali', 'nomorteleponwali']]];
-    const BIO_TGL = ['tanggalLahir', 'tanggalDiterima'], BIO_LABEL = Object.fromEntries(BIO_KOL.map(k => [k[0], k[1]]));
-    const bimp = reactive({ show: false, rows: [], file: '', kosong: 0, done: null });
-    const bimpCount = computed(() => { const c = { isi: 0, lewat: 0, error: 0, sel: 0 }; bimp.rows.forEach(r => { if (r.st === 'error') c.error++; else if (r.st === 'isi') { c.isi++; c.sel += r.isi.length; } else c.lewat++; }); return c; });
-    const bioTgl = v => { // -> 'yyyy-mm-dd', atau null bila tidak dikenali
-      v = norm(v); let m = /^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/.exec(v), y, mo, d;
-      if (m) { y = +m[1]; mo = +m[2]; d = +m[3]; } else if ((m = /^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/.exec(v))) { d = +m[1]; mo = +m[2]; y = +m[3]; } else return null;
-      const t = new Date(Date.UTC(y, mo - 1, d)); if (t.getUTCFullYear() !== y || t.getUTCMonth() !== mo - 1 || t.getUTCDate() !== d) return null;
-      return y + '-' + ('0' + mo).slice(-2) + '-' + ('0' + d).slice(-2);
-    };
-    const templateBiodata = () => run(async () => {
-      const X = await XL(), wb = X.utils.book_new();
-      const list = siswaTampil.value.slice().sort((a, b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
-      const aoa = [['NIS/NISN', 'Nama (acuan)', 'Kelas (acuan)'].concat(BIO_KOL.map(k => k[1]))];
-      (list.length ? list : [{ nisn: '0012345678', nama: 'Contoh Siswa', kelas: 'X TKJ 1' }]).forEach(s => aoa.push([String(s.nisn || s.nis), s.nama, s.kelas].concat(BIO_KOL.map(() => ''))));
-      const ws = X.utils.aoa_to_sheet(aoa), rg = X.utils.decode_range(ws['!ref']);
-      for (let R = 1; R <= rg.e.r; R++) for (let C = 0; C <= rg.e.c; C++) { const a = X.utils.encode_cell({ r: R, c: C }); if (!ws[a]) ws[a] = { t: 's', v: '' }; ws[a].z = '@'; } // format teks: angka 0 di depan nomor tidak hilang
-      ws['!cols'] = [16, 28, 14].concat(BIO_KOL.map(k => /^alamat/.test(k[0]) ? 40 : /^(nama|sekolah)/.test(k[0]) ? 26 : 18)).map(w => ({ wch: w }));
-      X.utils.book_append_sheet(wb, ws, 'Data Biodata');
-      const pt = [['Petunjuk pengisian'], ['1. Kolom NIS/NISN wajib terisi (NISN 10 digit atau NIS/ID login). Kolom Nama dan Kelas hanya acuan dan tidak diimpor.'], ['2. Isi hanya kolom biodata yang diperlukan. Kolom yang tidak dipakai boleh dihapus; baris tanpa biodata dilewati.'], ['3. Impor hanya MENGISI kolom yang masih kosong di sistem. Data yang sudah ada tidak akan ditimpa; untuk mengubahnya gunakan tombol Ubah pada Data Siswa.'], ['4. Tanggal ditulis tahun-bulan-tanggal (mis. 2009-05-17) atau tanggal/bulan/tahun (mis. 17/05/2009). Tanggal yang tidak valid diabaikan.'], ['5. Siswa yang tidak ditemukan tidak ditambahkan. Gunakan Impor Excel untuk menambah siswa baru.']];
-      X.utils.book_append_sheet(wb, Object.assign(X.utils.aoa_to_sheet(pt), { '!cols': [{ wch: 110 }] }), 'Petunjuk');
-      X.writeFile(wb, 'Template_Biodata_Siswa.xlsx');
-    });
-    async function pickBiodata(ev) {
-      const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
-      await run(async () => {
-        const X = await XL(), wb = X.read(await f.arrayBuffer(), { type: 'array', cellDates: true });
-        let aoa = null, hd = null, ci = -1;
-        for (const nm of wb.SheetNames) { // sheet pertama yang memiliki kolom NIS/NISN
-          const a = X.utils.sheet_to_json(wb.Sheets[nm], { header: 1, raw: false, dateNF: 'yyyy-mm-dd', defval: '' });
-          const h2 = (a[0] || []).map(x => norm(x).toLowerCase().replace(/[^a-z]/g, '')), i = h2.findIndex(x => BIO_ID.indexOf(x) >= 0);
-          if (i >= 0) { aoa = a; hd = h2; ci = i; break; }
-        }
-        if (!aoa) throw new Error('Baris pertama harus berisi kolom NIS/NISN. Unduh "Template biodata" agar formatnya sesuai.');
-        const kc = BIO_KOL.map(k => [k[0], hd.findIndex(x => k[2].indexOf(x) >= 0)]).filter(p => p[1] >= 0);
-        if (!kc.length) throw new Error('Tidak ada kolom biodata yang dikenali pada file ini.');
-        const byNisn = new Map(), byNis = new Map(); siswa.value.forEach(s => { if (s.nisn) byNisn.set(String(s.nisn), s); byNis.set(String(s.nis), s); });
-        const seen = new Set(), rows = []; let kosong = 0;
-        aoa.slice(1).forEach((r, i) => {
-          const id = norm(r[ci]), vals = {}, buruk = [];
-          kc.forEach(([k, j]) => { const raw = norm(r[j]); if (!raw) return; if (BIO_TGL.indexOf(k) >= 0) { const t = bioTgl(raw); if (t === null) { buruk.push(k); return; } vals[k] = t; } else vals[k] = raw; });
-          if (!id && r.every(v => !norm(v))) return;
-          if (id && !Object.keys(vals).length && !buruk.length) { kosong++; return; }
-          const o = { no: i + 2, id, nis: '', nama: '', vals, isi: [], st: 'error', msg: '' };
-          let s = byNisn.get(id) || null; const t = byNis.get(id) || null;
-          if (!s && /^\d{1,9}$/.test(id)) s = byNisn.get(id.padStart(10, '0')) || null;
-          if (!id) o.msg = 'NIS/NISN kosong';
-          else if (s && t && s !== t) o.msg = 'NIS/NISN cocok dengan dua siswa berbeda';
-          else if (!(s = s || t)) o.msg = 'Tidak ditemukan di data siswa (tidak ditambahkan)';
-          else if (seen.has(String(s.nis))) o.msg = 'Siswa ganda di file';
-          else {
-            seen.add(String(s.nis)); o.nis = String(s.nis); o.nama = s.nama;
-            o.isi = Object.keys(vals).filter(k => !String(s[k] || '').trim());
-            o.st = o.isi.length ? 'isi' : 'lewat';
-            const ada = Object.keys(vals).length - o.isi.length;
-            o.msg = (o.isi.length ? 'Mengisi ' + o.isi.length + ' kolom: ' + o.isi.map(k => BIO_LABEL[k]).join(', ') : 'Tidak ada kolom kosong yang bisa diisi') + (ada ? ' (' + ada + ' sudah terisi, tidak diubah)' : '') + (buruk.length ? ' (tanggal tidak valid diabaikan: ' + buruk.map(k => BIO_LABEL[k]).join(', ') + ')' : '');
-          }
-          if (o.st === 'error') o.nama = o.nama || '-';
-          rows.push(o);
-        });
-        if (!rows.length) throw new Error(kosong ? 'Tidak ada biodata yang terisi di file ini.' : 'Tidak ada data di file.');
-        Object.assign(bimp, { show: true, rows, file: f.name, kosong, done: null });
-      });
-    }
-    const doImportBiodata = () => run(async () => {
-      const list = bimp.rows.filter(r => r.st === 'isi').map(r => { const o = { nis: r.nis }; r.isi.forEach(k => { o[k] = r.vals[k]; }); return o; });
-      let diisi = 0, sel = 0, lewat = 0, gagal = '', ket = [];
-      try {
-        for (let i = 0; i < list.length; i += 100) {
-          const d = await api('siswaBiodataImport', { rows: list.slice(i, i + 100) });
-          diisi += d.diisi; sel += d.sel; lewat += d.lewat;
-          if (d.tidakAda && d.tidakAda.length) ket.push(d.tidakAda.length + ' tidak ditemukan');
-          if (d.ambigu && d.ambigu.length) ket.push(d.ambigu.length + ' ID ambigu');
-        }
-      } catch (e) { gagal = niceErr(e.message); }
-      bimp.done = { diisi, sel, lewat, catatan: ket.join(', ') };
-      try { siswa.value = await api('siswaList'); } catch (e) { /* */ }
-      if (gagal) throw new Error(gagal + (diisi ? ' (' + diisi + ' siswa sudah diproses)' : ''));
-    });
     const downloadCreds = () => run(async () => {
       await saveXlsx('Kredensial_Siswa_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Kredensial', [['Username siswa', 'Nama', 'Kelas', 'Sandi awal']].concat(imp.creds.map(x => [String(x.nis), x.nama, x.kelas, String(x.sandi)])), [18, 32, 14, 14]]]);
     });
-    const editSiswa = s => { Object.assign(sf, { edit: !!s, nis: '', nisn: '', nama: '', gender: 'L', kelas: '', kontak: '', tempatLahir: '', tanggalLahir: '', alamat: '', namaAyah: '', namaIbu: '', namaWali: '', kontakOrtu: '', agama: '', statusKeluarga: '', anakKe: '', teleponRumah: '', sekolahAsal: '', diterimaKelas: '', tanggalDiterima: '', alamatOrtu: '', teleponOrtu: '', pekerjaanAyah: '', pekerjaanIbu: '', alamatWali: '', teleponWali: '', pekerjaanWali: '' }, s || {}); showS.value = true; };
+    const editSiswa = s => { Object.assign(sf, { edit: !!s, nis: '', nisn: '', nama: '', gender: 'L', kelas: '', kontak: '' }, s || {}); showS.value = true; };
     const saveSiswa = () => run(async () => {
       const nisn = String(sf.nisn || '').trim();
       if (!/^\d{10}$/.test(nisn)) throw new Error('NISN wajib terdiri dari 10 digit angka');
-      await api('siswaSave', { edit: sf.edit, s: { nis: sf.edit ? sf.nis : nisn, nisn, nama: sf.nama, gender: sf.gender, kelas: sf.kelas, kontak: sf.kontak, tempatLahir: sf.tempatLahir, tanggalLahir: sf.tanggalLahir, alamat: sf.alamat, namaAyah: sf.namaAyah, namaIbu: sf.namaIbu, namaWali: sf.namaWali, kontakOrtu: sf.kontakOrtu, agama: sf.agama, statusKeluarga: sf.statusKeluarga, anakKe: sf.anakKe, teleponRumah: sf.teleponRumah, sekolahAsal: sf.sekolahAsal, diterimaKelas: sf.diterimaKelas, tanggalDiterima: sf.tanggalDiterima, alamatOrtu: sf.alamatOrtu, teleponOrtu: sf.teleponOrtu, pekerjaanAyah: sf.pekerjaanAyah, pekerjaanIbu: sf.pekerjaanIbu, alamatWali: sf.alamatWali, teleponWali: sf.teleponWali, pekerjaanWali: sf.pekerjaanWali } });
+      await api('siswaSave', { edit: sf.edit, s: { nis: sf.edit ? sf.nis : nisn, nisn, nama: sf.nama, gender: sf.gender, kelas: sf.kelas, kontak: sf.kontak } });
       showS.value = false; siswa.value = await api('siswaList'); await refresh(); ok.value = 'Data siswa tersimpan';
     });
     const delSiswa = s => cfmRun('Hapus ' + s.nama + '? Akun login siswa ikut terhapus.', async () => { await api('siswaDelete', { nis: s.nis }); siswa.value = await api('siswaList'); await refresh(); });
@@ -5047,8 +4487,8 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const setSemuaF = s => frows.value.forEach(r => { r.status = s; });
     const saveNilai = () => run(async () => {
       if (!nKey || !nrows.value.length) throw new Error('Daftar siswa belum dimuat untuk isian ini. Isi tujuan pembelajaran lalu tekan Tab/Enter, tunggu daftar muncul, baru simpan.');
-      const bad = nrows.value.find(r => r.skor != null && String(r.skor).trim() !== '' && (!Number.isFinite(Number(r.skor)) || Number(r.skor) < 0 || Number(r.skor) > 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus berupa angka antara 0 dan 100');
-      const body = JSON.parse(JSON.stringify({ ...nKey, rows: nrows.value })), key = 'n|' + [nKey.kelas, nKey.mapel, nKey.tp, nKey.jenis].join('|'); let d;
+      const bad = nrows.value.find(r => r.skor !== '' && r.skor != null && !(Number(r.skor) >= 0 && Number(r.skor) <= 100)); if (bad) throw new Error('Skor ' + bad.nama + ' harus antara 0 dan 100');
+      const body = { ...nKey, rows: nrows.value }, key = 'n|' + [nKey.kelas, nKey.mapel, nKey.tp, nKey.jenis].join('|'); let d;
       try { d = await api('nilaiSave', body); } catch (e) { if (!jaringan(e.message)) throw e; qMasuk('nilaiSave', 'Nilai ' + nKey.kelas + ' - ' + nKey.mapel + ' (' + nKey.jenis + ')', key, body); ok.value = 'Tidak ada sinyal. Nilai disimpan di HP dan dikirim otomatis saat tersambung.'; return; }
       qHapusKey(key); ok.value = d.tersimpan + ' nilai tersimpan';
     });
@@ -5100,26 +4540,8 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const ptabs = computed(() => [{ k: 'input', t: 'Input Kehadiran' }, { k: 'rekap', t: 'Rekapitulasi' }, { k: 'detail', t: 'Detail Harian (1\u201331)' }, { k: 'grafik', t: 'Grafik' }, { k: 'riwayat', t: 'Riwayat Input Presensi' }].filter(t => t.k !== 'input' || canInput.value));
     const mapelOf = k => [...new Set(pilih.value.pairs.filter(p => !k || p.kelas === k).map(p => p.mapel))].sort((a, b) => a.localeCompare(b));
     const pickKelas = (o, auto) => { o.mapel = ''; if (auto && o.kelas) { const m = mapelOf(o.kelas); if (m.length === 1) o.mapel = m[0]; } };
-    const tanggalPresensiValid = v => { if (!/^\d{4}-\d{2}-\d{2}$/.test(String(v || ''))) return false; const a = String(v).split('-').map(Number), d = new Date(a[0], a[1] - 1, a[2]); return d.getFullYear() === a[0] && d.getMonth() === a[1] - 1 && d.getDate() === a[2]; };
     const ringkasInput = computed(() => { const c = { H: 0, I: 0, S: 0, A: 0, D: 0 }; rows.value.forEach(r => { if (c[r.status] !== undefined) c[r.status]++; }); return c; });
     let pReq = 0;
-    // Pengingat presensi harian: sesi di jadwal guru (hari ini s.d. 6 hari lalu) yang belum diisi. Hanya membaca; gagal = diam.
-    const pt = reactive({ show: false, daftar: [], total: 0, hariIni: 0, cek: 7 });
-    const cekPT = async tampil => {
-      if (!user.value || user.value.role !== 'GURU') return;
-      try {
-        const d = await api('presensiTertunggak');
-        pt.daftar = Array.isArray(d && d.daftar) ? d.daftar : []; pt.total = (d && d.total) || 0; pt.hariIni = (d && d.hariIni) || 0; pt.cek = (d && d.cek) || 7;
-        if (!pt.daftar.length) { pt.show = false; return; }
-        if (tampil) {
-          const k = 'pt_' + user.value.username + '_' + hari0; let sudah = '';
-          try { sudah = sessionStorage.getItem(k) || ''; } catch (e) { /* */ }
-          if (!sudah) { pt.show = true; try { sessionStorage.setItem(k, '1'); } catch (e) { /* */ } }
-        }
-      } catch (e) { /* pengingat tidak boleh mengganggu alur utama */ }
-    };
-    const ptTanggal = t => { const a = String(t || '').split('-').map(Number); if (a.length !== 3) return t; return t === hari0 ? 'Hari ini' : a[2] + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][a[1] - 1]; };
-    const ptIsi = async x => { pt.show = false; await go('presensi'); ptab.value = 'input'; Object.assign(pi, { tanggal: x.tanggal, kelas: x.kelas, mapel: x.mapel, ada: false }); loadPresensi(); };
     const loadPresensi = () => {
       rows.value = []; pi.ada = false; const rid = ++pReq;
       if (pi.kelas && pi.mapel && pi.tanggal) run(async () => {
@@ -5130,14 +4552,10 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     };
     const savePresensi = () => run(async () => {
       if (!pi.kelas || !pi.mapel) throw new Error('Pilih kelas dan mata pelajaran terlebih dahulu');
-      if (!tanggalPresensiValid(pi.tanggal)) throw new Error('Tanggal presensi tidak valid. Pilih tanggal yang benar terlebih dahulu.');
-      if (!Array.isArray(rows.value) || !rows.value.length) throw new Error('Daftar siswa belum dimuat. Muat ulang kelas dan mata pelajaran sebelum menyimpan presensi.');
-      const statusValid = new Set(ST.map(s => s.k)), seenNis = new Set();
-      for (const r0 of rows.value) { if (!r0 || !statusValid.has(r0.status)) throw new Error('Ada status kehadiran yang tidak valid. Periksa kembali daftar siswa.'); const id = String(r0.nis == null ? '' : r0.nis).trim(); if (id && seenNis.has(id)) throw new Error('Ada NIS siswa ganda pada daftar presensi (' + id + '). Muat ulang data kelas sebelum menyimpan.'); if (id) seenNis.add(id); }
-      const body = JSON.parse(JSON.stringify({ kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal, rows: rows.value })), key = 'p|' + [pi.kelas, pi.mapel, pi.tanggal].join('|'), r = ringkasInput.value; let d;
+      const body = { kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal, rows: rows.value }, key = 'p|' + [pi.kelas, pi.mapel, pi.tanggal].join('|'), r = ringkasInput.value; let d;
       try { d = await api('presensiSave', body); } catch (e) { if (!jaringan(e.message)) throw e; qMasuk('presensiSave', 'Presensi ' + pi.kelas + ' - ' + pi.mapel + ' (' + pi.tanggal + ')', key, body); ok.value = 'Tidak ada sinyal. Presensi disimpan di HP dan dikirim otomatis saat tersambung.'; return; }
       qHapusKey(key);
-      pi.ada = true; cekPT(false); ok.value = d.tersimpan + ' siswa tersimpan (Hadir ' + r.H + ', Izin ' + r.I + ', Sakit ' + r.S + ', Alpa ' + r.A + ', Dispensasi ' + r.D + ')';
+      pi.ada = true; ok.value = d.tersimpan + ' siswa tersimpan (Hadir ' + r.H + ', Izin ' + r.I + ', Sakit ' + r.S + ', Alpa ' + r.A + ', Dispensasi ' + r.D + ')';
     });
     const fetchSesi = async () => {
       if (pr.jenis === 'Harian' ? !pr.tanggal : !pr.bulan) throw new Error('Pilih ' + (pr.jenis === 'Harian' ? 'tanggal' : 'bulan') + ' terlebih dahulu');
@@ -5323,33 +4741,33 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       try { jadwal.value = await api('jadwalList'); } catch (e) { /* */ }
     });
     const gdata = ref([]), gq = ref(''), grole = ref(''), showG = ref(false);
-    const gf = reactive({ edit: false, username: '', nama: '', nuptk: '', role: 'GURU', tugasWakur: false, sandi: '', wali: [] });
+    const gf = reactive({ edit: false, username: '', nama: '', role: 'GURU', tugasWakur: false, sandi: '', wali: [] });
     const kred = reactive({ show: false, judul: '', list: [], copied: false });
-    const guruTampil = computed(() => { const t = gq.value.toLowerCase(); return gdata.value.filter(g => (!grole.value || (grole.value === 'WAKUR' ? String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR') : g.role === grole.value)) && (!t || (g.nama + ' ' + g.username + ' ' + (g.nuptk||'') + ' ' + g.wali.join(' ') + ' ' + g.kelasAjar.join(' ')).toLowerCase().includes(t))); });
+    const guruTampil = computed(() => { const t = gq.value.toLowerCase(); return gdata.value.filter(g => (!grole.value || (grole.value === 'WAKUR' ? String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR') : g.role === grole.value)) && (!t || (g.nama + ' ' + g.username + ' ' + g.wali.join(' ') + ' ' + g.kelasAjar.join(' ')).toLowerCase().includes(t))); });
     const refreshGuru = async () => { [gdata.value, kelasAll.value] = await Promise.all([api('guruDetail'), api('kelasDetail')]); };
     const showKred = (judul, list) => Object.assign(kred, { show: true, judul, list, copied: false });
     const copyKred = async () => {
       const teks = kred.list.map(c => c.nama + '\nUsername: ' + c.username + '\nSandi: ' + c.sandi).join('\n\n');
       try { await navigator.clipboard.writeText(teks); kred.copied = true; } catch (e) { await tanya({ judul: 'Salin kredensial', detail: 'Salin teks berikut secara manual.', nilai: teks, multiline: true, bacaSaja: true, tombol: 'Selesai', tanpaBatal: true }); }
     };
-    const editGuru = g => { err.value = ok.value = ''; const task = !!g && (String(g.role || '').toUpperCase() === 'WAKUR' || String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR')); Object.assign(gf, { edit: !!g, username: g ? g.username : '', nama: g ? g.nama : '', nuptk: g ? (g.nuptk||'') : '', role: g && g.role === 'WAKUR' ? 'GURU' : (g ? g.role : 'GURU'), tugasWakur: task, sandi: '', wali: g ? [...g.wali] : [] }); showG.value = true; };
+    const editGuru = g => { err.value = ok.value = ''; const task = !!g && (String(g.role || '').toUpperCase() === 'WAKUR' || String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR')); Object.assign(gf, { edit: !!g, username: g ? g.username : '', nama: g ? g.nama : '', role: g && g.role === 'WAKUR' ? 'GURU' : (g ? g.role : 'GURU'), tugasWakur: task, sandi: '', wali: g ? [...g.wali] : [] }); showG.value = true; };
     const saveGuru = () => run(async () => {
       if (!/^[A-Za-z0-9._-]{3,30}$/.test(gf.username)) throw new Error('Username 3-30 karakter: huruf, angka, titik, minus, atau garis bawah');
       if (!gf.nama) throw new Error('Nama wajib diisi');
       if (!gf.edit && gf.sandi && gf.sandi.length < 6) throw new Error('Sandi minimal 6 karakter');
-      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, nuptk: gf.nuptk, role: gf.role, tugasTambahan: gf.role === 'GURU' && gf.tugasWakur ? 'WAKUR' : '', sandi: gf.sandi, wali: gf.role !== 'GURU' ? [] : gf.wali } });
+      const d = await api('guruSave', { edit: gf.edit, g: { username: gf.username, nama: gf.nama, role: gf.role, tugasTambahan: gf.role === 'GURU' && gf.tugasWakur ? 'WAKUR' : '', sandi: gf.sandi, wali: gf.role !== 'GURU' ? [] : gf.wali } });
       showG.value = false; await refreshGuru();
       if (d.sandi) showKred('Akun guru dibuat', [{ username: d.username, nama: gf.nama, sandi: d.sandi, role: gf.role }]);
       ok.value = gf.edit ? 'Data guru diperbarui' : 'Akun guru dibuat';
     });
     const delGuru = g => cfmRun('Hapus akun ' + g.nama + '? Status wali kelasnya ikut dilepas.', async () => { await api('guruDelete', { username: g.username }); await refreshGuru(); ok.value = 'Akun dihapus'; });
     const exportGuru = () => run(async () => {
-      const aoa = [['No', 'Username', 'Nama', 'NUPTK', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, g.nuptk||'', ROLE_LBL[g.role] || 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
-      await saveXlsx('Data_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Guru', aoa, [5, 20, 32, 20, 16, 20, 30, 12]]]); ok.value = guruTampil.value.length + ' akun diekspor';
+      const aoa = [['No', 'Username', 'Nama', 'Peran', 'Wali Kelas', 'Kelas Ajar', 'Jam/Minggu']].concat(guruTampil.value.map((g, i) => [i + 1, g.username, g.nama, ROLE_LBL[g.role] || 'Guru', g.wali.join(', '), g.kelasAjar.join(', '), g.jam]));
+      await saveXlsx('Data_Guru_' + new Date().toLocaleDateString('sv-SE') + '.xlsx', [['Data Guru', aoa, [5, 20, 32, 16, 20, 30, 12]]]); ok.value = guruTampil.value.length + ' akun diekspor';
     });
     const templateGuru = () => run(async () => {
       await saveXlsx('Template_Impor_Guru.xlsx', [
-        ['Data Guru', [['Username', 'Nama', 'NUPTK', 'Peran', 'Wali Kelas', 'Sandi'], ['budi.santoso', 'Budi Santoso, S.Pd.', '', 'Guru', 'X TKJ 1', ''], ['siti.aminah', 'Siti Aminah, S.Kom.', '', 'Guru', 'XI TM 1, XI TM 2', 'rahasia123'], ['kepsek', 'Drs. Contoh, M.Pd.', '', 'Kepala Sekolah', '', ''], ['staf.tu', 'Rina Lestari', '', 'Staf', '', '']], [20, 34, 20, 16, 24, 16]],
+        ['Data Guru', [['Username', 'Nama', 'Peran', 'Wali Kelas', 'Sandi'], ['budi.santoso', 'Budi Santoso, S.Pd.', 'Guru', 'X TKJ 1', ''], ['siti.aminah', 'Siti Aminah, S.Kom.', 'Guru', 'XI TM 1, XI TM 2', 'rahasia123'], ['kepsek', 'Drs. Contoh, M.Pd.', 'Kepala Sekolah', '', ''], ['staf.tu', 'Rina Lestari', 'Staf', '', '']], [20, 34, 16, 24, 16]],
         ['Petunjuk', [['Petunjuk pengisian'], ['1. Isi mulai baris 2 pada sheet "Data Guru"; hapus baris contoh.'], ['2. Kolom wajib: Username (3-30 karakter: huruf, angka, titik, minus, garis bawah) dan Nama.'], ['3. Peran: Guru, Kepala Sekolah, atau Staf (staf hanya dapat melihat dan mengunduh data guru dan siswa). Kosong = Guru. Hanya guru yang bisa menjadi wali kelas.'], ['4. Wali Kelas: nama kelas yang SUDAH ada di Kelola Kelas; beberapa kelas dipisah koma. Kosong = tidak mengubah.'], ['5. Sandi: opsional, min. 6 karakter. Kosong = dibuat acak (dapat diunduh setelah impor). Untuk akun yang sudah ada, kolom ini diabaikan.']], [100]]]);
     });
     const gimp = reactive({ show: false, rows: [], file: '', update: true, done: null, creds: [], gagal: [], prog: 0 });
@@ -5361,14 +4779,14 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         const aoa = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
         const hd = (aoa[0] || []).map(h => norm(h).toLowerCase().replace(/[^a-z]/g, ''));
         const col = names => hd.findIndex(h => names.indexOf(h) >= 0);
-        const c = { un: col(['username', 'user', 'id']), nuptk: col(['nuptk']), nama: col(['nama', 'namaguru', 'namalengkap']), role: col(['peran', 'role', 'jabatan']), wali: col(['walikelas', 'wali', 'kelaswali']), sandi: col(['sandi', 'password', 'katasandi']) };
+        const c = { un: col(['username', 'user', 'id', 'nip', 'nuptk']), nama: col(['nama', 'namaguru', 'namalengkap']), role: col(['peran', 'role', 'jabatan']), wali: col(['walikelas', 'wali', 'kelaswali']), sandi: col(['sandi', 'password', 'katasandi']) };
         if (c.un < 0 || c.nama < 0) throw new Error('Baris pertama harus berisi judul kolom Username dan Nama. Gunakan tombol "Unduh template".');
         await refreshGuru();
         const ada = new Set(gdata.value.map(x => x.username)), seen = new Set(), kmap = {}, out = [];
         kelasAll.value.forEach(k => kmap[k.kelas.toLowerCase()] = k.kelas);
         aoa.slice(1).forEach((r, i) => {
           if (r.every(v => !norm(v))) return;
-          const o = { no: i + 2, username: norm(r[c.un]), nama: norm(r[c.nama]), nuptk: c.nuptk < 0 ? '' : norm(r[c.nuptk]), role: roleDari(c.role >= 0 ? norm(r[c.role]) : ''), wali: [], sandi: c.sandi < 0 ? '' : norm(r[c.sandi]), st: 'baru', msg: '' };
+          const o = { no: i + 2, username: norm(r[c.un]), nama: norm(r[c.nama]), role: roleDari(c.role >= 0 ? norm(r[c.role]) : ''), wali: [], sandi: c.sandi < 0 ? '' : norm(r[c.sandi]), st: 'baru', msg: '' };
           const walis = c.wali < 0 ? [] : norm(r[c.wali]).split(/[,;|\n]/).map(s => s.trim()).filter(Boolean), salah = [];
           walis.forEach(w => { const k = kmap[w.toLowerCase()]; if (k) { if (o.wali.indexOf(k) < 0) o.wali.push(k); } else salah.push(w); });
           if (!o.username) { o.st = 'error'; o.msg = 'Username kosong'; }
@@ -5386,7 +4804,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       });
     }
     const doImportGuru = () => run(async () => {
-      const list = gimp.rows.filter(r => r.st !== 'error' && (gimp.update || r.st === 'baru')).map(r => ({ username: r.username, nama: r.nama, nuptk: r.nuptk, role: r.role, wali: r.wali, sandi: r.sandi }));
+      const list = gimp.rows.filter(r => r.st !== 'error' && (gimp.update || r.st === 'baru')).map(r => ({ username: r.username, nama: r.nama, role: r.role, wali: r.wali, sandi: r.sandi }));
       let baru = 0, ubah = 0, creds = [], gagal = [];
       gimp.prog = 1;
       try {
@@ -5558,38 +4976,6 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       };
       return t.split(' ').map(x => x.split('-').map(kata).join('-')).join(' ');
     };
-    // Biodata cetak: teks KAPITAL/huruf kecil semua dirapikan jadi huruf judul (Abdul Hakim); teks yang sudah campuran dibiarkan.
-    // Singkatan umum (SMPN, RT, RW, dst.) dan angka romawi tetap kapital.
-    const BIO_SINGKAT = { SMP: 'SMP', SMPN: 'SMPN', SMA: 'SMA', SMAN: 'SMAN', SMK: 'SMK', SMKN: 'SMKN', SD: 'SD', SDN: 'SDN', MI: 'MI', MIN: 'MIN', MTS: 'MTs', MTSN: 'MTsN', MA: 'MA', MAN: 'MAN', RT: 'RT', RW: 'RW', WA: 'WA', PNS: 'PNS', TNI: 'TNI', POLRI: 'POLRI', BUMN: 'BUMN', PT: 'PT', CV: 'CV', II: 'II', III: 'III', IV: 'IV', VI: 'VI', VII: 'VII', VIII: 'VIII', IX: 'IX', X: 'X', XI: 'XI', XII: 'XII' };
-    const bioRapi = v => {
-      const t = String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
-      if (!t) return '';
-      const hh = t.replace(/[^A-Za-z]/g, '');
-      if (!hh || (hh !== hh.toUpperCase() && hh !== hh.toLowerCase())) return t;
-      return t.split(' ').map(w => {
-        if (!/[A-Za-z]/.test(w)) return w;
-        return w.toLowerCase().replace(/[a-z]+/g, (run, i, all) => {
-          const sing = BIO_SINGKAT[run.toUpperCase()];
-          if (sing) return sing;
-          return (i === 0 || /[.\-\/(,]/.test(all[i - 1])) ? run.charAt(0).toUpperCase() + run.slice(1) : run;
-        });
-      }).join(' ');
-    };
-    // Buku Induk: rapikan per kata (KAPITAL/huruf kecil -> Huruf Judul). Kata campuran (mis. MTSs.) dan singkatan umum dibiarkan benar.
-    const biRapi = v => {
-      const t = String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
-      if (!t) return '';
-      return t.split(' ').map(w => {
-        const h = w.replace(/[^A-Za-z]/g, '');
-        if (!h) return w;
-        if (h !== h.toUpperCase() && h !== h.toLowerCase()) return w;
-        return w.toLowerCase().replace(/[a-z]+/g, (run, i, all) => {
-          const sing = BIO_SINGKAT[run.toUpperCase()];
-          if (sing) return sing;
-          return (i === 0 || /[.\-\/(,]/.test(all[i - 1])) ? run.charAt(0).toUpperCase() + run.slice(1) : run;
-        });
-      }).join(' ');
-    };
     const barisR = t => String(t || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 6).map(x => { const i = x.search(/\s[-\u2013|]\s/); return i < 0 ? { a: x, b: '' } : { a: x.slice(0, i).trim(), b: x.slice(i + 3).trim() }; });
     const rpGrup = computed(() => { if (!rp.value) return []; let n = 0; return ['Umum', 'Kejuruan', 'Muatan Lokal', 'Mata Pelajaran Pilihan'].map(g => ({ g: g, items: rp.value.mapel.filter(m => m.grup === g).map(m => Object.assign({ no: ++n }, m)) })).filter(x => x.items.length); });
     const rpList = computed(() => rp.value ? (rpSatu.value ? rp.value.siswa.filter(s => s.nis === rpSatu.value) : rp.value.siswa) : []);
@@ -5658,41 +5044,29 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     };
     const rpGuruMap = ref({}), rpGuruDiag = ref(null);
     const rpGuruStat = computed(() => {
-      const d = rp.value;
-      if (!d || !Array.isArray(d.siswa) || !d.siswa.length || !Array.isArray(d.mapel)) return null;
+      const d = rp.value; if (!d || !d.siswa || !d.siswa.length || !Array.isArray(d.mapel)) return null;
       const n = d.siswa.length, nm = new Map();
       d.mapel.forEach(m => nm.set(m.nama, m.label || m.nama));
       (d.kosongMapel || []).forEach(x => { if (!nm.has(x)) nm.set(x, x); });
       if (!nm.size) return null;
-      // Indikator harus mengikuti nilai yang benar-benar ditampilkan pada cetak rapor.
-      // Pada rapor STS maupun SAS, kolom nilai yang tampil menggunakan field `akhir`.
-      const isi = v => v != null && String(v).trim() !== '' && String(v).trim() !== '-';
-      const tersedia = d.siswa.some(s => s && s.nilai && Object.keys(s.nilai).some(k => {
-        const x = s.nilai[k]; return x && Object.prototype.hasOwnProperty.call(x, 'akhir') && isi(x.akhir);
-      }));
-      const p = (d.periode ? d.periode === 'STS' : rpMeta.periode === 'STS') ? 'sts' : 'sas';
-      const cnt = m => {
-        let a = 0;
-        for (const s of d.siswa) {
-          const x = s && s.nilai && s.nilai[m];
-          // Nilai 0 adalah nilai yang sah; nilai kosong/tanda strip bukan nilai masuk.
-          if (x && isi(x.akhir)) a++;
-        }
-        return a;
-      };
+      const ada = f => d.siswa.some(s => s.nilai && Object.keys(s.nilai).some(k => s.nilai[k] && Object.prototype.hasOwnProperty.call(s.nilai[k], f)));
+      const tersedia = { sts: ada('sts'), sas: ada('sas') };
+      const p = (d.periode ? d.periode === 'STS' : rpMeta.periode === 'STS') ? 'sts' : 'sas'; // hanya jenis rapor yang sedang dibuka
+      const isi = v => v != null && v !== '' && v !== '-';
+      const cnt = m => { let a = 0, b = 0; for (const s of d.siswa) { const x = s.nilai && s.nilai[m]; if (!x) continue; if (isi(x.sts)) a++; if (isi(x.sas)) b++; } return { sts: a, sas: b }; };
       const grup = new Map();
       [...nm.keys()].forEach(m => {
         const gs = cariGuruMapel(m, nm.get(m)), nama = gs.length ? gs.join(' / ') : '', key = nama || ('?' + m);
         if (!grup.has(key)) grup.set(key, { key, nama: nama || 'Guru tidak terbaca', dikenal: !!nama, mapel: [] });
-        const c = cnt(m); grup.get(key).mapel.push({ label: nm.get(m), v: c });
+        const c = cnt(m); grup.get(key).mapel.push({ label: nm.get(m), sts: c.sts, sas: c.sas, v: c[p] });
       });
       const list = [...grup.values()].map(g => {
-        const tot = g.mapel.length * n, hp = g.mapel.reduce((a, m) => a + m.v, 0);
-        return Object.assign(g, { n, tot, pct: tot ? Math.round(hp / tot * 100) : 0, full: tersedia && tot > 0 && hp === tot });
+        const tot = g.mapel.length * n, h1 = g.mapel.reduce((a, m) => a + m.sts, 0), h2 = g.mapel.reduce((a, m) => a + m.sas, 0), hp = g.mapel.reduce((a, m) => a + m.v, 0);
+        return Object.assign(g, { n, tot, stsHas: h1, sasHas: h2, stsPct: Math.round(h1 / tot * 100), sasPct: Math.round(h2 / tot * 100), stsFull: tersedia.sts && h1 === tot, sasFull: tersedia.sas && h2 === tot, pct: Math.round(hp / tot * 100), full: tersedia[p] && hp === tot });
       }).sort((a, b) => (a.full ? 1 : 0) - (b.full ? 1 : 0) || a.nama.localeCompare(b.nama));
-      const total = list.length, pFull = list.filter(g => g.full).length;
+      const total = list.length, stsFull = list.filter(g => g.stsFull).length, sasFull = list.filter(g => g.sasFull).length, pFull = list.filter(g => g.full).length;
       const tdk = list.filter(g => !g.dikenal).reduce((a, g) => a + g.mapel.length, 0);
-      return { tdk, list, total, n, tersedia: { sts: tersedia, sas: tersedia }, p, pLabel: p.toUpperCase(), ok: tersedia, pFull, pPct: total ? Math.round(pFull / total * 100) : 0, stsFull: pFull, sasFull: pFull, stsPct: total ? Math.round(pFull / total * 100) : 0, sasPct: total ? Math.round(pFull / total * 100) : 0 };
+      return { tdk, list, total, stsFull, sasFull, n, tersedia, p, pLabel: p.toUpperCase(), ok: tersedia[p], pFull, pPct: total ? Math.round(pFull / total * 100) : 0, stsPct: total ? Math.round(stsFull / total * 100) : 0, sasPct: total ? Math.round(sasFull / total * 100) : 0 };
     });
     let rpTimer = 0;                                   // gabungkan perubahan dropdown beruntun -> 1 panggilan server
     const loadRapor = () => { clearTimeout(rpTimer); rpTimer = 0; return run(muatRapor); };
@@ -5832,7 +5206,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const muatUlangWakurNilai = () => run(loadWakurNilai);
     const bandMax = computed(() => mon.value ? Math.max(0, ...mon.value.bands.map(b => b.n)) : 0);
     const waLink = r => {
-      let n = String(r.kontak || '').replace(/\D/g, ''); if (n.startsWith('620')) n = '62' + n.slice(3); else if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n;
+      let n = String(r.kontak || '').replace(/\D/g, ''); if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n;
       if (!/^62\d{8,13}$/.test(n)) return '';
       const t = 'Yth. Bapak/Ibu orang tua/wali dari ' + r.nama + ' (' + r.kelas + '). Kami dari SMK CALM menginformasikan bahwa pada ' + fmtBln(mon.value.bulan) + ' ananda tercatat alpa ' + r.alpa + ' kali dengan kehadiran ' + r.persen + '%. Mohon kerja samanya untuk memantau kehadiran ananda. Terima kasih.';
       return 'https://wa.me/' + n + '?text=' + encodeURIComponent(t);
@@ -5863,7 +5237,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       await hasilAkun('Akun dan sandi awal', r); });
     const portalUrl = () => EMB ? (document.referrer || location.href) : location.href.split(/[?#]/)[0];
     const teksAkun = c => 'Akun Portal Akademik SMK CALM\nNama: ' + c.nama + '\nUsername: ' + c.username + '\nSandi: ' + c.sandi + '\nAlamat: ' + portalUrl() + '\nSegera ganti sandi lewat menu Ganti Sandi setelah masuk.';
-    const noWa = k => { let n = String(k || '').replace(/\D/g, ''); if (n.startsWith('620')) n = '62' + n.slice(3); else if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n; return /^62\d{8,13}$/.test(n) ? n : ''; };
+    const noWa = k => { let n = String(k || '').replace(/\D/g, ''); if (n.startsWith('0')) n = '62' + n.slice(1); else if (n.startsWith('8')) n = '62' + n; return /^62\d{8,13}$/.test(n) ? n : ''; };
     const waAkun = c => 'https://wa.me/' + noWa(c.kontak) + '?text=' + encodeURIComponent(teksAkun(c));
     const cetakKred = () => {
       kartu.value = { kelas: kred.judul, siswa: kred.list.map(c => ({ nis: c.username, nama: c.nama, sandi: c.sandi, ket: (ROLE_LBL[c.role] || '') + (c.kelas ? ' ' + c.kelas : '') || 'Akun' })) };
@@ -6097,9 +5471,9 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
         setInterval(kirimTinggiEmbed, 1000);
       }
     }
-    return { roleGroups, predRata, namaRapi, bioRapi, biRapi, pt, cekPT, ptTanggal, ptIsi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, biodataUntuk, tanggalBiodata, cetakCover, cetakPaketRapor, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, biodataDasarLengkap, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, bimp, bimpCount, templateBiodata, pickBiodata, doImportBiodata, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, biRows, biReqs, biQ, biKelas, biTerpilih, biShowForm, biForm, biFields, biCatatan, biRiwayat, biRiwayatLoading, biRiwayatError, biKelasOptions, biTampil, muatBukuInduk, biBukaDetail, biBukaAjukan, biAjukan, biProses, windowPrintSafe, biCetakSatu, biEkspor, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
+    return { roleGroups, predRata, namaRapi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, cetakCover, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat,
-      siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, sf, kf, jf, nm, hariList,
+      siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, hasilSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
       jhari, jq, jblok, jGuruFilter, blokInfo, bf2, BLOK_CLS, blokLbl, saveBlok, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, jimp, jimpCount, exportJadwal, templateJadwal, pickJadwalFile, doImportJadwal, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax, wakurNilai, wakurNilaiJenis, wakurNilaiQ, wakurNilaiTampil, loadWakurNilai, muatUlangWakurNilai,
@@ -6107,7 +5481,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai, nMode, frows, kt, saveFormatif, saveKktp, setSemuaF, jl, cekTahunR, opsiTahun,
-      antreSaya, kirimAntre, perbaikiAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
+      antreSaya, kirimAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
       anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu, ca, caSiswa, caHari, caWali, caBulanLabel, cetakAbsen, DESK, roleNama, salam, memuat,
       hasWakurTask, canManageJadwal, editJadwal };
   }
