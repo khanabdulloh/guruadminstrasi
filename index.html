@@ -1024,6 +1024,25 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   html body.cetak-rapor .rapor-page table.rapor-id > tbody > tr > td:nth-child(6) { width: 25.5% !important; text-align: left !important; padding-left: 5pt !important; white-space: nowrap !important; }
 }
 </style>
+<style id="absen-repeat-kop-fix">
+@media print {
+  body.cetak-absen .absen-section { padding: 15mm 12mm 12mm !important; }
+  body.cetak-absen .absen-sheet { overflow: visible !important; }
+  body.cetak-absen .absen-scroll { overflow: visible !important; }
+  body.cetak-absen .absen-table { width: 100% !important; }
+  body.cetak-absen .absen-table thead { display: table-header-group !important; }
+  body.cetak-absen .absen-table .absen-repeat-heading { break-inside: avoid !important; page-break-inside: avoid !important; }
+  body.cetak-absen .absen-table .absen-repeat-heading > th {
+    padding: 0 2pt 5pt !important;
+    border: 0 !important;
+    background: #fff !important;
+    vertical-align: top !important;
+  }
+  body.cetak-absen .absen-repeat-heading .absen-title { margin: 5pt 0 2pt !important; }
+  body.cetak-absen .absen-repeat-heading .absen-meta { margin-bottom: 5pt !important; }
+  body.cetak-absen .absen-table tr { break-inside: avoid; page-break-inside: avoid; }
+}
+</style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="splash" role="status" aria-live="polite">
@@ -1569,12 +1588,11 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       <p v-if="!ca.kelas" class="nl-empty noprint">Pilih kelas untuk melihat pratinjau daftar hadir.</p>
       <p v-else-if="!caSiswa.length" class="nl-empty noprint">Belum ada siswa di kelas ini.</p>
       <div v-else class="absen-sheet">
-        <kop :k="cfg.kop"></kop>
-        <p class="absen-title">DAFTAR HADIR SISWA</p>
-        <div class="absen-meta"><span>Kelas: <b>{{ca.kelas}}</b></span><span>Minggu: <b>{{caBulanLabel}}</b></span><span v-if="cfg.tahun&&cfg.tahun.tahun">Tahun ajaran: <b>{{cfg.tahun.tahun}}</b></span><span>Wali kelas: <b>{{caWali||'-'}}</b></span><span v-if="ca.ket"><b>{{ca.ket}}</b></span></div>
         <div class="absen-scroll"><table class="absen-table calm-table-print">
           <colgroup><col style="width:30px"><col style="width:84px"><col style="width:190px"><col style="width:28px"><col v-for="h in caHari" :key="'c'+h.d"><col style="width:30px"><col style="width:30px"><col style="width:30px"></colgroup>
-          <thead><tr><th rowspan="2">No</th><th rowspan="2">NISN</th><th rowspan="2">Nama</th><th rowspan="2">L/P</th><th :colspan="caHari.length">Kehadiran</th><th colspan="3">Jumlah</th></tr>
+          <thead>
+            <tr class="absen-repeat-heading"><th :colspan="caHari.length + 7"><kop :k="cfg.kop"></kop><p class="absen-title">DAFTAR HADIR SISWA</p><div class="absen-meta"><span>Kelas: <b>{{ca.kelas}}</b></span><span>Minggu: <b>{{caBulanLabel}}</b></span><span v-if="cfg.tahun&&cfg.tahun.tahun">Tahun ajaran: <b>{{cfg.tahun.tahun}}</b></span><span>Wali kelas: <b>{{caWali||'-'}}</b></span><span v-if="ca.ket"><b>{{ca.ket}}</b></span></div></th></tr>
+            <tr><th rowspan="2">No</th><th rowspan="2">NISN</th><th rowspan="2">Nama</th><th rowspan="2">L/P</th><th :colspan="caHari.length">Kehadiran</th><th colspan="3">Jumlah</th></tr>
             <tr><th v-for="h in caHari" :key="h.d">{{h.nama}}<br><span class="absen-tg">{{h.tgl}}/{{h.bln+1}}</span></th><th>S</th><th>I</th><th>A</th></tr></thead>
           <tbody>
             <tr v-for="(s,i) in caSiswa" :key="s.nis"><td>{{i+1}}</td><td>{{s.nisn||'-'}}</td><td class="nm">{{s.nama}}</td><td>{{s.gender}}</td><td v-for="h in caHari" :key="h.d"></td><td></td><td></td><td></td></tr>
