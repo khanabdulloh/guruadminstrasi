@@ -570,8 +570,11 @@ main section table:not(.border-collapse) button,main section table:not(.border-c
   body.cetak-absen .absen-title{font-size:12pt;margin:6pt 0 2pt}
   body.cetak-absen .absen-meta{font-size:8.5pt;margin-bottom:6pt;color:#111}
   body.cetak-absen .absen-note{font-size:7.5pt;color:#333}
-  body.cetak-absen .absen-note{margin-bottom:0}
-  body.cetak-absen .absen-ttd{font-size:9pt;margin-top:22pt;padding:0 14pt;line-height:1.45;break-inside:avoid;page-break-inside:avoid}
+  /* Jarak atas tanda tangan memakai padding (bukan margin) agar tetap ada saat blok pindah ke halaman berikutnya;
+     3 baris terakhir tabel + keterangan ikut pindah bersama tanda tangan supaya tidak berdiri sendiri di halaman kosong. */
+  body.cetak-absen .absen-note{margin-bottom:0;break-after:avoid;page-break-after:avoid}
+  body.cetak-absen .absen-table tbody tr:nth-last-child(-n+3){break-after:avoid;page-break-after:avoid}
+  body.cetak-absen .absen-ttd{font-size:9pt;margin-top:0;padding:24pt 14pt 0;line-height:1.45;break-inside:avoid;page-break-inside:avoid}
   body.cetak-absen .absen-ttd .sp{height:48pt}
 }
 @page absen{size:A4 portrait;margin:12mm}
