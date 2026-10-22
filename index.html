@@ -1163,6 +1163,107 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   body.bi-print-list #app section.bukuinduk-view { display:block!important; }
 }
 </style>
+
+<style id="buku-induk-print-repair-v11">
+/* Perbaikan final cetak Buku Induk: daftar landscape, biodata portrait. */
+@page biListLandscape { size: A4 landscape; margin: 10mm; }
+@page biPortrait { size: A4 portrait; margin: 12mm 14mm 14mm; }
+
+@media print {
+  html, body { background:#fff !important; }
+  body.bi-print-list { page: biListLandscape !important; margin:0 !important; color:#111827 !important; }
+  body.bi-print-list #app,
+  body.bi-print-list #app main,
+  body.bi-print-list #app section.bukuinduk-view {
+    display:block !important; position:static !important; width:100% !important;
+    max-width:none !important; height:auto !important; min-height:0 !important;
+    margin:0 !important; padding:0 !important; overflow:visible !important;
+    background:#fff !important; box-shadow:none !important;
+  }
+  body.bi-print-list #app main > section:not(.bukuinduk-view),
+  body.bi-print-list #app aside,
+  body.bi-print-list #app header,
+  body.bi-print-list #app nav,
+  body.bi-print-list #splash,
+  body.bi-print-list #app .bi-toolbar,
+  body.bi-print-list #app .bi-summary,
+  body.bi-print-list #app .bi-filter,
+  body.bi-print-list #app .noprint,
+  body.bi-print-list #app .modal-wrap,
+  body.bi-print-list #app .bi-detail-overlay { display:none !important; }
+
+  body.bi-print-list #app section.bukuinduk-view > *:not(.bi-print-heading):not(.bi-list-print) {
+    display:none !important;
+  }
+  body.bi-print-list #app .bi-print-heading {
+    display:block !important; visibility:visible !important; text-align:center !important;
+    color:#000 !important; margin:0 0 7mm !important; padding:0 0 4mm !important;
+    border-bottom:2px double #111827 !important;
+  }
+  body.bi-print-list #app .bi-print-heading h1 {
+    display:block !important; font-size:15pt !important; line-height:1.25 !important;
+    font-weight:800 !important; letter-spacing:.04em !important; margin:0 0 2mm !important;
+  }
+  body.bi-print-list #app .bi-print-heading p {
+    display:block !important; font-size:9pt !important; line-height:1.35 !important;
+    margin:1mm 0 0 !important;
+  }
+  body.bi-print-list #app .bi-list-print {
+    display:block !important; width:100% !important; max-width:none !important;
+    min-width:0 !important; margin:0 !important; padding:0 !important;
+    overflow:visible !important; border:0 !important; border-radius:0 !important;
+    box-shadow:none !important; background:#fff !important;
+  }
+  body.bi-print-list #app .bi-list-print table {
+    display:table !important; width:100% !important; min-width:0 !important;
+    table-layout:fixed !important; border-collapse:collapse !important;
+    font-size:8pt !important; line-height:1.25 !important; color:#000 !important;
+  }
+  body.bi-print-list #app .bi-list-print thead { display:table-header-group !important; }
+  body.bi-print-list #app .bi-list-print tbody { display:table-row-group !important; }
+  body.bi-print-list #app .bi-list-print tr {
+    break-inside:avoid !important; page-break-inside:avoid !important;
+  }
+  body.bi-print-list #app .bi-list-print th,
+  body.bi-print-list #app .bi-list-print td {
+    display:table-cell !important; box-sizing:border-box !important;
+    padding:5pt 4pt !important; border:.6pt solid #64748b !important;
+    color:#000 !important; background:#fff !important; vertical-align:top !important;
+    white-space:normal !important; overflow-wrap:anywhere !important;
+    word-break:normal !important; font-size:8pt !important;
+  }
+  body.bi-print-list #app .bi-list-print th {
+    text-align:center !important; font-weight:800 !important;
+    background:#e8edf3 !important; -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+  }
+  body.bi-print-list #app .bi-list-print th:nth-child(1),
+  body.bi-print-list #app .bi-list-print td:nth-child(1) { width:4% !important; text-align:center !important; }
+  body.bi-print-list #app .bi-list-print th:nth-child(2),
+  body.bi-print-list #app .bi-list-print td:nth-child(2) { width:10% !important; }
+  body.bi-print-list #app .bi-list-print th:nth-child(3),
+  body.bi-print-list #app .bi-list-print td:nth-child(3) { width:11% !important; }
+  body.bi-print-list #app .bi-list-print th:nth-child(4),
+  body.bi-print-list #app .bi-list-print td:nth-child(4) { width:23% !important; }
+  body.bi-print-list #app .bi-list-print th:nth-child(5),
+  body.bi-print-list #app .bi-list-print td:nth-child(5) { width:5% !important; text-align:center !important; }
+  body.bi-print-list #app .bi-list-print th:nth-child(6),
+  body.bi-print-list #app .bi-list-print td:nth-child(6) { width:11% !important; }
+  body.bi-print-list #app .bi-list-print th:nth-child(7),
+  body.bi-print-list #app .bi-list-print td:nth-child(7) { width:19% !important; }
+  body.bi-print-list #app .bi-list-print th:nth-child(8),
+  body.bi-print-list #app .bi-list-print td:nth-child(8) { width:17% !important; }
+  body.bi-print-list #app .bi-list-print th:last-child,
+  body.bi-print-list #app .bi-list-print td:last-child { display:none !important; }
+  body.bi-print-list #app .bi-list-print tr:hover { background:#fff !important; }
+
+  body.bi-print-one { page:biPortrait !important; }
+  body.bi-print-one #app .bi-print-heading,
+  body.bi-print-one #app .bi-list-print { display:none !important; }
+  body.bi-print-one #app section.bukuinduk-view { page:biPortrait !important; }
+}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="splash" role="status" aria-live="polite">
@@ -4510,10 +4611,26 @@ const app = createApp({
     const biProses=(r,status)=>run(async()=>{await api('bukuIndukProses',{id:r.id,status,catatanAdmin:biCatatan[r.id]||''});await muatBukuInduk();ok.value='Status pengajuan diperbarui. Jika disetujui, Admin perlu memperbarui data melalui Kelola Siswa.';});
     const biMulaiCetak=(mode)=>{
       const cls=mode==='biodata'?'bi-print-one':'bi-print-list';
-      const bersih=()=>{document.body.classList.remove('bi-print-list','bi-print-one');window.removeEventListener('afterprint',bersih);};
-      bersih();document.body.classList.add(cls);window.addEventListener('afterprint',bersih,{once:true});
-      // Fallback untuk browser yang tidak memicu afterprint.
-      setTimeout(()=>{try{window.print();}finally{setTimeout(bersih,1200);}},80);
+      let selesai=false;
+      const bersih=()=>{
+        if(selesai)return;
+        selesai=true;
+        document.body.classList.remove('bi-print-list','bi-print-one');
+        window.removeEventListener('afterprint',bersih);
+        window.removeEventListener('focus',pulih);
+      };
+      const pulih=()=>{ setTimeout(()=>{ if(!document.hidden) bersih(); },700); };
+      bersih();
+      selesai=false;
+      document.body.classList.add(cls);
+      window.addEventListener('afterprint',bersih,{once:true});
+      window.addEventListener('focus',pulih,{once:true});
+      // Beri browser waktu menerapkan CSS cetak sebelum membuka dialog.
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        setTimeout(()=>{ try { window.print(); } catch(e) { bersih(); } },100);
+      }));
+      // Fallback untuk browser yang tidak mengirim afterprint/focus.
+      setTimeout(()=>{ if(document.body.classList.contains(cls)) bersih(); },60000);
     };
     const windowPrintSafe=()=>biMulaiCetak('daftar');
     const biCetakSatu=()=>{if(!biTerpilih.value)return;biMulaiCetak('biodata');};
