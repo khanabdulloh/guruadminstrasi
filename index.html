@@ -1107,6 +1107,41 @@ button,a,.inp,summary,[role=button]{touch-action:manipulation}
   body.bi-print-list,body.bi-print-one{background:#fff!important;color:#000!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 </style>
+
+<style id="buku-induk-print-final-fix">
+/* Final print layout for Buku Induk: A4 portrait with a manual 3 x 4 cm photo box. */
+@page biPortrait { size: A4 portrait; margin: 12mm 14mm 14mm; }
+@media print {
+  html body.bi-print-one { margin:0!important; padding:0!important; background:#fff!important; }
+  body.bi-print-one #calm-app { display:block!important; width:100%!important; max-width:none!important; margin:0!important; padding:0!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view { display:block!important; width:100%!important; margin:0!important; padding:0!important; overflow:visible!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view > *:not(.bi-detail-overlay) { display:none!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-overlay { display:block!important; position:static!important; inset:auto!important; width:100%!important; max-width:none!important; height:auto!important; max-height:none!important; min-height:0!important; padding:0!important; margin:0!important; overflow:visible!important; background:#fff!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-overlay > .bi-detail-print { display:block!important; position:static!important; width:100%!important; max-width:none!important; height:auto!important; max-height:none!important; min-height:0!important; margin:0!important; padding:0!important; overflow:visible!important; border:0!important; border-radius:0!important; box-shadow:none!important; background:#fff!important; color:#111!important; page:biPortrait!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-toolbar,
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-footer { display:none!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-student-head { display:flex!important; visibility:visible!important; align-items:flex-start!important; justify-content:space-between!important; gap:8mm!important; width:100%!important; box-sizing:border-box!important; margin:0 0 7mm!important; padding:0 0 5mm!important; border-bottom:1.2pt solid #1f2937!important; overflow:visible!important; break-inside:avoid!important; page-break-inside:avoid!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-student-title { display:block!important; flex:1 1 auto!important; min-width:0!important; text-align:left!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-school { font-size:9pt!important; line-height:1.35!important; font-weight:800!important; letter-spacing:.035em!important; margin:0 0 4mm!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-student-title h1 { font-size:16pt!important; line-height:1.2!important; font-weight:800!important; margin:0 0 1.5mm!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-subtitle { font-size:8.5pt!important; font-weight:700!important; letter-spacing:.07em!important; margin:0 0 5mm!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-student-name { font-size:12pt!important; line-height:1.35!important; font-weight:800!important; margin:0 0 1.5mm!important; overflow-wrap:anywhere!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-student-id { font-size:8.5pt!important; line-height:1.4!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-photo-placeholder { display:flex!important; visibility:visible!important; flex:0 0 30mm!important; width:30mm!important; min-width:30mm!important; height:40mm!important; min-height:40mm!important; box-sizing:border-box!important; align-items:center!important; justify-content:center!important; flex-direction:column!important; gap:2mm!important; margin:0!important; padding:2mm!important; border:1pt dashed #475569!important; border-radius:0!important; background:#fff!important; color:#64748b!important; text-align:center!important; font-size:9pt!important; line-height:1.3!important; break-inside:avoid!important; page-break-inside:avoid!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-photo-placeholder span { display:block!important; font-size:10pt!important; font-weight:800!important; letter-spacing:.08em!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-photo-placeholder strong { display:block!important; font-size:8pt!important; font-weight:600!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-content { display:block!important; width:100%!important; margin:0!important; padding:0!important; overflow:visible!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-section-title { font-size:9.5pt!important; font-weight:800!important; margin:0 0 2mm!important; padding:0 0 1.5mm!important; border-bottom:.6pt solid #9ca3af!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-grid { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:0 8mm!important; width:100%!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-field { display:block!important; min-width:0!important; padding:2.4mm 1mm!important; border:0!important; border-bottom:.5pt solid #d1d5db!important; border-radius:0!important; background:#fff!important; break-inside:avoid!important; page-break-inside:avoid!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-label { font-size:7pt!important; line-height:1.3!important; font-weight:800!important; letter-spacing:.035em!important; color:#4b5563!important; margin:0 0 1mm!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-detail-value { font-size:8.5pt!important; line-height:1.35!important; font-weight:500!important; color:#111827!important; white-space:pre-wrap!important; overflow-wrap:anywhere!important; word-break:normal!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-signature { display:flex!important; justify-content:space-between!important; gap:15mm!important; margin-top:9mm!important; font-size:8.5pt!important; line-height:1.5!important; color:#111!important; text-align:center!important; break-inside:avoid!important; page-break-inside:avoid!important; }
+  body.bi-print-one #calm-app section.bukuinduk-view .bi-print-signature > div { width:45%!important; }
+  body.bi-print-one #calm-app aside, body.bi-print-one #calm-app header, body.bi-print-one #splash { display:none!important; }
+}
+</style>
+
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="splash" role="status" aria-live="polite">
