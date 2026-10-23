@@ -4761,16 +4761,15 @@ html.embedded #app .bi-detail-content{overflow:visible!important}
 }
 </style>
 <style id="bi-scroll-fix-v1">
-/* Perbaikan: popup "Lihat" Buku Induk tidak bisa digulir saat aplikasi disematkan (iframe) di layar lebar.
-   Mode tertanam kini memakai tata letak mengalir di SEMUA lebar layar; tinggi iframe mengikuti isi popup. */
+/* Popup "Lihat" Buku Induk: tinggi dibatasi, header & tombol Cetak selalu terlihat, hanya isi biodata yang digulir.
+   Batas tinggi memakai angka tetap karena 100vh di dalam iframe tinggi-otomatis = tinggi seluruh halaman. */
 @media screen{
 html.embedded body:has(.bi-detail-overlay){overflow:visible!important}
-html.embedded #app .bi-detail-overlay{position:absolute!important;inset:0 0 auto 0!important;height:auto!important;min-height:0!important;overflow:visible!important;align-items:flex-start!important;padding:10px 10px 32px!important}
-html.embedded #app .bi-detail-print{max-height:none!important;overflow:visible!important;margin:0 auto!important}
-html.embedded #app .bi-detail-content,html.embedded #app .bi-sheet{overflow:visible!important;max-height:none!important}
-/* Mode penuh (bukan iframe): pastikan area lembar selalu bisa digulir */
-html:not(.embedded) #app .bi-detail-print{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px)!important}
-html:not(.embedded) #app .bi-sheet{overflow-y:auto!important;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+html.embedded #app .bi-detail-overlay{position:absolute!important;inset:0 0 auto 0!important;height:auto!important;min-height:0!important;overflow:visible!important;align-items:flex-start!important;padding:12px 10px 24px!important}
+html #app .bi-detail-print{display:flex!important;flex-direction:column!important;height:min(640px,calc(100dvh - 24px))!important;max-height:min(640px,calc(100dvh - 24px))!important;overflow:hidden!important;margin:0 auto!important}
+html #app .bi-detail-print>.bi-detail-toolbar,html #app .bi-detail-print>.bi-tabs,html #app .bi-detail-print>.bi-detail-footer{flex:0 0 auto!important}
+html #app .bi-detail-print>.bi-sheet{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+html.embedded #app .bi-detail-content{overflow:visible!important}
 }
 </style>
 <style id="calm-surat-v1">
