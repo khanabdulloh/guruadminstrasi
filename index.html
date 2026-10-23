@@ -1274,6 +1274,22 @@ html body .bi-detail-overlay .bi-history-table{min-width:0;width:100%}
 @media(prefers-reduced-motion:reduce){#app .admin-doc-view *{transition:none!important}}
 </style>
 
+<style id="koreksi-bk-style">
+.kb-banner{margin:0 0 1rem;padding:.7rem .9rem;border-radius:.9rem;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-size:.8rem;line-height:1.5}
+.kb-banner.kb-warn{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.kb-note{margin-top:.35rem;padding:.3rem .5rem;border-radius:.6rem;font-size:.7rem;line-height:1.4;border:1px solid;max-width:26rem}
+.kb-note.k{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.kb-note.c{background:#f0f9ff;border-color:#bae6fd;color:#075985}
+.kb-sub{margin-top:.2rem;font-size:.7rem;line-height:1.35;color:#64748b}
+.kb-chip{display:inline-block;padding:.05rem .45rem;border-radius:999px;font-size:.65rem;font-weight:700;vertical-align:middle}
+.kb-chip.on{background:#fef3c7;color:#92400e}
+.kb-chip.off{background:#e2e8f0;color:#475569}
+.kb-hist{padding:.4rem 0;border-top:1px solid #e2e8f0;font-size:.75rem;line-height:1.45}
+.kb-hist:first-child{border-top:0}
+.kb-lock{opacity:.55;cursor:not-allowed}
+.kb-mark{color:#d97706;font-weight:800;cursor:pointer}
+@media print{.kb-banner{display:none!important}}
+</style>
 </head>
 <body class="calm-table-polish bg-slate-100 text-slate-800">
 <div id="splash" role="status" aria-live="polite">
@@ -1574,6 +1590,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
         <p v-if="ptab==='rekap'" class="text-center font-bold underline mb-3">REKAPITULASI PRESENSI - {{pr.jenis==='Harian'?fmtTgl(pr.tanggal):fmtBln(pr.bulan)}}</p>
         <p v-if="ptab==='detail'" class="text-center font-bold underline mb-3">DETAIL PRESENSI HARIAN - {{pd.kelas}} - {{pd.mapel}} - {{fmtBln(pd.bulan)}}</p></div>
       <div class="page-head noprint"><h2 class="h2">Presensi Siswa</h2><p class="desk">{{DESK.presensi}}</p></div>
+      <p v-if="user&&user.role==='BK'" class="kb-banner noprint">Data di sini sama dengan yang diinput guru mata pelajaran dan hanya dapat dilihat. Gunakan tab <b>Koreksi BK</b> untuk meluruskan status siswa atau memberi catatan; guru pengampu dan wali kelas akan diberi tahu dan dapat melihat catatan Anda.</p>
       <div class="flex gap-1 overflow-x-auto mb-4 noprint border-b border-slate-200" role="tablist">
         <button v-for="t in ptabs" :key="t.k" role="tab" @click="setTab(t.k)" class="tab" :class="ptab===t.k?'tab-on':''">{{t.t}}</button>
       </div>
@@ -1590,19 +1607,20 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <div class="flex flex-wrap items-center gap-2 mb-3">
             <span class="text-sm font-bold text-slate-700">{{pi.kelas}} &middot; {{pi.mapel}} &middot; {{fmtTgl(pi.tanggal)}}</span>
             <span v-if="pi.ada" class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Sudah pernah disimpan - Anda sedang merevisi</span>
-            <button @click="rows.forEach(r=>r.status='H')" class="btn-o ml-auto">Semua hadir</button>
+            <button @click="rows.forEach(r=>{if(!koreksiKunci(r.nis))r.status='H'})" class="btn-o ml-auto">Semua hadir</button>
           </div>
           <div class="flex flex-wrap gap-2 mb-3 text-xs font-bold">
             <span v-for="s in ST" :key="s.k" class="px-2.5 py-1 rounded-full text-white" :class="sc[s.k]">{{s.t}}: {{ringkasInput[s.k]}}</span>
             <span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-700">Jumlah: {{rows.length}} siswa</span>
           </div>
+          <p v-if="Object.keys(pi.koreksi||{}).length" class="kb-banner">Sebagian siswa memiliki <b>koreksi atau catatan dari BK</b> (tampil di bawah nama). Siswa yang statusnya dikoreksi BK terkunci agar tidak tertimpa saat Anda menyimpan; bila perlu perubahan, hubungi guru BK.</p>
           <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
             <table class="w-full text-sm">
               <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>NISN</th><th>Nama</th><th>Status</th><th>Keterangan</th></tr></thead>
               <tbody><tr v-for="(r,i) in rows" :key="r.nis" class="border-t">
-                <td class="p-3">{{i+1}}</td><td>{{labelNisn(r.nis, r.nisn)}}</td><td class="pr-2">{{r.nama}}</td>
-                <td><div class="flex gap-1"><button v-for="s in ST" :key="s.k" type="button" @click="r.status=s.k" :title="s.t" :aria-label="s.t" class="w-9 h-9 rounded-lg font-bold text-xs" :class="r.status===s.k?sc[s.k]+' text-white':'bg-slate-100 text-slate-600'">{{s.k}}</button></div></td>
-                <td class="pr-3"><input v-model="r.keterangan" maxlength="100" placeholder="opsional" class="w-full min-w-[8rem] border-b border-slate-200 py-1 focus:outline-none focus:border-blue-700"></td>
+                <td class="p-3">{{i+1}}</td><td>{{labelNisn(r.nis, r.nisn)}}</td><td class="pr-2">{{r.nama}}<div v-if="pi.koreksi[r.nis]" class="kb-note" :class="pi.koreksi[r.nis].jenis==='Koreksi'?'k':'c'"><b>{{pi.koreksi[r.nis].jenis==='Koreksi'?'Dikoreksi BK':'Catatan BK'}}</b><template v-if="pi.koreksi[r.nis].jenis==='Koreksi'"> (guru: {{stT(pi.koreksi[r.nis].statusAsal)}} &rarr; {{stT(pi.koreksi[r.nis].statusKoreksi)}})</template>: {{pi.koreksi[r.nis].catatan}} <span style="opacity:.7">- {{pi.koreksi[r.nis].olehNama}}</span></div></td>
+                <td><div class="flex gap-1"><button v-for="s in ST" :key="s.k" type="button" @click="!koreksiKunci(r.nis)&&(r.status=s.k)" :disabled="koreksiKunci(r.nis)" :title="koreksiKunci(r.nis)?'Dikoreksi BK, terkunci':s.t" :aria-label="s.t" class="w-9 h-9 rounded-lg font-bold text-xs" :class="[r.status===s.k?sc[s.k]+' text-white':'bg-slate-100 text-slate-600',koreksiKunci(r.nis)?'kb-lock':'']">{{s.k}}</button></div></td>
+                <td class="pr-3"><input v-model="r.keterangan" :disabled="koreksiKunci(r.nis)" maxlength="100" placeholder="opsional" class="w-full min-w-[8rem] border-b border-slate-200 py-1 focus:outline-none focus:border-blue-700"></td>
               </tr></tbody>
             </table>
           </div>
@@ -1610,6 +1628,53 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <button @click="savePresensi" :disabled="busy" class="mt-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">{{pi.ada?'Simpan revisi presensi':'Simpan presensi'}}</button>
         </template>
         <p v-else-if="pi.kelas&&pi.mapel&&!busy" class="text-slate-500 text-sm">Belum ada siswa di kelas ini.</p>
+      </div>
+
+      <div v-if="ptab==='koreksi'">
+        <template v-if="canKoreksi">
+          <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid sm:grid-cols-3 gap-3 noprint">
+            <label class="lb">Tanggal presensi<input type="date" v-model="kbf.tanggal" :max="hari0" @change="loadKoreksi" class="inp w-full mt-1 normal-case"></label>
+            <label class="lb">Pilih kelas<select v-model="kbf.kelas" @change="pickKelas(kbf,true);loadKoreksi()" class="inp w-full mt-1 normal-case"><option value="">-- Pilih Kelas --</option><option v-for="k in pilih.kelas" :key="k">{{k}}</option></select></label>
+            <label class="lb">Mata pelajaran<select v-model="kbf.mapel" @change="loadKoreksi" :disabled="!kbf.kelas" class="inp w-full mt-1 normal-case disabled:bg-slate-100"><option value="">{{kbf.kelas?'-- Pilih Mapel --':'-- Pilih Kelas Dahulu --'}}</option><option v-for="m in mapelOf(kbf.kelas)" :key="m">{{m}}</option></select></label>
+          </div>
+          <p v-if="kbf.dimuat&&!kbf.ada" class="kb-banner kb-warn">Guru belum menginput presensi untuk kelas, mapel, dan tanggal ini, jadi belum ada yang dapat dikoreksi.</p>
+          <template v-if="kbf.ada&&kbf.rows.length">
+            <div class="flex flex-wrap items-center gap-2 mb-3"><span class="text-sm font-bold text-slate-700">{{kbf.kelas}} &middot; {{kbf.mapel}} &middot; {{fmtTgl(kbf.tanggal)}}</span><span class="text-xs text-slate-500">{{kfDirty.length}} perubahan belum disimpan</span></div>
+            <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-sm">
+              <thead class="bg-slate-50 text-left"><tr><th class="p-3">No</th><th>Nama</th><th>Status saat ini</th><th>Koreksi</th><th>Catatan BK</th><th></th></tr></thead>
+              <tbody><tr v-for="(r,i) in kbf.rows" :key="r.nis" class="border-t" style="vertical-align:top">
+                <td class="p-3">{{i+1}}</td>
+                <td class="pr-2 py-2">{{r.nama}}<div v-if="r.keterangan" class="kb-sub">Ket. guru: {{r.keterangan}}</div></td>
+                <td class="pr-2 py-2"><span class="px-2 py-1 rounded-full text-white text-xs font-bold" :class="sc[r.statusIni]">{{stT(r.statusIni)}}</span>
+                  <div v-if="r.kor&&r.kor.jenis==='Koreksi'" class="kb-sub">Asli guru: {{stT(r.kor.statusAsal)}}</div>
+                  <div v-if="r.kor" class="kb-note" :class="r.kor.jenis==='Koreksi'?'k':'c'"><b>{{r.kor.jenis==='Koreksi'?'Dikoreksi':'Catatan'}}</b> oleh {{r.kor.olehNama}}: {{r.kor.catatan}}</div></td>
+                <td class="pr-2 py-2"><div class="flex gap-1"><button v-for="s in ST" :key="s.k" type="button" @click="r.status=s.k" :title="s.t" :aria-label="s.t" class="w-9 h-9 rounded-lg font-bold text-xs" :class="r.status===s.k?sc[s.k]+' text-white':'bg-slate-100 text-slate-600'">{{s.k}}</button></div></td>
+                <td class="pr-2 py-2"><input v-model="r.catatan" maxlength="300" :placeholder="r.status!==r.statusIni?'Wajib: alasan koreksi':'Catatan (opsional)'" class="w-full min-w-[12rem] border-b border-slate-200 py-1 focus:outline-none focus:border-blue-700"></td>
+                <td class="pr-3 py-2"><button v-if="r.kor" type="button" @click="cabutKoreksi(r)" class="btn-o !px-2 text-xs">Cabut</button></td>
+              </tr></tbody>
+            </table></div>
+            <p class="text-xs text-slate-500 mt-2">Catatan wajib diisi (minimal 5 karakter) untuk setiap siswa yang statusnya diubah atau diberi catatan. Hanya baris yang berubah yang disimpan.</p>
+            <button @click="saveKoreksi" :disabled="busy||!kfDirty.length" class="mt-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-2.5 disabled:opacity-60">Simpan koreksi</button>
+            <div v-if="kbf.hist.length" class="bg-white rounded-2xl shadow-sm p-4 mt-4"><h3 class="font-bold text-sm mb-1">Riwayat koreksi sesi ini</h3>
+              <div v-for="h in kbf.hist" :key="h.id" class="kb-hist"><b>{{h.nama}}</b>: <template v-if="h.jenis==='Koreksi'">{{stT(h.statusAsal)}} &rarr; {{stT(h.statusKoreksi)}}. </template><template v-else>catatan. </template>{{h.catatan}}
+                <span class="kb-sub">- {{h.olehNama}}, {{h.waktu}}</span> <span v-if="h.aktif" class="kb-chip on">Aktif</span><span v-else class="kb-chip off">Tidak aktif<template v-if="h.alasanCabut">: {{h.alasanCabut}}</template></span></div></div>
+          </template>
+        </template>
+        <div class="mt-6">
+          <h3 class="font-bold mb-2">{{canKoreksi?'Koreksi terbaru (45 hari terakhir)':'Koreksi dan catatan dari BK (45 hari terakhir)'}}</h3>
+          <p v-if="!canKoreksi" class="kb-banner">Guru BK dapat meluruskan status presensi dan memberi catatan. Perubahan itu otomatis tercermin di rekap dan portal siswa; catatannya tampil di bawah nama siswa pada form presensi.</p>
+          <p v-if="!korList.length" class="text-sm text-slate-500">Belum ada koreksi atau catatan BK pada periode ini.</p>
+          <div class="grid md:grid-cols-2 gap-3">
+            <div v-for="h in korList" :key="h.id" class="bg-white rounded-2xl shadow-sm p-4">
+              <p class="font-extrabold text-blue-900">{{h.kelas}} <span class="font-medium text-slate-400">|</span> <span class="text-slate-700">{{h.mapel}}</span></p>
+              <p class="text-sm text-slate-500">{{fmtTgl(h.tanggal)}}</p>
+              <p class="text-sm mt-2"><b>{{h.nama}}</b>: <template v-if="h.jenis==='Koreksi'">{{stT(h.statusAsal)}} &rarr; {{stT(h.statusKoreksi)}}</template><template v-else>catatan BK</template> <span v-if="h.aktif" class="kb-chip on">Aktif</span><span v-else class="kb-chip off">Tidak aktif</span></p>
+              <p class="text-sm mt-1">{{h.catatan}}</p>
+              <p class="kb-sub">{{h.olehNama}} &middot; {{h.waktu}}<template v-if="!h.aktif&&h.alasanCabut"> &middot; dicabut: {{h.alasanCabut}}</template></p>
+              <div v-if="canKoreksi||canInput" class="mt-3"><button @click="bukaKorSesi(h)" class="btn-o">{{canKoreksi?'BUKA SESI':'BUKA PRESENSI'}}</button></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-if="ptab==='rekap'">
@@ -1667,8 +1732,10 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <div class="bg-white rounded-2xl shadow-sm overflow-x-auto"><table class="w-full text-[11px]">
             <thead class="bg-slate-50 text-left"><tr><th class="p-2">No</th><th>Nama</th><th v-for="d in rk.hari" :key="d" class="px-0.5 text-center font-medium">{{d}}</th><th class="px-1">H</th><th class="px-1">D</th><th class="px-1">I</th><th class="px-1">S</th><th class="px-1">A</th><th class="px-1">%</th></tr></thead>
             <tbody><tr v-for="(s,i) in rk.siswa" :key="s.nis" class="border-t"><td class="p-2">{{i+1}}</td><td class="whitespace-nowrap pr-2">{{s.nama}}</td>
-              <td v-for="d in rk.hari" :key="d" class="px-0.5 text-center" :class="s.harian[d]?txc[s.harian[d]]:'text-slate-300'">{{s.harian[d]||'·'}}</td>
+              <td v-for="d in rk.hari" :key="d" class="px-0.5 text-center" :class="s.harian[d]?txc[s.harian[d]]:'text-slate-300'">{{s.harian[d]||'·'}}<sup v-if="rkKor(s.nis,d)" class="kb-mark" :title="rkKor(s.nis,d)">*</sup></td>
               <td class="px-1">{{s.H}}</td><td class="px-1">{{s.D}}</td><td class="px-1">{{s.I}}</td><td class="px-1">{{s.S}}</td><td class="px-1">{{s.A}}</td><td class="px-1 font-bold">{{s.persen==null?'-':s.persen+'%'}}</td></tr></tbody></table></div>
+          <div v-if="rkKorList.length" class="bg-white rounded-2xl shadow-sm p-4 mt-3"><h3 class="font-bold text-sm mb-1">Koreksi dan catatan BK bulan ini <span class="kb-mark">*</span></h3>
+            <div v-for="x in rkKorList" :key="x.nis+'|'+x.d" class="kb-hist"><b>{{x.nama}}</b>, tanggal {{x.d}}: <template v-if="x.jenis==='Koreksi'">{{stT(x.statusAsal)}} &rarr; {{stT(x.statusKoreksi)}}. </template>{{x.catatan}} <span class="kb-sub">- {{x.olehNama}}</span></div></div>
           <div class="noprint mt-3"><button @click="printPage" class="btn-o">Cetak</button></div>
           <div class="hidden print:block"><ttd :t="cfg.ttd"></ttd></div>
         </template>
@@ -1735,6 +1802,8 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
               <p class="text-sm mt-2">Hadir: <b>{{s.H}}</b>, Dispensasi: <b>{{s.D}}</b> dari <b>{{s.total}}</b> Siswa</p>
               <p v-if="s.I+s.S+s.A" class="text-xs text-slate-500">Izin {{s.I}} &middot; Sakit {{s.S}} &middot; Alpa {{s.A}}</p>
               <p class="text-xs text-slate-400">Diinput oleh {{s.oleh||'-'}}</p>
+              <p v-if="s.koreksiBK" class="text-xs font-bold mt-1" style="color:#b45309">{{s.koreksiBK}} koreksi/catatan BK aktif</p>
+              <div v-if="canKoreksi&&s.mapel" class="mt-3"><button @click="koreksiSesi(s)" class="btn-o">KOREKSI / CATATAN BK</button></div>
               <div v-if="canInput" class="flex items-center gap-2 mt-3">
                 <button v-if="s.mapel" @click="editSesi(s)" class="btn-o">EDIT DATA</button>
                 <button @click="delSesi(s)" class="ml-auto p-2 rounded-xl text-rose-600 hover:bg-rose-50" title="Hapus presensi" aria-label="Hapus presensi"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button>
@@ -4903,7 +4972,7 @@ const app = createApp({
     const acc = { WAKUR: 'bg-cyan-700 text-white', KEPSEK: 'bg-violet-600 text-white', ADMIN: 'adm-sym', GURU: 'bg-emerald-600 text-white', STAF: 'bg-sky-600 text-white', SISWA: 'bg-amber-400 text-slate-900', ORTU: 'bg-blue-600 text-white', BK: 'bg-rose-600 text-white' };
     const heroCls = { WAKUR: 'from-navy-900 to-cyan-600', KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600', ORTU: 'from-navy-900 to-sky-600', BK: 'from-navy-900 to-violet-600' };
     const sub = { WAKUR: 'Pantau jadwal mengajar seluruh guru, kelas, mata pelajaran, dan blok A/B.', KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Kelola administrasi persuratan, layanan, arsip, dan data sekolah.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.', ORTU: 'Pantau kehadiran, nilai, dan catatan bimbingan anak Anda.', BK: 'Catat pelanggaran dan pantau poin tata tertib siswa.' };
-    const quick = { WAKUR: ['jadwal'], KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal', 'perangkat'], STAF: ['cetakabsen', 'suratmasuk', 'suratkeluar', 'disposisi', 'layanan'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya', 'notif'], ORTU: ['anak', 'notif'], BK: ['konseling', 'pelanggaran'] };
+    const quick = { WAKUR: ['jadwal'], KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal', 'perangkat'], STAF: ['cetakabsen', 'suratmasuk', 'suratkeluar', 'disposisi', 'layanan'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya', 'notif'], ORTU: ['anak', 'notif'], BK: ['konseling', 'pelanggaran', 'presensi'] };
     const DESK = {'pekerjaanstaf': 'Pantau pekerjaan staf tata usaha: surat, disposisi, arsip, layanan, mutasi, dan dokumen (hanya lihat).', 'dashboard': 'Ringkasan hari ini dan pintasan ke menu yang sering dipakai.', 'monitor': 'Ringkasan kehadiran, nilai, jurnal, dan kinerja guru sepanjang bulan.', 'nilaiMonitor': 'Pantau kelengkapan nilai STS dan SAS seluruh kelas secara baca-saja.', 'catatan': 'Tulis catatan, apresiasi, atau arahan untuk guru.', 'catatansaya': 'Catatan, apresiasi, dan arahan dari pimpinan untuk Anda.', 'izin': 'Pengajuan izin dan sakit siswa beserta status persetujuannya.', 'kelas': 'Atur daftar kelas dan wali kelas.', 'siswa': 'Lihat dan kelola data siswa per kelas.', 'bksiswa': 'Lihat data dasar siswa untuk kebutuhan bimbingan, konseling, dan tindak lanjut BK.', 'guru': 'Data guru dan tenaga kependidikan beserta akunnya.', 'akun': 'Buat akun, reset sandi, dan bagikan sandi awal pengguna.', 'jadwal': 'Jadwal pelajaran per hari, guru, kelas, mata pelajaran, dan blok A/B.', 'presensi': 'Catat kehadiran siswa dan lihat rekap harian maupun bulanan.', 'nilai': 'Isi nilai sumatif atau catat ketercapaian tujuan pembelajaran (TP) siswa.', 'leger': 'Rekap nilai semua mata pelajaran dalam satu kelas.', 'rapor': 'Wali kelas menyiapkan, memfinalkan, dan mencetak rapor semester serta kenaikan kelas.', 'jurnal': 'Catat materi dan kegiatan pada setiap pertemuan mengajar.', 'bimbingan': 'Catatan bimbingan wali kelas untuk siswa.', 'bimbingansaya': 'Catatan bimbingan dari wali kelas dan guru BK untuk Anda.', 'pengaturan': 'Blok jadwal, kop surat, penandatangan, bobot nilai, dan kunci nilai.', 'dokumen': 'Simpan dan buka tautan dokumen resmi sekolah.', 'log': 'Riwayat tindakan pengguna di portal untuk keperluan pemeriksaan.', 'pkl': 'Data penempatan, jurnal, dan nilai PKL/Prakerin siswa.', 'tahun': 'Atur tahun ajaran, simpan riwayat kelas, dan luluskan siswa.', 'sandi': 'Gunakan sandi yang sulit ditebak dan jangan bagikan kepada siapa pun.', 'anak': 'Kehadiran, nilai, dan catatan bimbingan anak Anda.', 'notif': 'Pemberitahuan terbaru dari sekolah.', 'pelanggaran': 'Catat pelanggaran dan pantau poin tata tertib siswa.', 'pengurangan': 'Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.', 'konseling': 'Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.', 'perangkat': 'Pantau kelengkapan perangkat ajar guru dan unggah berkas yang diperlukan.', 'riwayat': 'Riwayat kehadiran Anda pada setiap mata pelajaran.', 'nilaisaya': 'Nilai Anda per mata pelajaran dan tujuan pembelajaran.', 'suratmasuk': 'Catat dan telusuri surat masuk beserta statusnya.', 'suratkeluar': 'Catat dan telusuri surat keluar.', 'disposisi': 'Teruskan surat masuk dengan instruksi dan batas waktu.', 'arsip': 'Arsip dokumen sekolah menurut kode, kategori, dan lokasi simpan.', 'layanan': 'Layanan administrasi menurut pemohon, jenis, dan statusnya.', 'mutasi': 'Catat mutasi siswa masuk dan keluar.', 'cetaksurat': 'Susun dan cetak surat resmi dengan kop sekolah.', 'cetakabsen': 'Cetak daftar hadir kelas per minggu (Senin–Jumat) untuk diisi manual.', 'rekapadmin': 'Rekap bulanan kegiatan administrasi tata usaha.'};
     const roleNama = { WAKUR: 'Wakil Kepala Sekolah Bidang Kurikulum', ADMIN: 'Administrator', GURU: 'Guru', STAF: 'Staf tata usaha', KEPSEK: 'Kepala sekolah', SISWA: 'Siswa', ORTU: 'Orang tua', BK: 'Guru BK' };
     const salam = () => { const j = parseInt(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Jakarta' }), 10); return j < 4 ? 'Selamat malam' : j < 11 ? 'Selamat pagi' : j < 15 ? 'Selamat siang' : j < 18 ? 'Selamat sore' : 'Selamat malam'; };
@@ -4913,7 +4982,7 @@ const app = createApp({
     const mnav = ref(false);
     const openMenuGroup = ref('Ringkasan');
     const M = { mutasi: 'Mutasi Siswa', guru: 'Kelola Guru', akun: 'Akun & Sandi', monitor: 'Monitoring', nilaiMonitor: 'Monitoring Nilai STS/SAS', dashboard: 'Dashboard', bukuinduk: 'Buku Induk Peserta Didik', siswa: 'Kelola Siswa', kelas: 'Kelola Kelas', jadwal: 'Jadwal', presensi: 'Presensi Siswa', nilai: 'Input Nilai', riwayat: 'Kehadiran Saya', nilaisaya: 'Nilai Saya', jurnal: 'Jurnal Mengajar', bimbingan: 'Bimbingan Wali', bimbingansaya: 'Catatan Bimbingan', pengaturan: 'Pengaturan Sekolah', catatan: 'Catatan untuk Guru', catatansaya: 'Catatan Pimpinan', izin: 'Izin Siswa', leger: 'Leger Nilai', dokumen: 'Dokumen Digital', rapor: 'Rapor Siswa', log: 'Log Aktivitas', pkl: 'PKL / Prakerin', tahun: 'Tahun Ajaran', sandi: 'Ganti Sandi', anak: 'Data Anak', notif: 'Pemberitahuan', pelanggaran: 'Pelanggaran Siswa', pengurangan: 'Pengurangan Poin', konseling: 'Konseling BK', bksiswa: 'Data Siswa BK', perangkat: 'Perangkat Ajar', pekerjaanstaf: 'Pekerjaan Staf' };
-    const MENU = { WAKUR: ['dashboard', 'jadwal', 'nilaiMonitor', 'sandi'], ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'bukuinduk', 'mutasi', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'cetaksurat', 'cetakabsen', 'rekapadmin', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'bukuinduk', 'mutasi', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'cetakabsen', 'rekapadmin', 'dokumen', 'sandi'], STAF: ['dashboard', 'bukuinduk', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'cetakabsen', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'bksiswa', 'notif', 'bimbingan', 'konseling', 'pelanggaran', 'pengurangan', 'rapor', 'sandi'] };
+    const MENU = { WAKUR: ['dashboard', 'jadwal', 'nilaiMonitor', 'sandi'], ADMIN: ['dashboard', 'monitor', 'catatan', 'izin', 'kelas', 'bukuinduk', 'mutasi', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'cetaksurat', 'cetakabsen', 'rekapadmin', 'siswa', 'guru', 'akun', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'pelanggaran', 'pkl', 'dokumen', 'perangkat', 'tahun', 'pengaturan', 'log', 'sandi'], GURU: ['dashboard', 'jadwal', 'presensi', 'nilai', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pkl', 'izin', 'catatansaya', 'notif', 'perangkat', 'dokumen', 'sandi'], KEPSEK: ['dashboard', 'monitor', 'catatan', 'jadwal', 'presensi', 'leger', 'rapor', 'jurnal', 'bimbingan', 'konseling', 'pelanggaran', 'pkl', 'perangkat', 'bukuinduk', 'mutasi', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'cetakabsen', 'rekapadmin', 'dokumen', 'sandi'], STAF: ['dashboard', 'bukuinduk', 'siswa', 'guru', 'suratmasuk', 'suratkeluar', 'disposisi', 'arsip', 'layanan', 'mutasi', 'cetaksurat', 'cetakabsen', 'rekapadmin', 'sandi'], SISWA: ['dashboard', 'jadwal', 'riwayat', 'izin', 'nilaisaya', 'bimbingansaya', 'notif', 'pkl', 'sandi'], ORTU: ['dashboard', 'anak', 'notif', 'sandi'], BK: ['dashboard', 'bksiswa', 'presensi', 'notif', 'bimbingan', 'konseling', 'pelanggaran', 'pengurangan', 'rapor', 'sandi'] };
     const ICON = {
       dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
       siswa: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -5152,6 +5221,7 @@ const app = createApp({
     READ.add('raporKoreksiSumberGet');
     READ.add('wakurMonitorNilai');
     READ.add('sekolahGet');
+    READ.add('presensiKoreksiList');
     READ.add('bukuIndukRiwayat');
     const SAFE = a => READ.has(a);
     const CC = new Map(), CC_TTL = 60000;
@@ -5268,10 +5338,11 @@ const app = createApp({
         if (!Array.isArray(d.agenda)) await fetchAg();
       }
       if (k === 'presensi') {
-        [cfg.value, pilih.value] = await Promise.all([api('pengaturanGet'), api('presensiPilihan')]); ptab.value = canInput.value ? 'input' : 'rekap';
-        rows.value = []; rk.value = null; prRes.value = pgRes.value = prwRes.value = null; Object.assign(pi, { tanggal: hari0, kelas: '', mapel: '', ada: false });
+        const _bkP = user.value.role === 'BK'; [cfg.value, pilih.value] = await Promise.all([_bkP ? api('kopCetakGet').then(x => x || cfg.value).catch(() => cfg.value) : api('pengaturanGet'), api('presensiPilihan')]); ptab.value = canInput.value ? 'input' : (_bkP ? 'koreksi' : 'rekap');
+        rows.value = []; rk.value = null; prRes.value = pgRes.value = prwRes.value = null; Object.assign(pi, { tanggal: hari0, kelas: '', mapel: '', ada: false, koreksi: {} }); Object.assign(kbf, { tanggal: hari0, kelas: '', mapel: '', ada: false, dimuat: false, rows: [], hist: [] });
         Object.assign(pr, { jenis: 'Harian', tanggal: hari0, bulan: hari0.slice(0, 7), kelas: '', mapel: '' }); Object.assign(pd, { kelas: '', mapel: '' }); Object.assign(pg, { bulan: '', kelas: '' }); prw.bulan = '';
         if (ptab.value === 'rekap') await fetchSesi();
+        if (ptab.value === 'koreksi') await fetchKorList();
       }
       if (k === 'riwayat') riwayat.value = await api('riwayatSaya');
       if (k === 'siswa') { [siswa.value, kelasAll.value] = await Promise.all([api('siswaList'), api('kelasDetail')]); }
@@ -5583,6 +5654,49 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const saveDok = () => run(async () => { await api('dokumenSave', { ...df }); showD.value = false; df.judul = df.url = df.kategori = ''; await fetchD(); ok.value = 'Dokumen tersimpan'; });
     const delDok = d => cfmRun('Hapus tautan ' + d.judul + '?', async () => { await api('dokumenDelete', { id: d.id }); await fetchD(); });
     const canInput = computed(() => !!user.value && ['ADMIN', 'GURU'].includes(user.value.role));
+    /* ===== Sinkronisasi presensi guru <-> BK: koreksi & catatan BK ===== */
+    const canKoreksi = computed(() => !!user.value && ['BK', 'ADMIN'].includes(user.value.role));
+    const stT = k => (ST.find(x => x.k === k) || {}).t || k;
+    const koreksiKunci = nis => !!(pi.koreksi && pi.koreksi[nis] && pi.koreksi[nis].jenis === 'Koreksi');
+    const kbf = reactive({ tanggal: hari0, kelas: '', mapel: '', ada: false, dimuat: false, rows: [], hist: [] });
+    const korList = ref([]);
+    const fetchKorList = async () => { korList.value = await api('presensiKoreksiList', {}); };
+    let kReq = 0;
+    const muatKoreksi = async () => {
+      const rid = ++kReq, p = { kelas: kbf.kelas, mapel: kbf.mapel, tanggal: kbf.tanggal };
+      const [d, h] = await Promise.all([api('presensiGet', p), api('presensiKoreksiList', p)]);
+      if (rid !== kReq) return;
+      kbf.ada = !!d.ada; kbf.hist = Array.isArray(h) ? h : [];
+      kbf.rows = d.ada ? d.rows.map(r => ({ nis: r.nis, nisn: r.nisn, nama: r.nama, keterangan: r.keterangan || '', statusIni: r.status, status: r.status, catatan: '', kor: (d.koreksi || {})[r.nis] || null })) : [];
+      kbf.dimuat = true;
+    };
+    const loadKoreksi = () => { kbf.rows = []; kbf.ada = false; kbf.dimuat = false; kbf.hist = []; if (kbf.kelas && kbf.mapel && kbf.tanggal) run(muatKoreksi); };
+    const kfDirty = computed(() => kbf.rows.filter(r => r.status !== r.statusIni || String(r.catatan || '').trim() !== ''));
+    const saveKoreksi = () => run(async () => {
+      const items = kfDirty.value;
+      if (!items.length) throw new Error('Belum ada perubahan status atau catatan untuk disimpan');
+      const kurang = items.find(r => String(r.catatan || '').trim().length < 5);
+      if (kurang) throw new Error('Catatan wajib diisi (minimal 5 karakter) untuk ' + kurang.nama + '. Catatan ini akan dibaca guru.');
+      const d = await api('presensiKoreksiSave', { kelas: kbf.kelas, mapel: kbf.mapel, tanggal: kbf.tanggal, items: items.map(r => ({ nis: r.nis, status: r.status, catatan: String(r.catatan).trim() })) });
+      await muatKoreksi(); await fetchKorList();
+      ok.value = d.tersimpan + ' siswa tersimpan (' + d.koreksi + ' koreksi status, ' + d.catatan + ' catatan). Guru pengampu dan wali kelas sudah diberi tahu.';
+    });
+    const cabutKoreksi = async r => {
+      if (!r || !r.kor) return;
+      const alasan = await tanya({ judul: 'Cabut koreksi ' + r.nama + '?', detail: 'Status dikembalikan ke data asli guru (' + stT(r.kor.statusAsal) + '). Guru pengampu diberi tahu.', label: 'Alasan pencabutan', placeholder: 'mis. Surat keterangan ternyata tidak valid', tombol: 'Cabut koreksi', bahaya: true, multiline: true });
+      if (alasan === null || alasan === undefined || alasan === false) return;
+      if (String(alasan).trim().length < 5) { err.value = 'Alasan pencabutan wajib diisi (minimal 5 karakter).'; toTop(); return; }
+      return run(async () => { await api('presensiKoreksiCabut', { id: r.kor.id, alasan: String(alasan).trim() }); await muatKoreksi(); await fetchKorList(); ok.value = 'Koreksi dicabut. Status dikembalikan ke data guru.'; });
+    };
+    const koreksiSesi = s => { ptab.value = 'koreksi'; Object.assign(kbf, { tanggal: s.tanggal, kelas: s.kelas, mapel: s.mapel }); loadKoreksi(); toTop(); };
+    const bukaKorSesi = h => { if (canKoreksi.value) koreksiSesi(h); else if (canInput.value) editSesi(h); };
+    const rkKorList = computed(() => {
+      const k = rk.value && rk.value.koreksi; if (!Array.isArray(k) || !k.length) return [];
+      const nm = {}; (rk.value.siswa || []).forEach(s => { nm[s.nis] = s.nama; });
+      return k.map(x => ({ ...x, nama: nm[x.nis] || x.nis })).sort((a, b) => a.d - b.d);
+    });
+    const rkKorMap = computed(() => { const m = {}; rkKorList.value.forEach(x => { m[x.nis + '|' + x.d] = (x.jenis === 'Koreksi' ? 'Dikoreksi BK: ' + stT(x.statusAsal) + ' menjadi ' + stT(x.statusKoreksi) + '. ' : 'Catatan BK: ') + x.catatan + ' (' + x.olehNama + ')'; }); return m; });
+    const rkKor = (nis, d) => rkKorMap.value[nis + '|' + d] || '';
     const canManageJadwal = computed(() => !!user.value && (user.value.role === 'ADMIN' || hasWakurTask(user.value)));
     const canJadwal = canInput, canWrite = canInput;
     const fmtTgl = s => s && /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
@@ -5591,12 +5705,12 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const ST = [{ k: 'H', t: 'Hadir' }, { k: 'I', t: 'Izin' }, { k: 'S', t: 'Sakit' }, { k: 'A', t: 'Alpa' }, { k: 'D', t: 'Dispensasi' }];
     const ST5 = [ST[0], ST[2], ST[1], ST[3], ST[4]];
     const ptab = ref('input'), pilih = ref({ kelas: [], pairs: [] });
-    const pi = reactive({ tanggal: hari0, kelas: '', mapel: '', ada: false });
+    const pi = reactive({ tanggal: hari0, kelas: '', mapel: '', ada: false, koreksi: {} });
     const pr = reactive({ jenis: 'Harian', tanggal: hari0, bulan: hari0.slice(0, 7), kelas: '', mapel: '' }), prRes = ref(null);
     const pd = reactive({ bulan: hari0.slice(0, 7), kelas: '', mapel: '' });
     const pg = reactive({ bulan: '', kelas: '' }), pgRes = ref(null);
     const prw = reactive({ bulan: '' }), prwRes = ref(null);
-    const ptabs = computed(() => [{ k: 'input', t: 'Input Kehadiran' }, { k: 'rekap', t: 'Rekapitulasi' }, { k: 'detail', t: 'Detail Harian (1\u201331)' }, { k: 'grafik', t: 'Grafik' }, { k: 'riwayat', t: 'Riwayat Input Presensi' }].filter(t => t.k !== 'input' || canInput.value));
+    const ptabs = computed(() => [{ k: 'input', t: 'Input Kehadiran' }, { k: 'rekap', t: 'Rekapitulasi' }, { k: 'detail', t: 'Detail Harian (1\u201331)' }, { k: 'grafik', t: 'Grafik' }, { k: 'riwayat', t: 'Riwayat Input Presensi' }, { k: 'koreksi', t: canKoreksi.value ? 'Koreksi BK' : 'Catatan BK' }].filter(t => t.k !== 'input' || canInput.value));
     const mapelOf = k => [...new Set(pilih.value.pairs.filter(p => !k || p.kelas === k).map(p => p.mapel))].sort((a, b) => a.localeCompare(b));
     const pickKelas = (o, auto) => { o.mapel = ''; if (auto && o.kelas) { const m = mapelOf(o.kelas); if (m.length === 1) o.mapel = m[0]; } };
     const tanggalPresensiValid = v => { if (!/^\d{4}-\d{2}-\d{2}$/.test(String(v || ''))) return false; const a = String(v).split('-').map(Number), d = new Date(a[0], a[1] - 1, a[2]); return d.getFullYear() === a[0] && d.getMonth() === a[1] - 1 && d.getDate() === a[2]; };
@@ -5620,11 +5734,11 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const ptTanggal = t => { const a = String(t || '').split('-').map(Number); if (a.length !== 3) return t; return t === hari0 ? 'Hari ini' : a[2] + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][a[1] - 1]; };
     const ptIsi = async x => { pt.show = false; await go('presensi'); ptab.value = 'input'; Object.assign(pi, { tanggal: x.tanggal, kelas: x.kelas, mapel: x.mapel, ada: false }); loadPresensi(); };
     const loadPresensi = () => {
-      rows.value = []; pi.ada = false; const rid = ++pReq;
+      rows.value = []; pi.ada = false; pi.koreksi = {}; const rid = ++pReq;
       if (pi.kelas && pi.mapel && pi.tanggal) run(async () => {
         const d = await api('presensiGet', { kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal });
         if (rid !== pReq) return;
-        rows.value = d.rows; pi.ada = d.ada;
+        rows.value = d.rows; pi.ada = d.ada; pi.koreksi = d.koreksi || {};
       });
     };
     const savePresensi = () => run(async () => {
@@ -5636,7 +5750,12 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       const body = JSON.parse(JSON.stringify({ kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal, rows: rows.value })), key = 'p|' + [pi.kelas, pi.mapel, pi.tanggal].join('|'), r = ringkasInput.value; let d;
       try { d = await api('presensiSave', body); } catch (e) { if (!jaringan(e.message)) throw e; qMasuk('presensiSave', 'Presensi ' + pi.kelas + ' - ' + pi.mapel + ' (' + pi.tanggal + ')', key, body); ok.value = 'Tidak ada sinyal. Presensi disimpan di HP dan dikirim otomatis saat tersambung.'; return; }
       qHapusKey(key);
-      pi.ada = true; cekPT(false); ok.value = d.tersimpan + ' siswa tersimpan (Hadir ' + r.H + ', Izin ' + r.I + ', Sakit ' + r.S + ', Alpa ' + r.A + ', Dispensasi ' + r.D + ')';
+      pi.ada = true; cekPT(false); let pesan = d.tersimpan + ' siswa tersimpan (Hadir ' + r.H + ', Izin ' + r.I + ', Sakit ' + r.S + ', Alpa ' + r.A + ', Dispensasi ' + r.D + ')';
+      if (d.terkunciBK && d.terkunciBK.length) {
+        try { const z = await api('presensiGet', { kelas: pi.kelas, mapel: pi.mapel, tanggal: pi.tanggal }); rows.value = z.rows; pi.koreksi = z.koreksi || {}; } catch (e) { /* tampilan diperbarui saat dimuat ulang */ }
+        if (d.dipertahankanBK && d.dipertahankanBK.length) pesan += '. ' + d.dipertahankanBK.length + ' siswa tetap mengikuti koreksi BK (status tidak diubah)';
+      }
+      ok.value = pesan;
     });
     const fetchSesi = async () => {
       if (pr.jenis === 'Harian' ? !pr.tanggal : !pr.bulan) throw new Error('Pilih ' + (pr.jenis === 'Harian' ? 'tanggal' : 'bulan') + ' terlebih dahulu');
@@ -5654,7 +5773,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const loadRiwayat = () => run(fetchRiwayat);
     const setTab = t => {
       ptab.value = t; err.value = ok.value = '';
-      if (t === 'rekap') run(fetchSesi); if (t === 'grafik') run(fetchGrafik); if (t === 'riwayat') run(fetchRiwayat);
+      if (t === 'rekap') run(fetchSesi); if (t === 'grafik') run(fetchGrafik); if (t === 'riwayat') run(fetchRiwayat); if (t === 'koreksi') run(fetchKorList);
     };
     const editSesi = s => { ptab.value = 'input'; Object.assign(pi, { tanggal: s.tanggal, kelas: s.kelas, mapel: s.mapel }); loadPresensi(); toTop(); };
     const delSesi = s => cfmRun('Hapus presensi ' + s.kelas + ' - ' + (s.mapel || 'tanpa mapel') + ' pada ' + fmtTgl(s.tanggal) + '? Tidak bisa dibatalkan.', async () => {
@@ -6638,7 +6757,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, mutasiTampil, mutasiRingkasan, biTab, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, tuMUStatusAwal, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, editMutasi, saveMutasi, delMutasi, resetCetakSurat, printSurat, srmStatus, srkStatus, suratMasukTampil, suratMasukRingkasan, suratKeluarTampil, suratKeluarRingkasan, fmtTglRingkas, fmtTglSurat, srUrl, csBaris, csTab,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, hasilSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
-      rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln,
+      rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln, canKoreksi, stT, koreksiKunci, kbf, korList, fetchKorList, loadKoreksi, kfDirty, saveKoreksi, cabutKoreksi, koreksiSesi, bukaKorSesi, rkKorList, rkKor,
       jhari, jq, jblok, jGuruFilter, blokInfo, bf2, BLOK_CLS, blokLbl, saveBlok, jadwalTampil, showJd, openJadwal, kelasNama, mapelSaran, jimp, jimpCount, exportJadwal, templateJadwal, pickJadwalFile, doImportJadwal, gdata, gq, grole, guruTampil, showG, gf, kred, gimp, gimpCount, templateGuru, pickGuruFile, exportGuru, editGuru, saveGuru, delGuru, doImportGuru, downloadGuruCreds, copyKred, mon, monBulan, loadMon, bandMax, wakurNilai, wakurNilaiJenis, wakurNilaiQ, wakurNilaiTampil, loadWakurNilai, muatUlangWakurNilai,
       leger, lk, lkelas, dokumen, showD, df, loadDok, loadLeger, saveDok, delDok,
       akun, akq, akrole, akkelas, akpilih, akLihat, akTampil, akKelas, akSemua, akPilihSemua, konfirmReset, resetSatu, bagikanAwal, waAkun, noWa, cetakKred, unduhKred,
