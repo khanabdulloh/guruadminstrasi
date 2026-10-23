@@ -1826,7 +1826,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <div class="srt-sec">Penandatangan</div>
           <div class="srt-form">
             <label class="lb">Nama<input v-model.trim="cs.namaTtd" :placeholder="(cfg.ttd&&cfg.ttd.nama)||'Nama penandatangan'" class="inp w-full mt-1"></label>
-            <label class="lb">NUPTK / identitas<input v-model.trim="cs.nipTtd" :placeholder="(cfg.ttd&&cfg.ttd.nip)||'NUPTK atau identitas'" class="inp w-full mt-1"></label>
+            <label class="lb">NUPTK<input v-model.trim="cs.nipTtd" :placeholder="(cfg.ttd&&cfg.ttd.nip)||'Masukkan NUPTK'" class="inp w-full mt-1"></label>
           </div>
           <p class="srt-hint">Jika dikosongkan, surat memakai penandatangan yang diatur di menu Pengaturan.</p>
         </div></div>
@@ -1842,7 +1842,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
               </div></div>
               <template v-if="cs.isi"><div class="srt-fr" v-for="(l,i) in csBaris" :key="i"><div class="srt-fc srt-isi">{{l||'\u00a0'}}</div></div></template>
               <div v-else class="srt-fr"><div class="srt-fc srt-isi srt-ph">Isi surat akan tampil di sini.</div></div>
-              <div class="srt-fr"><div class="srt-fc"><div class="srt-ttd"><div>{{cfg.ttd&&cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{fmtTglSurat(cs.tanggal)}}</div><div>{{cfg.ttd&&cfg.ttd.jabatan?cfg.ttd.jabatan:''}}</div><div class="srt-ttd-sp"></div><div><b style="text-decoration:underline">{{cs.namaTtd||cfg.ttd&&cfg.ttd.nama||'-'}}</b></div><div v-if="cs.nipTtd||cfg.ttd&&cfg.ttd.nip">NUPTK / Identitas: {{cs.nipTtd||cfg.ttd&&cfg.ttd.nip}}</div></div></div></div>
+              <div class="srt-fr"><div class="srt-fc"><div class="srt-ttd"><div>{{cfg.ttd&&cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{fmtTglSurat(cs.tanggal)}}</div><div>{{cfg.ttd&&cfg.ttd.jabatan?cfg.ttd.jabatan:''}}</div><div class="srt-ttd-sp"></div><div><b style="text-decoration:underline">{{cs.namaTtd||cfg.ttd&&cfg.ttd.nama||'-'}}</b></div><div v-if="cs.nipTtd||cfg.ttd&&cfg.ttd.nip">NUPTK. {{cs.nipTtd||cfg.ttd&&cfg.ttd.nip}}</div></div></div></div>
             </div>
             <div class="srt-ff"><div class="srt-fr"><div class="srt-fc"><div class="srt-sp"></div></div></div></div>
           </div></div>
