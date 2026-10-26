@@ -1323,17 +1323,17 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 .absen-guru-footer{display:flex;justify-content:space-between;gap:20px;font-size:11px;margin-top:12px}
 .absen-guru-sign{display:flex;justify-content:space-between;text-align:center;margin-top:28px;font-size:11px;line-height:1.5}
 .absen-guru-sign>div{width:42%}.ag-sign-space{height:58px}
-@page absenguru{size:A4 portrait;margin:10mm}
+@page absenguru{size:A4 portrait;margin:14mm 12mm 14mm 12mm}
 @media print{
  body.cetak-absensi-guru{background:#fff!important;color:#111!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
  body.cetak-absensi-guru main>*:not(.absen-guru-section){display:none!important}
- body.cetak-absensi-guru .absen-guru-section{display:block!important;page:absenguru;width:100%!important;margin:0!important;padding:0!important}
+ body.cetak-absensi-guru .absen-guru-section{display:block!important;page:absenguru;width:100%!important;max-width:100%!important;box-sizing:border-box!important;margin:0!important;padding:0!important}
  body.cetak-absensi-guru .absen-guru-section .noprint{display:none!important}
- body.cetak-absensi-guru .absen-guru-sheet{display:block!important;border:0!important;border-radius:0!important;padding:0!important;overflow:visible!important;max-width:none!important;margin:0!important}
- body.cetak-absensi-guru .absen-guru-table{font-size:9pt!important;table-layout:fixed}
- body.cetak-absensi-guru .absen-guru-table th,body.cetak-absensi-guru .absen-guru-table td{padding:5pt 4pt!important;height:27pt!important}
+ body.cetak-absensi-guru .absen-guru-sheet{display:block!important;box-sizing:border-box!important;width:100%!important;border:0!important;border-radius:0!important;padding:0!important;overflow:visible!important;max-width:none!important;margin:0!important}
+ body.cetak-absensi-guru .absen-guru-table{width:100%!important;font-size:8.5pt!important;table-layout:fixed;border-collapse:collapse!important;margin:0!important}
+ body.cetak-absensi-guru .absen-guru-table thead{display:table-header-group!important} body.cetak-absensi-guru .absen-guru-table tfoot{display:table-footer-group!important} body.cetak-absensi-guru .absen-guru-table th,body.cetak-absensi-guru .absen-guru-table td{box-sizing:border-box!important;padding:3pt 4pt!important;height:22pt!important;line-height:1.2!important}
  body.cetak-absensi-guru .absen-guru-table .ag-name{min-width:0!important;width:32%!important}
- body.cetak-absensi-guru .absen-guru-table tr{break-inside:avoid;page-break-inside:avoid}
+ body.cetak-absensi-guru .absen-guru-table tr{break-inside:avoid!important;page-break-inside:avoid!important} body.cetak-absensi-guru .absen-guru-head{margin-bottom:8px!important} body.cetak-absensi-guru .absen-guru-head h1{font-size:15px!important;margin:8px 0 4px!important} body.cetak-absensi-guru .absen-guru-details{margin:10px 0 12px!important;gap:5px 18px!important} body.cetak-absensi-guru .absen-guru-footer{margin-top:8px!important} body.cetak-absensi-guru .absen-guru-sign{margin-top:18px!important}
 }
 </style>
 
