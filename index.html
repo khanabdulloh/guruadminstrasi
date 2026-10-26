@@ -1311,29 +1311,45 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 
 <style id="cetak-absensi-guru-css">
 .absen-guru-sheet{background:#fff;padding:16px;border:1px solid #dbe3ee;border-radius:12px;overflow-x:auto;color:#111}
-.absen-guru-table{width:100%;border-collapse:collapse;font-size:11px;color:#111}
-.absen-guru-table th,.absen-guru-table td{border:1px solid #555;padding:7px 6px;text-align:center;height:30px}
+.absen-guru-table{width:100%;border-collapse:collapse;font-size:11px;color:#111;table-layout:fixed}
+.absen-guru-table th,.absen-guru-table td{border:1px solid #555;padding:7px 6px;text-align:center;height:30px;overflow-wrap:anywhere}
 .absen-guru-table th{background:#eef2f7;font-weight:800}
-.absen-guru-table .ag-name{text-align:left;min-width:170px}
+.absen-guru-table .ag-no{width:7%}
+.absen-guru-table .ag-name{text-align:left;width:31%}
+.absen-guru-table .ag-jab{width:19%}
+.absen-guru-table .ag-ttd{width:26%}
+.absen-guru-table .ag-ket{width:17%}
+.absen-guru-table td.ag-jab{font-size:.92em}
 .absen-guru-head{text-align:center;margin-bottom:12px;color:#111}
 .absen-guru-head h1{font-size:16px;font-weight:800;margin:8px 0 3px}
 .absen-guru-head .ag-kegiatan{font-size:13px;font-weight:700;margin:5px 0}
-.absen-guru-details{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;font-size:11px;margin:14px 0}
+.absen-guru-details{display:grid;grid-template-columns:1fr;gap:4px;font-size:11px;margin:14px 0}
 .absen-guru-details>div{display:grid;grid-template-columns:90px 1fr;gap:4px}
+.absen-guru-foot{break-inside:avoid;page-break-inside:avoid}
 .absen-guru-footer{display:flex;justify-content:space-between;font-size:10px;margin-top:10px}
 .absen-guru-sign{display:flex;justify-content:space-between;text-align:center;margin-top:24px;font-size:11px}
 .absen-guru-sign>div{width:42%}.ag-sign-space{height:55px}
 @page absenguru{size:A4 portrait;margin:10mm}
 @media print{
  body.cetak-absensi-guru{background:#fff!important;color:#111!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ body.cetak-absensi-guru #splash,body.cetak-absensi-guru aside,body.cetak-absensi-guru header,body.cetak-absensi-guru nav,body.cetak-absensi-guru .loadbar,body.cetak-absensi-guru .modal-wrap{display:none!important}
+ body.cetak-absensi-guru main{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
  body.cetak-absensi-guru main>*:not(.absen-guru-section){display:none!important}
  body.cetak-absensi-guru .absen-guru-section{display:block!important;page:absenguru;width:100%!important;margin:0!important;padding:0!important}
  body.cetak-absensi-guru .absen-guru-section .noprint{display:none!important}
  body.cetak-absensi-guru .absen-guru-sheet{display:block!important;border:0!important;border-radius:0!important;padding:0!important;overflow:visible!important}
- body.cetak-absensi-guru .absen-guru-table{font-size:9pt!important;table-layout:fixed}
- body.cetak-absensi-guru .absen-guru-table th,body.cetak-absensi-guru .absen-guru-table td{padding:5pt 4pt!important;height:28pt!important}
- body.cetak-absensi-guru .absen-guru-table .ag-name{min-width:0!important;width:32%!important}
+ body.cetak-absensi-guru .absen-guru-head h1{font-size:14pt!important}
+ body.cetak-absensi-guru .absen-guru-head .ag-kegiatan{font-size:11.5pt!important}
+ body.cetak-absensi-guru .absen-guru-details{font-size:9.5pt!important}
+ body.cetak-absensi-guru .absen-guru-table{font-size:9.5pt!important;width:100%!important}
+ body.cetak-absensi-guru .absen-guru-table thead{display:table-header-group!important}
+ body.cetak-absensi-guru .absen-guru-table th,body.cetak-absensi-guru .absen-guru-table td{padding:4pt 4pt!important;height:25pt!important;border:.6pt solid #333!important}
+ body.cetak-absensi-guru .absen-guru-table th{background:#e8edf3!important}
  body.cetak-absensi-guru .absen-guru-table tr{break-inside:avoid;page-break-inside:avoid}
+ body.cetak-absensi-guru .absen-guru-table tbody tr:nth-last-child(-n+2){break-after:avoid;page-break-after:avoid}
+ body.cetak-absensi-guru .absen-guru-foot{break-inside:avoid;page-break-inside:avoid}
+ body.cetak-absensi-guru .absen-guru-footer{font-size:9pt!important}
+ body.cetak-absensi-guru .absen-guru-sign{font-size:10pt!important}
 }
 </style>
 
@@ -2008,11 +2024,13 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <div><b>Tempat</b><span>: {{ag.tempat||'................................................'}}</span></div>
         </div>
         <table class="absen-guru-table calm-table-print">
-          <thead><tr><th style="width:36px">No.</th><th class="ag-name">Nama Guru / Tenaga Kependidikan</th><th style="width:29%">Jabatan</th><th style="width:25%">Tanda Tangan</th><th style="width:18%">Keterangan</th></tr></thead>
-          <tbody><tr v-for="(g,i) in aguruTampil" :key="g.username||g.nama||i"><td>{{i+1}}</td><td class="ag-name">{{namaRapi(g.nama||g.namaGuru||g.username||'')}}</td><td>{{g.jabatan||g.namaJabatan||''}}</td><td></td><td></td></tr></tbody>
+          <thead><tr><th class="ag-no">No.</th><th class="ag-name">Nama Guru / Tenaga Kependidikan</th><th class="ag-jab">Jabatan</th><th class="ag-ttd">Tanda Tangan</th><th class="ag-ket">Keterangan</th></tr></thead>
+          <tbody><tr v-for="(g,i) in aguruTampil" :key="g.username||g.nama||i"><td>{{i+1}}</td><td class="ag-name">{{namaRapi(g.nama||g.namaGuru||g.username||'')}}</td><td class="ag-jab">{{agJabatan(g)}}</td><td class="ag-ttd"></td><td class="ag-ket"></td></tr></tbody>
         </table>
-        <div class="absen-guru-footer"><span>Jumlah peserta: {{aguru.length}} orang</span><span>{{cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{agTanggalLabel||'................................'}}</span></div>
-        <div class="absen-guru-sign"><div>Mengetahui,<div>{{cfg.ttd.jabatan||'Kepala Sekolah'}}</div><div class="ag-sign-space"></div><b>{{cfg.ttd.nama||'........................................'}}</b><div v-if="cfg.ttd.nip">NUPTK. {{cfg.ttd.nip}}</div></div><div>Notulis / Petugas<div class="ag-sign-space"></div><b>........................................</b></div></div>
+        <div class="absen-guru-foot">
+          <div class="absen-guru-footer"><span>Jumlah peserta: {{aguru.length}} orang</span><span>{{cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{agTanggalLabel||'................................'}}</span></div>
+          <div class="absen-guru-sign"><div>Mengetahui,<div>{{cfg.ttd.jabatan||'Kepala Sekolah'}}</div><div class="ag-sign-space"></div><b>{{cfg.ttd.nama||'........................................'}}</b><div v-if="cfg.ttd.nip">NUPTK. {{cfg.ttd.nip}}</div></div><div>Notulis / Petugas<div class="ag-sign-space"></div><b>........................................</b></div></div>
+        </div>
       </div>
     </section>
 
@@ -5044,7 +5062,7 @@ const app = createApp({
     const heroCls = { WAKUR: 'from-navy-900 to-cyan-600', KEPSEK: 'from-navy-900 to-violet-600', ADMIN: 'from-navy-900 to-navy-600', GURU: 'from-navy-900 to-emerald-600', STAF: 'from-navy-900 to-sky-600', SISWA: 'from-navy-900 to-navy-600', ORTU: 'from-navy-900 to-sky-600', BK: 'from-navy-900 to-violet-600' };
     const sub = { WAKUR: 'Pantau jadwal mengajar seluruh guru, kelas, mata pelajaran, dan blok A/B.', KEPSEK: 'Pantau kehadiran, kinerja guru, wali kelas, dan capaian siswa.', ADMIN: 'Pantau seluruh sekolah dan kelola data induk.', GURU: 'Jadwal dan kelas ajar Anda.', STAF: 'Kelola administrasi persuratan, layanan, arsip, dan data sekolah.', SISWA: 'Kehadiran, nilai, dan jadwal Anda.', ORTU: 'Pantau kehadiran, nilai, dan catatan bimbingan anak Anda.', BK: 'Catat pelanggaran dan pantau poin tata tertib siswa.' };
     const quick = { WAKUR: ['jadwal'], KEPSEK: ['monitor', 'catatan', 'presensi', 'leger'], ADMIN: ['siswa', 'guru', 'akun', 'jadwal', 'presensi', 'pengaturan'], GURU: ['presensi', 'nilai', 'jurnal', 'perangkat'], STAF: ['cetakabsen', 'suratmasuk', 'suratkeluar', 'disposisi', 'layanan'], SISWA: ['riwayat', 'nilaisaya', 'bimbingansaya', 'notif'], ORTU: ['anak', 'notif'], BK: ['konseling', 'pelanggaran', 'presensi'] };
-    const DESK = {'cetakabsenguru': 'Cetak lembar absensi guru bulanan untuk diisi manual; hanya membaca daftar guru dan tidak mengubah data presensi.', 'pekerjaanstaf': 'Pantau pekerjaan staf tata usaha: surat, disposisi, arsip, layanan, mutasi, dan dokumen (hanya lihat).', 'dashboard': 'Ringkasan hari ini dan pintasan ke menu yang sering dipakai.', 'monitor': 'Ringkasan kehadiran, nilai, jurnal, dan kinerja guru sepanjang bulan.', 'nilaiMonitor': 'Pantau kelengkapan nilai STS dan SAS seluruh kelas secara baca-saja.', 'catatan': 'Tulis catatan, apresiasi, atau arahan untuk guru.', 'catatansaya': 'Catatan, apresiasi, dan arahan dari pimpinan untuk Anda.', 'izin': 'Pengajuan izin dan sakit siswa beserta status persetujuannya.', 'kelas': 'Atur daftar kelas dan wali kelas.', 'siswa': 'Lihat dan kelola data siswa per kelas.', 'bksiswa': 'Lihat data dasar siswa untuk kebutuhan bimbingan, konseling, dan tindak lanjut BK.', 'guru': 'Data guru dan tenaga kependidikan beserta akunnya.', 'akun': 'Buat akun, reset sandi, dan bagikan sandi awal pengguna.', 'jadwal': 'Jadwal pelajaran per hari, guru, kelas, mata pelajaran, dan blok A/B.', 'presensi': 'Catat kehadiran siswa dan lihat rekap harian maupun bulanan.', 'nilai': 'Isi nilai sumatif atau catat ketercapaian tujuan pembelajaran (TP) siswa.', 'leger': 'Rekap nilai semua mata pelajaran dalam satu kelas.', 'rapor': 'Wali kelas menyiapkan, memfinalkan, dan mencetak rapor semester serta kenaikan kelas.', 'jurnal': 'Catat materi dan kegiatan pada setiap pertemuan mengajar.', 'bimbingan': 'Catatan bimbingan wali kelas untuk siswa.', 'bimbingansaya': 'Catatan bimbingan dari wali kelas dan guru BK untuk Anda.', 'pengaturan': 'Blok jadwal, kop surat, penandatangan, bobot nilai, dan kunci nilai.', 'dokumen': 'Simpan dan buka tautan dokumen resmi sekolah.', 'log': 'Riwayat tindakan pengguna di portal untuk keperluan pemeriksaan.', 'pkl': 'Data penempatan, jurnal, dan nilai PKL/Prakerin siswa.', 'tahun': 'Atur tahun ajaran, simpan riwayat kelas, dan luluskan siswa.', 'sandi': 'Gunakan sandi yang sulit ditebak dan jangan bagikan kepada siapa pun.', 'anak': 'Kehadiran, nilai, dan catatan bimbingan anak Anda.', 'notif': 'Pemberitahuan terbaru dari sekolah.', 'pelanggaran': 'Catat pelanggaran dan pantau poin tata tertib siswa.', 'pengurangan': 'Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.', 'konseling': 'Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.', 'perangkat': 'Pantau kelengkapan perangkat ajar guru dan unggah berkas yang diperlukan.', 'riwayat': 'Riwayat kehadiran Anda pada setiap mata pelajaran.', 'nilaisaya': 'Nilai Anda per mata pelajaran dan tujuan pembelajaran.', 'suratmasuk': 'Catat dan telusuri surat masuk beserta statusnya.', 'suratkeluar': 'Catat dan telusuri surat keluar.', 'disposisi': 'Teruskan surat masuk dengan instruksi dan batas waktu.', 'arsip': 'Arsip dokumen sekolah menurut kode, kategori, dan lokasi simpan.', 'layanan': 'Layanan administrasi menurut pemohon, jenis, dan statusnya.', 'mutasi': 'Catat mutasi siswa masuk dan keluar.', 'cetaksurat': 'Susun dan cetak surat resmi dengan kop sekolah.', 'cetakabsen': 'Cetak daftar hadir kelas per minggu (Senin–Jumat) untuk diisi manual.', 'rekapadmin': 'Rekap bulanan kegiatan administrasi tata usaha.'};
+    const DESK = {'cetakabsenguru': 'Cetak daftar hadir guru untuk rapat atau kegiatan sekolah, diisi manual; hanya membaca daftar guru dan tidak mengubah data presensi.', 'pekerjaanstaf': 'Pantau pekerjaan staf tata usaha: surat, disposisi, arsip, layanan, mutasi, dan dokumen (hanya lihat).', 'dashboard': 'Ringkasan hari ini dan pintasan ke menu yang sering dipakai.', 'monitor': 'Ringkasan kehadiran, nilai, jurnal, dan kinerja guru sepanjang bulan.', 'nilaiMonitor': 'Pantau kelengkapan nilai STS dan SAS seluruh kelas secara baca-saja.', 'catatan': 'Tulis catatan, apresiasi, atau arahan untuk guru.', 'catatansaya': 'Catatan, apresiasi, dan arahan dari pimpinan untuk Anda.', 'izin': 'Pengajuan izin dan sakit siswa beserta status persetujuannya.', 'kelas': 'Atur daftar kelas dan wali kelas.', 'siswa': 'Lihat dan kelola data siswa per kelas.', 'bksiswa': 'Lihat data dasar siswa untuk kebutuhan bimbingan, konseling, dan tindak lanjut BK.', 'guru': 'Data guru dan tenaga kependidikan beserta akunnya.', 'akun': 'Buat akun, reset sandi, dan bagikan sandi awal pengguna.', 'jadwal': 'Jadwal pelajaran per hari, guru, kelas, mata pelajaran, dan blok A/B.', 'presensi': 'Catat kehadiran siswa dan lihat rekap harian maupun bulanan.', 'nilai': 'Isi nilai sumatif atau catat ketercapaian tujuan pembelajaran (TP) siswa.', 'leger': 'Rekap nilai semua mata pelajaran dalam satu kelas.', 'rapor': 'Wali kelas menyiapkan, memfinalkan, dan mencetak rapor semester serta kenaikan kelas.', 'jurnal': 'Catat materi dan kegiatan pada setiap pertemuan mengajar.', 'bimbingan': 'Catatan bimbingan wali kelas untuk siswa.', 'bimbingansaya': 'Catatan bimbingan dari wali kelas dan guru BK untuk Anda.', 'pengaturan': 'Blok jadwal, kop surat, penandatangan, bobot nilai, dan kunci nilai.', 'dokumen': 'Simpan dan buka tautan dokumen resmi sekolah.', 'log': 'Riwayat tindakan pengguna di portal untuk keperluan pemeriksaan.', 'pkl': 'Data penempatan, jurnal, dan nilai PKL/Prakerin siswa.', 'tahun': 'Atur tahun ajaran, simpan riwayat kelas, dan luluskan siswa.', 'sandi': 'Gunakan sandi yang sulit ditebak dan jangan bagikan kepada siapa pun.', 'anak': 'Kehadiran, nilai, dan catatan bimbingan anak Anda.', 'notif': 'Pemberitahuan terbaru dari sekolah.', 'pelanggaran': 'Catat pelanggaran dan pantau poin tata tertib siswa.', 'pengurangan': 'Catat pengurangan setelah pembinaan dan perubahan perilaku. Riwayat pelanggaran asli tetap tersimpan.', 'konseling': 'Catatan konseling siswa, tindak lanjut, dan jadwal monitoring berikutnya.', 'perangkat': 'Pantau kelengkapan perangkat ajar guru dan unggah berkas yang diperlukan.', 'riwayat': 'Riwayat kehadiran Anda pada setiap mata pelajaran.', 'nilaisaya': 'Nilai Anda per mata pelajaran dan tujuan pembelajaran.', 'suratmasuk': 'Catat dan telusuri surat masuk beserta statusnya.', 'suratkeluar': 'Catat dan telusuri surat keluar.', 'disposisi': 'Teruskan surat masuk dengan instruksi dan batas waktu.', 'arsip': 'Arsip dokumen sekolah menurut kode, kategori, dan lokasi simpan.', 'layanan': 'Layanan administrasi menurut pemohon, jenis, dan statusnya.', 'mutasi': 'Catat mutasi siswa masuk dan keluar.', 'cetaksurat': 'Susun dan cetak surat resmi dengan kop sekolah.', 'cetakabsen': 'Cetak daftar hadir kelas per minggu (Senin–Jumat) untuk diisi manual.', 'rekapadmin': 'Rekap bulanan kegiatan administrasi tata usaha.'};
     const roleNama = { WAKUR: 'Wakil Kepala Sekolah Bidang Kurikulum', ADMIN: 'Administrator', GURU: 'Guru', STAF: 'Staf tata usaha', KEPSEK: 'Kepala sekolah', SISWA: 'Siswa', ORTU: 'Orang tua', BK: 'Guru BK' };
     const salam = () => { const j = parseInt(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Jakarta' }), 10); return j < 4 ? 'Selamat malam' : j < 11 ? 'Selamat pagi' : j < 15 ? 'Selamat siang' : j < 18 ? 'Selamat sore' : 'Selamat malam'; };
     const memuat = ref(false); let nGo = 0;
@@ -5425,7 +5443,7 @@ const app = createApp({
       if (k === 'layanan') await loadLayanan();
       if (k === 'mutasi') { await Promise.all([loadMutasi(), api('siswaList').then(x=>siswa.value=x), api('kelasDetail').then(x=>kelasAll.value=x)]); }
       if (k === 'cetakabsen') { [cfg.value, siswa.value, kelasAll.value] = await Promise.all([api('pengaturanGet'), api('siswaList'), api('kelasDetail')]); Object.assign(ca, { kelas: '', tgl: hari0, ket: '', extra: 0 }); }
-      if (k === 'cetakabsenguru') { [cfg.value, guru.value] = await Promise.all([api('pengaturanGet'), api('guruList')]); ag.bulan = hari0.slice(0,7); ag.ket = ''; ag.extra = 0; }
+      if (k === 'cetakabsenguru') { [cfg.value, guru.value] = await Promise.all([api('pengaturanGet'), api('guruList')]); Object.assign(ag, { kegiatan: '', tanggal: hari0, waktu: '', tempat: '', extra: 0 }); }
       if (k === 'cetaksurat') { await api('pengaturanGet').then(x=>cfg.value=x); resetCetakSurat(); }
       if (k === 'rekapadmin') await loadRekapAdmin();
       if (k === 'pekerjaanstaf') { pk.bulan = ''; await loadPekerjaanStaf(); }
@@ -6769,16 +6787,27 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const resetCetakSurat=()=>Object.assign(cs,{jenis:'Surat Keterangan Aktif',nomor:'',tanggal:hari0,kepada:'',perihal:'',isi:'',namaTtd:'',nipTtd:''});
     const printSurat=()=>{if(!cs.isi.trim())return err.value='Isi surat wajib diisi';Vue.nextTick(()=>window.print());};
     const ag = reactive({ kegiatan: '', tanggal: hari0, waktu: '', tempat: '', extra: 0 });
-    const aguru = computed(() => (guru.value || []).filter(g => String(g.role || 'GURU').toUpperCase() !== 'SISWA').slice().sort((a,b) => String(a.nama||'').localeCompare(String(b.nama||''),'id')));
+    const AG_URUT = { KEPSEK: 0, WAKUR: 1, GURU: 2, BK: 3, STAF: 4 };
+    const agJabatan = g => {
+      const r = String(g.role || 'GURU').toUpperCase();
+      const tt = String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase());
+      if (r === 'GURU' && tt.includes('WAKUR')) return 'Guru / ' + ROLE_LBL.WAKUR;
+      return g.jabatan || g.namaJabatan || ROLE_LBL[r] || '';
+    };
+    const aguru = computed(() => (Array.isArray(guru.value) ? guru.value : ((guru.value && guru.value.rows) || [])).filter(g => g && !['SISWA','ORTU','ADMIN'].includes(String(g.role || 'GURU').toUpperCase())).slice().sort((a,b) => {
+      const ra = AG_URUT[String(a.role||'GURU').toUpperCase()] ?? 9, rb = AG_URUT[String(b.role||'GURU').toUpperCase()] ?? 9;
+      return ra - rb || String(a.nama||'').localeCompare(String(b.nama||''),'id');
+    }));
     const aguruTampil = computed(() => aguru.value.concat(Array.from({length: ag.extra || 0}, (_,i) => ({ nama: '', username: 'baris-kosong-'+i }))));
     const agTanggalLabel = computed(() => { if (!ag.tanggal) return ''; const d=new Date(ag.tanggal+'T00:00:00'); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); });
     const muatAbsensiGuru = () => run(async () => { guru.value = await api('guruList'); });
     const cetakAbsensiGuru = () => {
       if (!aguru.value.length) { err.value='Daftar guru kosong; muat ulang daftar guru terlebih dahulu.'; toTop(); return; }
       document.body.classList.add('cetak-absensi-guru');
-      const cleanup = () => { document.body.classList.remove('cetak-absensi-guru'); window.removeEventListener('afterprint', cleanup); };
+      let selesai = false;
+      const cleanup = () => { if (selesai) return; selesai = true; document.body.classList.remove('cetak-absensi-guru'); window.removeEventListener('afterprint', cleanup); };
       window.addEventListener('afterprint', cleanup, { once:true });
-      Vue.nextTick(() => setTimeout(() => { try { window.print(); } catch(e) { cleanup(); } }, 150));
+      Vue.nextTick(() => setTimeout(() => { try { window.print(); } catch(e) { cleanup(); } }, 250));
     };
     const ca = reactive({ kelas: '', tgl: hari0, ket: '', extra: 0 });
     const caSiswa = computed(() => siswa.value.filter(x => x.kelas === ca.kelas).slice().sort((a, b) => String(a.nama).localeCompare(String(b.nama))));
@@ -6848,7 +6877,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai, nMode, frows, kt, saveFormatif, saveKktp, setSemuaF, jl, cekTahunR, opsiTahun,
       antreSaya, kirimAntre, perbaikiAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
-      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, bkDataSiswa, bkSiswaKelas, bkSiswaQ, bkDataSiswaTampil, loadBKDataSiswa, gantiKelasBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu, ca, caSiswa, caHari, caWali, caBulanLabel, cetakAbsen, ag, aguru, aguruTampil, agTanggalLabel, muatAbsensiGuru, cetakAbsensiGuru, DESK, roleNama, salam, memuat,
+      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, bkDataSiswa, bkSiswaKelas, bkSiswaQ, bkDataSiswaTampil, loadBKDataSiswa, gantiKelasBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu, ca, caSiswa, caHari, caWali, caBulanLabel, cetakAbsen, ag, aguru, aguruTampil, agJabatan, agTanggalLabel, muatAbsensiGuru, cetakAbsensiGuru, DESK, roleNama, salam, memuat,
       hasWakurTask, canManageJadwal, editJadwal };
   }
 });
