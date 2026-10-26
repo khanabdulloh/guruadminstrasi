@@ -2010,7 +2010,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <div><b>Tempat</b><span>: {{ag.tempat||'................................................'}}</span></div>
         </div>
         <table class="absen-guru-table calm-table-print">
-          <thead><tr><th style="width:36px">No.</th><th class="ag-name">Nama Guru / Tenaga Kependidikan</th><th style="width:29%">Jabatan</th><th style="width:25%">Tanda Tangan</th><th style="width:18%">Keterangan</th></tr></thead>
+          <colgroup><col style="width:6%"><col style="width:30%"><col style="width:24%"><col style="width:24%"><col style="width:16%"></colgroup><thead><tr class="ag-pad" aria-hidden="true"><th colspan="5"></th></tr><tr><th class="ag-no">No.</th><th class="ag-name">{{ag.tipe==='staf'?'Nama Staf':'Nama Guru / Tenaga Kependidikan'}}</th><th class="ag-jab">Jabatan</th><th class="ag-ttd">Tanda Tangan</th><th class="ag-ket">Keterangan</th></tr></thead><tfoot class="ag-pad-foot" aria-hidden="true"><tr class="ag-pad"><td colspan="5"></td></tr></tfoot>
           <tbody><tr v-for="(g,i) in aguruTampil" :key="g.username||g.nama||i"><td>{{i+1}}</td><td class="ag-name">{{namaRapi(g.nama||g.namaGuru||g.username||'')}}</td><td>{{g.jabatan||g.namaJabatan||''}}</td><td></td><td></td></tr></tbody>
         </table>
         <div class="absen-guru-footer"><span>Jumlah peserta: {{agDaftar.length}} orang</span><span>{{cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{agTanggalLabel||'................................'}}</span></div>
@@ -3580,6 +3580,33 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 
   /* Cetak kartu login */
   body.cetak-kartu main             { padding: 12mm !important; }
+}
+</style>
+<style id="absensi-guru-print-fix">
+/* Perbaikan cetak Absensi Guru/Staf — hanya menyentuh kelas .absen-guru-* dan body.cetak-absensi-guru.
+   1) @page absenguru dibuat margin 0 (sama seperti rapor/absen/pelanggaran di v103) agar header/footer
+      otomatis browser (URL, tanggal) tidak ikut tercetak.
+   2) Ruang tepi dipindah ke padding; baris spacer di thead/tfoot mengulang jarak atas/bawah di setiap halaman.
+   3) Lebar kolom dijumlah 100% (sebelumnya 104% + 36px). */
+.ag-pad{display:none}
+@page absenguru{size:A4 portrait;margin:0}
+@media print{
+  html body.cetak-absensi-guru .absen-guru-section{padding:12mm 12mm 12mm!important}
+  html body.cetak-absensi-guru .absen-guru-table{table-layout:fixed!important}
+  html body.cetak-absensi-guru .absen-guru-table .ag-pad{display:table-row!important}
+  html body.cetak-absensi-guru .absen-guru-table .ag-pad th,
+  html body.cetak-absensi-guru .absen-guru-table .ag-pad td{height:12mm!important;padding:0!important;border:0!important;background:#fff!important}
+  html body.cetak-absensi-guru .absen-guru-details{margin-bottom:0!important}
+  html body.cetak-absensi-guru .absen-guru-table .ag-no{width:6%!important}
+  html body.cetak-absensi-guru .absen-guru-table .ag-name{width:30%!important}
+  html body.cetak-absensi-guru .absen-guru-table .ag-jab{width:24%!important}
+  html body.cetak-absensi-guru .absen-guru-table .ag-ttd{width:24%!important}
+  html body.cetak-absensi-guru .absen-guru-table .ag-ket{width:16%!important}
+  html body.cetak-absensi-guru .absen-guru-table th{background:#e8edf3!important}
+  html body.cetak-absensi-guru .absen-guru-table .ag-pad th{background:#fff!important}
+  html body.cetak-absensi-guru .absen-guru-footer,
+  html body.cetak-absensi-guru .absen-guru-sign{break-inside:avoid!important;page-break-inside:avoid!important}
+  html body.cetak-absensi-guru .absen-guru-sign{margin-top:14px!important}
 }
 </style>
 <style id="visual-refinement-v104">
