@@ -6839,12 +6839,19 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const aguruTampil = computed(() => agDaftar.value.concat(Array.from({length: ag.extra || 0}, (_,i) => ({ nama: '', username: 'baris-kosong-'+i }))));
     const agTanggalLabel = computed(() => { if (!ag.tanggal) return ''; const d=new Date(ag.tanggal+'T00:00:00'); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); });
     const muatAbsensiGuru = () => run(async () => { const r = await api('guruDetail'); guru.value = Array.isArray(r) ? r : (r && Array.isArray(r.rows) ? r.rows : (r && Array.isArray(r.data) ? r.data : [])); });
+    const tungguGambarKop = (root, maks) => new Promise(res => {
+      const belum = Array.from((root || document).querySelectorAll('img')).filter(i => !i.complete);
+      if (!belum.length) return res();
+      let sisa = belum.length, t0 = setTimeout(res, maks || 6000);
+      const cek = () => { if (--sisa <= 0) { clearTimeout(t0); res(); } };
+      belum.forEach(i => { i.addEventListener('load', cek, { once: true }); i.addEventListener('error', cek, { once: true }); });
+    });
     const cetakAbsensiGuru = () => {
       if (!agDaftar.value.length) { err.value=ag.tipe==='staf' ? 'Belum ada akun staf; isi nama staf tambahan, satu nama per baris.' : 'Daftar guru kosong; muat ulang daftar guru terlebih dahulu.'; toTop(); return; }
       document.body.classList.add('cetak-absensi-guru');
       const cleanup = () => { document.body.classList.remove('cetak-absensi-guru'); window.removeEventListener('afterprint', cleanup); };
       window.addEventListener('afterprint', cleanup, { once:true });
-      Vue.nextTick(() => setTimeout(() => { try { window.print(); } catch(e) { cleanup(); } }, 150));
+      Vue.nextTick(() => setTimeout(async () => { await tungguGambarKop(document.querySelector('.absen-guru-sheet'), 6000); try { window.print(); } catch(e) { cleanup(); } }, 150));
     };
     const ca = reactive({ kelas: '', tgl: hari0, ket: '', extra: 0 });
     const caSiswa = computed(() => siswa.value.filter(x => x.kelas === ca.kelas).slice().sort((a, b) => String(a.nama).localeCompare(String(b.nama))));
@@ -6919,9 +6926,9 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
   }
 });
 app.component('kop', { props: ['k'], template: `<div class="flex items-center gap-3 border-b-4 border-double border-slate-800 pb-2 mb-3">
-  <div class="w-16 shrink-0"><img v-if="k.logoKiri" :src="k.logoKiri" class="h-16 w-16 object-contain" alt=""></div>
+  <div class="w-16 shrink-0"><img v-if="k.logoKiri" :src="k.logoKiri" class="h-16 w-16 object-contain" alt="" loading="eager" referrerpolicy="no-referrer"></div>
   <div class="flex-1 text-center leading-tight"><div v-for="(r,i) in k.baris" :key="i" :style="{fontSize:r.s+'px',fontWeight:r.b?800:400}">{{r.t}}</div></div>
-  <div class="w-16 shrink-0"><img v-if="k.logoKanan" :src="k.logoKanan" class="h-16 w-16 object-contain" alt=""></div></div>` });
+  <div class="w-16 shrink-0"><img v-if="k.logoKanan" :src="k.logoKanan" class="h-16 w-16 object-contain" alt="" loading="eager" referrerpolicy="no-referrer"></div></div>` });
 app.component('ttd', { props: ['t'], data: () => ({ tgl: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) }),
   template: `<div class="text-sm w-64 ml-auto mt-8 text-center"><div>{{t.kota}}, {{tgl}}</div><div>{{t.jabatan}}</div><div class="h-16"></div>
   <div class="font-bold underline">{{t.nama||'.....................'}}</div><div v-if="t.nip">NUPTK. {{t.nip}}</div></div>` });
