@@ -1990,14 +1990,14 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     <section v-if="view==='cetakabsenguru'" class="absen-guru-section">
       <div class="page-head noprint mb-4"><h2 class="h2">Cetak Absensi Guru</h2><p class="desk">Cetak daftar hadir guru untuk rapat, kegiatan sekolah, dan keperluan administrasi.</p></div>
       <div class="nl-card noprint mb-4">
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="ag-form">
           <label class="lb">Jenis daftar hadir<select v-model="ag.tipe" class="inp w-full mt-1"><option value="semua">Guru dan staf</option><option value="guru">Guru saja</option><option value="staf">Staf saja</option></select></label>
-          <label v-if="ag.tipe!=='guru'" class="lb lg:col-span-3">Tambahan nama staf (opsional) <textarea v-model="ag.daftarStaf" rows="3" placeholder="Satu nama setiap baris" class="inp w-full mt-1"></textarea><small class="text-slate-500">Staf yang sudah punya akun terambil otomatis ({{agStafData.length}} orang). Isi di sini hanya untuk staf yang belum punya akun.</small></label>
           <label class="lb">Nama kegiatan / rapat<input v-model.trim="ag.kegiatan" maxlength="120" placeholder="mis. Rapat Evaluasi Pembelajaran" class="inp w-full mt-1"></label>
           <label class="lb">Hari, tanggal<input type="date" v-model="ag.tanggal" class="inp w-full mt-1"></label>
           <label class="lb">Waktu<input v-model.trim="ag.waktu" maxlength="60" placeholder="mis. 09.00 WIB s.d. selesai" class="inp w-full mt-1"></label>
           <label class="lb">Tempat<input v-model.trim="ag.tempat" maxlength="100" placeholder="mis. Ruang Rapat SMKS CALM" class="inp w-full mt-1"></label>
           <label class="lb">Baris kosong tambahan<select v-model.number="ag.extra" class="inp w-full mt-1"><option :value="0">Tanpa tambahan</option><option :value="3">3 baris</option><option :value="5">5 baris</option><option :value="10">10 baris</option></select></label>
+          <label v-if="ag.tipe!=='guru'" class="lb ag-full">Tambahan nama staf (opsional)<textarea v-model="ag.daftarStaf" rows="3" placeholder="Satu nama setiap baris" class="inp w-full mt-1"></textarea><small class="text-slate-500">Staf yang sudah punya akun terambil otomatis ({{agStafData.length}} orang). Isi di sini hanya untuk staf yang belum punya akun.</small></label>
         </div>
         <div class="flex flex-wrap items-center gap-3 mt-4"><button @click="muatAbsensiGuru" class="btn-o">Muat ulang daftar guru &amp; staf</button><button @click="cetakAbsensiGuru" :disabled="!agDaftar.length" class="btn-p">Cetak daftar hadir</button><span class="text-xs text-slate-500">Formulir untuk tanda tangan manual; tidak menyimpan atau mengubah data presensi.</span></div>
       </div>
@@ -3592,6 +3592,11 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
    2) Ruang tepi dipindah ke padding; baris spacer di thead/tfoot mengulang jarak atas/bawah di setiap halaman.
    3) Lebar kolom dijumlah 100% (sebelumnya 104% + 36px). */
 .ag-pad{display:none}
+.ag-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;align-items:start}
+.ag-form .ag-full{grid-column:1/-1}
+.ag-form textarea{resize:vertical;min-height:84px;display:block}
+.ag-form small{display:block;margin-top:6px;line-height:1.4;font-weight:400;text-transform:none;letter-spacing:normal}
+@media(max-width:639px){.ag-form{grid-template-columns:minmax(0,1fr)}}
 .absen-guru-table th,.absen-guru-table td{border:1px solid #334155}
 .absen-guru-table th{vertical-align:middle;line-height:1.3}
 .absen-guru-table th.ag-name{text-align:center}
