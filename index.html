@@ -5355,11 +5355,11 @@ const app = createApp({
       if (!j.ok) { if (/Sesi/.test(j.error)) logout(); throw new Error(j.error || 'Server menolak permintaan tanpa keterangan. Coba lagi.'); }
       return j.data;
     }
-    const NET = 'Tidak dapat terhubung ke server. Jika internet normal, klik "Uji alamat server" di halaman masuk: bila yang tampil bukan teks JSON, perbaiki Apps Script (deploy akses "Anyone", Version: New version, lalu cek menu Executions untuk galat kode).';
-    const TIMEOUT = 'Server terlalu lama merespons (lebih dari 60 detik). Coba lagi beberapa saat.';
-    const NONJSON = 'Server membalas halaman error, bukan data. Biasanya: Web App belum di-deploy ulang (Deploy > Manage deployments > Edit > Version: New version), akses bukan "Anyone", atau ada galat pada kode Apps Script.';
+    const NET = 'Koneksi ke server terputus. Periksa jaringan internet Anda, lalu coba lagi. Jika masalah berlanjut, hubungi administrator sekolah.';
+    const TIMEOUT = 'Server membutuhkan waktu terlalu lama untuk merespons. Silakan coba lagi beberapa saat.';
+    const NONJSON = 'Layanan sedang tidak dapat diakses. Silakan coba beberapa saat lagi. Jika masalah berlanjut, hubungi administrator sekolah.';
     const niceErr = m => m === 'NETWORK' || m === 'Failed to fetch' ? NET : m === 'TIMEOUT' ? TIMEOUT : m === 'NONJSON' ? NONJSON
-      : /Cannot read properties of null/.test(m) ? 'Sheet belum lengkap. Jalankan fungsi setup() sekali di editor Apps Script. (' + m + ')' : m;
+      : /Cannot read properties of null/.test(m) ? 'Data belum dapat ditampilkan. Silakan coba lagi atau hubungi administrator sekolah.' : m;
     async function cekServer() {
       srv.value = 'wait'; srvMsg.value = '';
       const ac = new AbortController(), to = setTimeout(() => ac.abort(), 15000);
@@ -5371,7 +5371,7 @@ const app = createApp({
     let nb = 0;
     async function run(fn) {
       err.value = ok.value = ''; nb++; busy.value = true;
-      try { await fn(); } catch (e) { err.value = (e instanceof TypeError && e.message !== 'Failed to fetch') ? 'Terjadi kesalahan pada aplikasi (' + e.message + '). Muat ulang halaman lalu coba lagi; bila berulang, hubungi administrator.' : niceErr(e.message); }
+      try { await fn(); } catch (e) { err.value = (e instanceof TypeError && e.message !== 'Failed to fetch') ? 'Terjadi kendala pada aplikasi. Muat ulang halaman lalu coba lagi; bila berulang, hubungi administrator sekolah.' : niceErr(e.message); }
       nb = Math.max(0, nb - 1); busy.value = nb > 0;
       if (err.value) toTop(); else if (ok.value) { const m = ok.value; toTop(); setTimeout(() => { if (ok.value === m) ok.value = ''; }, 7000); }
     }
