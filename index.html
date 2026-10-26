@@ -5454,7 +5454,7 @@ const app = createApp({
       if (k === 'layanan') await loadLayanan();
       if (k === 'mutasi') { await Promise.all([loadMutasi(), api('siswaList').then(x=>siswa.value=x), api('kelasDetail').then(x=>kelasAll.value=x)]); }
       if (k === 'cetakabsen') { [cfg.value, siswa.value, kelasAll.value] = await Promise.all([api('pengaturanGet'), api('siswaList'), api('kelasDetail')]); Object.assign(ca, { kelas: '', tgl: hari0, ket: '', extra: 0 }); }
-      if (k === 'cetakabsenguru') { const r = await Promise.all([api('pengaturanGet'), api('guruList')]); cfg.value = r[0] || cfg.value; const gl = r[1]; guru.value = Array.isArray(gl) ? gl : (gl && Array.isArray(gl.rows) ? gl.rows : (gl && Array.isArray(gl.data) ? gl.data : [])); ag.tanggal = hari0; ag.kegiatan = ''; ag.waktu = ''; ag.tempat = ''; ag.extra = 0; }
+      if (k === 'cetakabsenguru') { const r = await Promise.all([api('pengaturanGet'), api('guruDetail')]); cfg.value = r[0] || cfg.value; const gl = r[1]; guru.value = Array.isArray(gl) ? gl : (gl && Array.isArray(gl.rows) ? gl.rows : (gl && Array.isArray(gl.data) ? gl.data : [])); ag.tanggal = hari0; ag.kegiatan = ''; ag.waktu = ''; ag.tempat = ''; ag.extra = 0; }
       if (k === 'cetaksurat') { await api('pengaturanGet').then(x=>cfg.value=x); resetCetakSurat(); }
       if (k === 'rekapadmin') await loadRekapAdmin();
       if (k === 'pekerjaanstaf') { pk.bulan = ''; await loadPekerjaanStaf(); }
@@ -6807,7 +6807,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const agJabatan = g => { if (!g || !(g.nama || g.namaGuru || g.username)) return ''; const r = String(g.role || 'GURU').toUpperCase(); if (r === 'STAF') return 'Staf Tata Usaha'; if (r === 'KEPSEK') return 'Kepala Sekolah'; if (r === 'BK') return 'Guru BK'; return String(g.tugasTambahan || '').split(/[,;|]/).map(x => x.trim().toUpperCase()).includes('WAKUR') ? 'Guru / WKS Kurikulum' : 'Guru'; };
     const aguruTampil = computed(() => agDaftar.value.concat(Array.from({length: ag.extra || 0}, (_,i) => ({ nama: '', username: 'baris-kosong-'+i }))));
     const agTanggalLabel = computed(() => { if (!ag.tanggal) return ''; const d=new Date(ag.tanggal+'T00:00:00'); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); });
-    const muatAbsensiGuru = () => run(async () => { const r = await api('guruList'); guru.value = Array.isArray(r) ? r : (r && Array.isArray(r.rows) ? r.rows : (r && Array.isArray(r.data) ? r.data : [])); });
+    const muatAbsensiGuru = () => run(async () => { const r = await api('guruDetail'); guru.value = Array.isArray(r) ? r : (r && Array.isArray(r.rows) ? r.rows : (r && Array.isArray(r.data) ? r.data : [])); });
     const cetakAbsensiGuru = () => {
       if (!agDaftar.value.length) { err.value=ag.tipe==='staf' ? 'Belum ada akun staf; isi nama staf tambahan, satu nama per baris.' : 'Daftar guru kosong; muat ulang daftar guru terlebih dahulu.'; toTop(); return; }
       document.body.classList.add('cetak-absensi-guru');
