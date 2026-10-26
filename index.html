@@ -1310,28 +1310,28 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 })();</script>
 
 <style id="cetak-absensi-guru-css">
-.absen-guru-sheet{background:#fff;padding:16px;border:1px solid #dbe3ee;border-radius:12px;overflow-x:auto;color:#111}
-.absen-guru-table{width:100%;border-collapse:collapse;font-size:11px;color:#111}
-.absen-guru-table th,.absen-guru-table td{border:1px solid #555;padding:7px 6px;text-align:center;height:30px}
-.absen-guru-table th{background:#eef2f7;font-weight:800}
-.absen-guru-table .ag-name{text-align:left;min-width:170px}
-.absen-guru-head{text-align:center;margin-bottom:12px;color:#111}
-.absen-guru-head h1{font-size:16px;font-weight:800;margin:8px 0 3px}
+.absen-guru-sheet{background:#fff;padding:22px;border:1px solid #dbe3ee;border-radius:12px;overflow-x:auto;color:#172033;max-width:1100px;margin:0 auto;font-family:Arial,sans-serif}
+.absen-guru-table{width:100%;border-collapse:collapse;font-size:12px;color:#172033;table-layout:fixed}
+.absen-guru-table th,.absen-guru-table td{border:1px solid #64748b;padding:8px 7px;text-align:center;height:34px;vertical-align:middle}
+.absen-guru-table th{background:#edf2f7;font-weight:700;color:#243b5a}
+.absen-guru-table .ag-name{text-align:left;min-width:170px;overflow-wrap:anywhere}
+.absen-guru-head{text-align:center;margin-bottom:14px;color:#111827}
+.absen-guru-head h1{font-size:17px;font-weight:800;margin:12px 0 5px;letter-spacing:.2px}
 .absen-guru-head .ag-kegiatan{font-size:13px;font-weight:700;margin:5px 0}
-.absen-guru-details{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;font-size:11px;margin:14px 0}
-.absen-guru-details>div{display:grid;grid-template-columns:90px 1fr;gap:4px}
-.absen-guru-footer{display:flex;justify-content:space-between;font-size:10px;margin-top:10px}
-.absen-guru-sign{display:flex;justify-content:space-between;text-align:center;margin-top:24px;font-size:11px}
-.absen-guru-sign>div{width:42%}.ag-sign-space{height:55px}
+.absen-guru-details{display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;font-size:12px;margin:16px 0 18px}
+.absen-guru-details>div{display:grid;grid-template-columns:100px 1fr;gap:5px;line-height:1.45}
+.absen-guru-footer{display:flex;justify-content:space-between;gap:20px;font-size:11px;margin-top:12px}
+.absen-guru-sign{display:flex;justify-content:space-between;text-align:center;margin-top:28px;font-size:11px;line-height:1.5}
+.absen-guru-sign>div{width:42%}.ag-sign-space{height:58px}
 @page absenguru{size:A4 portrait;margin:10mm}
 @media print{
  body.cetak-absensi-guru{background:#fff!important;color:#111!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
  body.cetak-absensi-guru main>*:not(.absen-guru-section){display:none!important}
  body.cetak-absensi-guru .absen-guru-section{display:block!important;page:absenguru;width:100%!important;margin:0!important;padding:0!important}
  body.cetak-absensi-guru .absen-guru-section .noprint{display:none!important}
- body.cetak-absensi-guru .absen-guru-sheet{display:block!important;border:0!important;border-radius:0!important;padding:0!important;overflow:visible!important}
+ body.cetak-absensi-guru .absen-guru-sheet{display:block!important;border:0!important;border-radius:0!important;padding:0!important;overflow:visible!important;max-width:none!important;margin:0!important}
  body.cetak-absensi-guru .absen-guru-table{font-size:9pt!important;table-layout:fixed}
- body.cetak-absensi-guru .absen-guru-table th,body.cetak-absensi-guru .absen-guru-table td{padding:5pt 4pt!important;height:28pt!important}
+ body.cetak-absensi-guru .absen-guru-table th,body.cetak-absensi-guru .absen-guru-table td{padding:5pt 4pt!important;height:27pt!important}
  body.cetak-absensi-guru .absen-guru-table .ag-name{min-width:0!important;width:32%!important}
  body.cetak-absensi-guru .absen-guru-table tr{break-inside:avoid;page-break-inside:avoid}
 }
@@ -1991,17 +1991,19 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
       <div class="page-head noprint mb-4"><h2 class="h2">Cetak Absensi Guru</h2><p class="desk">Cetak daftar hadir guru untuk rapat, kegiatan sekolah, dan keperluan administrasi.</p></div>
       <div class="nl-card noprint mb-4">
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <label class="lb">Jenis daftar hadir<select v-model="ag.tipe" class="inp w-full mt-1"><option value="guru">Guru dan tenaga kependidikan</option><option value="staf">Staf (isi nama manual)</option></select></label>
+          <label v-if="ag.tipe==='staf'" class="lb lg:col-span-3">Daftar nama staf <textarea v-model="ag.daftarStaf" rows="4" placeholder="Satu nama setiap baris" class="inp w-full mt-1"></textarea><small class="text-slate-500">Nama staf diisi manual agar tidak keliru mengambil daftar guru.</small></label>
           <label class="lb">Nama kegiatan / rapat<input v-model.trim="ag.kegiatan" maxlength="120" placeholder="mis. Rapat Evaluasi Pembelajaran" class="inp w-full mt-1"></label>
           <label class="lb">Hari, tanggal<input type="date" v-model="ag.tanggal" class="inp w-full mt-1"></label>
           <label class="lb">Waktu<input v-model.trim="ag.waktu" maxlength="60" placeholder="mis. 09.00 WIB s.d. selesai" class="inp w-full mt-1"></label>
           <label class="lb">Tempat<input v-model.trim="ag.tempat" maxlength="100" placeholder="mis. Ruang Rapat SMKS CALM" class="inp w-full mt-1"></label>
           <label class="lb">Baris kosong tambahan<select v-model.number="ag.extra" class="inp w-full mt-1"><option :value="0">Tanpa tambahan</option><option :value="3">3 baris</option><option :value="5">5 baris</option><option :value="10">10 baris</option></select></label>
         </div>
-        <div class="flex flex-wrap items-center gap-3 mt-4"><button @click="muatAbsensiGuru" class="btn-o">Muat ulang daftar guru</button><button @click="cetakAbsensiGuru" :disabled="!aguru.length" class="btn-p">Cetak daftar hadir</button><span class="text-xs text-slate-500">Formulir untuk tanda tangan manual; tidak menyimpan atau mengubah data presensi.</span></div>
+        <div class="flex flex-wrap items-center gap-3 mt-4"><button @click="muatAbsensiGuru" class="btn-o">Muat ulang daftar guru</button><button @click="cetakAbsensiGuru" :disabled="ag.tipe==='guru' ? !aguru.length : !ag.daftarStaf.trim()" class="btn-p">Cetak daftar hadir</button><span class="text-xs text-slate-500">Formulir untuk tanda tangan manual; tidak menyimpan atau mengubah data presensi.</span></div>
       </div>
-      <p v-if="!aguru.length" class="nl-empty noprint">Daftar guru belum tersedia atau belum ada data guru.</p>
+      <p v-if="ag.tipe==='guru' && !aguru.length" class="nl-empty noprint">Daftar guru belum tersedia atau belum ada data guru.</p>
       <div v-else class="absen-guru-sheet">
-        <div class="absen-guru-head"><kop :k="cfg.kop"></kop><h1>DAFTAR HADIR GURU DAN TENAGA KEPENDIDIKAN</h1><h2 v-if="ag.kegiatan" class="ag-kegiatan">{{ag.kegiatan}}</h2></div>
+        <div class="absen-guru-head"><kop :k="cfg.kop"></kop><h1>{{ag.tipe==='staf'?'DAFTAR HADIR STAF':'DAFTAR HADIR GURU DAN TENAGA KEPENDIDIKAN'}}</h1><h2 v-if="ag.kegiatan" class="ag-kegiatan">{{ag.kegiatan}}</h2></div>
         <div class="absen-guru-details">
           <div><b>Hari/Tanggal</b><span>: {{agTanggalLabel||'................................................'}}</span></div>
           <div><b>Waktu</b><span>: {{ag.waktu||'................................................'}}</span></div>
@@ -2011,7 +2013,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <thead><tr><th style="width:36px">No.</th><th class="ag-name">Nama Guru / Tenaga Kependidikan</th><th style="width:29%">Jabatan</th><th style="width:25%">Tanda Tangan</th><th style="width:18%">Keterangan</th></tr></thead>
           <tbody><tr v-for="(g,i) in aguruTampil" :key="g.username||g.nama||i"><td>{{i+1}}</td><td class="ag-name">{{namaRapi(g.nama||g.namaGuru||g.username||'')}}</td><td>{{g.jabatan||g.namaJabatan||''}}</td><td></td><td></td></tr></tbody>
         </table>
-        <div class="absen-guru-footer"><span>Jumlah peserta: {{aguru.length}} orang</span><span>{{cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{agTanggalLabel||'................................'}}</span></div>
+        <div class="absen-guru-footer"><span>Jumlah peserta: {{agDaftar.length}} orang</span><span>{{cfg.ttd.kota?cfg.ttd.kota+', ':''}}{{agTanggalLabel||'................................'}}</span></div>
         <div class="absen-guru-sign"><div>Mengetahui,<div>{{cfg.ttd.jabatan||'Kepala Sekolah'}}</div><div class="ag-sign-space"></div><b>{{cfg.ttd.nama||'........................................'}}</b><div v-if="cfg.ttd.nip">NUPTK. {{cfg.ttd.nip}}</div></div><div>Notulis / Petugas<div class="ag-sign-space"></div><b>........................................</b></div></div>
       </div>
     </section>
@@ -6768,13 +6770,14 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const delMutasi=r=>cfmRun('Hapus riwayat mutasi ini?', async()=>{await api('mutasiSiswaDelete',{id:r.id});await loadMutasi();});
     const resetCetakSurat=()=>Object.assign(cs,{jenis:'Surat Keterangan Aktif',nomor:'',tanggal:hari0,kepada:'',perihal:'',isi:'',namaTtd:'',nipTtd:''});
     const printSurat=()=>{if(!cs.isi.trim())return err.value='Isi surat wajib diisi';Vue.nextTick(()=>window.print());};
-    const ag = reactive({ kegiatan: '', tanggal: hari0, waktu: '', tempat: '', extra: 0 });
+    const ag = reactive({ tipe: 'guru', kegiatan: '', tanggal: hari0, waktu: '', tempat: '', extra: 0, daftarStaf: '' });
     const aguru = computed(() => { const src = guru.value; const rows = Array.isArray(src) ? src : (src && Array.isArray(src.rows) ? src.rows : (src && Array.isArray(src.data) ? src.data : [])); return rows.filter(g => String(g.role || 'GURU').toUpperCase() !== 'SISWA').slice().sort((a,b) => String(a.nama||a.namaGuru||a.username||'').localeCompare(String(b.nama||b.namaGuru||b.username||''),'id')); });
-    const aguruTampil = computed(() => aguru.value.concat(Array.from({length: ag.extra || 0}, (_,i) => ({ nama: '', username: 'baris-kosong-'+i }))));
+    const agDaftar = computed(() => ag.tipe === 'staf' ? ag.daftarStaf.split(/\r?\n/).map(x => x.trim()).filter(Boolean).map((nama,i)=>({nama, username:'staf-manual-'+i, jabatan:'Staf'})) : aguru.value);
+    const aguruTampil = computed(() => agDaftar.value.concat(Array.from({length: ag.extra || 0}, (_,i) => ({ nama: '', username: 'baris-kosong-'+i }))));
     const agTanggalLabel = computed(() => { if (!ag.tanggal) return ''; const d=new Date(ag.tanggal+'T00:00:00'); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); });
     const muatAbsensiGuru = () => run(async () => { const r = await api('guruList'); guru.value = Array.isArray(r) ? r : (r && Array.isArray(r.rows) ? r.rows : (r && Array.isArray(r.data) ? r.data : [])); });
     const cetakAbsensiGuru = () => {
-      if (!aguru.value.length) { err.value='Daftar guru kosong; muat ulang daftar guru terlebih dahulu.'; toTop(); return; }
+      if (!agDaftar.value.length) { err.value=ag.tipe==='staf' ? 'Isi nama staf, satu nama per baris.' : 'Daftar guru kosong; muat ulang daftar guru terlebih dahulu.'; toTop(); return; }
       document.body.classList.add('cetak-absensi-guru');
       const cleanup = () => { document.body.classList.remove('cetak-absensi-guru'); window.removeEventListener('afterprint', cleanup); };
       window.addEventListener('afterprint', cleanup, { once:true });
@@ -6848,7 +6851,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       cfg, resetTxt, backupUrl, addBaris, savePengaturan, backup, resetSem,
       editSiswa, saveSiswa, delSiswa, saveKelas, delKelas, saveJadwal, delJadwal, loadNilai, saveNilai, nMode, frows, kt, saveFormatif, saveKktp, setSemuaF, jl, cekTahunR, opsiTahun,
       antreSaya, kirimAntre, perbaikiAntre, buangAntre, pwa, pasang, showPwaHelp, tutupPwaHelp, ukd, pa, paf, paAtur, isPim, pickFilePa, savePa, delPa, aturPa, ingatPa,
-      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, bkDataSiswa, bkSiswaKelas, bkSiswaQ, bkDataSiswaTampil, loadBKDataSiswa, gantiKelasBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu, ca, caSiswa, caHari, caWali, caBulanLabel, cetakAbsen, ag, aguru, aguruTampil, agTanggalLabel, muatAbsensiGuru, cetakAbsensiGuru, DESK, roleNama, salam, memuat,
+      anak, atab, bimbTab, anakMapel, nlist, notifN, pel, plq, showPl, plsiswa, panduanPel, showPanduanPel, plf, canPel, loadPl, openPl, openPanduanPel, printPelanggaran, applyMasterPl, pickKelasPl, savePl, delPl, perluTindak, pelRingkasan, butirSaran, penguranganSiswa, showKurangi, kurangiRows, kurangiInfo, kpf, openKurangi, saveKurangi, konseling, ksq, showKonseling, konselingSiswa, kfBK, bkDataSiswa, bkSiswaKelas, bkSiswaQ, bkDataSiswaTampil, loadBKDataSiswa, gantiKelasBK, canKonseling, JENIS_KONSELING, STATUS_KONSELING, loadKonseling, openKonseling, editKonseling, pickKelasKonseling, saveKonseling, delKonseling, statusKonselingCls, akOrtu, buatOrtu, ca, caSiswa, caHari, caWali, caBulanLabel, cetakAbsen, ag, aguru, agDaftar, aguruTampil, agTanggalLabel, muatAbsensiGuru, cetakAbsensiGuru, DESK, roleNama, salam, memuat,
       hasWakurTask, canManageJadwal, editJadwal };
   }
 });
