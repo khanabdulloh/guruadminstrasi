@@ -1,9 +1,10 @@
-/* Service worker Portal Akademik SMK CALM v11
+/* Service worker Portal Akademik SMK CALM v12
  * - Halaman (navigasi): jaringan dulu (batas 4 dtk); bila lambat/offline, salinan terakhir dipakai → aplikasi tetap terbuka cepat
  *   walau sinyal lemah, dan salinan diperbarui di latar belakang.
  * - Aset statis (Vue, font, logo): stale-while-revalidate → buka lebih cepat, diperbarui di latar belakang.
  * - API Apps Script TIDAK pernah dicegat/di-cache (data selalu dari server; antrean offline ditangani aplikasi).
  *
+ * v12: naikkan versi cache agar daftar siswa di Catat mutasi tidak lagi dibatasi 80 nama.
  * v11: naikkan versi cache agar tombol & tampilan baru menu Mutasi Siswa dimuat.
  * v10: naikkan versi cache agar formulir cetak siswa pindahan baru (2 lembar A4 tetap, tanpa halaman kosong) dimuat.
  * v9: naikkan versi cache agar tahun ajaran otomatis & catatan mutasi baru dimuat.
@@ -14,7 +15,7 @@
  *     scope penghapusan dibatasi ke prefix 'smk-calm-' agar tidak menghapus cache aplikasi lain
  *     di origin yang sama (mis. portal lain di domain yang sama).
  */
-const VER = 'smk-calm-v11', SHELL = VER + '-shell', ASET = VER + '-aset';
+const VER = 'smk-calm-v12', SHELL = VER + '-shell', ASET = VER + '-aset';
 const CDN = ['unpkg.com', 'cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com', 'blogger.googleusercontent.com'];
 
 self.addEventListener('install', () => { self.skipWaiting(); });
