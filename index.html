@@ -1428,6 +1428,8 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
   body.cetak-pdh .pdh-r2{break-before:page;page-break-before:always}
   body.cetak-pdh .pdh-r2>td{border-top:0}
   body.cetak-pdh .pdh-sec{break-after:avoid;page-break-after:avoid}
+  body.cetak-pdh .pdh-p{break-after:avoid;page-break-after:avoid}
+  body.cetak-pdh .pdh-sign{margin-top:3mm}
   body.cetak-pdh .pdh-t tr,body.cetak-pdh .pdh-b tr,body.cetak-pdh .pdh-sign,body.cetak-pdh .pdh-cat,body.cetak-pdh .pdh-flex,body.cetak-pdh .pdh-p{break-inside:avoid;page-break-inside:avoid}
   body.cetak-pdh .pdh-b thead{display:table-header-group}
 }
@@ -2038,7 +2040,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
           <div class="pdh-sign"><div><br>Peserta didik,<div class="sp"></div><b>{{pfm.nama||'..........................'}}</b></div><div>{{(cfg.ttd&&cfg.ttd.kota)||'Garut'}}, {{pdTgl}}<br>Orang tua / wali,<div class="sp"></div><b>{{pfm.namaWali||pfm.namaAyah||pfm.namaIbu||'..........................'}}</b></div></div>
           <div class="pdh-sec">G. CATATAN &amp; PERSETUJUAN SEKOLAH</div>
           <div class="pdh-cat"><span>Catatan petugas tata usaha:</span><i></i><i></i></div>
-          <div class="pdh-sign"><div>Petugas Tata Usaha,<div class="sp"></div><b>{{(user&&user.nama)||'..........................'}}</b></div><div>Mengetahui,<br>{{(cfg.ttd&&cfg.ttd.jabatan)||'Kepala Sekolah'}}<div class="sp"></div><b>{{(cfg.ttd&&cfg.ttd.nama)||'..........................'}}</b><br><span v-if="cfg.ttd&&cfg.ttd.nip">NUPTK. {{cfg.ttd.nip}}</span></div></div></div></td></tr></tbody></table>
+          <div class="pdh-sign"><div><br>Petugas Tata Usaha,<div class="sp"></div><b>{{(user&&user.nama)||'..........................'}}</b></div><div>Mengetahui,<br>{{(cfg.ttd&&cfg.ttd.jabatan)||'Kepala Sekolah'}}<div class="sp"></div><b>{{(cfg.ttd&&cfg.ttd.nama)||'..........................'}}</b><br><span v-if="cfg.ttd&&cfg.ttd.nip">NUPTK. {{cfg.ttd.nip}}</span></div></div></div></td></tr></tbody></table>
       </div>
       <div class="pdh-act noprint"><span class="pdh-act-i">{{pfm.nama||'Formulir belum diisi'}}<small>{{pdIsi}}/{{pdTotal}} kolom terisi</small></span><button type="button" class="btn-o" @click="resetPD">Kosongkan</button><button v-if="!roKep" type="button" class="btn-o" @click="simpanPD">{{pfm.id?'Perbarui formulir':'Simpan formulir'}}</button><button type="button" class="btn-p" @click="cetakPD">Cetak formulir</button></div>
     </section>
@@ -6993,7 +6995,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const bukaTersimpanPD=r=>{Object.assign(pfm,PD_KOSONG(),r,{id:r.id,tgl:r.tanggal||hari0,muId:r.mutasiId||'',nis:r.nis||'',nisLokal:r.nis||''});toTop();};
     const hapusPD=r=>cfmRun('Hapus formulir pindahan tersimpan ini?',async()=>{await api('formulirPindahanDelete',{id:r.id});if(pfm.id===r.id)pfm.id='';await muatPD();});
     const bukaPD=()=>{err.value='';resetPD();pfm.muId='';showPD.value=true;toTop();muatPD();api('pengaturanGet').then(c=>{if(c)cfg.value=c;}).catch(()=>{});};
-    const cetakPD=()=>{document.body.classList.add('cetak-pdh');const bersih=()=>{document.body.classList.remove('cetak-pdh');window.removeEventListener('afterprint',bersih);};window.addEventListener('afterprint',bersih,{once:true});Vue.nextTick(()=>setTimeout(async()=>{await tungguGambarKop(document.querySelector('.pdh-section'),6000);try{window.print();}catch(e){bersih();}},150));};
+    const cetakPD=()=>{const bersih=()=>{document.body.classList.remove('cetak-pdh');const e=document.getElementById('pdh-page-style');if(e)e.remove();window.removeEventListener('afterprint',bersih);};bersih();const ps=document.createElement('style');ps.id='pdh-page-style';ps.textContent='@page{size:A4 portrait;size:210mm 297mm;margin:0}@page pdh{size:210mm 297mm;margin:0}';document.body.appendChild(ps);document.body.classList.add('cetak-pdh');window.addEventListener('afterprint',bersih,{once:true});Vue.nextTick(()=>setTimeout(async()=>{await tungguGambarKop(document.querySelector('.pdh-section'),6000);try{window.print();}catch(e){bersih();}finally{setTimeout(bersih,1500);}},150));};
     const resetCetakSurat=()=>Object.assign(cs,{jenis:'Surat Keterangan Aktif',nomor:'',tanggal:hari0,kepada:'',perihal:'',isi:'',namaTtd:'',nipTtd:''});
     const printSurat=()=>{if(!cs.isi.trim())return err.value='Isi surat wajib diisi';Vue.nextTick(()=>window.print());};
     const ag = reactive({ tipe: 'semua', kegiatan: '', tanggal: hari0, waktu: '', tempat: '', extra: 0, daftarStaf: '' });
