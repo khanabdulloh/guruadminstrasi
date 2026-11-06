@@ -1342,38 +1342,6 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 .pdh-det{background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .pdh-det summary{cursor:pointer;font-weight:700;color:#1e3a8a;margin-bottom:8px}
 .pdh-scroll{overflow-x:auto;padding:12px;background:#e2e8f0;border-radius:12px}
-.pdh-page{width:210mm;height:296mm;box-sizing:border-box;padding:11mm 16mm;margin:0 auto 12px;background:#fff;color:#111;font-size:10pt;line-height:1.35;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-.pdh-h1{text-align:center;font-size:13pt;font-weight:800;margin:2mm 0 0;letter-spacing:.02em}
-.pdh-sub{text-align:center;font-size:9.5pt;margin:1mm 0 3mm}
-.pdh-mini{font-size:8.5pt;color:#444;border-bottom:1px solid #999;padding-bottom:1.5mm;margin-bottom:2mm}
-.pdh-sec{font-weight:800;font-size:10pt;margin:4mm 0 1.5mm;padding:1mm 2mm;background:#e8edf3;border-left:3px solid #1e3a8a}
-.pdh-flex{display:flex;gap:6mm;align-items:flex-start}
-.pdh-foto{flex:none;width:30mm;height:40mm;border:1px solid #444;display:flex;align-items:center;justify-content:center;text-align:center;font-size:8pt;color:#666}
-.pdh-t{width:100%;border-collapse:collapse}
-.pdh-t td{padding:0;vertical-align:bottom;height:6.4mm}
-.pdh-t td.l{width:52mm;white-space:nowrap}
-.pdh-t td.c{width:4mm;text-align:center}
-.pdh-t td.v{border-bottom:1px dotted #555;padding-left:1mm}
-.pdh-t td.v.tall{height:13mm;vertical-align:top}
-.pdh-b{width:100%;border-collapse:collapse;font-size:9.5pt}
-.pdh-b th,.pdh-b td{border:.6pt solid #333;height:6.6mm;padding:0 1.5mm;text-align:center}
-.pdh-b th{background:#e8edf3;font-weight:700}
-.pdh-b td.t{text-align:left}
-.pdh-p{text-align:justify;margin:0 0 1mm;font-size:9.5pt}
-.pdh-cat{font-size:9.5pt}.pdh-cat i{display:block;height:6mm;border-bottom:1px dotted #555}
-.pdh-sign{display:flex;justify-content:space-around;text-align:center;font-size:9.5pt;margin-top:2mm;break-inside:avoid}
-.pdh-sign>div{min-width:60mm}.pdh-sign .sp{height:17mm}
-@page pdh{size:A4 portrait;margin:0}
-@media print{
-  body.cetak-pdh{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  body.cetak-pdh main>*:not(.pdh-section){display:none!important}
-  #app>div:has(.pdh-section){display:block!important;min-height:0!important}
-  body.cetak-pdh .pdh-section{display:block!important;page:pdh;padding:0!important;margin:0!important;max-width:none!important}
-  body.cetak-pdh .pdh-ctl{display:none!important}
-  body.cetak-pdh .pdh-scroll{overflow:visible!important;padding:0!important;background:none!important;border-radius:0!important}
-  body.cetak-pdh .pdh-page{margin:0!important;box-shadow:none!important;break-after:page;page-break-after:always}
-  body.cetak-pdh .pdh-page:last-child{break-after:auto;page-break-after:auto}
-}
 </style>
 
 <style id="mu-ui-css">
@@ -1409,29 +1377,61 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
 #app .pdh-det summary{padding:.55rem 0;margin:0}#app .pdh-det[open] summary{margin-bottom:.4rem}
 #app .pdh-act{position:sticky;bottom:0;z-index:20;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:.5rem;margin-top:1rem;padding:.7rem 1rem;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border:1px solid #e2e8f0;border-radius:1rem;box-shadow:0 -6px 20px rgba(15,23,42,.08)}
 #app .pdh-act-i{margin-right:auto;display:flex;flex-direction:column;font-size:.85rem;font-weight:800;color:#0f172a;overflow-wrap:anywhere}#app .pdh-act-i small{font-size:.7rem;font-weight:600;color:#64748b}
-/* Lembar cetak: mengalir antar halaman, tidak terpotong */
-.pdh-scroll{padding:16px}
-.pdh-flow{width:210mm;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#fff;box-shadow:0 4px 18px rgba(15,23,42,.18)}
-.pdh-flow>thead>tr>td,.pdh-flow>tfoot>tr>td,.pdh-flow>tbody>tr>td{padding:0;border:0}
-.pdh-sp{height:0}
-.pdh-page{height:auto!important;min-height:0!important;overflow:visible!important;box-shadow:none!important;margin:0!important;padding:11mm 15mm!important}
-.pdh-r2>td{border-top:2px dashed #cbd5e1}
-.pdh-t td.l{width:56mm;white-space:normal;padding-right:2mm}
-.pdh-t td.v,.pdh-b td.t,.pdh-p,.pdh-cat{overflow-wrap:anywhere;word-break:break-word}
-.pdh-h1{font-size:13.5pt;padding-bottom:1.5mm;border-bottom:1.2pt solid #111}
-.pdh-sec{border-left:0;padding:1.1mm 2.5mm;background:#e8edf3;border-top:.8pt solid #111;border-bottom:.8pt solid #111;font-size:9.5pt;letter-spacing:.03em}
+</style>
+
+<style id="pdh-css3">
+.pdh-scroll{padding:16px;overflow-x:auto;background:#e2e8f0;border-radius:12px}
+.pdh-stack{width:210mm;margin:0 auto}
+.pdh-lbl{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12px;color:#64748b;padding:0 2px 6px}
+.pdh-lbl b{color:#0b2a66;font-weight:800}
+.pdh-page{position:relative;width:210mm;height:296.5mm;box-sizing:border-box;padding:12mm 15mm 0;margin:0 0 20px;background:#fff;color:#111;font-size:10pt;line-height:1.35;box-shadow:0 4px 18px rgba(15,23,42,.18);overflow:hidden}
+.pdh-page:last-child{margin-bottom:0}
+.pdh-body{height:267mm;overflow:hidden}
+.pdh-foot{position:absolute;left:15mm;right:15mm;bottom:9mm;display:flex;justify-content:space-between;gap:6mm;padding-top:1.5mm;border-top:.6pt solid #999;font-size:8pt;color:#555}
+.pf-title{text-align:center;margin:1mm 0 2.5mm}
+.pf-title h1{margin:0;font-size:13.5pt;font-weight:800;letter-spacing:.04em}
+.pf-title p{margin:1.2mm 0 0;font-size:9pt;color:#333}
+.pf-title i{display:inline-block;width:1mm;height:1mm;border-radius:50%;background:#888;margin:0 3mm;vertical-align:middle}
+.pf-note{margin:0;text-align:center;font-size:8pt;font-style:italic;color:#555}
+.pf-run{display:flex;justify-content:space-between;gap:6mm;padding-bottom:1.5mm;margin-bottom:1mm;border-bottom:.8pt solid #1e3a8a;font-size:8.5pt;color:#444}
+.pf-sec{margin-top:3.5mm}
+.pf-sec>h2{display:flex;align-items:center;gap:2.5mm;margin:0 0 1.5mm;padding-bottom:1mm;border-bottom:.8pt solid #1e3a8a;font-size:9.5pt;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#0b2a66}
+.pf-sec>h2 span{display:inline-flex;align-items:center;justify-content:center;width:5.2mm;height:5.2mm;border-radius:1mm;background:#0b2a66;color:#fff;font-size:8.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pf-t{width:100%;border-collapse:collapse}
+.pf-t td{padding:0;vertical-align:bottom;height:6.2mm;line-height:1.25}
+.pf-t td.l{width:54mm;padding-right:2mm;color:#222}
+.pf-t td.c{width:4mm;text-align:center}
+.pf-t td.v{padding:0 1mm;border-bottom:.6pt dotted #555;font-weight:600;overflow-wrap:anywhere;word-break:break-word}
+.pf-t td.v.tall{height:12.5mm;vertical-align:top;padding-top:1mm}
+.pf-with-foto{display:flex;gap:5mm;align-items:flex-start}
+.pf-with-foto .pf-t{flex:1;min-width:0}
+.pf-foto{flex:none;width:28mm;height:37mm;margin-top:1.5mm;border:.7pt solid #555;display:flex;align-items:center;justify-content:center;text-align:center;font-size:7.5pt;line-height:1.5;color:#777}
+.pf-b{width:100%;border-collapse:collapse;font-size:9.5pt}
+.pf-b th,.pf-b td{height:6.4mm;padding:0 1.8mm;border:.6pt solid #444;text-align:center}
+.pf-b th{background:#e8edf3;font-size:9pt;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pf-b td.t{text-align:left;overflow-wrap:anywhere}
+.pf-p{margin:0 0 1mm;text-align:justify;font-size:9.5pt;line-height:1.4}
+.pf-cek{margin:2mm 0 0;font-size:9.5pt}
+.pf-cat{margin-top:2mm;font-size:9.5pt}
+.pf-cat i{display:block;height:6mm;border-bottom:.6pt dotted #555}
+.pf-sign{display:flex;justify-content:space-between;gap:8mm;margin-top:2mm;text-align:center;font-size:9.5pt}
+.pf-sign>div{flex:1}
+.pf-sign .sp{height:16mm}
+.pf-sign b{display:inline-block;min-width:48mm;padding:0 2mm;border-bottom:.6pt solid #111}
+#app .pdh-wide{grid-column:1/-1}
+#app .pdh-hint{margin:-.4rem 0 .8rem;font-size:.76rem;color:#64748b}
+#app .pdh-det summary small{margin-left:.4rem;font-size:.7rem;font-weight:700;color:#64748b}
 @page pdh{size:A4 portrait;margin:0}
 @media print{
-  body.cetak-pdh .pdh-flow{width:100%!important;box-shadow:none!important}
-  body.cetak-pdh .pdh-sp{height:12mm}
-  body.cetak-pdh .pdh-page{padding:0 15mm!important;break-after:auto!important;page-break-after:auto!important}
-  body.cetak-pdh .pdh-r2{break-before:page;page-break-before:always}
-  body.cetak-pdh .pdh-r2>td{border-top:0}
-  body.cetak-pdh .pdh-sec{break-after:avoid;page-break-after:avoid}
-  body.cetak-pdh .pdh-p{break-after:avoid;page-break-after:avoid}
-  body.cetak-pdh .pdh-sign{margin-top:3mm}
-  body.cetak-pdh .pdh-t tr,body.cetak-pdh .pdh-b tr,body.cetak-pdh .pdh-sign,body.cetak-pdh .pdh-cat,body.cetak-pdh .pdh-flex,body.cetak-pdh .pdh-p{break-inside:avoid;page-break-inside:avoid}
-  body.cetak-pdh .pdh-b thead{display:table-header-group}
+  body.cetak-pdh{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.cetak-pdh main>*:not(.pdh-section){display:none!important}
+  #app>div:has(.pdh-section){display:block!important;min-height:0!important}
+  body.cetak-pdh .pdh-section{display:block!important;page:pdh;padding:0!important;margin:0!important;max-width:none!important}
+  body.cetak-pdh .pdh-ctl,body.cetak-pdh .pdh-lbl,body.cetak-pdh .pdh-act{display:none!important}
+  body.cetak-pdh .pdh-scroll{overflow:visible!important;padding:0!important;background:none!important;border-radius:0!important}
+  body.cetak-pdh .pdh-stack{zoom:1!important;width:210mm!important;margin:0!important}
+  body.cetak-pdh .pdh-page{margin:0!important;box-shadow:none!important;break-after:page;page-break-after:always;break-inside:avoid}
+  body.cetak-pdh .pdh-page:last-child{break-after:auto;page-break-after:auto}
 }
 </style>
 
@@ -2016,7 +2016,7 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
     <!-- Formulir Siswa Pindahan (cetak; tidak menyimpan data) -->
     <section v-if="view==='mutasi'&&showPD" class="pdh-section">
       <div class="pdh-ctl noprint">
-        <div class="pdh-top"><div><h2 class="h2">Formulir Siswa Pindahan</h2><p class="desk">Pilih sumber data agar terisi otomatis, lengkapi seperlunya, lalu simpan atau cetak. Kolom kosong dicetak sebagai titik-titik untuk diisi tangan.</p></div><button type="button" class="btn-o" @click="showPD=false">← Kembali</button></div>
+        <div class="pdh-top"><div><h2 class="h2">Formulir Siswa Pindahan</h2><p class="desk">Pilih catatan mutasi atau siswa agar data terisi otomatis, lengkapi seperlunya, periksa pratinjau A4 di bawah, lalu cetak. Kolom kosong dicetak sebagai titik-titik untuk diisi tangan.</p></div><button type="button" class="btn-o" @click="showPD=false">← Kembali</button></div>
         <div class="pdh-card"><div class="pdh-ct"><span class="pdh-n">1</span>Jenis formulir &amp; sumber data</div>
           <div class="pdh-seg" role="group" aria-label="Jenis formulir"><button type="button" :class="{on:pdMasuk}" :aria-pressed="pdMasuk" @click="pfm.jenis='Pindah Masuk'">Pindah Masuk<small>Siswa baru pindahan ke sekolah ini</small></button><button type="button" :class="{on:!pdMasuk}" :aria-pressed="!pdMasuk" @click="pfm.jenis='Pindah Keluar'">Pindah Keluar<small>Siswa pindah ke sekolah lain</small></button></div>
           <div class="pdh-grid">
@@ -2026,37 +2026,43 @@ window.__splashHide=function(){if(s.__h)return;s.__h=1;clearTimeout(a);clearTime
             <label class="lb">Tanggal formulir<input type="date" v-model="pfm.tgl" class="inp w-full mt-1"></label>
             <label class="lb">Tahun ajaran<input v-model.trim="pfm.tahunAjaran" :placeholder="'Otomatis: '+pdTahunAuto" class="inp w-full mt-1"></label>
           </div></div>
-        <div class="pdh-card"><div class="pdh-ct"><span class="pdh-n">2</span>Lengkapi data<span class="pdh-prog">{{pdIsi}} dari {{pdTotal}} kolom terisi</span></div><div class="pdh-bar" aria-hidden="true"><i :style="{width:pdPersen+'%'}"></i></div>
-          <details v-for="(g,gi) in PD_F" :key="g.t" class="pdh-det" :open="gi===0"><summary>{{g.t}}</summary><div class="pdh-grid"><label v-for="f in g.f" :key="f[0]" class="lb">{{f[1]}}<span v-if="f[0]==='nama'" class="mu-req">wajib</span><input v-model.trim="pfm[f[0]]" :type="f[2]||'text'" :list="f[0]==='kelasTujuan'?'pdh-kelas':null" class="inp w-full mt-1"></label></div></details></div>
+        <div class="pdh-card"><div class="pdh-ct"><span class="pdh-n">2</span>Lengkapi data<span class="pdh-prog">{{pdIsi}} dari {{pdTotal}} kolom terisi</span></div><div class="pdh-bar" aria-hidden="true"><i :style="{width:pdPersen+'%'}"></i></div><p class="pdh-hint">Tidak perlu mengisi semuanya: bagian yang dikosongkan akan dicetak sebagai garis titik-titik. Pratinjau kertas ada di bawah dan ikut berubah saat Anda mengetik.</p>
+          <details v-for="(g,gi) in PD_F" :key="g.t" class="pdh-det" :open="gi===0"><summary>{{g.t}}<small>{{g.f.filter(f=>String(pfm[f[0]]||'').trim()).length}}/{{g.f.length}} terisi</small></summary><div class="pdh-grid"><label v-for="f in g.f" :key="f[0]" class="lb" :class="{'pdh-wide':pdWide.has(f[0])}">{{f[1]}}<span v-if="f[0]==='nama'" class="mu-req">wajib</span><select v-if="f[0]==='gender'" v-model="pfm.gender" class="inp w-full mt-1"><option value="">— pilih —</option><option value="L">Laki-laki</option><option value="P">Perempuan</option><option v-if="pfm.gender&&pfm.gender!=='L'&&pfm.gender!=='P'" :value="pfm.gender">{{pfm.gender}}</option></select><textarea v-else-if="pdWide.has(f[0])" v-model.trim="pfm[f[0]]" rows="2" class="inp w-full mt-1" style="height:auto;padding:.55rem .85rem"></textarea><input v-else v-model.trim="pfm[f[0]]" :type="f[2]||'text'" :inputmode="pdNum.has(f[0])?'numeric':null" :list="f[0]==='kelasTujuan'?'pdh-kelas':null" class="inp w-full mt-1"></label></div></details></div>
         <datalist id="pdh-kelas"><option v-for="k in kelasAll" :key="k.kelas" :value="k.kelas"></option></datalist>
         <div class="pdh-card"><div class="pdh-ct"><span class="pdh-n">3</span>Arsip formulir</div><details class="pdh-det"><summary>Formulir tersimpan ({{pdRiwayat.length}})</summary><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-left"><tr><th class="p-2">Tanggal</th><th class="p-2">Nama</th><th class="p-2">Jenis</th><th class="p-2">Kelas tujuan</th><th class="p-2">Aksi</th></tr></thead><tbody><tr v-for="r in pdRiwayat" :key="r.id" class="border-t"><td class="p-2 whitespace-nowrap">{{r.tanggal}}</td><td class="p-2">{{r.nama}}<div class="text-xs text-slate-500">NISN {{r.nisn||'-'}}</div></td><td class="p-2">{{r.jenis}}</td><td class="p-2">{{r.kelasTujuan||'-'}}</td><td class="p-2 whitespace-nowrap"><button type="button" class="text-blue-800 font-bold mr-3" @click="bukaTersimpanPD(r)">Buka</button><button v-if="!roKep" type="button" class="text-rose-600 font-bold" @click="hapusPD(r)">Hapus</button></td></tr><tr v-if="!pdRiwayat.length"><td colspan="5" class="p-3 text-slate-500">Belum ada formulir tersimpan.</td></tr></tbody></table></div></details></div>
       </div>
-      <div class="pdh-scroll"><table class="pdh-flow"><thead><tr><td class="pdh-sp"></td></tr></thead><tfoot><tr><td class="pdh-sp"></td></tr></tfoot><tbody><tr class="pdh-r1"><td><div class="pdh-page">
+      <div class="pdh-scroll"><div class="pdh-stack">
+        <div class="pdh-lbl noprint"><b>Halaman 1 dari 2</b><span>Identitas · Orang tua/wali · Sekolah</span></div>
+        <article class="pdh-page"><div class="pdh-body"><div class="pdh-fit">
           <kop v-if="cfg.kop" :k="cfg.kop"></kop>
-          <h1 class="pdh-h1">{{pdJudul}}</h1>
-          <p class="pdh-sub">Tahun ajaran <b>{{pdTA}}</b> &nbsp;·&nbsp; Semester <b>{{pdSemester}}</b> &nbsp;·&nbsp; No. registrasi <b>{{pfm.noReg||'....................'}}</b></p>
-          <p class="pdh-pet">Isilah dengan huruf cetak yang jelas dan lampirkan berkas pada bagian E. Kolom yang tidak berlaku diisi tanda strip (–).</p>
-          <div class="pdh-sec">A. IDENTITAS PESERTA DIDIK</div>
-          <div class="pdh-flex"><table class="pdh-t"><tbody><tr v-for="r in pdA" :key="r[0]"><td class="l">{{r[0]}}</td><td class="c">:</td><td class="v">{{r[1]}}</td></tr></tbody></table><div class="pdh-foto">Pas foto<br>3 × 4 cm</div></div>
-          <div class="pdh-sec">B. DATA ORANG TUA / WALI</div>
-          <table class="pdh-t"><tbody><tr v-for="r in pdB" :key="r[0]"><td class="l">{{r[0]}}</td><td class="c">:</td><td class="v">{{r[1]}}</td></tr></tbody></table>
-          <div class="pdh-sec">C. {{pdMasuk?'SEKOLAH ASAL':'SEKOLAH TUJUAN'}}</div>
-          <table class="pdh-t"><tbody><tr v-for="r in pdC" :key="r[0]"><td class="l">{{r[0]}}</td><td class="c">:</td><td class="v" :class="{tall:r[0]==='Alasan pindah'}">{{r[1]}}</td></tr></tbody></table>
-        <p class="pdh-mini pdh-mini-b"><span>{{SEKOLAH_PD}}</span><span>Halaman 1 dari 2</span></p></div></td></tr><tr class="pdh-r2"><td><div class="pdh-page">
-          <p class="pdh-mini"><span>{{pdJudul}} · {{pfm.nama||'................................'}}</span><span>Halaman 2 dari 2</span></p>
-          <div class="pdh-sec">D. {{pdMasuk?'PENEMPATAN DI '+SEKOLAH_PD.toUpperCase():'KETERANGAN KEPINDAHAN'}}</div>
-          <table class="pdh-t"><tbody><tr v-for="r in pdD" :key="r[0]"><td class="l">{{r[0]}}</td><td class="c">:</td><td class="v">{{r[1]}}</td></tr></tbody></table>
-          <div class="pdh-sec">E. KELENGKAPAN BERKAS</div>
-          <table class="pdh-b"><thead><tr><th style="width:8mm">No</th><th>Jenis berkas</th><th style="width:15mm">Ada</th><th style="width:15mm">Tidak</th><th style="width:34mm">Keterangan</th></tr></thead><tbody><tr v-for="(b,i) in pdBerkas" :key="b"><td>{{i+1}}</td><td class="t">{{b}}</td><td><span class="bx"></span></td><td><span class="bx"></span></td><td></td></tr></tbody></table>
-          <p class="pdh-cek">Kelengkapan berkas: <span class="bx"></span> Lengkap &nbsp;&nbsp; <span class="bx"></span> Belum lengkap, dilengkapi paling lambat ......................................</p>
-          <div class="pdh-sec">F. PERNYATAAN ORANG TUA / WALI</div>
-          <p class="pdh-p">Yang bertanda tangan di bawah ini, orang tua/wali peserta didik tersebut di atas, menyatakan bahwa seluruh data dalam formulir ini adalah benar, {{pdMasuk?'bersedia menaati tata tertib '+SEKOLAH_PD+', serta melengkapi berkas administrasi yang dipersyaratkan.':'mengajukan permohonan pindah sekolah atas kehendak sendiri, serta telah menyelesaikan kewajiban administrasi di '+SEKOLAH_PD+'.'}} Apabila di kemudian hari ditemukan data yang tidak benar, saya bersedia menerima konsekuensi sesuai ketentuan yang berlaku.</p>
-          <div class="pdh-sign"><div><br>Peserta didik,<div class="sp"></div><b>{{pfm.nama||'..........................'}}</b></div><div>{{(cfg.ttd&&cfg.ttd.kota)||'Garut'}}, {{pdTgl}}<br>Orang tua / wali,<div class="sp"></div><b>{{pfm.namaWali||pfm.namaAyah||pfm.namaIbu||'..........................'}}</b></div></div>
-          <div class="pdh-sec">G. CATATAN &amp; PERSETUJUAN SEKOLAH</div>
-          <p class="pdh-cek">Keputusan sekolah: <span class="bx"></span> {{pdMasuk?'Diterima':'Disetujui'}} &nbsp;&nbsp; <span class="bx"></span> {{pdMasuk?'Belum dapat diterima':'Belum dapat disetujui'}} &nbsp;&nbsp; <span class="bx"></span> Ditangguhkan</p>
-          <div class="pdh-cat"><span>Catatan petugas tata usaha:</span><i></i><i></i></div>
-          <div class="pdh-sign"><div><br>Petugas Tata Usaha,<div class="sp"></div><b>{{(user&&user.nama)||'..........................'}}</b></div><div>Mengetahui,<br>{{(cfg.ttd&&cfg.ttd.jabatan)||'Kepala Sekolah'}}<div class="sp"></div><b>{{(cfg.ttd&&cfg.ttd.nama)||'..........................'}}</b><br><span v-if="cfg.ttd&&cfg.ttd.nip">NUPTK. {{cfg.ttd.nip}}</span></div></div></div></td></tr></tbody></table>
-      </div>
+          <header class="pf-title"><h1>{{pdJudul}}</h1><p>Tahun ajaran <b>{{pdTA}}</b><i></i>Semester <b>{{pdSemester}}</b><i></i>No. registrasi <b>{{pfm.noReg||'....................'}}</b></p></header>
+          <p class="pf-note">Isilah dengan huruf cetak yang jelas dan lampirkan berkas pada bagian E. Kolom yang tidak berlaku diisi tanda strip (–).</p>
+          <section class="pf-sec"><h2><span>A</span>Identitas Peserta Didik</h2>
+            <div class="pf-with-foto"><table class="pf-t"><tbody><tr v-for="r in pdA" :key="r[0]"><td class="l">{{r[0]}}</td><td class="c">:</td><td class="v">{{r[1]}}</td></tr></tbody></table><div class="pf-foto">Pas foto<br>3 × 4 cm</div></div></section>
+          <section class="pf-sec"><h2><span>B</span>Data Orang Tua / Wali</h2>
+            <table class="pf-t"><tbody><tr v-for="r in pdB" :key="r[0]"><td class="l">{{r[0]}}</td><td class="c">:</td><td class="v">{{r[1]}}</td></tr></tbody></table></section>
+          <section class="pf-sec"><h2><span>C</span>{{pdMasuk?'Sekolah Asal':'Sekolah Tujuan'}}</h2>
+            <table class="pf-t"><tbody><tr v-for="r in pdC" :key="r[0]"><td class="l">{{r[0]}}</td><td class="c">:</td><td class="v" :class="{tall:r[0]==='Alasan pindah'}">{{r[1]}}</td></tr></tbody></table></section>
+        </div></div>
+        <footer class="pdh-foot"><span>{{SEKOLAH_PD}}</span><span>Halaman 1 dari 2</span></footer></article>
+        <div class="pdh-lbl noprint"><b>Halaman 2 dari 2</b><span>Penempatan · Berkas · Pernyataan · Persetujuan</span></div>
+        <article class="pdh-page"><div class="pdh-body"><div class="pdh-fit">
+          <div class="pf-run"><span>{{pdJudul}}</span><span>{{pfm.nama||'................................'}}</span></div>
+          <section class="pf-sec"><h2><span>D</span>{{pdMasuk?'Penempatan di '+SEKOLAH_PD:'Keterangan Kepindahan'}}</h2>
+            <table class="pf-t"><tbody><tr v-for="r in pdD" :key="r[0]"><td class="l">{{r[0]}}</td><td class="c">:</td><td class="v">{{r[1]}}</td></tr></tbody></table></section>
+          <section class="pf-sec"><h2><span>E</span>Kelengkapan Berkas</h2>
+            <table class="pf-b"><thead><tr><th style="width:9mm">No</th><th>Jenis berkas</th><th style="width:15mm">Ada</th><th style="width:15mm">Tidak</th><th style="width:36mm">Keterangan</th></tr></thead><tbody><tr v-for="(b,i) in pdBerkas" :key="b"><td>{{i+1}}</td><td class="t">{{b}}</td><td><span class="bx"></span></td><td><span class="bx"></span></td><td></td></tr></tbody></table>
+            <p class="pf-cek">Kelengkapan berkas: <span class="bx"></span> Lengkap &nbsp;&nbsp; <span class="bx"></span> Belum lengkap, dilengkapi paling lambat ......................................</p></section>
+          <section class="pf-sec"><h2><span>F</span>Pernyataan Orang Tua / Wali</h2>
+            <p class="pf-p">Yang bertanda tangan di bawah ini, orang tua/wali peserta didik tersebut di atas, menyatakan bahwa seluruh data dalam formulir ini adalah benar, {{pdMasuk?'bersedia menaati tata tertib '+SEKOLAH_PD+', serta melengkapi berkas administrasi yang dipersyaratkan.':'mengajukan permohonan pindah sekolah atas kehendak sendiri, serta telah menyelesaikan kewajiban administrasi di '+SEKOLAH_PD+'.'}} Apabila di kemudian hari ditemukan data yang tidak benar, saya bersedia menerima konsekuensi sesuai ketentuan yang berlaku.</p>
+            <div class="pf-sign"><div>&nbsp;<br>Peserta didik,<div class="sp"></div><b>{{pfm.nama||'..........................'}}</b></div><div>{{(cfg.ttd&&cfg.ttd.kota)||'Garut'}}, {{pdTgl}}<br>Orang tua / wali,<div class="sp"></div><b>{{pfm.namaWali||pfm.namaAyah||pfm.namaIbu||'..........................'}}</b></div></div></section>
+          <section class="pf-sec"><h2><span>G</span>Catatan &amp; Persetujuan Sekolah</h2>
+            <p class="pf-cek" style="margin-top:0">Keputusan sekolah: <span class="bx"></span> {{pdMasuk?'Diterima':'Disetujui'}} &nbsp;&nbsp; <span class="bx"></span> {{pdMasuk?'Belum dapat diterima':'Belum dapat disetujui'}} &nbsp;&nbsp; <span class="bx"></span> Ditangguhkan</p>
+            <div class="pf-cat"><span>Catatan petugas tata usaha:</span><i></i><i></i></div>
+            <div class="pf-sign"><div>&nbsp;<br>Petugas Tata Usaha,<div class="sp"></div><b>{{(user&&user.nama)||'..........................'}}</b></div><div>Mengetahui,<br>{{(cfg.ttd&&cfg.ttd.jabatan)||'Kepala Sekolah'}}<div class="sp"></div><b>{{(cfg.ttd&&cfg.ttd.nama)||'..........................'}}</b><br><span v-if="cfg.ttd&&cfg.ttd.nip">NUPTK. {{cfg.ttd.nip}}</span></div></div></section>
+        </div></div>
+        <footer class="pdh-foot"><span>{{SEKOLAH_PD}}</span><span>Halaman 2 dari 2</span></footer></article>
+      </div></div>
       <div class="pdh-act noprint"><span class="pdh-act-i">{{pfm.nama||'Formulir belum diisi'}}<small>{{pdIsi}}/{{pdTotal}} kolom terisi</small></span><button type="button" class="btn-o" @click="resetPD">Kosongkan</button><button v-if="!roKep" type="button" class="btn-o" @click="simpanPD">{{pfm.id?'Perbarui formulir':'Simpan formulir'}}</button><button type="button" class="btn-p" @click="cetakPD">Cetak formulir</button></div>
     </section>
 
@@ -7017,7 +7023,14 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
     const bukaTersimpanPD=r=>{Object.assign(pfm,PD_KOSONG(),r,{id:r.id,tgl:r.tanggal||hari0,muId:r.mutasiId||'',nis:r.nis||'',nisLokal:r.nis||''});toTop();};
     const hapusPD=r=>cfmRun('Hapus formulir pindahan tersimpan ini?',async()=>{await api('formulirPindahanDelete',{id:r.id});if(pfm.id===r.id)pfm.id='';await muatPD();});
     const bukaPD=()=>{err.value='';resetPD();pfm.muId='';showPD.value=true;toTop();muatPD();api('pengaturanGet').then(c=>{if(c)cfg.value=c;}).catch(()=>{});};
-    const cetakPD=()=>{const bersih=()=>{document.body.classList.remove('cetak-pdh');const e=document.getElementById('pdh-page-style');if(e)e.remove();window.removeEventListener('afterprint',bersih);};bersih();const ps=document.createElement('style');ps.id='pdh-page-style';ps.textContent='@page{size:A4 portrait;size:210mm 297mm;margin:0}@page pdh{size:210mm 297mm;margin:0}';document.body.appendChild(ps);document.body.classList.add('cetak-pdh');window.addEventListener('afterprint',bersih,{once:true});Vue.nextTick(()=>setTimeout(async()=>{await tungguGambarKop(document.querySelector('.pdh-section'),6000);try{window.print();}catch(e){bersih();}finally{setTimeout(bersih,1500);}},150));};
+    const cetakPD=()=>{const bersih=()=>{document.body.classList.remove('cetak-pdh');const e=document.getElementById('pdh-page-style');if(e)e.remove();window.removeEventListener('afterprint',bersih);};bersih();const ps=document.createElement('style');ps.id='pdh-page-style';ps.textContent='@page{size:A4 portrait;size:210mm 297mm;margin:0}@page pdh{size:210mm 297mm;margin:0}';document.body.appendChild(ps);document.body.classList.add('cetak-pdh');window.addEventListener('afterprint',bersih,{once:true});Vue.nextTick(()=>setTimeout(async()=>{await tungguGambarKop(document.querySelector('.pdh-section'),6000);fitPD();try{window.print();}catch(e){bersih();}finally{setTimeout(bersih,1500);}},150));};
+    const pdNum=new Set(['nisn','nisLokal','nik','telepon','teleponOrtu','anakKe','sekolahNpsn']), pdWide=new Set(['alamat','alamatOrtu','sekolahAlamat','alasan']);
+    const fitPD=()=>{document.querySelectorAll('.pdh-page').forEach(p=>{const b=p.querySelector('.pdh-body'),f=p.querySelector('.pdh-fit');if(!b||!f)return;f.style.zoom='';const av=b.clientHeight,need=f.scrollHeight;if(av>0&&need>av)f.style.zoom=Math.max(.72,av/need*.98).toFixed(3);});};
+    const zoomPD=()=>{const sc=document.querySelector('.pdh-scroll'),st=document.querySelector('.pdh-stack');if(!sc||!st)return;const w=sc.clientWidth-32,pw=210*96/25.4;st.style.zoom=w<pw?Math.max(.3,w/pw).toFixed(3):'';};
+    const refreshPD=()=>Vue.nextTick(()=>{zoomPD();fitPD();});
+    Vue.watch(pfm,refreshPD);
+    Vue.watch(showPD,v=>{if(v){[60,700,2000].forEach(t=>setTimeout(refreshPD,t));}});
+    window.addEventListener('resize',()=>{if(showPD.value)refreshPD();});
     const resetCetakSurat=()=>Object.assign(cs,{jenis:'Surat Keterangan Aktif',nomor:'',tanggal:hari0,kepada:'',perihal:'',isi:'',namaTtd:'',nipTtd:''});
     const printSurat=()=>{if(!cs.isi.trim())return err.value='Isi surat wajib diisi';Vue.nextTick(()=>window.print());};
     const ag = reactive({ tipe: 'semua', kegiatan: '', tanggal: hari0, waktu: '', tempat: '', extra: 0, daftarStaf: '' });
@@ -7103,7 +7116,7 @@ const labelNisn = (nis, langsung) => { const key = String(nis == null ? '' : nis
       }
     }
     return { agJabatan, agStafData, roKep, MON_VIEWS, petugasDari, pk, pkData, loadPekerjaanStaf, PK_MOD, pkRingkas, pkTotal, pkAktivitas, roleGroups, predRata, namaRapi, bioRapi, biRapi, pt, cekPT, ptTanggal, ptIsi, bulat, coverKem, bkMeta, bkRingkas, SEK_FIELD, sek, siapCover, coverNis, coverIdentitas, coverList, coverLogo, sekBaris, biodataUntuk, tanggalBiodata, cetakCover, cetakPaketRapor, muatSekolah, simpanSekolah, katBK, autoKatBK, dlg, dlgInput, dlgCocok, dlgOk, dlgBatal, raporCetakDialog, batalCetakRapor, lanjutCetakRapor, pkl, pq, showPk, jp, jlist, pf2, jf2, nl, pklTampil, editPkl, savePkl, delPkl, bukaJurPkl, ubahJurPkl, saveJurPkl, putusJur, saveNilaiPkl, exportPkl, ta, rw, rwSel, rwq, rwLabel, alumni, aq, ll, alumniTampil, saveTa, loadRw, arsipRw, lulusKelas, exportRw, exportAlumni, kunci, saveKunci, logs, lq, logTampil, aksiLbl, pairKunci, remedial, rpPil, rpKelas, rp, rpF, rpInfo, rpMeta, rpTab, rpTabs, bkRapor, bkKelas, bkRaporBusy, pilihKelasBK, simpanSemuaRaporBK, editRaporBK, batalEditRaporBK, simpanEditRaporBK, hapusRaporBK, nilaiSubTab, nilaiRiwayatKelasDipilih, nilaiRiwayatSem, nilaiRiwayatTahun, nilaiRiwayatTpDipilih, nilaiRiwayatTPOptions, riwayatPenilaianTampil, riwayatNilaiAuditTampil, nilaiArsipTampil, nilaiRiwayatKelas, bukaRiwayatNilai, riwayatPenilaian, riwayatNilaiAudit, nilaiArsip, loadRiwayatPenilaian, editRiwayatPenilaian, hapusRiwayatPenilaian, rpList, rpGrup, rpGuruStat, rpGuruDiag, siapCetak, rkp, rkpIdx, rkpPer, rkpSumber, rkpSumberNis, rkpSumberTampil, loadSumberRapor, simpanSumberRapor, rcf, rnaik, rnaikTxt, bolehEditR, rpPeran, rpFinal, rpCek, rpBisaPaksa, periksaRapor, finalkanRapor, bukaFinalRapor, tglRapor, tglPendekR, nv, rataKolom, rataKkm, ketRata, barisR, loadRapor, loadRaporTunda, gantiTabR, simpanRapor, terapkanRek, cetakRapor, loadRekap, loadRc, simpanRc, loadNaik, prosesNaik, mnav, openMenuGroup, GROUP_ICON, nextSkor, canEdit, ROLE_LBL, ROLE_CLS, API_URL, izlist, iz, saveIzin, putusIzin, agenda, showAg, af, bukaAg, saveAg, delAg, JENIS, ak, saveAk, kkmOf, resetLabel, bk2, backupNow, waLink, caps, pilihRole, capsCek, cg, cgf, cglist, cgTampil, saveCatatan, delCatatan, belumBaca, peng, showPg, pf, kartu, canPost, bukaPeng, savePeng, delPeng, cetakKartu, bukaJurnal, editJurnal, pilihNis, showP, kelasTujuan, semuaDipilih, pilihSemua, bukaPindah, doPindah, presensiCepat, exportLeger, exportRekap, showK, editKelas, ICON, skelas, sq, siswaTampil, biodataDasarLengkap, labelNisn, exportSiswa, templateSiswa, imp, impCount, pickFile, doImport, bimp, bimpCount, templateBiodata, pickBiodata, doImportBiodata, downloadCreds, loginRole, showPw, srv, srvMsg, roles, roleInfo, cekServer, acc, heroCls, sub, quick, clock, LOGO, user, view, dash, biRows, biReqs, biQ, biKelas, biTerpilih, biShowForm, biForm, biFields, biCatatan, biRiwayat, biRiwayatLoading, biRiwayatError, biMapel, biKelasOptions, biTampil, muatBukuInduk, biNuptkPetugas, biBukaDetail, biBukaAjukan, biAjukan, biProses, windowPrintSafe, biCetakSatu, biEkspor, kelasList, kelas, tanggal, rows, riwayat, f, pw, err, ok, busy, badge, sc, lbl, tgl, menu, menuGroups, login, logout, go, loadPresensi, savePresensi, ganti,
-      suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, mutasiTampil, mutasiRingkasan, biTab, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, tuMUStatusAwal, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, editMutasi, saveMutasi, delMutasi, showPD, pfm, PD_F, SEKOLAH_PD, pdMasuk, pdJudul, pdTgl, pdA, pdB, pdC, pdD, pdBerkas, resetPD, pilihSiswaPD, pilihMutasiPD, bukaPD, cetakPD, pdTA, pdTahunAuto, pdSemester, muJenisInfo, muStatusInfo, muLabelTujuan, pdRiwayat, pdIsi, pdTotal, pdPersen, muCari, siswaMu, muSiswa, simpanPD, bukaTersimpanPD, hapusPD, resetCetakSurat, printSurat, srmStatus, srkStatus, suratMasukTampil, suratMasukRingkasan, suratKeluarTampil, suratKeluarRingkasan, fmtTglRingkas, fmtTglSurat, srUrl, csBaris, csTab,
+      suratMasuk, suratKeluar, disposisi, arsip, layanan, mutasi, mutasiTampil, mutasiRingkasan, biTab, rekapAdmin, tuSM, tuSK, tuDP, tuAR, tuLA, tuMU, tuRK, showSM, showSK, showDP, showAR, showLA, showMU, tuSMF, tuSKF, tuDPF, tuARF, tuLAF, tuMUF, tuMUStatusAwal, cs, loadSuratMasuk, loadSuratKeluar, loadDisposisi, loadArsip, loadLayanan, loadMutasi, loadRekapAdmin, openSuratMasuk, editSuratMasuk, saveSuratMasuk, delSuratMasuk, openSuratKeluar, editSuratKeluar, saveSuratKeluar, delSuratKeluar, openDisposisi, editDisposisi, pilihSuratDisposisi, saveDisposisi, delDisposisi, openArsip, editArsip, saveArsip, delArsip, openLayanan, editLayanan, saveLayanan, delLayanan, openMutasi, editMutasi, saveMutasi, delMutasi, showPD, pfm, PD_F, SEKOLAH_PD, pdMasuk, pdJudul, pdTgl, pdA, pdB, pdC, pdD, pdBerkas, resetPD, pilihSiswaPD, pilihMutasiPD, bukaPD, cetakPD, pdTA, pdTahunAuto, pdSemester, muJenisInfo, muStatusInfo, muLabelTujuan, pdRiwayat, pdIsi, pdTotal, pdPersen, pdNum, pdWide, muCari, siswaMu, muSiswa, simpanPD, bukaTersimpanPD, hapusPD, resetCetakSurat, printSurat, srmStatus, srkStatus, suratMasukTampil, suratMasukRingkasan, suratKeluarTampil, suratKeluarRingkasan, fmtTglRingkas, fmtTglSurat, srUrl, csBaris, csTab,
       siswa, showS, kelasAll, jadwal, guru, pil, pilIdx, nrows, nilaiSaya, hasilSaya, sf, kf, jf, nm, hariList,
       jurnal, bimb, bulan, q, showJ, showB, bk, bsiswa, jr, bf, loadJurnal, loadBimb, printPage, saveJurnal, delJurnal, openB, pickKelasB, saveBimb, delBimb,
       rk, COL, txc, segs, hari0, canInput, canJadwal, canWrite, fmtTgl, fmtBln, ST, ST5, ptab, ptabs, setTab, pilih, pi, pr, prRes, pd, pg, pgRes, prw, prwRes, mapelOf, pickKelas, ringkasInput, loadSesi, loadDetail, loadGrafik, loadRiwayat, editSesi, delSesi, donut, bars, ln, canKoreksi, stT, koreksiKunci, kbf, korList, fetchKorList, loadKoreksi, kfDirty, saveKoreksi, cabutKoreksi, koreksiSesi, bukaKorSesi, rkKorList, rkKor,
